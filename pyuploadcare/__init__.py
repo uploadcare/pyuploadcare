@@ -53,7 +53,9 @@ def tests():
 
 
 def keep(file_id):
-    """Tells UploadCare to keep the file"""
+    """Tells UploadCare to keep the file
+
+    Returns a dict with the information about the file"""
     return make_request('POST', '/api/files/%s/' % file_id, {'keep': 1})
 
 
