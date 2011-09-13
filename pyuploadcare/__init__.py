@@ -2,63 +2,83 @@ import httplib
 import email.utils
 import hashlib
 import hmac
+import urlparse
+import re
 
-from django.utils import simplejson as json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
-UPLOADCARE_PUB_KEY = 'kfahdkfahfskagufdlfuga'
-UPLOADCARE_SECRET = 'd89syw4i8gofwdf8wye393dw'
+from .file import File
 
+uuid_regex = re.compile(r'[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}')
 
-def make_request(verb, uri, data=None):    
-    content = ''
     
-    if data:
-        content = json.dumps(data)
+class UploadCare(object):
+    def __init__(self, pub_key, secret, timeout=5, api_base="http://api.uploadcare.com/"):
+        self.pub_key = pub_key
+        self.secret = secret
+        self.timeout = timeout
+
+        self.api_base = api_base
+
+        parts = urlparse.urlsplit(api_base)
+
+        self.host = parts.hostname
+        self.port = parts.port
+        self.path = parts.path
+
+    def file(self, file_serialized):
+        m = uuid_regex.search(file_serialized)
+
+        if not m:
+            raise ValueError("Couldn't find UUID")
+
+        f = File(m.group(0), self)
+
+        if file_serialized.startswith('http'):
+            f._cached_url = file_serialized
         
-    content_type = 'application/json'
-    content_md5 = hashlib.md5(content).hexdigest()
-    date = email.utils.formatdate(usegmt=True)
+        return f
 
-    sign_string = '\n'.join([verb,
-                             content_md5,
-                             content_type,
-                             date,
-                             uri])
 
-    print sign_string
 
-    sign = hmac.new(str(UPLOADCARE_SECRET),
-                    sign_string,
-                    hashlib.sha1).hexdigest()
+    def make_request(self, verb, uri, data=None):    
+        parts = [''] + filter(None, self.path.split('/') + uri.split('/')) + ['']
+        uri = '/'.join(parts)
+
+        content = ''
     
-    headers = {
-        'Authentication': 'UploadCare %s:%s' % (UPLOADCARE_PUB_KEY, sign),
-        'Date': date,
-        'Content-Type': content_type
-        }
+        if data:
+            content = json.dumps(data)
+        
+        content_type = 'application/json'
+        content_md5 = hashlib.md5(content).hexdigest()
+        date = email.utils.formatdate(usegmt=True)
 
-    con = httplib.HTTPConnection('0.0.0.0', 8000, timeout=1)
-    con.set_debuglevel(1)
+        sign_string = '\n'.join([verb,
+                                 content_md5,
+                                 content_type,
+                                 date,
+                                 uri])
 
-    resp = con.request(verb, uri, content, headers)
-    
-    return json.load(con.getresponse())
+        sign = hmac.new(str(self.secret),
+                        sign_string,
+                        hashlib.sha1).hexdigest()
+        
+        headers = {
+            'Authentication': 'UploadCare %s:%s' % (self.pub_key, sign),
+            'Date': date,
+            'Content-Type': content_type
+            }
 
-    
+        con = httplib.HTTPConnection(self.host, self.port, timeout=self.timeout)
+        con.request(verb, uri, content, headers)
 
-def tests():
-    print make_request('GET', '/api/files/FILECARE_6/')
-    print make_request('POST', '/api/files/FILECARE_5/', {'keep': 0})
-    print make_request('GET', '/api/files/')
+        response = con.getresponse().read()
+        print response
 
-
-def keep(file_id):
-    """Tells UploadCare to keep the file
-
-    Returns a dict with the information about the file"""
-    return make_request('POST', '/api/files/%s/' % file_id, {'keep': 1})
+        return json.loads(response)
 
 
-
-if __name__ == '__main__':
-    tests()
