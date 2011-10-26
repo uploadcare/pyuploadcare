@@ -1,3 +1,4 @@
+import time
 
 class File(object):
     _info = None
@@ -10,8 +11,14 @@ class File(object):
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
 
-    def keep(self):
+    def keep(self, wait=False):
         self._info = self.ucare.make_request('POST', self.api_uri(), {'keep': 1})
+
+        if wait:
+            while not self.info['on_s3']:
+                self.update_info()
+                time.sleep(0.1)
+
 
     @property
     def info(self):

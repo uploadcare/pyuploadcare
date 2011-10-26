@@ -14,6 +14,9 @@ from .file import File
 
 uuid_regex = re.compile(r'[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}')
 
+class UploadCareException(Exception):
+    pass
+
     
 class UploadCare(object):
     def __init__(self, pub_key, secret, timeout=5, api_base="http://api.uploadcare.com/"):
@@ -76,9 +79,12 @@ class UploadCare(object):
         con = httplib.HTTPConnection(self.host, self.port, timeout=self.timeout)
         con.request(verb, uri, content, headers)
 
-        response = con.getresponse().read()
-        print response
+        response = con.getresponse()
+        data = response.read()
 
-        return json.loads(response)
+        if response.status != 200:
+            raise UploadCareException('Response status is %i. Data: %s' % (response.status, data))
+
+        return json.loads(data)
 
 
