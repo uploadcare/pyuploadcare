@@ -19,6 +19,8 @@ class File(object):
                 self.update_info()
                 time.sleep(0.1)
 
+    def delete(self):
+        self.ucare.make_request('DELETE', self.api_uri())
 
     @property
     def info(self):
