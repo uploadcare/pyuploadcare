@@ -35,6 +35,7 @@ class UploadCare(object):
         self.path = parts.path
 
     def file(self, file_serialized):
+        print 'serialized got: ', file_serialized
         m = uuid_regex.search(file_serialized)
 
         if not m:
@@ -81,8 +82,15 @@ class UploadCare(object):
         con = httplib.HTTPConnection(self.host, self.port, timeout=self.timeout)
         con.request(verb, uri, content, headers)
 
+#        assert False
+
+        print 'sent: ', verb, uri, content
+
         response = con.getresponse()
         data = response.read()
+
+        print 'got: ', response.status, data
+
 
         if response.status == 200: # Ok
             return json.loads(data)

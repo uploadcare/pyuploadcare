@@ -7,3 +7,5 @@ def UploadCare(**kwargs):
     kws.update(kwargs)
 
     return pyuploadcare.UploadCare(**kws)
+
+from pyuploadcare.dj.models import FileField

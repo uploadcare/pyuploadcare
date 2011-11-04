@@ -32,12 +32,6 @@ class File(object):
     def update_info(self):
         self._info = self.ucare.make_request('GET', self.api_uri())
 
-    def url(self):
-        if self._cached_url:
-            return self._cached_url
-
-        return self.info['original_file_url']
-
     def api_uri(self):
         return '/files/%s/' % self.file_id
 
@@ -48,4 +42,13 @@ class File(object):
             return self.url()
 
         return self.file_id
+
+    def url(self):
+        if self._cached_url:
+            return self._cached_url
+
+        return self.info['original_file_url']
+
+    def filename(self):
+        return self.url().split('/')[-1]
 
