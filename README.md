@@ -1,5 +1,15 @@
 # How to use it with Django?
 
+## settings.py
+
+    UPLOADCARE = {
+        'pub_key': '***',
+        'secret': '***'
+    }
+
+
+## models.py
+
     from django.db import models
 
     from pyuploadcare.dj import FileField
