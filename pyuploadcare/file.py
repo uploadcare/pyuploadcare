@@ -1,5 +1,8 @@
 import time
 
+RESIZER_BASE = 'http://services.uploadcare.com/resizer/%(file_id)s/%(cmd_line)s/'
+
+
 class File(object):
     _info = None
     _cached_url = None
@@ -10,6 +13,12 @@ class File(object):
 
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
+
+    def __getattr__(self, name):
+        if name.startswith('resized_'):
+            return self.string_resized(name[8:])
+
+        return super(File, self).__getattr__(name)
 
     def keep(self, wait=False):
         self._info = self.ucare.make_request('POST', self.api_uri(), {'keep': 1})
@@ -51,4 +60,26 @@ class File(object):
 
     def filename(self):
         return self.url().split('/')[-1]
+
+    def resized(self, width=None, height=None, crop=False):
+        dimensions = str(width or '')
+
+        if height:
+            dimensions += 'x%i' % height 
+
+        chunks = [dimensions]
+
+        if crop:
+            chunks.append('crop')
+
+        cmd_line = '/'.join(chunks)
+
+        return RESIZER_BASE % {'file_id': self.file_id, 'cmd_line': cmd_line}
+
+    def string_resized(self, cmd_line):
+        cmd_line = cmd_line.replace('_', '/')
+        
+        return RESIZER_BASE % {'file_id': self.file_id, 'cmd_line': cmd_line}
+
+
 
