@@ -33,8 +33,9 @@ class FileField(models.Field):
         return value.serialize()
 
     def get_db_prep_save(self, value):
-        value.keep()
-        return value.serialize()
+        if value:
+            value.keep()
+            return value.serialize()
 
     def value_to_string(self, obj):
         assert False
