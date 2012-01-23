@@ -10,7 +10,7 @@ UPLOADCARE_LOCAL_JS = 'uploadcare/assets/uploaders/line-widget.%(lang)s.js'
 AVAIL_ASSET_LANG = ('en', 'ru', 'pl')
 
 def get_asset_lang():
-    '''returns a dict with one key: "lang" '''
+    '''returns a localized asset url '''
     lang = get_language()
     if lang.startswith('en'):
         lang = lang[:2]
