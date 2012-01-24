@@ -21,6 +21,13 @@ As soon as you get your API keys, add them to your Django settings file:
         'secret': '***'
     }
 
+If you don't want to use hosted assets (from static.uploadcare.com) you
+must add 'pyuploadcare.dj' to INSTALLED_APPS setting and add 
+
+    PYUPLOADCARE_USE_HOSTED_ASSETS = False
+
+somewhere in the settings file.
+
 You're all set now!
 
 Adding a UploadCare file field to your model is really simple. Like that:
