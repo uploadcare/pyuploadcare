@@ -2,3 +2,4 @@ pyuploadcare.egg-info/
 temp.db
 build/
 dist/
+*.pyc
