@@ -59,6 +59,9 @@ class File(object):
         return self.info['original_file_url']
 
     def filename(self):
+        if not self.url():
+            return ''
+
         return self.url().split('/')[-1]
 
     def resized(self, width=None, height=None, crop=False):

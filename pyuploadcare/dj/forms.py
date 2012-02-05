@@ -2,7 +2,10 @@ from django.forms import Field, TextInput, Media
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, get_language
+
 from pyuploadcare.dj.conf import USE_HOSTED_ASSETS
+from pyuploadcare.dj import UploadCare
+
 
 UPLOADCARE_JS = 'http://static.uploadcare.com/assets/uploaders/line-widget.%(lang)s.js'
 UPLOADCARE_LOCAL_JS = 'uploadcare/assets/uploaders/line-widget.%(lang)s.js'
@@ -33,8 +36,6 @@ class FileWidget(TextInput):
     
 
     def __init__(self, attrs=None):
-        from pyuploadcare.dj import UploadCare
-
         default_attrs = {'role': 'uploadcare-line-uploader',
                          'data-public-key': UploadCare().pub_key,
                          'data-override-style': 'float: left;'}
@@ -48,6 +49,9 @@ class FileWidget(TextInput):
         html = super(FileWidget, self).render(name, value, attrs)
 
         if value:
+            if isinstance(value, basestring):
+                value = UploadCare().file(value)
+
             if value.url():
                 fname = '<a href="%s">%s</a>' % (value.url(), value.filename())
             else:
