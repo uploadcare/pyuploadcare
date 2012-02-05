@@ -26,7 +26,9 @@ must add 'pyuploadcare.dj' to INSTALLED_APPS setting and add
 
     PYUPLOADCARE_USE_HOSTED_ASSETS = False
 
-somewhere in the settings file.
+somewhere in the settings file. (Kudos to [Sławek Ehlert][3] for the feature!)
+
+[3]: https://github.com/slafs
 
 You're all set now!
 
@@ -44,7 +46,7 @@ Adding a UploadCare file field to your model is really simple. Like that:
 
 `FileField` doesn't require any arguments, file paths or whatever. It **just works**. That's the point of it all.
 
-It look nice in the admin interface
+It looks nice in the admin interface
 
 ![Admin page](http://f.cl.ly/items/1v120O3h2W462o3T323F/Screen%20Shot%202011-11-04%20at%202.03.32%20PM.png)
 
