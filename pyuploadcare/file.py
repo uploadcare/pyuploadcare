@@ -1,6 +1,32 @@
 import time
+import urllib
+import logging
+
+logger = logging.getLogger("pyuploadcare")
+
 
 RESIZER_BASE = 'http://services.uploadcare.com/resizer/%(file_id)s/%(cmd_line)s/'
+
+class LazyFile(object):
+    def __init__(self, id, ucare):
+        self.id = id
+        self.ucare = ucare
+
+    def load_data(self):
+        return self.ucare.make_request('GET', '/files/download/%s/' % self.id)
+
+    def wait(self):
+        while True:
+            data = self.load_data()
+            logger.debug('loaded data %s' % data)
+
+            if data['status'] == 'success':
+                return File(data['file_id'], self.ucare)
+
+            if data['status'] not in ('progress', 'unknown'):
+                raise Exception('Invalid task status')
+
+            time.sleep(0.1)
 
 
 class File(object):

@@ -4,13 +4,16 @@ import hashlib
 import hmac
 import urlparse
 import re
+import logging
+
+logger = logging.getLogger("pyuploadcare")
 
 try:
     import json
 except ImportError:
     import simplejson as json
 
-from .file import File
+from .file import File, LazyFile
 
 uuid_regex = re.compile(r'[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}')
 
@@ -35,7 +38,6 @@ class UploadCare(object):
         self.path = parts.path
 
     def file(self, file_serialized):
-        print 'serialized got: ', file_serialized
         m = uuid_regex.search(file_serialized)
 
         if not m:
@@ -48,6 +50,9 @@ class UploadCare(object):
         
         return f
 
+    def file_from_url(self, url):
+        data = self.make_request('POST', '/files/download/', {'source_url': url})
+        return LazyFile(data['id'], self)
 
 
     def make_request(self, verb, uri, data=None):    
@@ -84,13 +89,12 @@ class UploadCare(object):
 
 #        assert False
 
-        print 'sent: ', verb, uri, content
+        logger.debug('sent: %s %s %s' % (verb, uri, content))
 
         response = con.getresponse()
         data = response.read()
 
-        print 'got: ', response.status, data
-
+        logger.debug('got: %s %s' % (response.status, data))
 
         if response.status == 200: # Ok
             return json.loads(data)
@@ -98,7 +102,8 @@ class UploadCare(object):
         if response.status == 204: # No Content
             return
 
-        raise UploadCareException('Response status is %i. Data: %s' % (response.status, data), response=response)
+        raise UploadCareException('Response status is %i. Data: %s' % (response.status, data),
+                response=response)
 
 
 
