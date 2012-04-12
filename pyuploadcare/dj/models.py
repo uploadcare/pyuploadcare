@@ -32,7 +32,7 @@ class FileField(models.Field):
     def get_prep_value(self, value):
         return value.serialize()
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection=None):
         if value:
             value.keep()
             return value.serialize()
