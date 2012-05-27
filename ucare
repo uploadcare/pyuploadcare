@@ -1,0 +1,111 @@
+#!/usr/bin/python
+# encoding: utf-8
+
+import argparse
+import logging
+import pprint
+from os.path import exists
+
+from pyuploadcare import UploadCare, UploadCareException
+
+
+pp = pprint.PrettyPrinter(indent=2)
+logger = logging.getLogger('pyuploadcare')
+
+
+def get_key(name, key=None):
+    """Helper function, reads .name file for key if it is not provided"""
+    if key is None:
+        fname = '.{}'.format(name)
+        if exists(fname):
+            with open(fname, 'rt') as f:
+                key = f.readline().strip()
+        else:
+            print '{key} arg is not provided and .{key} file does not exist'.format(
+                key=name
+            )
+            exit()
+    return key
+
+
+def create_ucare(pub_key=None, secret=None):
+    return UploadCare(
+        pub_key=get_key('pub_key', pub_key),
+        secret=get_key('secret', secret)
+    )
+
+
+def list(args):
+    ucare = create_ucare(args.pub_key, args.secret)
+    pp.pprint(ucare.make_request('GET', '/files/'))
+
+
+def get(args):
+    ucare = create_ucare(args.pub_key, args.secret)
+    pp.pprint(ucare.make_request('GET', args.path))
+
+
+def keep(args):
+    ucare = create_ucare(args.pub_key, args.secret)
+    ucare.make_request('POST', args.path, data={'keep': 1})
+
+
+def delete(args):
+    ucare = create_ucare(args.pub_key, args.secret)
+    try:
+        ucare.make_request('DELETE', args.path)
+    except UploadCareException as e:
+        if e.response.status == 404:
+            print 'nothing to delete'
+
+
+def upload(args):
+    ucare = create_ucare(args.pub_key, args.secret)
+    ucare.file_from_url(args.path)
+
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+
+    # list
+    subparser = subparsers.add_parser('list', help='list all files')
+    subparser.set_defaults(func=list)
+
+    # get
+    subparser = subparsers.add_parser('get', help='get file info')
+    subparser.set_defaults(func=get)
+    subparser.add_argument('path', help='file path')
+
+    # keep
+    subparser = subparsers.add_parser('keep', help='claim keep')
+    subparser.set_defaults(func=keep)
+    subparser.add_argument('path', help='file path')
+
+    # delete
+    subparser = subparsers.add_parser('delete', help='request delete')
+    subparser.set_defaults(func=delete)
+    subparser.add_argument('path', help='file path')
+
+    # upload
+    subparser = subparsers.add_parser('upload', help='upload file from url')
+    subparser.set_defaults(func=upload)
+    subparser.add_argument('url', help='file url')
+
+    # common arguments
+    parser.add_argument('--pub_key',
+                        help='API key, if not set is read from .pub_key file')
+    parser.add_argument('--secret',
+                    help='API secret, if not set is read from .secret file')
+
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = get_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()

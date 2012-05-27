@@ -150,9 +150,7 @@ LOGGING = {
 
 
 UPLOADCARE = {
-    #'pub_key': '3aaee4d571b832736d722396bf541154f14aaa1f50e0199e374ba8edea84efb6',
-    #'secret': 'eea670103077e50b0d22ddc8da92165a04ba20c43274506bdad27b7966199ac2',
     #'api_base': "http://0.0.0.0:8000/api/",
-    'pub_key': 'd07d12ae31b52d365ed3570dd651201f737d673c130c15185d53057e3b903e06',
-    'secret': '6c8986d5861262e3cf231d315555980381891117e8357ac60cc20418fd6bf15b'
+    'pub_key': '--your key here--',
+    'secret': '--your secret here--'
 }
