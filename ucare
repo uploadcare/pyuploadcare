@@ -52,16 +52,12 @@ def keep(args):
 
 def delete(args):
     ucare = create_ucare(args.pub_key, args.secret)
-    try:
-        ucare.make_request('DELETE', args.path)
-    except UploadCareException as e:
-        if e.response.status == 404:
-            print 'nothing to delete'
+    ucare.make_request('DELETE', args.path)
 
 
 def upload(args):
     ucare = create_ucare(args.pub_key, args.secret)
-    ucare.file_from_url(args.path)
+    ucare.make_request('POST', '/files/download/', {'source_url': args.url})
 
 
 def get_args():
@@ -104,7 +100,10 @@ def get_args():
 
 def main():
     args = get_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except UploadCareException as e:
+        print e
 
 
 if __name__ == '__main__':
