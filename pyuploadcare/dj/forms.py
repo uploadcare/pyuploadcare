@@ -1,5 +1,4 @@
-from django.forms import Field, TextInput, Media
-from django.conf import settings
+from django.forms import Field, TextInput
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, get_language
 
@@ -12,8 +11,9 @@ UPLOADCARE_LOCAL_JS = 'uploadcare/assets/uploaders/line-widget.%(lang)s.js'
 
 AVAIL_ASSET_LANG = ('en', 'ru', 'pl')
 
+
 def get_asset_lang():
-    '''returns a localized asset url '''
+    """returns a localized asset url"""
     lang = get_language()
     if lang.startswith('en'):
         lang = lang[:2]
@@ -33,16 +33,15 @@ class FileWidget(TextInput):
 
     class Media:
         js = (get_asset_lang(),)
-    
 
     def __init__(self, attrs=None):
         default_attrs = {'role': 'uploadcare-line-uploader',
                          'data-public-key': UploadCare().pub_key,
                          'data-override-style': 'float: left;'}
-        
-        if attrs:
+
+        if attrs is not None:
             default_attrs.update(attrs)
-            
+
         super(FileWidget, self).__init__(default_attrs)
 
     def render(self, name, value, attrs):
@@ -52,17 +51,17 @@ class FileWidget(TextInput):
             if isinstance(value, basestring):
                 value = UploadCare().file(value)
 
-            if value.url():
-                fname = '<a href="%s">%s</a>' % (value.url(), value.filename())
+            if value.url:
+                fname = '<a href="%s">%s</a>' % (value.url, value.filename)
             else:
-                fname = '%s (%s)' % (value.filename(), _('unavail.'))
+                fname = '%s (%s)' % (value.filename, _('unavail.'))
 
             description = '<p>%s: %s</p>' % (_('File'), fname)
 
             html = mark_safe(html + description)
 
         return html
-    
+
 
 class FileField(Field):
     widget = FileWidget

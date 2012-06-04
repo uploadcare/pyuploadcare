@@ -15,14 +15,17 @@ except ImportError:
 
 from .file import File, LazyFile
 
-uuid_regex = re.compile(r'[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}')
+uuid_regex = re.compile(r'[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}')
+
 
 class UploadCareException(Exception):
-    def __init__(self, message, response=None):
+    def __init__(self, response, data):
+        message = 'Response status is %i. Data: %s' % (response.status, data)
         super(UploadCareException, self).__init__(message)
         self.response = response
+        self.data = data
 
-    
+
 class UploadCare(object):
     def __init__(self, pub_key, secret, timeout=5, api_base="http://api.uploadcare.com/"):
         self.pub_key = pub_key
@@ -47,23 +50,22 @@ class UploadCare(object):
 
         if file_serialized.startswith('http'):
             f._cached_url = file_serialized
-        
+
         return f
 
     def file_from_url(self, url):
         data = self.make_request('POST', '/files/download/', {'source_url': url})
         return LazyFile(data['id'], self)
 
-
-    def make_request(self, verb, uri, data=None):    
+    def make_request(self, verb, uri, data=None):
         parts = [''] + filter(None, self.path.split('/') + uri.split('/')) + ['']
         uri = '/'.join(parts)
 
         content = ''
-    
+
         if data:
             content = json.dumps(data)
-        
+
         content_type = 'application/json'
         content_md5 = hashlib.md5(content).hexdigest()
         date = email.utils.formatdate(usegmt=True)
@@ -77,7 +79,7 @@ class UploadCare(object):
         sign = hmac.new(str(self.secret),
                         sign_string,
                         hashlib.sha1).hexdigest()
-        
+
         headers = {
             'Authentication': 'UploadCare %s:%s' % (self.pub_key, sign),
             'Date': date,
@@ -86,8 +88,6 @@ class UploadCare(object):
 
         con = httplib.HTTPConnection(self.host, self.port, timeout=self.timeout)
         con.request(verb, uri, content, headers)
-
-#        assert False
 
         logger.debug('sent: %s %s %s' % (verb, uri, content))
 
@@ -102,9 +102,4 @@ class UploadCare(object):
         if response.status == 204: # No Content
             return
 
-        raise UploadCareException('Response status is %i. Data: %s' % (response.status, data),
-                response=response)
-
-
-
-
+        raise UploadCareException(response, data)

@@ -10,23 +10,19 @@ class FileField(models.Field):
 
     description = "UploadCare file id/URI with cached data"
 
-    def __init__(self, *args, **kwargs):
-        super(FileField, self).__init__(*args, **kwargs)
-
-
     def get_internal_type(self):
         return "TextField"
 
     def to_python(self, value):
         if not value:
             return None
-            
+
         if isinstance(value, basestring):
-            return UploadCare().file(value)        
+            return UploadCare().file(value)
 
         if isinstance(value, File):
             return value
-        
+
         raise ValidationError('Invalid value for a field')
 
     def get_prep_value(self, value):

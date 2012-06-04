@@ -1,10 +1,8 @@
-import datetime
-
 from django.test import TestCase
-from django.conf import settings
 from django import forms
 
 from pyuploadcare.dj import forms as uc_forms
+
 
 class TestFormFields(TestCase):
     def test_form_field(self):
