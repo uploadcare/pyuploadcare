@@ -43,6 +43,12 @@ to INSTALLED_APPS setting and add
 to django settings file. 'lang' placeholder will be substituted with current
 locale name from supported list ('en', 'pl', 'ru') or 'en'.
 
+UploadCare widget will use default upload handler url, unless you specify
+PYUPLOADCARE_UPLOAD_BASE_URL django settings
+
+    PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to.your.upload.handler'
+
+
 You're all set now!
 
 Adding a UploadCare file field to your model is really simple. Like that:

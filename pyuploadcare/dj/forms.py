@@ -25,9 +25,14 @@ class FileWidget(TextInput):
         js = (get_asset_lang(),)
 
     def __init__(self, attrs=None):
-        default_attrs = {'role': 'uploadcare-line-uploader',
-                         'data-public-key': UploadCare().pub_key,
-                         'data-override-style': 'float: left;'}
+        default_attrs = {
+            'role': 'uploadcare-line-uploader',
+            'data-public-key': UploadCare().pub_key,
+            'data-override-style': 'float: left;',
+        }
+
+        if conf.UPLOAD_BASE_URL is not None:
+            default_attrs['data-upload-base-url'] = conf.UPLOAD_BASE_URL
 
         if attrs is not None:
             default_attrs.update(attrs)

@@ -71,3 +71,4 @@ UPLOADCARE = {
 
 #PYUPLOADCARE_USE_HOSTED_ASSETS = False
 #PYUPLOADCARE_WIDGET_URL = 'http://static.example.com/widget.%(lang)s.js'
+#PYUPLOADCARE_UPLOAD_BASE_URL = 'http://other.upload.handler/'
