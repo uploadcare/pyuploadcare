@@ -3,3 +3,4 @@ temp.db
 build/
 dist/
 *.pyc
+.idea
