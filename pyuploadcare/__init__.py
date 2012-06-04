@@ -6,15 +6,15 @@ import urlparse
 import re
 import logging
 
-logger = logging.getLogger("pyuploadcare")
-
 try:
     import json
 except ImportError:
     import simplejson as json
 
-from .file import File, LazyFile
+from pyuploadcare.file import File, LazyFile
 
+
+logger = logging.getLogger("pyuploadcare")
 uuid_regex = re.compile(r'[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}')
 
 
@@ -27,7 +27,8 @@ class UploadCareException(Exception):
 
 
 class UploadCare(object):
-    def __init__(self, pub_key, secret, timeout=5, api_base="http://api.uploadcare.com/"):
+    def __init__(self, pub_key, secret, timeout=5,
+                 api_base="http://api.uploadcare.com/"):
         self.pub_key = pub_key
         self.secret = secret
         self.timeout = timeout
@@ -54,12 +55,13 @@ class UploadCare(object):
         return f
 
     def file_from_url(self, url):
-        data = self.make_request('POST', '/files/download/', {'source_url': url})
+        data = self.make_request('POST', '/files/download/',
+                                 {'source_url': url})
         return LazyFile(data['id'], self)
 
     def make_request(self, verb, uri, data=None):
-        parts = [''] + filter(None, self.path.split('/') + uri.split('/')) + ['']
-        uri = '/'.join(parts)
+        parts = filter(None, self.path.split('/') + uri.split('/'))
+        uri = '/'.join([''] + parts + [''])
 
         content = ''
 
@@ -86,7 +88,8 @@ class UploadCare(object):
             'Content-Type': content_type
             }
 
-        con = httplib.HTTPConnection(self.host, self.port, timeout=self.timeout)
+        con = httplib.HTTPConnection(self.host, self.port,
+                                     timeout=self.timeout)
         con.request(verb, uri, content, headers)
 
         logger.debug('sent: %s %s %s' % (verb, uri, content))

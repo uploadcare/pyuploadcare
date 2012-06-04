@@ -2,14 +2,8 @@ from django.forms import Field, TextInput
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _, get_language
 
-from pyuploadcare.dj.conf import USE_HOSTED_ASSETS
+from pyuploadcare.dj import conf
 from pyuploadcare.dj import UploadCare
-
-
-UPLOADCARE_JS = 'http://static.uploadcare.com/assets/uploaders/line-widget.%(lang)s.js'
-UPLOADCARE_LOCAL_JS = 'uploadcare/assets/uploaders/line-widget.%(lang)s.js'
-
-AVAIL_ASSET_LANG = ('en', 'ru', 'pl')
 
 
 def get_asset_lang():
@@ -18,14 +12,10 @@ def get_asset_lang():
     if lang.startswith('en'):
         lang = lang[:2]
 
-    if not lang in AVAIL_ASSET_LANG:
+    if not lang in conf.AVAIL_ASSET_LANG:
         lang = 'en'
 
-    BASE_ASSET_URL = UPLOADCARE_JS
-    if not USE_HOSTED_ASSETS:
-        BASE_ASSET_URL = UPLOADCARE_LOCAL_JS
-
-    return BASE_ASSET_URL % {'lang' : lang}
+    return conf.UPLOADCARE_JS % {'lang': lang}
 
 
 class FileWidget(TextInput):
