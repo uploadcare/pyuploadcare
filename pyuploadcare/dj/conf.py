@@ -7,7 +7,8 @@ widget_version = '0.0.1'
 
 hosted_url = 'http://fastatic.uploadcare.com/widget/%(version)s/uploadcare-%(version)s.line.%%(lang)s.js' % {
     'version': widget_version}
-local_url = 'uploadcare/assets/uploaders/line-widget.%(lang)s.js'
+local_url = 'uploadcare/assets/uploaders/uploadcare-%(version)s.line.%%(lang)s.js' % {
+    'version': widget_version}
 
 use_hosted_assets = getattr(settings, 'PYUPLOADCARE_USE_HOSTED_ASSETS', True)
 
