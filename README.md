@@ -21,14 +21,33 @@ As soon as you get your API keys, add them to your Django settings file:
         'secret': '***'
     }
 
-If you don't want to use hosted assets (from static.uploadcare.com) you
-must add 'pyuploadcare.dj' to INSTALLED_APPS setting and add 
+If you don't want to use hosted assets (from fastatic.uploadcare.com) you
+should add 'pyuploadcare.dj' to INSTALLED_APPS setting and add
 
     PYUPLOADCARE_USE_HOSTED_ASSETS = False
 
-somewhere in the settings file. (Kudos to [Sławek Ehlert][3] for the feature!)
+
+to django settings file. (Kudos to [Sławek Ehlert][3] for the feature!)
 
 [3]: https://github.com/slafs
+
+If you want to provide custom url for widget, you should add 'pyuploadcare.dj'
+to INSTALLED_APPS setting and add
+
+    PYUPLOADCARE_USE_HOSTED_ASSETS = False
+    PYUPLOADCARE_WIDGET_URL = 'http://path.to.asset'
+    # or
+    PYUPLOADCARE_WIDGET_URL = 'http://path.to.%(lang)s.asset.'
+
+
+to django settings file. 'lang' placeholder will be substituted with current
+locale name from supported list ('en', 'pl', 'ru') or 'en'.
+
+UploadCare widget will use default upload handler url, unless you specify
+PYUPLOADCARE_UPLOAD_BASE_URL django settings
+
+    PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to.your.upload.handler'
+
 
 You're all set now!
 
@@ -39,6 +58,7 @@ Adding a UploadCare file field to your model is really simple. Like that:
     from django.db import models
 
     from pyuploadcare.dj import FileField
+
 
     class Photo(models.Model):
         title = models.CharField(max_length=255)
