@@ -46,11 +46,15 @@ class File(object):
 
         return super(File, self).__getattr__(name)
 
-    def keep(self, wait=False):
+    def keep(self, wait=False, timeout=5):
         self._info = self.ucare.make_request('POST', self.api_uri, {'keep': 1})
 
         if wait:
+            time_started = time.time()
             while not self.info['on_s3']:
+                print time.time() - time_started
+                if time.time() - time_started > timeout:
+                    raise Exception('timed out trying to claim keep')
                 self.update_info()
                 time.sleep(0.1)
 

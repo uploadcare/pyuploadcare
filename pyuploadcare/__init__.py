@@ -1,3 +1,5 @@
+__version__ = (0, 7)
+
 import httplib
 import email.utils
 import hashlib
@@ -28,7 +30,8 @@ class UploadCareException(Exception):
 
 class UploadCare(object):
     def __init__(self, pub_key, secret, timeout=5,
-                 api_base="http://api.uploadcare.com/"):
+                 api_base='http://api.uploadcare.com/',
+                 api_version='0.2'):
         self.pub_key = pub_key
         self.secret = secret
         self.timeout = timeout
@@ -40,6 +43,12 @@ class UploadCare(object):
         self.host = parts.hostname
         self.port = parts.port
         self.path = parts.path
+
+        if api_version == '0.1':
+            self.accept = 'application/json'
+        else:
+            self.accept = 'application/vnd.uploadcare-v{}+json'.format(
+                                api_version)
 
     def file(self, file_serialized):
         m = uuid_regex.search(file_serialized)
@@ -85,8 +94,9 @@ class UploadCare(object):
         headers = {
             'Authentication': 'UploadCare %s:%s' % (self.pub_key, sign),
             'Date': date,
-            'Content-Type': content_type
-            }
+            'Content-Type': content_type,
+            'Accept': self.accept,
+        }
 
         con = httplib.HTTPConnection(self.host, self.port,
                                      timeout=self.timeout)
@@ -96,6 +106,7 @@ class UploadCare(object):
 
         response = con.getresponse()
         data = response.read()
+        # head = response.getheaders()
 
         logger.debug('got: %s %s' % (response.status, data))
 
