@@ -2,8 +2,11 @@
 # encoding: utf-8
 
 import argparse
+import urlparse
+import urllib
 import logging
 import pprint
+import ConfigParser
 from os.path import exists
 
 from pyuploadcare import UploadCare, UploadCareException
@@ -29,15 +32,28 @@ def get_key(name, key=None):
 
 
 def create_ucare(pub_key=None, secret=None):
+#    return UploadCare(
+#        pub_key=get_key('pub_key', pub_key),
+#        secret=get_key('secret', secret)
+#    )
     return UploadCare(
-        pub_key=get_key('pub_key', pub_key),
-        secret=get_key('secret', secret)
+        pub_key=settings['public'],
+        secret=settings['secret'],
+        api_base=settings['apiurl'],
     )
 
 
 def list(args):
     ucare = create_ucare(args.pub_key, args.secret)
-    pp.pprint(ucare.make_request('GET', '/files/'))
+    query = {}
+    for name in ['page', 'limit', 'kept', 'removed']:
+        arg = getattr(args, name)
+        if arg is not None:
+            query[name] = arg
+    q = urllib.urlencode(query)
+    url = urlparse.urlunsplit(['', '', '/files/', q, ''])
+
+    pp.pprint(ucare.make_request('GET', url))
 
 
 def get(args):
@@ -67,6 +83,12 @@ def get_args():
     # list
     subparser = subparsers.add_parser('list', help='list all files')
     subparser.set_defaults(func=list)
+    subparser.add_argument('--page', help='page to show')
+    subparser.add_argument('--limit', help='files per page')
+    subparser.add_argument('--kept', help='filter kept files',
+                           choices=['all', 'true', 'false'])
+    subparser.add_argument('--removed', help='filter removed files',
+                           choices=['all', 'true', 'false'])
 
     # get
     subparser = subparsers.add_parser('get', help='get file info')
@@ -106,5 +128,27 @@ def main():
         print e
 
 
+settings = {
+    'public': None,
+    'secret': None,
+    'apiurl': None,
+}
+
 if __name__ == '__main__':
+    config = ConfigParser.RawConfigParser()
+    config.read('ucare.ini')
+
+    try:
+        settings['secret'] = config.get('ucare', 'secret')
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        pass
+    try:
+        settings['public'] = config.get('ucare', 'public')
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        pass
+    try:
+        settings['apiurl'] = config.get('ucare', 'apiurl')
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        pass
+
     main()

@@ -68,10 +68,16 @@ class UploadCare(object):
                                  {'source_url': url})
         return LazyFile(data['id'], self)
 
-    def make_request(self, verb, uri, data=None):
-        parts = filter(None, self.path.split('/') + uri.split('/'))
-        uri = '/'.join([''] + parts + [''])
+    def _build_uri(self, uri):
+        """Abomination"""
+        uri_parts = urlparse.urlsplit(uri)
+        parts = filter(None, self.path.split('/') + uri_parts.path.split('/'))
+        path = '/'.join([''] + parts + [''])
+        uri = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
+        return uri
 
+    def make_request(self, verb, uri, data=None):
+        uri = self._build_uri(uri)
         content = ''
 
         if data:
@@ -81,11 +87,13 @@ class UploadCare(object):
         content_md5 = hashlib.md5(content).hexdigest()
         date = email.utils.formatdate(usegmt=True)
 
-        sign_string = '\n'.join([verb,
-                                 content_md5,
-                                 content_type,
-                                 date,
-                                 uri])
+        sign_string = '\n'.join([
+            verb,
+            content_md5,
+            content_type,
+            date,
+            uri,
+        ])
 
         sign = hmac.new(str(self.secret),
                         sign_string,
