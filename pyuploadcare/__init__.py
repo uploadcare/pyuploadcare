@@ -1,3 +1,5 @@
+__version__ = (0, 7)
+
 import httplib
 import email.utils
 import hashlib
@@ -28,7 +30,8 @@ class UploadCareException(Exception):
 
 class UploadCare(object):
     def __init__(self, pub_key, secret, timeout=5,
-                 api_base="http://api.uploadcare.com/"):
+                 api_base='http://api.uploadcare.com/',
+                 api_version='0.2'):
         self.pub_key = pub_key
         self.secret = secret
         self.timeout = timeout
@@ -40,6 +43,12 @@ class UploadCare(object):
         self.host = parts.hostname
         self.port = parts.port
         self.path = parts.path
+
+        if api_version == '0.1':
+            self.accept = 'application/json'
+        else:
+            self.accept = 'application/vnd.uploadcare-v{}+json'.format(
+                                api_version)
 
     def file(self, file_serialized):
         m = uuid_regex.search(file_serialized)
@@ -59,10 +68,16 @@ class UploadCare(object):
                                  {'source_url': url})
         return LazyFile(data['id'], self)
 
-    def make_request(self, verb, uri, data=None):
-        parts = filter(None, self.path.split('/') + uri.split('/'))
-        uri = '/'.join([''] + parts + [''])
+    def _build_uri(self, uri):
+        """Abomination"""
+        uri_parts = urlparse.urlsplit(uri)
+        parts = filter(None, self.path.split('/') + uri_parts.path.split('/'))
+        path = '/'.join([''] + parts + [''])
+        uri = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
+        return uri
 
+    def make_request(self, verb, uri, data=None):
+        uri = self._build_uri(uri)
         content = ''
 
         if data:
@@ -72,11 +87,13 @@ class UploadCare(object):
         content_md5 = hashlib.md5(content).hexdigest()
         date = email.utils.formatdate(usegmt=True)
 
-        sign_string = '\n'.join([verb,
-                                 content_md5,
-                                 content_type,
-                                 date,
-                                 uri])
+        sign_string = '\n'.join([
+            verb,
+            content_md5,
+            content_type,
+            date,
+            uri,
+        ])
 
         sign = hmac.new(str(self.secret),
                         sign_string,
@@ -85,8 +102,9 @@ class UploadCare(object):
         headers = {
             'Authentication': 'UploadCare %s:%s' % (self.pub_key, sign),
             'Date': date,
-            'Content-Type': content_type
-            }
+            'Content-Type': content_type,
+            'Accept': self.accept,
+        }
 
         con = httplib.HTTPConnection(self.host, self.port,
                                      timeout=self.timeout)
@@ -96,6 +114,7 @@ class UploadCare(object):
 
         response = con.getresponse()
         data = response.read()
+        # head = response.getheaders()
 
         logger.debug('got: %s %s' % (response.status, data))
 
