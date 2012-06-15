@@ -22,7 +22,7 @@ settings = {
 }
 
 
-def create_ucare(pub_key=None, secret=None):
+def create_ucare():
     return UploadCare(
         pub_key=settings['pub_key'],
         secret=settings['secret'],
@@ -32,7 +32,7 @@ def create_ucare(pub_key=None, secret=None):
 
 
 def list(args):
-    ucare = create_ucare(args.pub_key, args.secret)
+    ucare = create_ucare()
     query = {}
     for name in ['page', 'limit', 'kept', 'removed']:
         arg = getattr(args, name)
@@ -45,22 +45,22 @@ def list(args):
 
 
 def get(args):
-    ucare = create_ucare(args.pub_key, args.secret)
+    ucare = create_ucare()
     pp.pprint(ucare.make_request('GET', args.path))
 
 
 def keep(args):
-    ucare = create_ucare(args.pub_key, args.secret)
+    ucare = create_ucare()
     ucare.make_request('POST', args.path, data={'keep': 1})
 
 
 def delete(args):
-    ucare = create_ucare(args.pub_key, args.secret)
+    ucare = create_ucare()
     ucare.make_request('DELETE', args.path)
 
 
 def upload(args):
-    ucare = create_ucare(args.pub_key, args.secret)
+    ucare = create_ucare()
     ucare.make_request('POST', '/files/download/', {'source_url': args.url})
 
 
