@@ -52,7 +52,6 @@ class File(object):
         if wait:
             time_started = time.time()
             while not self.info['on_s3']:
-                print time.time() - time_started
                 if time.time() - time_started > timeout:
                     raise Exception('timed out trying to claim keep')
                 self.update_info()
