@@ -1,0 +1,5 @@
+[ucare]
+secret = -your secret here-
+pub_key = -your public key here-
+api_url = http://api.uploadcare.com/
+api_version = 0.2
