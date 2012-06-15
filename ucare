@@ -7,39 +7,27 @@ import urllib
 import logging
 import pprint
 import ConfigParser
-from os.path import exists
+import os.path
 
 from pyuploadcare import UploadCare, UploadCareException
 
 
 pp = pprint.PrettyPrinter(indent=2)
 logger = logging.getLogger('pyuploadcare')
-
-
-def get_key(name, key=None):
-    """Helper function, reads .name file for key if it is not provided"""
-    if key is None:
-        fname = '.{}'.format(name)
-        if exists(fname):
-            with open(fname, 'rt') as f:
-                key = f.readline().strip()
-        else:
-            print '{key} arg is not provided and .{key} file does not exist'.format(
-                key=name
-            )
-            exit()
-    return key
+settings = {
+    'pub_key': None,
+    'secret': None,
+    'api_url': 'http://api.uploadcare.com/',
+    'api_version': '0.2'
+}
 
 
 def create_ucare(pub_key=None, secret=None):
-#    return UploadCare(
-#        pub_key=get_key('pub_key', pub_key),
-#        secret=get_key('secret', secret)
-#    )
     return UploadCare(
-        pub_key=settings['public'],
+        pub_key=settings['pub_key'],
         secret=settings['secret'],
-        api_base=settings['apiurl'],
+        api_base=settings['api_url'],
+        api_version=settings['api_version']
     )
 
 
@@ -112,43 +100,57 @@ def get_args():
 
     # common arguments
     parser.add_argument('--pub_key',
-                        help='API key, if not set is read from .pub_key file')
+                        help='API key, if not set is read from uploadcare.ini'
+                             ' and ~/.uploadcare config files')
     parser.add_argument('--secret',
-                    help='API secret, if not set is read from .secret file')
+                    help='API secret, if not set is read from uploadcare.ini'
+                             ' and ~/.uploadcare config files')
+    parser.add_argument('--api_url',
+                        help='API url, can be read from uploadcare.ini'
+                             ' and ~/.uploadcare config files.'
+                             ' default: http://api.uploadcare.com/')
+    parser.add_argument('--api_version',
+                    help='API version, can be read from uploadcare.ini'
+                             ' and ~/.uploadcare config files.'
+                             ' default: 0.2')
 
     args = parser.parse_args()
     return args
 
 
+def load_config_from_file(filename):
+    filename = os.path.expanduser(filename)
+    if not os.path.exists(filename):
+        return
+
+    config = ConfigParser.RawConfigParser()
+    config.read(filename)
+
+    for name in settings.keys():
+        try:
+            settings[name] = config.get('ucare', name)
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            pass
+
+
+def load_config_from_args(args):
+    for name in settings.keys():
+        arg = getattr(args, name)
+        if arg is not None:
+            settings[name] = arg
+
+
 def main():
     args = get_args()
+    load_config_from_file('~/.uploadcare')
+    load_config_from_file('uploadcare.ini')
+    load_config_from_args(args)
+
     try:
         args.func(args)
     except UploadCareException as e:
         print e
 
 
-settings = {
-    'public': None,
-    'secret': None,
-    'apiurl': None,
-}
-
 if __name__ == '__main__':
-    config = ConfigParser.RawConfigParser()
-    config.read('ucare.ini')
-
-    try:
-        settings['secret'] = config.get('ucare', 'secret')
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        pass
-    try:
-        settings['public'] = config.get('ucare', 'public')
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        pass
-    try:
-        settings['apiurl'] = config.get('ucare', 'apiurl')
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        pass
-
     main()
