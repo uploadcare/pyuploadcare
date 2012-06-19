@@ -49,6 +49,7 @@ class UploadCare(object):
         else:
             self.accept = 'application/vnd.uploadcare-v{}+json'.format(
                                 api_version)
+        self.user_agent = 'pyuploadcare/{}'.format(api_version)
 
     def file(self, file_serialized):
         m = uuid_regex.search(file_serialized)
@@ -104,6 +105,7 @@ class UploadCare(object):
             'Date': date,
             'Content-Type': content_type,
             'Accept': self.accept,
+            'User-Agent': self.user_agent,
         }
 
         con = httplib.HTTPConnection(self.host, self.port,
