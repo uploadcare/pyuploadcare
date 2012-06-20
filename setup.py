@@ -14,8 +14,13 @@ setup(
             'static/uploadcare/assets/uploaders/*.js',
         ]
     },
+    entry_points = {
+        'console_scripts': [
+            'ucare = pyuploadcare.ucare_cli:main',
+        ],
+    },
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-    ]
+    ],
 )
