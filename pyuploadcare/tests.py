@@ -82,3 +82,25 @@ class FileTest(unittest.TestCase):
         response = MockResponse(200, '{"on_s3": true}')
         con.return_value.getresponse.return_value = response
         f.keep(wait=True, timeout=1)
+
+    @patch('httplib.HTTPConnection', autospec=True)
+    def test_url_caching(self, con):
+        """Test that known url is cached and no requests are made"""
+
+        ucare = UploadCare('pub', 'secret')
+        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
+        con.return_value.getresponse.return_value = MockResponse(200,
+            '{"original_file_url": "meh"}')
+
+        self.assertEqual(0, len(con.mock_calls))
+
+        f = ucare.file(uuid)
+        self.assertEqual('meh', f.url)
+        # 3 calls made (create con, request, get response)
+        self.assertEqual(3, len(con.mock_calls))
+
+        fake_url = 'http://i-am-the-file/{}/'.format(uuid)
+        f = ucare.file(fake_url)
+        self.assertEqual(fake_url, f.url)
+        # no additional calls are made
+        self.assertEqual(3, len(con.mock_calls))
