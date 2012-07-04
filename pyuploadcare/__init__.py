@@ -7,13 +7,10 @@ import hmac
 import urlparse
 import re
 import logging
+import json
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
-from pyuploadcare.file import File, LazyFile
+from pyuploadcare.file import File
+from pyuploadcare.uploader import UploaderMixin
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -28,15 +25,17 @@ class UploadCareException(Exception):
         self.data = data
 
 
-class UploadCare(object):
+class UploadCare(UploaderMixin):
     def __init__(self, pub_key, secret, timeout=5,
                  api_base='http://api.uploadcare.com/',
+                 upload_base='http://upload.uploadcare.com/',
                  api_version='0.2'):
         self.pub_key = pub_key
         self.secret = secret
         self.timeout = timeout
 
         self.api_base = api_base
+        self.upload_base = upload_base
 
         parts = urlparse.urlsplit(api_base)
 
@@ -64,10 +63,8 @@ class UploadCare(object):
 
         return f
 
-    def file_from_url(self, url):
-        data = self.make_request('POST', '/files/download/',
-                                 {'source_url': url})
-        return LazyFile(data['id'], self)
+    def file_from_url(self, url, wait=False, timeout=30):
+        return self.upload(url, wait, timeout)
 
     def _build_uri(self, uri):
         """Abomination"""
