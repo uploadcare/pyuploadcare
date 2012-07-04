@@ -18,6 +18,7 @@ settings = {
     'pub_key': None,
     'secret': None,
     'api_url': 'http://api.uploadcare.com/',
+    'upload_url': 'http://upload.uploadcare.com/',
     'api_version': '0.2'
 }
 
@@ -27,6 +28,7 @@ def create_ucare():
         pub_key=settings['pub_key'],
         secret=settings['secret'],
         api_base=settings['api_url'],
+        upload_base=settings['upload_url'],
         api_version=settings['api_version']
     )
 
@@ -44,24 +46,27 @@ def list(args):
     pp.pprint(ucare.make_request('GET', url))
 
 
-def get(args):
+def uc_file(url):
     ucare = create_ucare()
-    pp.pprint(ucare.make_request('GET', args.path))
+    return ucare.file(url)
+
+
+def get(args):
+    pp.pprint(uc_file(args.path).info)
 
 
 def keep(args):
-    ucare = create_ucare()
-    ucare.make_request('POST', args.path, data={'keep': 1})
+    uc_file(args.path).keep()
 
 
 def delete(args):
-    ucare = create_ucare()
-    ucare.make_request('DELETE', args.path)
+    uc_file(args.path).delete()
 
 
 def upload(args):
     ucare = create_ucare()
-    ucare.make_request('POST', '/files/download/', {'source_url': args.url})
+    ufile = ucare.file_from_url(args.url, wait=True)
+    print 'token: {0.token}\nstatus: {0.status}'.format(ufile)
 
 
 def get_args():
@@ -109,6 +114,10 @@ def get_args():
                         help='API url, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
                              ' default: http://api.uploadcare.com/')
+    parser.add_argument('--upload_url',
+                        help='Upload API url, can be read from uploadcare.ini'
+                             ' and ~/.uploadcare config files.'
+                             ' default: http://upload.uploadcare.com/')
     parser.add_argument('--api_version',
                     help='API version, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
