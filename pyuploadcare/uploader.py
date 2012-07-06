@@ -91,13 +91,14 @@ class UploaderMixin(object):
         with open(filename) as f:
             id = str(uuid4())
             response = requests.post(
-                '{}iframe/'.format(self.upload_base),
+                '{}base/'.format(self.upload_base),
                 data={
                     'UPLOADCARE_FILE_ID': id,
                     'UPLOADCARE_PUB_KEY': self.pub_key
                 },
                 files={'file': f})
             if response.status_code == 200:
-                return self.file(id)
+                data = json.loads(response.content)
+                return self.file(data['file'])
             raise UploaderException(
                 'status code: {}'.format(response.status_code))
