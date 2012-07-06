@@ -89,13 +89,9 @@ class UploaderMixin(object):
 
     def upload(self, filename):
         with open(filename) as f:
-            id = str(uuid4())
             response = requests.post(
                 '{}base/'.format(self.upload_base),
-                data={
-                    'UPLOADCARE_FILE_ID': id,
-                    'UPLOADCARE_PUB_KEY': self.pub_key
-                },
+                data={'UPLOADCARE_PUB_KEY': self.pub_key},
                 files={'file': f})
             if response.status_code == 200:
                 data = json.loads(response.content)
