@@ -63,10 +63,16 @@ def delete(args):
     uc_file(args.path).delete()
 
 
-def upload(args):
+def upload_from_url(args):
     ucare = create_ucare()
     ufile = ucare.file_from_url(args.url, wait=True)
     print 'token: {0.token}\nstatus: {0.status}'.format(ufile)
+
+
+def upload(args):
+    ucare = create_ucare()
+    ufile = ucare.upload(args.filename)
+    pp.pprint(ufile.info)
 
 
 def get_args():
@@ -98,10 +104,15 @@ def get_args():
     subparser.set_defaults(func=delete)
     subparser.add_argument('path', help='file path')
 
-    # upload
-    subparser = subparsers.add_parser('upload', help='upload file from url')
-    subparser.set_defaults(func=upload)
+    # upload from url
+    subparser = subparsers.add_parser('upload_from_url', help='upload file from url')
+    subparser.set_defaults(func=upload_from_url)
     subparser.add_argument('url', help='file url')
+
+    # upload
+    subparser = subparsers.add_parser('upload', help='upload file')
+    subparser.set_defaults(func=upload)
+    subparser.add_argument('filename', help='filename')
 
     # common arguments
     parser.add_argument('--pub_key',

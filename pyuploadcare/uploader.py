@@ -1,5 +1,6 @@
 import json
 import time
+from uuid import uuid4
 
 import requests
 
@@ -47,7 +48,7 @@ class UploadedFile(object):
 
 
 class UploaderMixin(object):
-    def upload(self, url, wait=False, timeout=30):
+    def upload_from_url(self, url, wait=False, timeout=30):
         """Upload file from given URL
 
         Return UploadedFile instance.
@@ -85,3 +86,18 @@ class UploaderMixin(object):
                 'could not find status in response: {}'.format(data))
 
         return data['status'], data
+
+    def upload(self, filename):
+        with open(filename) as f:
+            id = str(uuid4())
+            response = requests.post(
+                '{}iframe/'.format(self.upload_base),
+                data={
+                    'UPLOADCARE_FILE_ID': id,
+                    'UPLOADCARE_PUB_KEY': self.pub_key
+                },
+                files={'file': f})
+            if response.status_code == 200:
+                return self.file(id)
+            raise UploaderException(
+                'status code: {}'.format(response.status_code))

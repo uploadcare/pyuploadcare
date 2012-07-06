@@ -64,7 +64,7 @@ class UploadCare(UploaderMixin):
         return f
 
     def file_from_url(self, url, wait=False, timeout=30):
-        return self.upload(url, wait, timeout)
+        return self.upload_from_url(url, wait, timeout)
 
     def _build_uri(self, uri):
         """Abomination"""
