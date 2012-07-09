@@ -4,6 +4,7 @@
     * Added 'Accept' request header
     * Added ucare config file parsing
     * Added pyuploadcare/tests.py
+    * Replace upload API
 
 
 ### 0.6

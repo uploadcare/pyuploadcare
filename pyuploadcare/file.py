@@ -4,29 +4,7 @@ import logging
 logger = logging.getLogger("pyuploadcare")
 
 
-RESIZER_BASE = 'http://services.uploadcare.com/resizer/%(file_id)s/%(cmd_line)s/'
-
-
-class LazyFile(object):
-    def __init__(self, id, ucare):
-        self.id = id
-        self.ucare = ucare
-
-    def load_data(self):
-        return self.ucare.make_request('GET', '/files/download/%s/' % self.id)
-
-    def wait(self):
-        while True:
-            data = self.load_data()
-            logger.debug('loaded data %s' % data)
-
-            if data['status'] == 'success':
-                return File(data['file_id'], self.ucare)
-
-            if data['status'] not in ('progress', 'unknown'):
-                raise Exception('Invalid task status')
-
-            time.sleep(0.1)
+RESIZER_BASE = 'http://services.uploadcare.com/resizer/{file_id}/{cmd_line}/'
 
 
 class File(object):
@@ -76,8 +54,10 @@ class File(object):
 
     def serialize(self):
         """Returns a string suitable to be stored somewhere.
-        It's either an URL (to save a request) or just file-id"""
 
+        It's either an URL (to save a request) or just file-id.
+
+        """
         if self._info and self.url:
             return self.url
 
@@ -99,20 +79,16 @@ class File(object):
 
     def resized(self, width=None, height=None, crop=False):
         dimensions = str(width or '')
-
         if height:
             dimensions += 'x%i' % height
 
         chunks = [dimensions]
-
         if crop:
             chunks.append('crop')
 
         cmd_line = '/'.join(chunks)
-
-        return RESIZER_BASE % {'file_id': self.file_id, 'cmd_line': cmd_line}
+        return RESIZER_BASE.format(file_id=self.file_id, cmd_line=cmd_line)
 
     def string_resized(self, cmd_line):
         cmd_line = cmd_line.replace('_', '/')
-
-        return RESIZER_BASE % {'file_id': self.file_id, 'cmd_line': cmd_line}
+        return RESIZER_BASE.format(file_id=self.file_id, cmd_line=cmd_line)
