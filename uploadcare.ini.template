@@ -2,4 +2,5 @@
 secret = -your secret here-
 pub_key = -your public key here-
 api_url = http://api.uploadcare.com/
+upload_url = http://upload.uploadcare.com/
 api_version = 0.2
