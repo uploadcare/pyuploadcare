@@ -34,18 +34,15 @@ class UploadCareTest(unittest.TestCase):
         def request_v01(verb, uri, content, headers):
             self.assertIn('Accept', headers)
             self.assertIn('User-Agent', headers)
-            self.assertEqual(headers['Accept'],
-                             'application/json')
-            self.assertEqual(headers['User-Agent'],
-                             'pyuploadcare/0.1')
+            self.assertEqual(headers['Accept'], 'application/json')
+            self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.7')
 
         def request_v02(verb, uri, content, headers):
             self.assertIn('Accept', headers)
             self.assertIn('User-Agent', headers)
             self.assertEqual(headers['Accept'],
                              'application/vnd.uploadcare-v0.2+json')
-            self.assertEqual(headers['User-Agent'],
-                             'pyuploadcare/0.2')
+            self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.7')
 
         con.return_value.getresponse.return_value = MockResponse(200, '[]')
         con.return_value.request = request_v02
