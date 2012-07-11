@@ -48,7 +48,7 @@ class UploadCare(UploaderMixin):
         else:
             self.accept = 'application/vnd.uploadcare-v{}+json'.format(
                                 api_version)
-        self.user_agent = 'pyuploadcare/{}'.format(api_version)
+        self.user_agent = 'pyuploadcare/{}.{}'.format(*__version__)
 
     def file(self, file_serialized):
         m = uuid_regex.search(file_serialized)
