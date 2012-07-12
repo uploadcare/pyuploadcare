@@ -9,6 +9,7 @@ setup(
     author_email='v.golev@gmail.com',
     url='https://github.com/uploadcare/pyuploadcare',
     packages=['pyuploadcare', 'pyuploadcare.dj'],
+    test_suite='nose.collector',
     package_data={
         'pyuploadcare.dj': [
             'static/uploadcare/assets/uploaders/*.js',
@@ -20,6 +21,7 @@ setup(
         ],
     },
     install_requires=['requests==0.13.2'],
+    setup_requires=['nose==1.1.2'],
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
