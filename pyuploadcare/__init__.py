@@ -39,11 +39,13 @@ class UploadCare(UploaderMixin):
 
         parts = urlparse.urlsplit(api_base)
 
+        self.secure = parts.scheme == 'https'
         self.host = parts.hostname
         self.port = parts.port
         self.path = parts.path
 
-        if api_version == '0.1':
+        self.api_version = api_version
+        if self.api_version == '0.1':
             self.accept = 'application/json'
         else:
             self.accept = 'application/vnd.uploadcare-v{}+json'.format(
@@ -74,7 +76,7 @@ class UploadCare(UploaderMixin):
         uri = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
         return uri
 
-    def make_request(self, verb, uri, data=None):
+    def make_request(self, verb, uri, data=None, extra_headers=None):
         uri = self._build_uri(uri)
         content = ''
 
@@ -104,9 +106,15 @@ class UploadCare(UploaderMixin):
             'Accept': self.accept,
             'User-Agent': self.user_agent,
         }
+        if extra_headers is not None:
+            headers.update(extra_headers)
 
-        con = httplib.HTTPConnection(self.host, self.port,
-                                     timeout=self.timeout)
+        if self.secure:
+            con_class = httplib.HTTPSConnection
+        else:
+            con_class = httplib.HTTPConnection
+
+        con = con_class(self.host, self.port, timeout=self.timeout)
         con.request(verb, uri, content, headers)
 
         logger.debug('sent: %s %s %s' % (verb, uri, content))

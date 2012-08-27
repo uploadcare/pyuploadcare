@@ -25,7 +25,14 @@ class File(object):
         return super(File, self).__getattr__(name)
 
     def keep(self, wait=False, timeout=5):
-        self._info = self.ucare.make_request('POST', self.api_uri, {'keep': 1})
+        if self.ucare.api_version == '0.1':
+            self._info = self.ucare.make_request('POST', self.api_uri, data={
+                'keep': 1
+            })
+        else:
+            self.ucare.make_request('PUT', self.storage_uri, extra_headers={
+                'Content-Length': 0, # nginx demands content length
+            })
 
         if wait:
             time_started = time.time()
@@ -34,15 +41,24 @@ class File(object):
                     raise Exception('timed out trying to claim keep')
                 self.update_info()
                 time.sleep(0.1)
+        self.update_info()
 
-    def delete(self):
+    def delete(self, wait=False, timeout=5):
         self.ucare.make_request('DELETE', self.api_uri)
+
+        if wait:
+            time_started = time.time()
+            while self.info['removed'] is None:
+                if time.time() - time_started > timeout:
+                    raise Exception('timed out trying to delete')
+                self.update_info()
+                time.sleep(0.1)
+        self.update_info()
 
     @property
     def info(self):
         if not self._info:
             self.update_info()
-
         return self._info
 
     def update_info(self):
@@ -50,7 +66,11 @@ class File(object):
 
     @property
     def api_uri(self):
-        return '/files/%s/' % self.file_id
+        return '/files/{}/'.format(self.file_id)
+
+    @property
+    def storage_uri(self):
+        return '/files/{}/storage/'.format(self.file_id)
 
     def serialize(self):
         """Returns a string suitable to be stored somewhere.
@@ -67,14 +87,12 @@ class File(object):
     def url(self):
         if self._cached_url:
             return self._cached_url
-
         return self.info['original_file_url']
 
     @property
     def filename(self):
         if not self.url:
             return ''
-
         return self.url.split('/')[-1]
 
     def resized(self, width=None, height=None, crop=False):
