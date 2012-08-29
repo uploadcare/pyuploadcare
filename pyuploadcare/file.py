@@ -30,9 +30,7 @@ class File(object):
                 'keep': 1
             })
         else:
-            self.ucare.make_request('PUT', self.storage_uri, extra_headers={
-                'Content-Length': 0, # nginx demands content length
-            })
+            self.ucare.make_request('PUT', self.storage_uri)
 
         if wait:
             time_started = time.time()

@@ -1,6 +1,5 @@
 __version__ = (0, 7)
 
-import httplib
 import email.utils
 import hashlib
 import hmac
@@ -8,6 +7,7 @@ import urlparse
 import re
 import logging
 import json
+import requests
 
 from pyuploadcare.file import File
 from pyuploadcare.uploader import UploaderMixin
@@ -19,7 +19,7 @@ uuid_regex = re.compile(r'[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}')
 
 class UploadCareException(Exception):
     def __init__(self, response, data):
-        message = 'Response status is %i. Data: %s' % (response.status, data)
+        message = 'Response status is %i. Data: %s' % (response.status_code, data)
         super(UploadCareException, self).__init__(message)
         self.response = response
         self.data = data
@@ -37,12 +37,7 @@ class UploadCare(UploaderMixin):
         self.api_base = api_base
         self.upload_base = upload_base
 
-        parts = urlparse.urlsplit(api_base)
-
-        self.secure = parts.scheme == 'https'
-        self.host = parts.hostname
-        self.port = parts.port
-        self.path = parts.path
+        self._api_parts = urlparse.urlsplit(api_base)
 
         self.api_version = api_version
         if self.api_version == '0.1':
@@ -68,16 +63,26 @@ class UploadCare(UploaderMixin):
     def file_from_url(self, url, wait=False, timeout=30):
         return self.upload_from_url(url, wait, timeout)
 
-    def _build_uri(self, uri):
+    def _build_api_path(self, path):
         """Abomination"""
-        uri_parts = urlparse.urlsplit(uri)
-        parts = filter(None, self.path.split('/') + uri_parts.path.split('/'))
+        uri_parts = urlparse.urlsplit(path)
+        parts = filter(None, self._api_parts.path.split('/') + uri_parts.path.split('/'))
         path = '/'.join([''] + parts + [''])
-        uri = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
-        return uri
+        api_path = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
+        return api_path
 
-    def make_request(self, verb, uri, data=None, extra_headers=None):
-        uri = self._build_uri(uri)
+    def _build_api_uri(self, path):
+        """Abomination"""
+        base = urlparse.urlunsplit([
+            self._api_parts.scheme,
+            self._api_parts.netloc,
+            '', '', ''
+        ])
+        return base + path
+
+    def make_request(self, verb, path, data=None):
+
+        path = self._build_api_path(path)
         content = ''
 
         if data:
@@ -92,7 +97,7 @@ class UploadCare(UploaderMixin):
             content_md5,
             content_type,
             date,
-            uri,
+            path,
         ])
 
         sign = hmac.new(str(self.secret),
@@ -103,32 +108,25 @@ class UploadCare(UploaderMixin):
             'Authentication': 'UploadCare %s:%s' % (self.pub_key, sign),
             'Date': date,
             'Content-Type': content_type,
+            'Content-Length': str(len(content)),
             'Accept': self.accept,
             'User-Agent': self.user_agent,
         }
-        if extra_headers is not None:
-            headers.update(extra_headers)
 
-        if self.secure:
-            con_class = httplib.HTTPSConnection
-        else:
-            con_class = httplib.HTTPConnection
+        logger.debug('sent: %s %s %s' % (verb, path, content))
 
-        con = con_class(self.host, self.port, timeout=self.timeout)
-        con.request(verb, uri, content, headers)
+        uri = self._build_api_uri(path)
+        func = getattr(requests, verb.lower())
+        response = func(uri, headers=headers, verify=False)
 
-        logger.debug('sent: %s %s %s' % (verb, uri, content))
+        logger.debug('got: %s %s' % (response.status_code, response.content))
 
-        response = con.getresponse()
-        data = response.read()
-        # head = response.getheaders()
+        if response.status_code == 200: # Ok
+            if response.json is None:
+                raise ValueError('no json in response')
+            return response.json
 
-        logger.debug('got: %s %s' % (response.status, data))
-
-        if response.status == 200: # Ok
-            return json.loads(data)
-
-        if response.status == 204: # No Content
+        if response.status_code == 204: # No Content
             return
 
         raise UploadCareException(response, data)
