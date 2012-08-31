@@ -28,7 +28,7 @@ class MockResponse():
 
 class UploadCareTest(unittest.TestCase):
 
-    @patch('requests.api.request', autospec=True)
+    @patch('requests.request', autospec=True)
     def test_raises(self, request):
         request.return_value = MockResponse(404, '{}')
         ucare = UploadCare('pub', 'secret')
@@ -41,7 +41,7 @@ class UploadCareTest(unittest.TestCase):
             ucare.make_request('GET', '/files/')
         self.assertEqual('no json in response', cm.exception.message)
 
-    @patch('requests.api.request', autospec=True)
+    @patch('requests.request', autospec=True)
     def test_request_headers(self, request):
 
         request.return_value = MockResponse(200, '[]')
@@ -78,7 +78,7 @@ class UploadCareTest(unittest.TestCase):
 
 
 class FileTest(unittest.TestCase):
-    @patch('requests.api.request', autospec=True)
+    @patch('requests.request', autospec=True)
     def test_keep_timeout(self, request):
         ucare = UploadCare('pub', 'secret')
         response = MockResponse(200, '{"on_s3": false}')
@@ -94,7 +94,7 @@ class FileTest(unittest.TestCase):
         request.return_value = response
         f.keep(wait=True, timeout=1)
 
-    @patch('requests.api.request', autospec=True)
+    @patch('requests.request', autospec=True)
     def test_url_caching(self, request):
         """Test that known url is cached and no requests are made"""
 

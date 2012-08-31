@@ -116,8 +116,8 @@ class UploadCare(UploaderMixin):
         logger.debug('sent: %s %s %s' % (verb, path, content))
 
         uri = self._build_api_uri(path)
-        func = getattr(requests, verb.lower())
-        response = func(uri, headers=headers, verify=False)
+        response = requests.request(verb, uri, allow_redirects=True,
+                                    headers=headers)
 
         logger.debug('got: %s %s' % (response.status_code, response.content))
 
