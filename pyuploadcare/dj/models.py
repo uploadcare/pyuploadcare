@@ -30,7 +30,7 @@ class FileField(models.Field):
 
     def get_db_prep_save(self, value, connection=None):
         if value:
-            value.keep()
+            value.store()
             return value.serialize()
 
     def value_to_string(self, obj):
