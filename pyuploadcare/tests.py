@@ -79,20 +79,20 @@ class UploadCareTest(unittest.TestCase):
 
 class FileTest(unittest.TestCase):
     @patch('requests.request', autospec=True)
-    def test_keep_timeout(self, request):
+    def test_store_timeout(self, request):
         ucare = UploadCare('pub', 'secret')
         response = MockResponse(200, '{"on_s3": false}')
         request.return_value = response
 
         f = File('uuid', ucare)
         with self.assertRaises(Exception) as cm:
-            f.keep(wait=True, timeout=1)
-        self.assertEqual('timed out trying to claim keep',
+            f.store(wait=True, timeout=1)
+        self.assertEqual('timed out trying to store',
                          cm.exception.message)
 
         response = MockResponse(200, '{"on_s3": true}')
         request.return_value = response
-        f.keep(wait=True, timeout=1)
+        f.store(wait=True, timeout=1)
 
     @patch('requests.request', autospec=True)
     def test_url_caching(self, request):

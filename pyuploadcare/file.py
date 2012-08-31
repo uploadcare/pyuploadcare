@@ -24,7 +24,16 @@ class File(object):
 
         return super(File, self).__getattr__(name)
 
-    def keep(self, wait=False, timeout=5):
+    def keep(self, **kwargs):
+        """Deprecated method.
+
+        Use store instead.
+        Will be removed eventually.
+        """
+        logger.warn("keep() is deprecated, use store() instead")
+        return self.store(**kwargs)
+
+    def store(self, wait=False, timeout=5):
         if self.ucare.api_version == '0.1':
             self._info = self.ucare.make_request('POST', self.api_uri, data={
                 'keep': 1
@@ -36,7 +45,7 @@ class File(object):
             time_started = time.time()
             while not self.info['on_s3']:
                 if time.time() - time_started > timeout:
-                    raise Exception('timed out trying to claim keep')
+                    raise Exception('timed out trying to store')
                 self.update_info()
                 time.sleep(0.1)
         self.update_info()
