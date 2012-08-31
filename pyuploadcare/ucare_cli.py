@@ -55,8 +55,8 @@ def get(args):
     pp.pprint(uc_file(args.path).info)
 
 
-def keep(args):
-    uc_file(args.path).keep()
+def store(args):
+    uc_file(args.path).store()
 
 
 def delete(args):
@@ -94,9 +94,9 @@ def get_args():
     subparser.set_defaults(func=get)
     subparser.add_argument('path', help='file path')
 
-    # keep
-    subparser = subparsers.add_parser('keep', help='claim keep')
-    subparser.set_defaults(func=keep)
+    # store
+    subparser = subparsers.add_parser('store', help='store file')
+    subparser.set_defaults(func=store)
     subparser.add_argument('path', help='file path')
 
     # delete
