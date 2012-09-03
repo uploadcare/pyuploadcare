@@ -4,7 +4,14 @@
     * Added 'Accept' request header
     * Added ucare config file parsing
     * Added pyuploadcare/tests.py
-    * Replace upload API
+    * Replaced upload API
+    * Replaced File.keep with File.store, File.keep is deprecated
+    * File.store uses new PUT request
+    * Added timeouts to File.store, File.delete
+    * Added upload and upload_from_url to ucare
+    * Added tests during setup
+    * Replaced httplib with requests, support https (certificates for api requests are verified)
+    * Added api_version arg to UploadCare, default is 0.2
 
 
 ### 0.6
