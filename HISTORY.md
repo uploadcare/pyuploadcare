@@ -1,3 +1,7 @@
+### 0.x
+    * Replaced Authentication header with Authorization
+
+
 ### 0.7
     * Added __version__
     * Added 'User-Agent' request header

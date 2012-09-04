@@ -104,8 +104,15 @@ class UploadCare(UploaderMixin):
                         sign_string,
                         hashlib.sha1).hexdigest()
 
+
+        # TODO: remove this when bugs are fixed and api is deployed to production
+        if self.api_version == '0.1':
+            auth_header_name = 'Authentication'
+        else:
+            auth_header_name = 'Authorization'
+
         headers = {
-            'Authentication': 'UploadCare %s:%s' % (self.pub_key, sign),
+            auth_header_name: 'UploadCare {}:{}'.format(self.pub_key, sign),
             'Date': date,
             'Content-Type': content_type,
             'Content-Length': str(len(content)),
