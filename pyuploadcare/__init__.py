@@ -129,7 +129,10 @@ class UploadCare(UploaderMixin):
         logger.debug('got: %s %s' % (response.status_code, response.content))
 
         if 'warning' in response.headers:
-            logger.warn('API Warning: {}'.format(response.headers['warning']))
+            match = re.search('"(.+)"', response.headers['warning'])
+            if match:
+                for warning in match.group(1).split('; '):
+                    logger.warn('API Warning: {}'.format(warning))
 
         if response.status_code == 200: # Ok
             if response.json is None:
