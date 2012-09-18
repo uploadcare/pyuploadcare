@@ -85,7 +85,7 @@ class UploadCare(UploaderMixin):
         path = self._build_api_path(path)
         content = ''
 
-        if data:
+        if data is not None:
             content = json.dumps(data)
 
         content_type = 'application/json'
@@ -124,9 +124,12 @@ class UploadCare(UploaderMixin):
 
         uri = self._build_api_uri(path)
         response = requests.request(verb, uri, allow_redirects=True,
-                                    headers=headers)
+                                    headers=headers, data=content)
 
         logger.debug('got: %s %s' % (response.status_code, response.content))
+
+        if 'warning' in response.headers:
+            logger.warn('API Warning: {}'.format(response.headers['warning']))
 
         if response.status_code == 200: # Ok
             if response.json is None:
@@ -136,4 +139,4 @@ class UploadCare(UploaderMixin):
         if response.status_code == 204: # No Content
             return
 
-        raise UploadCareException(response, data)
+        raise UploadCareException(response, response.content)
