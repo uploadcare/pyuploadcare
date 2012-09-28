@@ -16,6 +16,7 @@ class MockResponse():
     def __init__(self, status, data):
         self.status_code = status
         self.content = data
+        self.headers = {}
 
     @property
     def json(self):
@@ -114,6 +115,27 @@ class FileTest(unittest.TestCase):
         self.assertEqual(fake_url, f.url)
         # no additional calls are made
         self.assertEqual(1, len(request.mock_calls))
+
+    @patch('requests.request', autospec=True)
+    def test_cdn_urls(self, request):
+        ucare = UploadCare('pub', 'secret')
+        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
+        f = ucare.file(uuid)
+        response = MockResponse(200, '{"on_s3": true, "last_keep_claim": true}')
+        request.return_value = response
+        f.store(wait=True, timeout=1)
+
+        self.assertEqual(f.cdn_url, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
+        self.assertEqual(f.resized_40x40, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40x40/')
+        self.assertEqual(f.resized_x40, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/x40/')
+        self.assertEqual(f.resized_40x, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40/')
+        self.assertEqual(f.cropped_40x40, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/40x40/')
+        with self.assertRaises(ValueError):
+            f.cropped_40
+        with self.assertRaises(ValueError):
+            f.resized_
+        with self.assertRaises(ValueError):
+            f.resized_1x1x1
 
 
 class TestFormFields(unittest.TestCase):

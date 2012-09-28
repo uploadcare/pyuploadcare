@@ -1,14 +1,9 @@
 import json
 import time
-from functools import partial
 
 import requests
 
 from pyuploadcare.file import File
-
-
-get = partial(requests.get, verify=False)
-post = partial(requests.post, verify=False)
 
 
 class UploaderException(Exception):
@@ -60,10 +55,9 @@ class UploaderMixin(object):
 
         """
         url_from = '{}from_url/'.format(self.upload_base)
-        response = get(url_from, params={
+        response = requests.get(url_from, params={
             'source_url': url,
-            'pub_key': self.pub_key,
-        })
+            'pub_key': self.pub_key,}, verify=self.verify_upload_ssl)
         if response.status_code != 200:
             raise UploaderException(
                 'status code: {}'.format(response.status_code))
@@ -79,7 +73,8 @@ class UploaderMixin(object):
 
     def get_status(self, token):
         url_status = '{}from_url/status/'.format(self.upload_base)
-        response = get(url_status, params={'token': token})
+        response = requests.get(url_status, params={'token': token},
+                                verify=self.verify_upload_ssl)
 
         if response.status_code != 200:
             raise UploaderException(
@@ -93,10 +88,11 @@ class UploaderMixin(object):
 
     def upload(self, filename):
         with open(filename) as f:
-            response = post(
+            response = requests.post(
                 '{}base/'.format(self.upload_base),
                 data={'UPLOADCARE_PUB_KEY': self.pub_key},
                 files={'file': f},
+                verify=self.verify_upload_ssl,
             )
             if response.status_code == 200:
                 data = json.loads(response.content)
