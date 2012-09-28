@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger("pyuploadcare")
 
 
-RESIZER_BASE = 'http://services.uploadcare.com/resizer/{file_id}/{cmd_line}/'
+CDN_BASE = 'http://ucarecdn.com/{uuid}/'
 
 
 class File(object):
@@ -18,11 +18,15 @@ class File(object):
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
 
-    def __getattr__(self, name):
-        if name.startswith('resized_'):
-            return self.string_resized(name[8:])
+    def __getattribute__(self, name):
+        if name.startswith('resized_') or name.startswith('cropped_'):
+            width, _, height = name[8:].partition('x')
+            width = int(width) if width else None
+            height = int(height) if height else None
+            func = self.cropped if name.startswith('c') else self.resized
+            return func(width, height)
 
-        return super(File, self).__getattr__(name)
+        return super(File, self).__getattribute__(name)
 
     def keep(self, **kwargs):
         """Deprecated method.
@@ -97,23 +101,29 @@ class File(object):
         return self.info['original_file_url']
 
     @property
+    def cdn_url(self):
+        if self.info['last_keep_claim'] is not None:
+            return CDN_BASE.format(uuid=self.file_id)
+        raise Exception('No CDN url for private file')
+
+    @property
     def filename(self):
         if not self.url:
             return ''
         return self.url.split('/')[-1]
 
-    def resized(self, width=None, height=None, crop=False):
-        dimensions = str(width or '')
+    def cropped(self, width=None, height=None):
+        if not width or not height:
+            raise ValueError('Need both width and height to crop')
+        dimensions = '{}x{}'.format(width, height)
+
+        return '{}-/crop/{}/'.format(self.cdn_url, dimensions)
+
+    def resized(self, width=None, height=None):
+        if not width and not height:
+            raise ValueError('Need width or height to resize')
+        dimensions = str(width) if width else ''
         if height:
-            dimensions += 'x%i' % height
+            dimensions += 'x{}'.format(height)
 
-        chunks = [dimensions]
-        if crop:
-            chunks.append('crop')
-
-        cmd_line = '/'.join(chunks)
-        return RESIZER_BASE.format(file_id=self.file_id, cmd_line=cmd_line)
-
-    def string_resized(self, cmd_line):
-        cmd_line = cmd_line.replace('_', '/')
-        return RESIZER_BASE.format(file_id=self.file_id, cmd_line=cmd_line)
+        return '{}-/resize/{}/'.format(self.cdn_url, dimensions)

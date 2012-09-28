@@ -19,6 +19,8 @@ settings = {
     'secret': None,
     'api_url': 'http://api.uploadcare.com/',
     'upload_url': 'http://upload.uploadcare.com/',
+    'verify_api_ssl': True,
+    'verify_upload_ssl': False,
     'api_version': '0.2'
 }
 
@@ -29,6 +31,8 @@ def create_ucare():
         secret=settings['secret'],
         api_base=settings['api_url'],
         upload_base=settings['upload_url'],
+        verify_api_ssl=settings['verify_api_ssl'],
+        verify_upload_ssl=settings['verify_upload_ssl'],
         api_version=settings['api_version']
     )
 
@@ -129,6 +133,16 @@ def get_args():
                         help='Upload API url, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
                              ' default: http://upload.uploadcare.com/')
+    parser.add_argument('--verify_upload_ssl',
+                        action='store_true',
+                        help='Verify ssl certificate of upload API url.'
+                             ' Can be read from uploadcare.ini'
+                             ' and ~/.uploadcare config files.')
+    parser.add_argument('--verify_api_ssl',
+                        action='store_true',
+                        help='Verify ssl certificate of API url.'
+                             ' Can be read from uploadcare.ini'
+                             ' and ~/.uploadcare config files.')
     parser.add_argument('--api_version',
                     help='API version, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
