@@ -113,6 +113,8 @@ class File(object):
         return self.url.split('/')[-1]
 
     def cropped(self, width=None, height=None):
+        logger.warn("cropped() is deprecated, use cdn_url with "
+                    "concatenated process command string")
         if not width or not height:
             raise ValueError('Need both width and height to crop')
         dimensions = '{}x{}'.format(width, height)
@@ -120,6 +122,8 @@ class File(object):
         return '{}-/crop/{}/'.format(self.cdn_url, dimensions)
 
     def resized(self, width=None, height=None):
+        logger.warn("resized() is deprecated, use cdn_url with "
+                    "concatenated process command string")
         if not width and not height:
             raise ValueError('Need width or height to resize')
         dimensions = str(width) if width else ''
