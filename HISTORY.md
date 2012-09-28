@@ -1,5 +1,8 @@
 ### 0.x
     * Replaced Authentication header with Authorization
+    * Log warnings found in HTTP headers
+    * Replace old resizer with new CDN
+    * Add verify_api_ssl, verify_upload_ssl options
 
 
 ### 0.7

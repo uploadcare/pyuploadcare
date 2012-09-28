@@ -29,6 +29,8 @@ class UploadCare(UploaderMixin):
     def __init__(self, pub_key, secret, timeout=5,
                  api_base='http://api.uploadcare.com/',
                  upload_base='http://upload.uploadcare.com/',
+                 verify_api_ssl=True,
+                 verify_upload_ssl=True,
                  api_version='0.2'):
         self.pub_key = pub_key
         self.secret = secret
@@ -36,6 +38,9 @@ class UploadCare(UploaderMixin):
 
         self.api_base = api_base
         self.upload_base = upload_base
+
+        self.verify_api_ssl = verify_api_ssl
+        self.verify_upload_ssl = verify_upload_ssl
 
         self._api_parts = urlparse.urlsplit(api_base)
 
@@ -124,6 +129,7 @@ class UploadCare(UploaderMixin):
 
         uri = self._build_api_uri(path)
         response = requests.request(verb, uri, allow_redirects=True,
+                                    verify=self.verify_api_ssl,
                                     headers=headers, data=content)
 
         logger.debug('got: %s %s' % (response.status_code, response.content))

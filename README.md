@@ -78,22 +78,26 @@ It's really simple, just use your UploadCare-enabled models as any other models:
 
         # p.photo contains pyuploadcare.file.File object
 
-        print p.photo.url()
+        print p.photo.cdn_url
 
         print p.photo.resized(200, 400) # returns the url of resized version of the image
         print p.photo.resized(height=400)
-        print p.photo.resized(150, 150, crop=True)
+        print p.photo.cropped(150, 150)
 
 ### Using it in templates
 
 To make your life easier, UploadCare file objects understand some 'magic' properties.
 
-    {{ p.photo.resized_120x200_crop }}
+    {{ p.photo.cropped_120x200 }}
     {{ p.photo.resized_120 }}
     {{ p.photo.resized_x120 }}
     {{ p.photo.resized_600x120 }}
 
 These are most useful in Django templates, which are somewhat limited in calling functions with arguments.
+Or you can contruct url manually:
+
+    {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
+
 
 [1]: http://uploadcare.com/
 [2]: https://groups.google.com/group/uploadcare-testing
