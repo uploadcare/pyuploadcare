@@ -180,9 +180,10 @@ def load_config_from_args(args):
         if arg is not None:
             settings[name] = arg
     custom_headers = {}
-    for header in args.header:
-        name, _, value = header.partition(':')
-        custom_headers[name] = value
+    if args.header is not None:
+        for header in args.header:
+            name, _, value = header.partition(':')
+            custom_headers[name] = value
     settings['custom_headers'] = custom_headers
 
 def main():
