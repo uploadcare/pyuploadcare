@@ -21,7 +21,8 @@ settings = {
     'upload_url': 'http://upload.uploadcare.com/',
     'verify_api_ssl': True,
     'verify_upload_ssl': False,
-    'api_version': '0.2'
+    'api_version': '0.2',
+    'custom_headers': None,
 }
 
 
@@ -34,6 +35,7 @@ def create_ucare():
         verify_api_ssl=settings['verify_api_ssl'],
         verify_upload_ssl=settings['verify_upload_ssl'],
         api_version=settings['api_version'],
+        custom_headers=settings['custom_headers'],
     )
 
 
@@ -147,6 +149,11 @@ def get_args():
                     help='API version, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
                              ' default: 0.2')
+    parser.add_argument('-H', '--header',
+                        help='Add custom HTTP headers, can be set several times.'
+                             ' header_name:value.'
+                             ' i.e. "ucare -H User-Agent:ie5 list"',
+                        action='append')
 
     args = parser.parse_args()
     return args
@@ -169,10 +176,14 @@ def load_config_from_file(filename):
 
 def load_config_from_args(args):
     for name in settings.keys():
-        arg = getattr(args, name)
+        arg = getattr(args, name, None)
         if arg is not None:
             settings[name] = arg
-
+    custom_headers = {}
+    for header in args.header:
+        name, _, value = header.partition(':')
+        custom_headers[name] = value
+    settings['custom_headers'] = custom_headers
 
 def main():
     args = get_args()

@@ -135,8 +135,11 @@ class UploadCare(UploaderMixin):
             'Content-Length': str(len(content)),
             'Accept': self.accept,
         })
-
-        logger.debug('sent: %s %s %s' % (verb, path, content))
+        logger.debug('''sent:
+            verb: {}
+            path: {}
+            headers: {}
+            data: {}'''.format(verb, path, headers, content))
 
         uri = self._build_api_uri(path)
         response = requests.request(verb, uri, allow_redirects=True,
