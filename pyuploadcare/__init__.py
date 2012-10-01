@@ -31,6 +31,7 @@ class UploadCare(UploaderMixin):
                  upload_base='http://upload.uploadcare.com/',
                  verify_api_ssl=True,
                  verify_upload_ssl=True,
+                 custom_headers=None,
                  api_version='0.2'):
         self.pub_key = pub_key
         self.secret = secret
@@ -41,6 +42,7 @@ class UploadCare(UploaderMixin):
 
         self.verify_api_ssl = verify_api_ssl
         self.verify_upload_ssl = verify_upload_ssl
+        self.custom_headers = custom_headers
 
         self._api_parts = urlparse.urlsplit(api_base)
 
@@ -50,7 +52,9 @@ class UploadCare(UploaderMixin):
         else:
             self.accept = 'application/vnd.uploadcare-v{}+json'.format(
                                 api_version)
-        self.user_agent = 'pyuploadcare/{}.{}'.format(*__version__)
+        self.default_headers = {
+            'User-Agent': 'pyuploadcare/{}.{}'.format(*__version__),
+        }
 
     def file(self, file_serialized):
         m = uuid_regex.search(file_serialized)
@@ -85,6 +89,14 @@ class UploadCare(UploaderMixin):
         ])
         return base + path
 
+    def _build_headers(self, headers=None):
+        result = dict(self.default_headers)
+        if headers is not None:
+            result.update(headers)
+        if self.custom_headers is not None:
+            result.update(self.custom_headers)
+        return result
+
     def make_request(self, verb, path, data=None):
 
         path = self._build_api_path(path)
@@ -116,16 +128,18 @@ class UploadCare(UploaderMixin):
         else:
             auth_header_name = 'Authorization'
 
-        headers = {
+        headers = self._build_headers({
             auth_header_name: 'UploadCare {}:{}'.format(self.pub_key, sign),
             'Date': date,
             'Content-Type': content_type,
             'Content-Length': str(len(content)),
             'Accept': self.accept,
-            'User-Agent': self.user_agent,
-        }
-
-        logger.debug('sent: %s %s %s' % (verb, path, content))
+        })
+        logger.debug('''sent:
+            verb: {}
+            path: {}
+            headers: {}
+            data: {}'''.format(verb, path, headers, content))
 
         uri = self._build_api_uri(path)
         response = requests.request(verb, uri, allow_redirects=True,
