@@ -33,7 +33,7 @@ def create_ucare():
         upload_base=settings['upload_url'],
         verify_api_ssl=settings['verify_api_ssl'],
         verify_upload_ssl=settings['verify_upload_ssl'],
-        api_version=settings['api_version']
+        api_version=settings['api_version'],
     )
 
 
