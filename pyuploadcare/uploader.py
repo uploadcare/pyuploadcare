@@ -55,9 +55,14 @@ class UploaderMixin(object):
 
         """
         url_from = '{}from_url/'.format(self.upload_base)
-        response = requests.get(url_from, params={
-            'source_url': url,
-            'pub_key': self.pub_key,}, verify=self.verify_upload_ssl)
+        response = requests.get(
+            url_from,
+            params={
+                'source_url': url,
+                'pub_key': self.pub_key,},
+            verify=self.verify_upload_ssl,
+            headers=self._build_headers(),
+        )
         if response.status_code != 200:
             raise UploaderException(
                 'status code: {}'.format(response.status_code))
@@ -73,8 +78,12 @@ class UploaderMixin(object):
 
     def get_status(self, token):
         url_status = '{}from_url/status/'.format(self.upload_base)
-        response = requests.get(url_status, params={'token': token},
-                                verify=self.verify_upload_ssl)
+        response = requests.get(
+            url_status,
+            params={'token': token},
+            verify=self.verify_upload_ssl,
+            headers=self._build_headers(),
+        )
 
         if response.status_code != 200:
             raise UploaderException(
@@ -93,6 +102,7 @@ class UploaderMixin(object):
                 data={'UPLOADCARE_PUB_KEY': self.pub_key},
                 files={'file': f},
                 verify=self.verify_upload_ssl,
+                headers=self._build_headers(),
             )
             if response.status_code == 200:
                 data = json.loads(response.content)
