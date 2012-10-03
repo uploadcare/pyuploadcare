@@ -1,8 +1,10 @@
-### 0.x
+### 0.8
+    * Fix file storing for old API
     * Replaced Authentication header with Authorization
     * Log warnings found in HTTP headers
     * Replace old resizer with new CDN
     * Add verify_api_ssl, verify_upload_ssl options
+    * Add custom HTTP headers to API and upload API requests
 
 
 ### 0.7

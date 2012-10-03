@@ -18,7 +18,8 @@ As soon as you get your API keys, add them to your Django settings file:
 
     UPLOADCARE = {
         'pub_key': '***',
-        'secret': '***'
+        'secret': '***',
+        'api_version': '0.1',
     }
 
 If you don't want to use hosted assets (from fastatic.uploadcare.com) you

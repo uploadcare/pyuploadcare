@@ -66,7 +66,8 @@ LOGGING = {
 UPLOADCARE = {
     #'api_base': "http://0.0.0.0:8000/api/",
     'pub_key': '--your key here--',
-    'secret': '--your secret here--'
+    'secret': '--your secret here--',
+    'api_version': '0.1',
 }
 
 #PYUPLOADCARE_USE_HOSTED_ASSETS = False
