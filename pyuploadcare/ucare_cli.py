@@ -71,14 +71,17 @@ def delete(args):
 
 def upload_from_url(args):
     ucare = create_ucare()
-    ufile = ucare.file_from_url(args.url, wait=True)
+    ufile = ucare.file_from_url(args.url, wait=(not args.dont_ask))
     print 'token: {0.token}\nstatus: {0.status}'.format(ufile)
 
 
 def upload(args):
     ucare = create_ucare()
     ufile = ucare.upload(args.filename)
-    pp.pprint(ufile.info)
+    if args.dont_ask:
+        print 'uuid: {0.file_id}'.format(ufile)
+    else:
+        pp.pprint(ufile.info)
 
 
 def get_args():
@@ -114,11 +117,17 @@ def get_args():
     subparser = subparsers.add_parser('upload_from_url', help='upload file from url')
     subparser.set_defaults(func=upload_from_url)
     subparser.add_argument('url', help='file url')
+    subparser.add_argument('--dont_ask',
+                           action='store_true',
+                           help='Do not care about upload status')
 
     # upload
     subparser = subparsers.add_parser('upload', help='upload file')
     subparser.set_defaults(func=upload)
     subparser.add_argument('filename', help='filename')
+    subparser.add_argument('--dont_ask',
+                           action='store_true',
+                           help='Do not care about upload status')
 
     # common arguments
     parser.add_argument('--pub_key',

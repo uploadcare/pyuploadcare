@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pyuploadcare',
-    version='0.8',
+    version='0.9',
     description='UploadCare.com API library',
     author='Valentin Golev',
     author_email='v.golev@gmail.com',
@@ -20,8 +20,8 @@ setup(
             'ucare = pyuploadcare.ucare_cli:main',
         ],
     },
-    install_requires=['requests==0.14.0'],
-    setup_requires=['nose==1.2.0',
+    install_requires=['requests>=0.14.0'],
+    setup_requires=['nose>=1.2.0',
                     'mock==0.8.0',],
     classifiers=[
         'Programming Language :: Python',

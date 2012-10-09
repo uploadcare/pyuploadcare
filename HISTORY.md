@@ -1,3 +1,8 @@
+### 0.9
+    * Add --dont_ask argument to ucare upload and upload_via_url commands
+    * Fix UploadedFile.wait()
+
+
 ### 0.8
     * Fix file storing for old API
     * Replaced Authentication header with Authorization
