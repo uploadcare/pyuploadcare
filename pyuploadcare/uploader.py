@@ -31,7 +31,7 @@ class UploadedFile(object):
             if time.time() - time_started > timeout:
                 return False
             self.update_status()
-            if self.status in ('success', 'failed'):
+            if self.status in ('success', 'failed', 'error'):
                 return True
             time.sleep(0.1)
 
