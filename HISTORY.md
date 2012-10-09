@@ -1,5 +1,5 @@
 ### 0.9
-    * Add --dont_ask argument to ucare upload and upload_via_url commands
+    * Add bunch of arguments to ucare upload and upload_via_url commands
     * Fix UploadedFile.wait()
 
 

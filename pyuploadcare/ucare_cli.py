@@ -9,7 +9,7 @@ import pprint
 import ConfigParser
 import os.path
 
-from pyuploadcare import UploadCare, UploadCareException
+from pyuploadcare import UploadCare, UploadCareException, __version__
 
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -69,23 +69,54 @@ def delete(args):
     uc_file(args.path).delete()
 
 
+def _check_upload_args(args):
+    if not args.secret and (args.store or args.info):
+        print 'Cannot store or get info without "--secret" key'
+        return False
+    return True
+
+
+def _handle_uploaded_file(uf, args):
+    if args.store:
+        uf.store(wait=True)
+        print 'File stored successfully.'
+
+    if args.info:
+        pp.pprint(uf.info)
+
+    if args.cdnurl:
+        print 'CDN url: {}'.format(uf.cdn_url)
+
+
 def upload_from_url(args):
+    if not _check_upload_args(args):
+        return
     ucare = create_ucare()
-    ufile = ucare.file_from_url(args.url, wait=(not args.dont_ask))
+    ufile = ucare.file_from_url(args.url, wait=(args.wait or args.store))
     print 'token: {0.token}\nstatus: {0.status}'.format(ufile)
+
+    if args.store or args.info:
+        _file = ufile.get_file()
+        if _file is None:
+            print 'Cannot store or get info.'
+            return
+
+        _handle_uploaded_file(_file, args)
 
 
 def upload(args):
+    if not _check_upload_args(args):
+        return
     ucare = create_ucare()
-    ufile = ucare.upload(args.filename)
-    if args.dont_ask:
-        print 'uuid: {0.file_id}'.format(ufile)
-    else:
-        pp.pprint(ufile.info)
+    _file = ucare.upload(args.filename)
+    _handle_uploaded_file(_file, args)
 
 
 def get_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version',
+                        version='ucare {}.{}'.format(*__version__))
+
     subparsers = parser.add_subparsers()
 
     # list
@@ -113,21 +144,55 @@ def get_args():
     subparser.set_defaults(func=delete)
     subparser.add_argument('path', help='file path')
 
+    # common upload args
+    upload_parent = argparse.ArgumentParser(add_help=False)
+    group = upload_parent.add_mutually_exclusive_group()
+    group.add_argument('--store',
+                       action='store_true',
+                       default=False,
+                       dest='store',
+                       help='Store uploaded file')
+    group.add_argument('--nostore',
+                       action='store_false',
+                       dest='store',
+                       help='Do not store uploaded file')
+    group = upload_parent.add_mutually_exclusive_group()
+    group.add_argument('--info',
+                       action='store_true',
+                       default=False,
+                       dest='info',
+                       help='Get uploaded file info')
+    group.add_argument('--noinfo',
+                       action='store_false',
+                       dest='info',
+                       help='Do not get uploaded file info')
+    upload_parent.add_argument('--cdnurl',
+                           action='store_true',
+                           help='Store file and get CDN url.')
+
     # upload from url
-    subparser = subparsers.add_parser('upload_from_url', help='upload file from url')
+    subparser = subparsers.add_parser('upload_from_url',
+                                      parents=[upload_parent],
+                                      help='upload file from url')
     subparser.set_defaults(func=upload_from_url)
     subparser.add_argument('url', help='file url')
-    subparser.add_argument('--dont_ask',
-                           action='store_true',
-                           help='Do not care about upload status')
+    group = subparser.add_mutually_exclusive_group()
+    group.add_argument('--wait',
+                       action='store_true',
+                       default=True,
+                       dest='wait',
+                       help='Wait for upload status')
+    group.add_argument('--nowait',
+                       action='store_false',
+                       dest='wait',
+                       help='Do not wait for upload status')
 
     # upload
-    subparser = subparsers.add_parser('upload', help='upload file')
+    subparser = subparsers.add_parser('upload',
+                                      parents=[upload_parent],
+                                      help='upload file')
     subparser.set_defaults(func=upload)
     subparser.add_argument('filename', help='filename')
-    subparser.add_argument('--dont_ask',
-                           action='store_true',
-                           help='Do not care about upload status')
 
     # common arguments
     parser.add_argument('--pub_key',
@@ -193,7 +258,10 @@ def load_config_from_args(args):
         for header in args.header:
             name, _, value = header.partition(':')
             custom_headers[name] = value
+    if args.cdnurl:
+        args.store = True
     settings['custom_headers'] = custom_headers
+
 
 def main():
     args = get_args()
