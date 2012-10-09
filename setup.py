@@ -20,9 +20,9 @@ setup(
             'ucare = pyuploadcare.ucare_cli:main',
         ],
     },
-    install_requires=['requests==0.14.0'],
-    setup_requires=['nose==1.2.0',
-                    'mock==0.8.0',],
+    install_requires=['requests>=0.14.0'],
+    setup_requires=['nose>=1.2.0',
+                    'mock>=0.8.0',],
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
