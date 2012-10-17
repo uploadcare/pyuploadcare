@@ -1,3 +1,9 @@
+### 0.10
+    * Add console log handler to ucare
+    * Add wait argument to ucare store and delete commands
+    * Fix ucare arg handling
+
+
 ### 0.9
     * Add bunch of arguments to ucare upload and upload_via_url commands
     * Fix UploadedFile.wait()

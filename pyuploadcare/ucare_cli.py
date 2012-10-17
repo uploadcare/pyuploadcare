@@ -62,11 +62,11 @@ def get(args):
 
 
 def store(args):
-    uc_file(args.path).store()
+    uc_file(args.path).store(wait=args.wait)
 
 
 def delete(args):
-    uc_file(args.path).delete()
+    uc_file(args.path).delete(wait=args.wait)
 
 
 def _check_upload_args(args):
@@ -134,13 +134,31 @@ def get_args():
     subparser.set_defaults(func=get)
     subparser.add_argument('path', help='file path')
 
+
+    # common store and delete args
+    waiting_parent = argparse.ArgumentParser(add_help=False)
+    group = waiting_parent.add_mutually_exclusive_group()
+    group.add_argument('--wait',
+        action='store_true',
+        default=True,
+        dest='wait',
+        help='Wait for operation to complete')
+    group.add_argument('--nowait',
+        action='store_false',
+        dest='wait',
+        help='Do not wait for operation to complete')
+
     # store
-    subparser = subparsers.add_parser('store', help='store file')
+    subparser = subparsers.add_parser('store',
+                                      parents=[waiting_parent],
+                                      help='store file')
     subparser.set_defaults(func=store)
     subparser.add_argument('path', help='file path')
 
     # delete
-    subparser = subparsers.add_parser('delete', help='request delete')
+    subparser = subparsers.add_parser('delete',
+                                      parents=[waiting_parent],
+                                      help='request delete')
     subparser.set_defaults(func=delete)
     subparser.add_argument('path', help='file path')
 
@@ -254,11 +272,11 @@ def load_config_from_args(args):
         if arg is not None:
             settings[name] = arg
     custom_headers = {}
-    if args.header is not None:
+    if getattr(args, 'header', None) is not None:
         for header in args.header:
             name, _, value = header.partition(':')
             custom_headers[name] = value
-    if args.cdnurl:
+    if getattr(args, 'cdnurl', False):
         args.store = True
     settings['custom_headers'] = custom_headers
 
@@ -272,8 +290,15 @@ def main():
     try:
         args.func(args)
     except UploadCareException as e:
+        print 'ERROR:'
         print e
 
 
 if __name__ == '__main__':
+    ch = logging.StreamHandler()
+    fmt = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    ch.setFormatter(fmt)
+    logger.addHandler(ch)
+    logger.setLevel(logging.INFO)
+
     main()
