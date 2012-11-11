@@ -101,7 +101,7 @@ Or you can contruct url manually:
 
 ### Time settings
 
-Keep in mind, that Uploadcare authentication will fail if computer clock is not synchronized.
+Keep in mind that Uploadcare authentication will fail if computer clock is not synchronized.
 
 
 [1]: http://uploadcare.com/
