@@ -47,7 +47,7 @@ class File(object):
                     raise Exception('timed out trying to store')
                 self.update_info()
                 time.sleep(0.1)
-            self.ensure_on_cdn(timeout=timeout - time.time() + time_started)
+            self.ensure_on_cdn()
         self.update_info()
 
     def delete(self, wait=False, timeout=5):
@@ -79,7 +79,7 @@ class File(object):
         while True:
             if time.time() - time_started > timeout:
                 raise Exception('timed out waiting for file appear on cdn')
-            resp = requests.head(self.cdn_url)
+            resp = requests.head(self.cdn_url, headers=self.ucare.default_headers)
             if resp.status_code == 200:
                 return
             logger.debug(resp)
