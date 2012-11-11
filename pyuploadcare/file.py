@@ -47,8 +47,8 @@ class File(object):
                     raise Exception('timed out trying to store')
                 self.update_info()
                 time.sleep(0.1)
+            self.ensure_on_cdn(timeout=timeout - time.time() + time_started)
         self.update_info()
-        self.ensure_on_cdn()
 
     def delete(self, wait=False, timeout=5):
         self.ucare.make_request('DELETE', self.api_uri)
