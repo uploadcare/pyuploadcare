@@ -54,7 +54,7 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.2+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.10')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.11')
 
         ucare = UploadCare('pub', 'secret', api_version='0.1')
         ucare.make_request('GET', '/files/')
@@ -62,7 +62,7 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.10')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.11')
 
     def test_uri_builders(self):
         ucare = UploadCare('pub', 'secret')
@@ -82,7 +82,7 @@ class FileTest(unittest.TestCase):
     @patch('requests.request', autospec=True)
     def test_store_timeout(self, request):
         ucare = UploadCare('pub', 'secret')
-        response = MockResponse(200, '{"on_s3": false}')
+        response = MockResponse(200, '{"on_s3": false, "last_keep_claim": null}')
         request.return_value = response
 
         f = File('uuid', ucare)
@@ -91,9 +91,25 @@ class FileTest(unittest.TestCase):
         self.assertEqual('timed out trying to store',
                          cm.exception.message)
 
-        response = MockResponse(200, '{"on_s3": true}')
+        response = MockResponse(200, '{"on_s3": true, "last_keep_claim": "now"}')
         request.return_value = response
         f.store(wait=True, timeout=1)
+
+    @patch('requests.request', autospec=True)
+    def test_delete_timeout(self, request):
+        ucare = UploadCare('pub', 'secret')
+        response = MockResponse(200, '{"removed": null}')
+        request.return_value = response
+
+        f = File('uuid', ucare)
+        with self.assertRaises(Exception) as cm:
+            f.delete(wait=True, timeout=1)
+        self.assertEqual('timed out trying to delete',
+                         cm.exception.message)
+
+        response = MockResponse(200, '{"removed": "now"}')
+        request.return_value = response
+        f.delete(wait=True, timeout=1)
 
     @patch('requests.request', autospec=True)
     def test_url_caching(self, request):

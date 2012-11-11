@@ -1,5 +1,6 @@
 import json
 import time
+from urlparse import urljoin
 
 import requests
 
@@ -31,9 +32,23 @@ class UploadedFile(object):
             if time.time() - time_started > timeout:
                 return False
             self.update_status()
-            if self.status in ('success', 'failed', 'error'):
-                return True
+            if self.status == 'success':
+                break
+            if self.status in ('failed', 'error'):
+                return False
             time.sleep(0.1)
+
+        f = self.get_file()
+        if f is None:
+            return False
+#        while True:
+#            if time.time() - time_started > timeout:
+#                return False
+#            f.update_info()
+#            if f.is_on_s3:
+#                return True
+        f.ensure_on_s3(timeout=timeout + time_started - time.time())
+        return True
 
     def get_file(self):
         """Get uploadcare.file.File
@@ -54,7 +69,7 @@ class UploaderMixin(object):
         If `wait` is True, wait for upload to complete for `timeout` seconds.
 
         """
-        url_from = '{}from_url/'.format(self.upload_base)
+        url_from = urljoin(self.upload_base, 'from_url/')
         response = requests.get(
             url_from,
             params={
@@ -73,11 +88,12 @@ class UploaderMixin(object):
         token = data['token']
         _file = UploadedFile(self, url, token)
         if wait:
-            _file.wait(timeout=timeout)
+            if not _file.wait(timeout=timeout):
+                raise UploaderException('timed out during upload')
         return _file
 
     def get_status(self, token):
-        url_status = '{}from_url/status/'.format(self.upload_base)
+        url_status = urljoin(self.upload_base, 'from_url/status/')
         response = requests.get(
             url_status,
             params={'token': token},
@@ -95,10 +111,10 @@ class UploaderMixin(object):
 
         return data['status'], data
 
-    def upload(self, filename):
+    def upload(self, filename, wait=False, timeout=30):
         with open(filename) as f:
             response = requests.post(
-                '{}base/'.format(self.upload_base),
+                urljoin(self.upload_base, 'base/'),
                 data={'UPLOADCARE_PUB_KEY': self.pub_key},
                 files={'file': f},
                 verify=self.verify_upload_ssl,
@@ -106,6 +122,9 @@ class UploaderMixin(object):
             )
             if response.status_code == 200:
                 data = json.loads(response.content)
-                return self.file(data['file'])
+                _file = self.file(data['file'])
+                if wait:
+                    _file.ensure_on_s3(timeout=timeout)
+                return _file
             raise UploaderException(
                 'status code: {}'.format(response.status_code))

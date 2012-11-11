@@ -1,4 +1,4 @@
-__version__ = (0, 10)
+__version__ = (0, 11)
 
 import email.utils
 import hashlib
@@ -29,6 +29,7 @@ class UploadCare(UploaderMixin):
     def __init__(self, pub_key, secret, timeout=5,
                  api_base='http://api.uploadcare.com/',
                  upload_base='http://upload.uploadcare.com/',
+                 cdn_base='http://ucarecdn.com/',
                  verify_api_ssl=True,
                  verify_upload_ssl=True,
                  custom_headers=None,
@@ -39,6 +40,7 @@ class UploadCare(UploaderMixin):
 
         self.api_base = api_base
         self.upload_base = upload_base
+        self.cdn_base = cdn_base
 
         self.verify_api_ssl = verify_api_ssl
         self.verify_upload_ssl = verify_upload_ssl
@@ -121,15 +123,8 @@ class UploadCare(UploaderMixin):
                         sign_string,
                         hashlib.sha1).hexdigest()
 
-
-        # TODO: remove this when bugs are fixed and api is deployed to production
-        if self.api_version == '0.1':
-            auth_header_name = 'Authentication'
-        else:
-            auth_header_name = 'Authorization'
-
         headers = self._build_headers({
-            auth_header_name: 'UploadCare {}:{}'.format(self.pub_key, sign),
+            'Authorization': 'Uploadcare {}:{}'.format(self.pub_key, sign),
             'Date': date,
             'Content-Type': content_type,
             'Content-Length': str(len(content)),
