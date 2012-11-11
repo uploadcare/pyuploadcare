@@ -41,12 +41,6 @@ class UploadedFile(object):
         f = self.get_file()
         if f is None:
             return False
-#        while True:
-#            if time.time() - time_started > timeout:
-#                return False
-#            f.update_info()
-#            if f.is_on_s3:
-#                return True
         f.ensure_on_s3(timeout=timeout + time_started - time.time())
         return True
 
