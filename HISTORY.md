@@ -1,3 +1,12 @@
+### 0.11
+    * Add cdn_base to Ucare.__init__
+    * Get rid of api v.0.1 support
+    * Add File.ensure_on_s3 and File.ensure_on_cdn helpers
+    * Add File properties is_on_s3, is_removed, is_stored
+    * Fix url construction
+    * Add and correct waiting to upload and upload_from_url
+
+
 ### 0.10
     * Add console log handler to ucare
     * Add wait argument to ucare store and delete commands

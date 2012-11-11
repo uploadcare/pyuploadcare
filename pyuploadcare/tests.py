@@ -13,7 +13,7 @@ from pyuploadcare.dj import forms as uc_forms
 
 
 class MockResponse():
-    def __init__(self, status, data):
+    def __init__(self, status, data='{}'):
         self.status_code = status
         self.content = data
         self.headers = {}
@@ -54,7 +54,7 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.2+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.10')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.11')
 
         ucare = UploadCare('pub', 'secret', api_version='0.1')
         ucare.make_request('GET', '/files/')
@@ -62,7 +62,7 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.10')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.11')
 
     def test_uri_builders(self):
         ucare = UploadCare('pub', 'secret')
@@ -79,21 +79,40 @@ class UploadCareTest(unittest.TestCase):
 
 
 class FileTest(unittest.TestCase):
+    @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
-    def test_store_timeout(self, request):
+    def test_store_timeout(self, request, head):
         ucare = UploadCare('pub', 'secret')
-        response = MockResponse(200, '{"on_s3": false}')
+        api_response = MockResponse(200, '{"on_s3": false, "last_keep_claim": null}')
+        request.return_value = api_response
+        cdn_response = MockResponse(200)
+        head.return_value = cdn_response
+
+        f = File('uuid', ucare)
+        with self.assertRaises(Exception) as cm:
+            f.store(wait=True, timeout=0.2)
+        self.assertEqual('timed out trying to store',
+                         cm.exception.message)
+
+        response = MockResponse(200, '{"on_s3": true, "last_keep_claim": "now"}')
+        request.return_value = response
+        f.store(wait=True, timeout=1)
+
+    @patch('requests.request', autospec=True)
+    def test_delete_timeout(self, request):
+        ucare = UploadCare('pub', 'secret')
+        response = MockResponse(200, '{"removed": null}')
         request.return_value = response
 
         f = File('uuid', ucare)
         with self.assertRaises(Exception) as cm:
-            f.store(wait=True, timeout=1)
-        self.assertEqual('timed out trying to store',
+            f.delete(wait=True, timeout=0.2)
+        self.assertEqual('timed out trying to delete',
                          cm.exception.message)
 
-        response = MockResponse(200, '{"on_s3": true}')
+        response = MockResponse(200, '{"removed": "now"}')
         request.return_value = response
-        f.store(wait=True, timeout=1)
+        f.delete(wait=True, timeout=1)
 
     @patch('requests.request', autospec=True)
     def test_url_caching(self, request):
@@ -116,13 +135,16 @@ class FileTest(unittest.TestCase):
         # no additional calls are made
         self.assertEqual(1, len(request.mock_calls))
 
+    @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
-    def test_cdn_urls(self, request):
+    def test_cdn_urls(self, request, head):
         ucare = UploadCare('pub', 'secret')
         uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
         f = ucare.file(uuid)
-        response = MockResponse(200, '{"on_s3": true, "last_keep_claim": true}')
-        request.return_value = response
+        api_response = MockResponse(200, '{"on_s3": true, "last_keep_claim": true}')
+        request.return_value = api_response
+        cdn_response = MockResponse(200)
+        head.return_value = cdn_response
         f.store(wait=True, timeout=1)
 
         self.assertEqual(f.cdn_url, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
@@ -137,6 +159,19 @@ class FileTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             f.resized_1x1x1
 
+    @patch('requests.head', autospec=True)
+    @patch('requests.request', autospec=True)
+    def test_ensure_on_cdn_raises(self, request, head):
+        ucare = UploadCare('pub', 'secret')
+        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
+        f = ucare.file(uuid)
+        api_response = MockResponse(200, '{"on_s3": true, "last_keep_claim": true}')
+        request.return_value = api_response
+        cdn_response = MockResponse(404)
+        head.return_value = cdn_response
+        with self.assertRaises(Exception) as cm:
+            f.store(wait=True, timeout=0.1)
+        self.assertEqual('timed out waiting for file appear on cdn', cm.exception.message)
 
 class TestFormFields(unittest.TestCase):
 

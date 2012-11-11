@@ -1,10 +1,10 @@
 import time
 import logging
 
+import requests
+
+
 logger = logging.getLogger("pyuploadcare")
-
-
-CDN_BASE = 'http://ucarecdn.com/{uuid}/'
 
 
 class File(object):
@@ -38,20 +38,16 @@ class File(object):
         return self.store(**kwargs)
 
     def store(self, wait=False, timeout=5):
-        if self.ucare.api_version == '0.1':
-            self._info = self.ucare.make_request('POST', self.api_uri, data={
-                'keep': 1
-            })
-        else:
-            self.ucare.make_request('PUT', self.storage_uri)
+        self.ucare.make_request('PUT', self.storage_uri)
 
         if wait:
             time_started = time.time()
-            while not self.info['on_s3']:
+            while not (self.is_on_s3 and self.is_stored):
                 if time.time() - time_started > timeout:
                     raise Exception('timed out trying to store')
                 self.update_info()
                 time.sleep(0.1)
+            self.ensure_on_cdn()
         self.update_info()
 
     def delete(self, wait=False, timeout=5):
@@ -59,12 +55,35 @@ class File(object):
 
         if wait:
             time_started = time.time()
-            while self.info['removed'] is None:
+            while not self.is_removed:
                 if time.time() - time_started > timeout:
                     raise Exception('timed out trying to delete')
                 self.update_info()
                 time.sleep(0.1)
         self.update_info()
+
+    def ensure_on_s3(self, timeout=5):
+        time_started = time.time()
+        while not self.is_on_s3:
+            if time.time() - time_started > timeout:
+                raise Exception('timed out waiting for uploading to s3')
+            self.update_info()
+            time.sleep(0.1)
+
+    def ensure_on_cdn(self, timeout=5):
+        if not self.is_on_s3:
+            raise Exception('file is not on s3 yet')
+        if not self.is_stored:
+            raise Exception('file is private')
+        time_started = time.time()
+        while True:
+            if time.time() - time_started > timeout:
+                raise Exception('timed out waiting for file appear on cdn')
+            resp = requests.head(self.cdn_url, headers=self.ucare.default_headers)
+            if resp.status_code == 200:
+                return
+            logger.debug(resp)
+            time.sleep(0.1)
 
     @property
     def info(self):
@@ -74,6 +93,18 @@ class File(object):
 
     def update_info(self):
         self._info = self.ucare.make_request('GET', self.api_uri)
+
+    @property
+    def is_on_s3(self):
+        return self.info['on_s3']
+
+    @property
+    def is_stored(self):
+        return self.info['last_keep_claim'] is not None
+
+    @property
+    def is_removed(self):
+        return self.info['removed'] is not None
 
     @property
     def api_uri(self):
@@ -102,8 +133,9 @@ class File(object):
 
     @property
     def cdn_url(self):
-        if self.info['last_keep_claim'] is not None:
-            return CDN_BASE.format(uuid=self.file_id)
+        if self.is_on_s3 and self.is_stored:
+            fmt = self.ucare.cdn_base + '{uuid}/'
+            return fmt.format(uuid=self.file_id)
         raise Exception('No CDN url for private file')
 
     @property
