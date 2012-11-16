@@ -63,13 +63,12 @@ LOGGING = {
 
 
 # upload care stuff starts here
+# NB: files uploaded by demo account are removed daily, use it to fool around
 UPLOADCARE = {
-    #'api_base': "http://0.0.0.0:8000/api/",
-    'pub_key': '--your key here--',
-    'secret': '--your secret here--',
-    'api_version': '0.1',
+    'pub_key': 'demopublickey',
+    'secret': 'demoprivatekey',
 }
 
 #PYUPLOADCARE_USE_HOSTED_ASSETS = False
-#PYUPLOADCARE_WIDGET_URL = 'http://static.example.com/widget.%(lang)s.js'
+#PYUPLOADCARE_WIDGET_URL = 'http://static.example.com/widget.js'
 #PYUPLOADCARE_UPLOAD_BASE_URL = 'http://other.upload.handler/'
