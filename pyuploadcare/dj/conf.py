@@ -3,12 +3,12 @@
 from django.conf import settings
 
 
-widget_version = '0.0.1'
+widget_version = '0.4.2'
 
-hosted_url = 'http://fastatic.uploadcare.com/widget/%(version)s/uploadcare-%(version)s.line.%%(lang)s.js' % {
-    'version': widget_version}
-local_url = 'uploadcare/assets/uploaders/uploadcare-%(version)s.line.%%(lang)s.js' % {
-    'version': widget_version}
+hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare-{version}.min.js'.format(
+    version=widget_version)
+local_url = 'uploadcare/assets/uploaders/uploadcare-{version}.min.js'.format(
+    version=widget_version)
 
 use_hosted_assets = getattr(settings, 'PYUPLOADCARE_USE_HOSTED_ASSETS', True)
 

@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pyuploadcare',
-    version='0.11',
+    version='0.12',
     description='UploadCare.com API library',
     author='Valentin Golev',
     author_email='v.golev@gmail.com',
