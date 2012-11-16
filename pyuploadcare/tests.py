@@ -54,7 +54,7 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.2+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.11')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.12')
 
         ucare = UploadCare('pub', 'secret', api_version='0.1')
         ucare.make_request('GET', '/files/')
@@ -62,14 +62,14 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.11')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.12')
 
     def test_uri_builders(self):
         ucare = UploadCare('pub', 'secret')
         path = ucare._build_api_path('/files/?asd=1')
         uri = ucare._build_api_uri(path)
         self.assertEqual(path, '/files/?asd=1')
-        self.assertEqual(uri, 'http://api.uploadcare.com/files/?asd=1')
+        self.assertEqual(uri, 'https://api.uploadcare.com/files/?asd=1')
 
         ucare = UploadCare('pub', 'secret', api_base='http://example.com/api')
         path = ucare._build_api_path('/files/?asd=1')
@@ -147,11 +147,11 @@ class FileTest(unittest.TestCase):
         head.return_value = cdn_response
         f.store(wait=True, timeout=1)
 
-        self.assertEqual(f.cdn_url, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
-        self.assertEqual(f.resized_40x40, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40x40/')
-        self.assertEqual(f.resized_x40, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/x40/')
-        self.assertEqual(f.resized_40x, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40/')
-        self.assertEqual(f.cropped_40x40, 'http://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/40x40/')
+        self.assertEqual(f.cdn_url, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
+        self.assertEqual(f.resized_40x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40x40/')
+        self.assertEqual(f.resized_x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/x40/')
+        self.assertEqual(f.resized_40x, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40/')
+        self.assertEqual(f.cropped_40x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/40x40/')
         with self.assertRaises(ValueError):
             f.cropped_40
         with self.assertRaises(ValueError):
@@ -184,8 +184,8 @@ class TestFormFields(unittest.TestCase):
 
         f = SomeForm()
         self.assertRegexpMatches(str(f.media),
-            'http://fastatic\.uploadcare\.com/widget/[\d\.]+/uploadcare-[\d\.]+line\.en\.js')
-        self.assertIn('role="uploadcare-line-uploader"', str(f['ff']))
+            'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js')
+        self.assertIn('role="uploadcare-uploader"', str(f['ff']))
         self.assertIn('data-public-key="asdf"', str(f['ff']))
         self.assertIn('type="hidden"', str(f['ff']))
 
@@ -199,7 +199,7 @@ class TestFormFields(unittest.TestCase):
 
         f = SomeForm()
         self.assertRegexpMatches(str(f.media),
-            'http://fastatic\.uploadcare\.com/widget/[\d\.]+/uploadcare-[\d\.]+line\.en\.js')
+            'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js')
         self.assertIn('role="role"', str(f['ff']))
         self.assertIn('data-public-key="asdf"', str(f['ff']))
         self.assertIn('type="hidden"', str(f['ff']))

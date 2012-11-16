@@ -1,34 +1,21 @@
 from django.forms import Field, TextInput
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import ugettext as _
 
 from pyuploadcare.dj import conf
 from pyuploadcare.dj import UploadCare
-
-
-def get_asset_lang():
-    """returns a localized asset url"""
-    lang = get_language()
-    if lang.startswith('en'):
-        lang = lang[:2]
-
-    if not lang in conf.AVAIL_ASSET_LANG:
-        lang = 'en'
-
-    return conf.UPLOADCARE_JS % {'lang': lang}
 
 
 class FileWidget(TextInput):
     input_type = 'hidden'
 
     class Media:
-        js = (get_asset_lang(),)
+        js = (conf.UPLOADCARE_JS,)
 
     def __init__(self, attrs=None):
         default_attrs = {
-            'role': 'uploadcare-line-uploader',
+            'role': 'uploadcare-uploader',
             'data-public-key': UploadCare().pub_key,
-            'data-override-style': 'float: left;',
         }
 
         if conf.UPLOAD_BASE_URL is not None:
@@ -47,11 +34,11 @@ class FileWidget(TextInput):
                 value = UploadCare().file(value)
 
             if value.url:
-                fname = '<a href="%s">%s</a>' % (value.url, value.filename)
+                fname = '<a href="{}">{}</a>'.format(value.url, value.filename)
             else:
-                fname = '%s (%s)' % (value.filename, _('unavail.'))
+                fname = '{} ({})'.format(value.filename, _('unavail.'))
 
-            description = '<p>%s: %s</p>' % (_('File'), fname)
+            description = '<p>{}: {}</p>'.format(_('File'), fname)
 
             html = mark_safe(html + description)
 
