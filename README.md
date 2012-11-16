@@ -10,7 +10,7 @@ To install it, just run
 
 ## How to use it with Django?
 
-First of all, you'll need API keys: public and private. You can get them at [the Uploadcare website][1]. Currently it requires an invitation code to register, please request an access to [uploadcare-testing user group][2] and find it there.
+First of all, you'll need API keys: public and private. You can get them at [the Uploadcare website][1].
 
 As soon as you get your API keys, add them to your Django settings file:
 
@@ -102,4 +102,3 @@ Keep in mind that Uploadcare authentication will fail if computer clock is not s
 
 
 [1]: https://uploadcare.com/
-[2]: https://groups.google.com/group/uploadcare-testing
