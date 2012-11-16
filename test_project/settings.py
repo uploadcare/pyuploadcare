@@ -63,7 +63,8 @@ LOGGING = {
 
 
 # upload care stuff starts here
-# NB: files uploaded by demo account are removed daily, use it to fool around
+# NB: files uploaded by demo account are removed daily, use it to fool around or
+#     signup on https://uploadcare.com to get your own keys.
 UPLOADCARE = {
     'pub_key': 'demopublickey',
     'secret': 'demoprivatekey',
