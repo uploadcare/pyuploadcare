@@ -17,10 +17,10 @@ logger = logging.getLogger('pyuploadcare')
 settings = {
     'pub_key': None,
     'secret': None,
-    'api_url': 'http://api.uploadcare.com/',
-    'upload_url': 'http://upload.uploadcare.com/',
+    'api_url': 'https://api.uploadcare.com/',
+    'upload_url': 'https://upload.uploadcare.com/',
     'verify_api_ssl': True,
-    'verify_upload_ssl': False,
+    'verify_upload_ssl': True,
     'api_version': '0.2',
     'custom_headers': None,
 }
@@ -222,11 +222,11 @@ def get_args():
     parser.add_argument('--api_url',
                         help='API url, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
-                             ' default: http://api.uploadcare.com/')
+                             ' default: https://api.uploadcare.com/')
     parser.add_argument('--upload_url',
                         help='Upload API url, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
-                             ' default: http://upload.uploadcare.com/')
+                             ' default: https://upload.uploadcare.com/')
     parser.add_argument('--verify_upload_ssl',
                         action='store_true',
                         help='Verify ssl certificate of upload API url.'

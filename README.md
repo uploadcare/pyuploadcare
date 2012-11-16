@@ -36,12 +36,9 @@ to INSTALLED_APPS setting and add
 
     PYUPLOADCARE_USE_HOSTED_ASSETS = False
     PYUPLOADCARE_WIDGET_URL = 'http://path.to.asset'
-    # or
-    PYUPLOADCARE_WIDGET_URL = 'http://path.to.%(lang)s.asset.'
 
 
-to django settings file. 'lang' placeholder will be substituted with current
-locale name from supported list ('en', 'pl', 'ru') or 'en'.
+to django settings file.
 
 Uploadcare widget will use default upload handler url, unless you specify
 PYUPLOADCARE_UPLOAD_BASE_URL django settings
@@ -68,7 +65,7 @@ Adding a Uploadcare file field to your model is really simple. Like that:
 
 It looks nice in the admin interface
 
-![Admin page](http://f.cl.ly/items/1v120O3h2W462o3T323F/Screen%20Shot%202011-11-04%20at%202.03.32%20PM.png)
+![Admin page](https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/)
 
 ### Using it
 
@@ -104,5 +101,5 @@ Or you can contruct url manually:
 Keep in mind that Uploadcare authentication will fail if computer clock is not synchronized.
 
 
-[1]: http://uploadcare.com/
+[1]: https://uploadcare.com/
 [2]: https://groups.google.com/group/uploadcare-testing
