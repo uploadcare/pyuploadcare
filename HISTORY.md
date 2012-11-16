@@ -1,3 +1,9 @@
+### 0.12
+    * Add new widget to pyuploadcare.dj
+    * Remove old widget
+    * Use https for all requests
+
+
 ### 0.11
     * Add cdn_base to Ucare.__init__
     * Get rid of api v.0.1 support
