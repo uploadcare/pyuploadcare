@@ -154,9 +154,9 @@ class CDNFile(object):
         return '{base}{id}/{command}'.format(base=self.file.ucare.cdn_base,
             id=self.file.file_id, command=self.command_string)
 
-    def _add_command(self, command, *args):
-        """Return self copy for chain access."""
-        command_string = '-/{}/{}/'.format(command, '/'.join(args))
+    def _add_raw_command(self, command, args):
+        """Return self copy with chainable applied command."""
+        command_string = '-/{}/{}/'.format(command, args)
         return self.__class__(self.file, self.command_string + command_string)
 
     def crop(self, width, height, center=False, fill_color=None):
@@ -169,20 +169,20 @@ class CDNFile(object):
             #     raise ValueError('Fill_color should be 3 or 6 hex digits.')
             # int(fill_color, 16)  # Will raise ValueError if not hex.
             args.append(fill_color)
-        return self._add_command('crop', *args)
+        return self._add_raw_command('crop', '/'.join(args))
 
     def resize(self, width=None, height=None):
         if not width and not height:
             raise ValueError('Width or height reqired to resize.')
 
         dimensions = '{}x{}'.format(width or '', height or '')
-        return self._add_command('resize', dimensions)
+        return self._add_raw_command('resize', dimensions)
 
     def scale_crop(self, width, height, center=False):
         args = ['{}x{}'.format(width, height)]
         if center:
             args.append('center')
-        return self._add_command('scale_crop', *args)
+        return self._add_raw_command('scale_crop', '/'.join(args))
 
     def effect(self, effect):
-        return self._add_command('effect', effect)
+        return self._add_raw_command('effect', effect)
