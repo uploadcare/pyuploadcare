@@ -6,6 +6,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project'
 from mock import patch
 from django.test.utils import override_settings
 from django import forms
+from django.template import Template, Context, TemplateSyntaxError
 
 from pyuploadcare import UploadCare, UploadCareException
 from pyuploadcare.file import File, CDNFile
@@ -76,6 +77,31 @@ class UploadCareTest(unittest.TestCase):
         uri = ucare._build_api_uri(path)
         self.assertEqual(path, '/api/files/?asd=1')
         self.assertEqual(uri, 'http://example.com/api/files/?asd=1')
+
+
+class TemplateTagsTest(unittest.TestCase):
+
+    @override_settings(INSTALLED_APPS=['pyuploadcare.dj'])
+    def test_filter_funcions(self):
+        ucare = UploadCare('pub', 'secret')
+        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
+        c = Context({'f': ucare.file(uuid), 't': 'string value'})
+
+        t = Template("{% load uploadcare %}{{ t|crop:'20x30' }}")
+        self.assertEqual(t.render(c), 'string value')
+        t = Template("{% load uploadcare %}{{ f|crop:'20x30' }}")
+        self.assertEqual(t.render(c),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/')
+        t = Template("{% load uploadcare %}{{ f|crop:'20x30'|resize:'60x80' }}")
+        self.assertEqual(t.render(c),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/-/resize/60x80/')
+        t = Template("{% load uc_crop from uploadcare %}{{ f|uc_crop:'20x30' }}")
+        self.assertEqual(t.render(c),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/')
+        with self.assertRaises(TemplateSyntaxError):
+            t = Template("{% load uc_crop from uploadcare %}{{ f|crop:'20x30' }}")
+            self.assertEqual(t.render(c),
+                'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/')
 
 
 class FileTest(unittest.TestCase):
