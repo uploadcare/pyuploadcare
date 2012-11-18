@@ -7,6 +7,13 @@ import requests
 logger = logging.getLogger("pyuploadcare")
 
 
+# This function is helper for constuct similar proxy methods.
+def make_cdn_command(method):
+    def command(self, *args, **kwargs):
+        return getattr(self.cdn_url, method)(*args, **kwargs)
+    return command
+
+
 class File(object):
     _info = None
     _cached_url = None
@@ -17,16 +24,6 @@ class File(object):
 
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
-
-    def __getattr__(self, name):
-        if name.startswith('resized_') or name.startswith('cropped_'):
-            width, _, height = name[8:].partition('x')
-            width = int(width) if width else None
-            height = int(height) if height else None
-            func = self.cropped if name.startswith('c') else self.resized
-            return func(width, height)
-
-        return super(File, self).__getattr__(name)
 
     def keep(self, **kwargs):
         """Deprecated method.
@@ -133,10 +130,7 @@ class File(object):
 
     @property
     def cdn_url(self):
-        if self.is_on_s3 and self.is_stored:
-            fmt = self.ucare.cdn_base + '{uuid}/'
-            return fmt.format(uuid=self.file_id)
-        raise Exception('No CDN url for private file')
+        return CDNFile(self)
 
     @property
     def filename(self):
@@ -144,22 +138,51 @@ class File(object):
             return ''
         return self.url.split('/')[-1]
 
-    def cropped(self, width=None, height=None):
-        logger.warn("cropped() is deprecated, use cdn_url with "
-                    "concatenated process command string")
-        if not width or not height:
-            raise ValueError('Need both width and height to crop')
-        dimensions = '{}x{}'.format(width, height)
+    # This method is just proxy to cdn_url methods.
+    crop = make_cdn_command('crop')
+    resize = make_cdn_command('resize')
+    scale_crop = make_cdn_command('scale_crop')
+    effect = make_cdn_command('effect')
 
-        return '{}-/crop/{}/'.format(self.cdn_url, dimensions)
 
-    def resized(self, width=None, height=None):
-        logger.warn("resized() is deprecated, use cdn_url with "
-                    "concatenated process command string")
+class CDNFile(object):
+    def __init__(self, file, command_string=''):
+        self.file = file
+        self.command_string = command_string
+
+    def __str__(self):
+        return '{base}{id}/{command}'.format(base=self.file.ucare.cdn_base,
+            id=self.file.file_id, command=self.command_string)
+
+    def _add_command(self, command, *args):
+        """Return self copy for chain access."""
+        command_string = '-/{}/{}/'.format(command, '/'.join(args))
+        return self.__class__(self.file, self.command_string + command_string)
+
+    def crop(self, width, height, center=False, fill_color=None):
+        args = ['{}x{}'.format(width, height)]
+        if center:
+            args.append('center')
+        if fill_color is not None:
+            # TODO: Does check needed? For example:
+            # if len(fill_color) not in (3, 6):
+            #     raise ValueError('Fill_color should be 3 or 6 hex digits.')
+            # int(fill_color, 16)  # Will raise ValueError if not hex.
+            args.append(fill_color)
+        return self._add_command('crop', *args)
+
+    def resize(self, width=None, height=None):
         if not width and not height:
-            raise ValueError('Need width or height to resize')
-        dimensions = str(width) if width else ''
-        if height:
-            dimensions += 'x{}'.format(height)
+            raise ValueError('Width or height reqired to resize.')
 
-        return '{}-/resize/{}/'.format(self.cdn_url, dimensions)
+        dimensions = '{}x{}'.format(width or '', height or '')
+        return self._add_command('resize', dimensions)
+
+    def scale_crop(self, width, height, center=False):
+        args = ['{}x{}'.format(width, height)]
+        if center:
+            args.append('center')
+        return self._add_command('scale_crop', *args)
+
+    def effect(self, effect):
+        return self._add_command('effect', effect)
