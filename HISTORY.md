@@ -1,3 +1,7 @@
+### 0.13
+    * Fix unicode issue on field render
+
+
 ### 0.12
     * Add new widget to pyuploadcare.dj
     * Remove old widget
