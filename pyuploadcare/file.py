@@ -108,11 +108,11 @@ class File(object):
 
     @property
     def api_uri(self):
-        return '/files/{}/'.format(self.file_id)
+        return '/files/{0}/'.format(self.file_id)
 
     @property
     def storage_uri(self):
-        return '/files/{}/storage/'.format(self.file_id)
+        return '/files/{0}/storage/'.format(self.file_id)
 
     def serialize(self):
         """Returns a string suitable to be stored somewhere.
@@ -149,9 +149,9 @@ class File(object):
                     "concatenated process command string")
         if not width or not height:
             raise ValueError('Need both width and height to crop')
-        dimensions = '{}x{}'.format(width, height)
+        dimensions = '{0}x{1}'.format(width, height)
 
-        return '{}-/crop/{}/'.format(self.cdn_url, dimensions)
+        return '{0}-/crop/{1}/'.format(self.cdn_url, dimensions)
 
     def resized(self, width=None, height=None):
         logger.warn("resized() is deprecated, use cdn_url with "
@@ -160,6 +160,6 @@ class File(object):
             raise ValueError('Need width or height to resize')
         dimensions = str(width) if width else ''
         if height:
-            dimensions += 'x{}'.format(height)
+            dimensions += 'x{0}'.format(height)
 
-        return '{}-/resize/{}/'.format(self.cdn_url, dimensions)
+        return '{0}-/resize/{1}/'.format(self.cdn_url, dimensions)
