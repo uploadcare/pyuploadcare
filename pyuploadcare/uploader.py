@@ -20,7 +20,7 @@ class UploadedFile(object):
         self.data = None
 
     def __repr__(self):
-        return '<uploadcare.UploadedFile {} {}>'.format(self.url, self.status)
+        return '<uploadcare.UploadedFile {0} {1}>'.format(self.url, self.status)
 
     def update_status(self):
         self.status, self.data = self.uploader.get_status(self.token)
@@ -74,11 +74,11 @@ class UploaderMixin(object):
         )
         if response.status_code != 200:
             raise UploaderException(
-                'status code: {}'.format(response.status_code))
+                'status code: {0}'.format(response.status_code))
         data = json.loads(response.content)
         if 'token' not in data:
             raise UploaderException(
-                'could not find token in response: {}'.format(data))
+                'could not find token in response: {0}'.format(data))
         token = data['token']
         _file = UploadedFile(self, url, token)
         if wait:
@@ -97,11 +97,11 @@ class UploaderMixin(object):
 
         if response.status_code != 200:
             raise UploaderException(
-                'status code: {}'.format(response.status_code))
+                'status code: {0}'.format(response.status_code))
         data = json.loads(response.content)
         if 'status' not in data:
             raise UploaderException(
-                'could not find status in response: {}'.format(data))
+                'could not find status in response: {0}'.format(data))
 
         return data['status'], data
 
@@ -121,4 +121,4 @@ class UploaderMixin(object):
                     _file.ensure_on_s3(timeout=timeout)
                 return _file
             raise UploaderException(
-                'status code: {}'.format(response.status_code))
+                'status code: {0}'.format(response.status_code))

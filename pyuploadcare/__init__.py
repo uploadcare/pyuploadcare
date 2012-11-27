@@ -52,10 +52,10 @@ class UploadCare(UploaderMixin):
         if self.api_version == '0.1':
             self.accept = 'application/json'
         else:
-            self.accept = 'application/vnd.uploadcare-v{}+json'.format(
+            self.accept = 'application/vnd.uploadcare-v{0}+json'.format(
                                 api_version)
         self.default_headers = {
-            'User-Agent': 'pyuploadcare/{}.{}'.format(*__version__),
+            'User-Agent': 'pyuploadcare/{0}.{1}'.format(*__version__),
         }
 
     def file(self, file_serialized):
@@ -124,17 +124,17 @@ class UploadCare(UploaderMixin):
                         hashlib.sha1).hexdigest()
 
         headers = self._build_headers({
-            'Authorization': 'Uploadcare {}:{}'.format(self.pub_key, sign),
+            'Authorization': 'Uploadcare {0}:{1}'.format(self.pub_key, sign),
             'Date': date,
             'Content-Type': content_type,
             'Content-Length': str(len(content)),
             'Accept': self.accept,
         })
         logger.debug('''sent:
-            verb: {}
-            path: {}
-            headers: {}
-            data: {}'''.format(verb, path, headers, content))
+            verb: {0}
+            path: {1}
+            headers: {2}
+            data: {3}'''.format(verb, path, headers, content))
 
         uri = self._build_api_uri(path)
         response = requests.request(verb, uri, allow_redirects=True,
@@ -147,7 +147,7 @@ class UploadCare(UploaderMixin):
             match = re.search('"(.+)"', response.headers['warning'])
             if match:
                 for warning in match.group(1).split('; '):
-                    logger.warn('API Warning: {}'.format(warning))
+                    logger.warn('API Warning: {0}'.format(warning))
 
         if response.status_code == 200: # Ok
             if response.json is None:

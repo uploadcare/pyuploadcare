@@ -85,7 +85,7 @@ def _handle_uploaded_file(uf, args):
         pp.pprint(uf.info)
 
     if args.cdnurl:
-        print 'CDN url: {}'.format(uf.cdn_url)
+        print 'CDN url: {0}'.format(uf.cdn_url)
 
 
 def upload_from_url(args):
@@ -115,7 +115,7 @@ def upload(args):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version',
-                        version='ucare {}.{}'.format(*__version__))
+                        version='ucare {0}.{1}'.format(*__version__))
 
     subparsers = parser.add_subparsers()
 
