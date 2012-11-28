@@ -129,7 +129,7 @@ class FileTest(unittest.TestCase):
         self.assertEqual('meh', f.url)
         self.assertEqual(1, len(request.mock_calls))
 
-        fake_url = 'http://i-am-the-file/{}/'.format(uuid)
+        fake_url = 'http://i-am-the-file/{0}/'.format(uuid)
         f = ucare.file(fake_url)
         self.assertEqual(fake_url, f.url)
         # no additional calls are made

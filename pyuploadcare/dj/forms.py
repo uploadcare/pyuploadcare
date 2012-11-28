@@ -34,11 +34,11 @@ class FileWidget(TextInput):
                 value = UploadCare().file(value)
 
             if value.url:
-                fname = u'<a href="{}">{}</a>'.format(value.url, value.filename)
+                fname = '<a href="{0}">{1}</a>'.format(value.url, value.filename)
             else:
-                fname = u'{} ({})'.format(value.filename, _('unavail.'))
+                fname = '{0} ({1})'.format(value.filename, _('unavail.'))
 
-            description = u'<p>{}: {}</p>'.format(_('File'), fname)
+            description = '<p>{0}: {1}</p>'.format(_('File'), fname)
 
             html = mark_safe(html + description)
 
