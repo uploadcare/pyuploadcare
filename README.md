@@ -8,6 +8,16 @@ To install it, just run
 
 (or `easy_install pyuploadcare` if you're into vintage)
 
+You can use `pyuploadcare` now:
+
+    >>> import pyuploadcare
+    >>> pyuploadcare.UploadCare
+    <class 'pyuploadcare.UploadCare'>
+    
+You can also use our console utility, `ucare`:
+
+    $ ucare -h
+
 ## How to use it with Django?
 
 First of all, you'll need API keys: public and private. You can get them at [the Uploadcare website][1].
