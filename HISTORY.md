@@ -1,3 +1,7 @@
+### 0.14
+    * Replace accept header for old api version
+
+
 ### 0.13
     * Fix unicode issue on field render
 

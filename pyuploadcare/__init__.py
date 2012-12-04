@@ -1,4 +1,4 @@
-__version__ = (0, 13)
+__version__ = (0, 14)
 
 import email.utils
 import hashlib
@@ -49,11 +49,7 @@ class UploadCare(UploaderMixin):
         self._api_parts = urlparse.urlsplit(api_base)
 
         self.api_version = api_version
-        if self.api_version == '0.1':
-            self.accept = 'application/json'
-        else:
-            self.accept = 'application/vnd.uploadcare-v{0}+json'.format(
-                                api_version)
+        self.accept = 'application/vnd.uploadcare-v{0}+json'.format(api_version)
         self.default_headers = {
             'User-Agent': 'pyuploadcare/{0}.{1}'.format(*__version__),
         }
