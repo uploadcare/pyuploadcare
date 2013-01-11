@@ -96,7 +96,6 @@ class UploadCare(UploaderMixin):
         return result
 
     def make_request(self, verb, path, data=None):
-
         path = self._build_api_path(path)
         content = ''
 
@@ -145,10 +144,9 @@ class UploadCare(UploaderMixin):
                 for warning in match.group(1).split('; '):
                     logger.warn('API Warning: {0}'.format(warning))
 
+        # TODO: Add check for content-type.
         if response.status_code == 200: # Ok
-            if response.json is None:
-                raise ValueError('no json in response')
-            return response.json
+            return response.json()
 
         if response.status_code == 204: # No Content
             return

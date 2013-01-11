@@ -1,7 +1,7 @@
 import unittest
 import os
 import json
-os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
 from django.test.utils import override_settings
@@ -18,29 +18,24 @@ class MockResponse():
         self.content = data
         self.headers = {}
 
-    @property
     def json(self):
         """Returns the json-encoded content of a response, if any."""
-        try:
-            return json.loads(self.content)
-        except ValueError:
-            return None
+        return json.loads(self.content)
 
 
 class UploadCareTest(unittest.TestCase):
 
     @patch('requests.request', autospec=True)
     def test_raises(self, request):
-        request.return_value = MockResponse(404, '{}')
         ucare = UploadCare('pub', 'secret')
 
+        request.return_value = MockResponse(404, '{}')
         with self.assertRaises(UploadCareException):
             ucare.make_request('GET', '/files/')
 
         request.return_value = MockResponse(200, 'meh')
         with self.assertRaises(ValueError) as cm:
             ucare.make_request('GET', '/files/')
-        self.assertEqual('no json in response', cm.exception.message)
 
     @patch('requests.request', autospec=True)
     def test_request_headers(self, request):

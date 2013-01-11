@@ -1,4 +1,3 @@
-import json
 import time
 from urlparse import urljoin
 
@@ -9,7 +8,6 @@ from pyuploadcare.file import File
 
 class UploaderException(Exception):
     pass
-
 
 class UploadedFile(object):
     def __init__(self, uploader, url, token):
@@ -75,7 +73,7 @@ class UploaderMixin(object):
         if response.status_code != 200:
             raise UploaderException(
                 'status code: {0}'.format(response.status_code))
-        data = json.loads(response.content)
+        data = response.json()
         if 'token' not in data:
             raise UploaderException(
                 'could not find token in response: {0}'.format(data))
@@ -98,7 +96,7 @@ class UploaderMixin(object):
         if response.status_code != 200:
             raise UploaderException(
                 'status code: {0}'.format(response.status_code))
-        data = json.loads(response.content)
+        data = response.json()
         if 'status' not in data:
             raise UploaderException(
                 'could not find status in response: {0}'.format(data))
@@ -115,8 +113,7 @@ class UploaderMixin(object):
                 headers=self._build_headers(),
             )
             if response.status_code == 200:
-                data = json.loads(response.content)
-                _file = self.file(data['file'])
+                _file = self.file(response.json()['file'])
                 if wait:
                     _file.ensure_on_s3(timeout=timeout)
                 return _file
