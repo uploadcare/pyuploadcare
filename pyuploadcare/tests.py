@@ -37,6 +37,9 @@ class UploadCareTest(unittest.TestCase):
         with self.assertRaises(ValueError) as cm:
             ucare.make_request('GET', '/files/')
 
+        self.assertEqual('No JSON object could be decoded',
+                         cm.exception.message)
+
     @patch('requests.request', autospec=True)
     def test_request_headers(self, request):
 
