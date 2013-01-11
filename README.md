@@ -93,17 +93,11 @@ It's really simple, just use your Uploadcare-enabled models as any other models:
 
 ### Using it in templates
 
-To make your life easier, Uploadcare file objects understand some 'magic' properties.
-
-    {{ p.photo.cropped_120x200 }}
-    {{ p.photo.resized_120 }}
-    {{ p.photo.resized_x120 }}
-    {{ p.photo.resized_600x120 }}
-
-These are most useful in Django templates, which are somewhat limited in calling functions with arguments.
-Or you can contruct url manually:
+You can contruct url with all effects manually:
 
     {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
+    
+Refer to [CDN settings][5] for more information.
 
 
 ### Time settings
@@ -112,3 +106,4 @@ Keep in mind that Uploadcare authentication will fail if computer clock is not s
 
 
 [1]: https://uploadcare.com/
+[5]: https://uploadcare.com/documentation/reference/basic/cdn/
