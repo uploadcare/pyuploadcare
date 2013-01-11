@@ -97,7 +97,7 @@ You can contruct url with all effects manually:
 
     {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
     
-Refer to [CDN settings][5] for more information.
+Refer to [CDN docs][5] for more information.
 
 
 ### Time settings
