@@ -6,9 +6,10 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project'
 from mock import patch
 from django.test.utils import override_settings
 from django import forms
+from django.template import Template, Context, TemplateSyntaxError
 
 from pyuploadcare import UploadCare, UploadCareException
-from pyuploadcare.file import File
+from pyuploadcare.file import File, CDNFile
 from pyuploadcare.dj import forms as uc_forms
 
 
@@ -76,6 +77,31 @@ class UploadCareTest(unittest.TestCase):
         uri = ucare._build_api_uri(path)
         self.assertEqual(path, '/api/files/?asd=1')
         self.assertEqual(uri, 'http://example.com/api/files/?asd=1')
+
+
+class TemplateTagsTest(unittest.TestCase):
+
+    @override_settings(INSTALLED_APPS=['pyuploadcare.dj'])
+    def test_filter_funcions(self):
+        ucare = UploadCare('pub', 'secret')
+        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
+        c = Context({'f': ucare.file(uuid), 't': 'string value'})
+
+        t = Template("{% load uploadcare %}{{ t|crop:'20x30' }}")
+        self.assertEqual(t.render(c), 'string value')
+        t = Template("{% load uploadcare %}{{ f|crop:'20x30' }}")
+        self.assertEqual(t.render(c),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/')
+        t = Template("{% load uploadcare %}{{ f|crop:'20x30'|resize:'60x80' }}")
+        self.assertEqual(t.render(c),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/-/resize/60x80/')
+        t = Template("{% load uc_crop from uploadcare %}{{ f|uc_crop:'20x30' }}")
+        self.assertEqual(t.render(c),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/')
+        with self.assertRaises(TemplateSyntaxError):
+            t = Template("{% load uc_crop from uploadcare %}{{ f|crop:'20x30' }}")
+            self.assertEqual(t.render(c),
+                'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/20x30/')
 
 
 class FileTest(unittest.TestCase):
@@ -147,17 +173,36 @@ class FileTest(unittest.TestCase):
         head.return_value = cdn_response
         f.store(wait=True, timeout=1)
 
-        self.assertEqual(f.cdn_url, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
-        self.assertEqual(f.resized_40x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40x40/')
-        self.assertEqual(f.resized_x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/x40/')
-        self.assertEqual(f.resized_40x, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40/')
-        self.assertEqual(f.cropped_40x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/40x40/')
-        with self.assertRaises(ValueError):
-            f.cropped_40
-        with self.assertRaises(ValueError):
-            f.resized_
-        with self.assertRaises(ValueError):
-            f.resized_1x1x1
+        # Python 2.7 required.
+        if hasattr(self, 'assertIsInstance'):
+            self.assertIsInstance(f.cdn_url, CDNFile)
+            self.assertIsInstance(f.cdn_url.crop(40, 40), CDNFile)
+            self.assertIsInstance(f.crop(40, 40), CDNFile)
+
+        self.assertEqual(str(f.cdn_url), unicode(f.cdn_url))
+        self.assertEqual(str(f.cdn_url.crop(40, 40)), unicode(f.crop(40, 40)))
+
+        self.assertEqual(str(f.cdn_url),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
+        self.assertEqual(str(f.resize(60, 40)),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/60x40/')
+        self.assertEqual(str(f.resize(height=40)),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/x40/')
+        self.assertEqual(str(f.resize(width=60)),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/60x/')
+        self.assertEqual(str(f.crop(60, 40)),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/60x40/')
+        self.assertEqual(str(f.crop(60, 40, True)),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/60x40/center/')
+        self.assertEqual(str(f.crop(60, 40, True, 'abcdef')),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/60x40/center/abcdef/')
+        self.assertEqual(str(f.crop(60, 40, fill_color='abcdef')),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/60x40/abcdef/')
+
+        self.assertEqual(str(f.resize(60, 40).crop(60, 40)),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/60x40/-/crop/60x40/')
+        self.assertEqual(str(f.cdn_url.crop(60, 40).resize(60, 40)),
+            'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/60x40/-/resize/60x40/')
 
     @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
