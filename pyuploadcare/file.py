@@ -18,7 +18,7 @@ class File(object):
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
 
-    def __getattribute__(self, name):
+    def __getattr__(self, name):
         if name.startswith('resized_') or name.startswith('cropped_'):
             width, _, height = name[8:].partition('x')
             width = int(width) if width else None
@@ -26,7 +26,7 @@ class File(object):
             func = self.cropped if name.startswith('c') else self.resized
             return func(width, height)
 
-        return super(File, self).__getattribute__(name)
+        return super(File, self).__getattr__(name)
 
     def keep(self, **kwargs):
         """Deprecated method.
