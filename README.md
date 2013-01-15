@@ -13,7 +13,7 @@ You can use `pyuploadcare` now:
     >>> import pyuploadcare
     >>> pyuploadcare.UploadCare
     <class 'pyuploadcare.UploadCare'>
-    
+
 You can also use our console utility, `ucare`:
 
     $ ucare -h
@@ -27,34 +27,12 @@ As soon as you get your API keys, add them to your Django settings file:
 ### settings.py
 
     UPLOADCARE = {
-        'pub_key': '***',
-        'secret': '***',
+
+        # Don't forget to change to real keys when it gets serious!
+
+        'pub_key': 'demopublickey',
+        'secret': 'demoprivatekey',
     }
-
-If you don't want to use hosted assets (from fastatic.uploadcare.com) you
-should add 'pyuploadcare.dj' to INSTALLED_APPS setting and add
-
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
-
-
-to django settings file. (Kudos to [Sławek Ehlert][3] for the feature!)
-
-[3]: https://github.com/slafs
-
-If you want to provide custom url for widget, you should add 'pyuploadcare.dj'
-to INSTALLED_APPS setting and add
-
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
-    PYUPLOADCARE_WIDGET_URL = 'http://path.to.asset'
-
-
-to django settings file.
-
-Uploadcare widget will use default upload handler url, unless you specify
-PYUPLOADCARE_UPLOAD_BASE_URL django settings
-
-    PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to.your.upload.handler'
-
 
 You're all set now!
 
@@ -96,13 +74,40 @@ It's really simple, just use your Uploadcare-enabled models as any other models:
 You can contruct url with all effects manually:
 
     {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
-    
+
 Refer to [CDN docs][5] for more information.
 
 
 ### Time settings
 
 Keep in mind that Uploadcare authentication will fail if computer clock is not synchronized.
+
+
+### Advanced settings
+
+If you don't want to use hosted assets (from fastatic.uploadcare.com) you
+should add 'pyuploadcare.dj' to INSTALLED_APPS setting and add
+
+    PYUPLOADCARE_USE_HOSTED_ASSETS = False
+
+
+to django settings file. (Kudos to [Sławek Ehlert][3] for the feature!)
+
+[3]: https://github.com/slafs
+
+If you want to provide custom url for widget, you should add 'pyuploadcare.dj'
+to INSTALLED_APPS setting and add
+
+    PYUPLOADCARE_USE_HOSTED_ASSETS = False
+    PYUPLOADCARE_WIDGET_URL = 'http://path.to.asset'
+
+
+to django settings file.
+
+Uploadcare widget will use default upload handler url, unless you specify
+PYUPLOADCARE_UPLOAD_BASE_URL django settings
+
+    PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to.your.upload.handler'
 
 
 [1]: https://uploadcare.com/
