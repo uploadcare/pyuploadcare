@@ -55,6 +55,28 @@ It looks nice in the admin interface
 
 ![Admin page](https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/)
 
+### In the model form
+
+`FileField` works in every `ModelForm` well,
+even outside of the admin interface.
+
+But you have to remember to add `{{ form.media }}`
+somewhere on your page, e.g. in the `<head>`:
+
+    {{ form.media }}
+
+    <form action="" method="POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <input type="submit">
+    </form>
+
+This is a default Django form property which is going to render any scripts
+needed for the form to work, in our case – Uploadcare scripts.
+
+
 ### Using it
 
 It's really simple, just use your Uploadcare-enabled models as any other models:
