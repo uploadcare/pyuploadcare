@@ -18,6 +18,9 @@ class File(object):
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
 
+    def __str__(self):
+        return self.cdn_url
+
     def __getattr__(self, name):
         if name.startswith('resized_') or name.startswith('cropped_'):
             width, _, height = name[8:].partition('x')

@@ -86,6 +86,7 @@ It's really simple, just use your Uploadcare-enabled models as any other models:
         # p.photo contains pyuploadcare.file.File object
 
         print p.photo.cdn_url
+        print str(p.photo)
 
         print p.photo.resized(200, 400) # returns the url of resized version of the image
         print p.photo.resized(height=400)
@@ -96,6 +97,10 @@ It's really simple, just use your Uploadcare-enabled models as any other models:
 You can contruct url with all effects manually:
 
     {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
+
+Or just:
+
+    {{ p.photo }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
 
 Refer to [CDN docs][5] for more information.
 
