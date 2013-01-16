@@ -33,7 +33,8 @@ class UploadCare(UploaderMixin):
                  verify_api_ssl=True,
                  verify_upload_ssl=True,
                  custom_headers=None,
-                 api_version='0.2'):
+                 api_version='0.2',
+                 **kwargs):
         self.pub_key = pub_key
         self.secret = secret
         self.timeout = timeout

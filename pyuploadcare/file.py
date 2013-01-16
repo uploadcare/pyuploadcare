@@ -18,6 +18,9 @@ class File(object):
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
 
+    def __str__(self):
+        return self.cdn_url
+
     def __getattr__(self, name):
         if name.startswith('resized_') or name.startswith('cropped_'):
             width, _, height = name[8:].partition('x')
@@ -133,10 +136,9 @@ class File(object):
 
     @property
     def cdn_url(self):
-        if self.is_on_s3 and self.is_stored:
-            fmt = self.ucare.cdn_base + '{uuid}/'
-            return fmt.format(uuid=self.file_id)
-        raise Exception('No CDN url for private file')
+        fmt = self.ucare.cdn_base + '{uuid}/'
+        return fmt.format(uuid=self.file_id)
+
 
     @property
     def filename(self):
