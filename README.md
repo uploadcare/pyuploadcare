@@ -13,7 +13,7 @@ You can use `pyuploadcare` now:
     >>> import pyuploadcare
     >>> pyuploadcare.UploadCare
     <class 'pyuploadcare.UploadCare'>
-    
+
 You can also use our console utility, `ucare`:
 
     $ ucare -h
@@ -27,9 +27,90 @@ As soon as you get your API keys, add them to your Django settings file:
 ### settings.py
 
     UPLOADCARE = {
-        'pub_key': '***',
-        'secret': '***',
+
+        # Don't forget to change to real keys when it gets serious!
+
+        'pub_key': 'demopublickey',
+        'secret': 'demoprivatekey',
     }
+
+You're all set now!
+
+Adding a Uploadcare file field to your model is really simple. Like that:
+
+### models.py
+
+    from django.db import models
+
+    from pyuploadcare.dj import FileField
+
+
+    class Photo(models.Model):
+        title = models.CharField(max_length=255)
+        photo = FileField()
+
+`FileField` doesn't require any arguments, file paths or whatever. It **just works**. That's the point of it all.
+
+It looks nice in the admin interface
+
+![Admin page](https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/)
+
+### In the model form
+
+`FileField` works in every `ModelForm` well,
+even outside of the admin interface.
+
+But you have to remember to add `{{ form.media }}`
+somewhere on your page, e.g. in the `<head>`:
+
+    {{ form.media }}
+
+    <form action="" method="POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <input type="submit">
+    </form>
+
+This is a default Django form property which is going to render any scripts
+needed for the form to work, in our case – Uploadcare scripts.
+
+
+### Using it
+
+It's really simple, just use your Uploadcare-enabled models as any other models:
+
+    for p in Photo.objects.all():
+
+        # p.photo contains pyuploadcare.file.File object
+
+        print p.photo.cdn_url
+        print str(p.photo)
+
+        print p.photo.resized(200, 400) # returns the url of resized version of the image
+        print p.photo.resized(height=400)
+        print p.photo.cropped(150, 150)
+
+### Using it in templates
+
+You can contruct url with all effects manually:
+
+    {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
+
+Or just:
+
+    {{ p.photo }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
+
+Refer to [CDN docs][5] for more information.
+
+
+### Time settings
+
+Keep in mind that Uploadcare authentication will fail if computer clock is not synchronized.
+
+
+### Advanced settings
 
 If you don't want to use hosted assets (from fastatic.uploadcare.com) you
 should add 'pyuploadcare.dj' to INSTALLED_APPS setting and add
@@ -54,55 +135,6 @@ Uploadcare widget will use default upload handler url, unless you specify
 PYUPLOADCARE_UPLOAD_BASE_URL django settings
 
     PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to.your.upload.handler'
-
-
-You're all set now!
-
-Adding a Uploadcare file field to your model is really simple. Like that:
-
-### models.py
-
-    from django.db import models
-
-    from pyuploadcare.dj import FileField
-
-
-    class Photo(models.Model):
-        title = models.CharField(max_length=255)
-        photo = FileField()
-
-`FileField` doesn't require any arguments, file paths or whatever. It **just works**. That's the point of it all.
-
-It looks nice in the admin interface
-
-![Admin page](https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/)
-
-### Using it
-
-It's really simple, just use your Uploadcare-enabled models as any other models:
-
-    for p in Photo.objects.all():
-
-        # p.photo contains pyuploadcare.file.File object
-
-        print p.photo.cdn_url
-
-        print p.photo.resized(200, 400) # returns the url of resized version of the image
-        print p.photo.resized(height=400)
-        print p.photo.cropped(150, 150)
-
-### Using it in templates
-
-You can contruct url with all effects manually:
-
-    {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
-    
-Refer to [CDN docs][5] for more information.
-
-
-### Time settings
-
-Keep in mind that Uploadcare authentication will fail if computer clock is not synchronized.
 
 
 [1]: https://uploadcare.com/
