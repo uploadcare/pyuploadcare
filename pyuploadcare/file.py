@@ -136,10 +136,9 @@ class File(object):
 
     @property
     def cdn_url(self):
-        if self.is_on_s3 and self.is_stored:
-            fmt = self.ucare.cdn_base + '{uuid}/'
-            return fmt.format(uuid=self.file_id)
-        raise Exception('No CDN url for private file')
+        fmt = self.ucare.cdn_base + '{uuid}/'
+        return fmt.format(uuid=self.file_id)
+
 
     @property
     def filename(self):
