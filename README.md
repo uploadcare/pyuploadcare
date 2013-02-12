@@ -1,5 +1,7 @@
 # PyUploadcare: a Python module for Uploadcare
 
+[![Build Status](https://travis-ci.org/uploadcare/pyuploadcare.png?branch=master)](https://travis-ci.org/uploadcare/pyuploadcare)
+
 This consists in API interface for [Uploadcare][1], and a couple of Django goodies.
 
 To install it, just run
