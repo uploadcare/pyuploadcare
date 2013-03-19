@@ -9,7 +9,6 @@ setup(
     author_email='v.golev@gmail.com',
     url='https://github.com/uploadcare/pyuploadcare',
     packages=['pyuploadcare', 'pyuploadcare.dj'],
-    test_suite='nose.collector',
     package_data={
         'pyuploadcare.dj': [
             'static/uploadcare/assets/uploaders/*.js',
@@ -21,11 +20,9 @@ setup(
         ],
     },
     install_requires=['requests>=1.0'],
-    tests_require=['nose>=1.2.0',
-                  'mock==0.8.0',
-                  'django>=1.4'],
     classifiers=[
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
     ],
 )
