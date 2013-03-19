@@ -9,3 +9,10 @@ install:
   - pip install $DJANGO --use-mirrors
   - python setup.py install
 script: nosetests tests.py
+notifications:
+  email:
+    recipients:
+      - valya@whitescape.com
+      - dm@whitescape.com
+    on_success: change
+    on_failure: change
