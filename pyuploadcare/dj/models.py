@@ -42,3 +42,17 @@ class FileField(models.Field):
 
         # yay for super!
         return super(FileField, self).formfield(**defaults)
+
+
+class ImageField(FileField):
+
+    def __init__(self, crop_tool=None, *args, **kwargs):
+        self.crop_tool = crop_tool
+        super(ImageField, self).__init__(*args, **kwargs)
+
+    def formfield(self, **kwargs):
+        defaults = {'crop_tool': self.crop_tool}
+        defaults.update(kwargs)
+
+        return super(ImageField, self).formfield(form_class=forms.ImageField,
+                                                 **defaults)
