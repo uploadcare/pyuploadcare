@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -44,9 +46,29 @@ class FileField(models.Field):
         return super(FileField, self).formfield(**defaults)
 
 
+pattern_of_crop_tool = re.compile(u'''
+    ^
+    (
+        disabled| # "disabled"
+        | # empty string
+        \d+:\d+| # "2:3"
+        \d+x\d+| # "200x300"
+        \d+x\d+\ upscale # "200x300 upscale"
+    )
+    $
+''', re.VERBOSE)
+
+
 class ImageField(FileField):
 
     def __init__(self, crop_tool=None, *args, **kwargs):
+        is_crop_valid = (
+            isinstance(crop_tool, basestring) and
+            pattern_of_crop_tool.match(crop_tool)
+        )
+        if not (crop_tool is None or is_crop_valid):
+            raise ValidationError('Invalid crop tool value')
+
         self.crop_tool = crop_tool
         super(ImageField, self).__init__(*args, **kwargs)
 
