@@ -46,7 +46,7 @@ class FileField(models.Field):
         return super(FileField, self).formfield(**defaults)
 
 
-pattern_of_crop_tool = re.compile(u'''
+pattern_of_crop = re.compile(u'''
     ^
     (
         disabled| # "disabled"
@@ -61,19 +61,19 @@ pattern_of_crop_tool = re.compile(u'''
 
 class ImageField(FileField):
 
-    def __init__(self, crop_tool=None, *args, **kwargs):
+    def __init__(self, manual_crop=None, *args, **kwargs):
         is_crop_valid = (
-            isinstance(crop_tool, basestring) and
-            pattern_of_crop_tool.match(crop_tool)
+            isinstance(manual_crop, basestring) and
+            pattern_of_crop.match(manual_crop)
         )
-        if not (crop_tool is None or is_crop_valid):
-            raise ValidationError('Invalid crop tool value')
+        if not (manual_crop is None or is_crop_valid):
+            raise ValidationError('Invalid manual crop value')
 
-        self.crop_tool = crop_tool
+        self.manual_crop = manual_crop
         super(ImageField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        defaults = {'crop_tool': self.crop_tool}
+        defaults = {'manual_crop': self.manual_crop}
         defaults.update(kwargs)
 
         return super(ImageField, self).formfield(form_class=forms.ImageField,
