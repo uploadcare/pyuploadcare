@@ -1,7 +1,9 @@
+# coding: utf-8
 import time
 import logging
 
 import requests
+from pyuploadcare.exceptions import TimeoutError
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -47,7 +49,7 @@ class File(object):
             time_started = time.time()
             while not (self.is_on_s3 and self.is_stored):
                 if time.time() - time_started > timeout:
-                    raise Exception('timed out trying to store')
+                    raise TimeoutError('timed out trying to store')
                 self.update_info()
                 time.sleep(0.1)
             self.ensure_on_cdn()
@@ -60,7 +62,7 @@ class File(object):
             time_started = time.time()
             while not self.is_removed:
                 if time.time() - time_started > timeout:
-                    raise Exception('timed out trying to delete')
+                    raise TimeoutError('timed out trying to delete')
                 self.update_info()
                 time.sleep(0.1)
         self.update_info()
@@ -69,7 +71,7 @@ class File(object):
         time_started = time.time()
         while not self.is_on_s3:
             if time.time() - time_started > timeout:
-                raise Exception('timed out waiting for uploading to s3')
+                raise TimeoutError('timed out waiting for uploading to s3')
             self.update_info()
             time.sleep(0.1)
 
@@ -81,7 +83,7 @@ class File(object):
         time_started = time.time()
         while True:
             if time.time() - time_started > timeout:
-                raise Exception('timed out waiting for file appear on cdn')
+                raise TimeoutError('timed out waiting for file appear on cdn')
             resp = requests.head(self.cdn_url, headers=self.ucare.default_headers)
             if resp.status_code == 200:
                 return
