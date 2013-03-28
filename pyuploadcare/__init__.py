@@ -11,6 +11,7 @@ import requests
 
 from pyuploadcare.file import File
 from pyuploadcare.uploader import UploaderMixin
+from pyuploadcare.exceptions import APIConnectionError
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -133,9 +134,12 @@ class UploadCare(UploaderMixin):
             data: {3}'''.format(verb, path, headers, content))
 
         uri = self._build_api_uri(path)
-        response = requests.request(verb, uri, allow_redirects=True,
-                                    verify=self.verify_api_ssl,
-                                    headers=headers, data=content)
+        try:
+            response = requests.request(verb, uri, allow_redirects=True,
+                                        verify=self.verify_api_ssl,
+                                        headers=headers, data=content)
+        except requests.RequestException as exc:
+            raise APIConnectionError(u'Network error: {exc}'.format(exc=exc))
 
         logger.debug('got: %s %s' % (response.status_code, response.content))
 
