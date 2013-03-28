@@ -11,7 +11,7 @@ import requests
 
 from pyuploadcare.file import File
 from pyuploadcare.uploader import UploaderMixin
-from pyuploadcare.exceptions import APIConnectionError
+from pyuploadcare.exceptions import APIConnectionError, AuthenticationError
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -155,5 +155,8 @@ class UploadCare(UploaderMixin):
 
         if response.status_code == 204: # No Content
             return
+
+        if response.status_code in (400, 403):
+            raise AuthenticationError(response.content)
 
         raise UploadCareException(response, response.content)
