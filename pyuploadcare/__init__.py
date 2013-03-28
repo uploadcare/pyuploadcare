@@ -11,19 +11,14 @@ import requests
 
 from pyuploadcare.file import File
 from pyuploadcare.uploader import UploaderMixin
-from pyuploadcare.exceptions import APIConnectionError, AuthenticationError
+from pyuploadcare.exceptions import (
+    UploadCareException, APIConnectionError, AuthenticationError,
+    APIError, InvalidRequestError,
+)
 
 
 logger = logging.getLogger("pyuploadcare")
 uuid_regex = re.compile(r'[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}')
-
-
-class UploadCareException(Exception):
-    def __init__(self, response, data):
-        message = 'Response status is %i. Data: %s' % (response.status_code, data)
-        super(UploadCareException, self).__init__(message)
-        self.response = response
-        self.data = data
 
 
 class UploadCare(UploaderMixin):
@@ -150,13 +145,20 @@ class UploadCare(UploaderMixin):
                     logger.warn('API Warning: {0}'.format(warning))
 
         # TODO: Add check for content-type.
-        if response.status_code == 200: # Ok
-            return response.json()
-
-        if response.status_code == 204: # No Content
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except ValueError as exc:
+                raise APIError(u'API error: {exc}'.format(exc=exc))
+        # No content.
+        if response.status_code == 204:
             return
 
         if response.status_code in (400, 403):
-            raise AuthenticationError(response.content)
+            raise AuthenticationError(
+                u'Authentication error: {exc}'.format(exc=response.content)
+            )
 
-        raise UploadCareException(response, response.content)
+        raise InvalidRequestError(
+            u'Invalid request error: {exc}'.format(exc=response.content)
+        )

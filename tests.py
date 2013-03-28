@@ -8,7 +8,7 @@ from mock import patch
 from django.test.utils import override_settings
 from django import forms
 
-from pyuploadcare import UploadCare, UploadCareException
+from pyuploadcare import UploadCare, UploadCareException, APIError
 from pyuploadcare.file import File
 from pyuploadcare.dj import forms as uc_forms
 
@@ -95,10 +95,10 @@ class UploadCareTest(ModernTestCase):
             ucare.make_request('GET', '/files/')
 
         request.return_value = MockResponse(200, 'meh')
-        with self._assertRaises(ValueError) as cm:
+        with self._assertRaises(APIError) as cm:
             ucare.make_request('GET', '/files/')
 
-        self.assertEqual('No JSON object could be decoded',
+        self.assertEqual('API error: No JSON object could be decoded',
                          cm.exception.message)
 
     @patch('requests.request', autospec=True)

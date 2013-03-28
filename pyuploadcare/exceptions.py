@@ -1,11 +1,11 @@
 # coding: utf-8
 
 
-class UploadcareException(Exception):
+class UploadCareException(Exception):
     """Base exception class of library."""
 
 
-class APIConnectionError(UploadcareException):
+class APIConnectionError(UploadCareException):
     """Network communication with Uploadcare errors."""
 
 
@@ -13,7 +13,13 @@ class TimeoutError(APIConnectionError):
     """Request timed out errors, e.g. when trying to store or delete."""
 
 
-class AuthenticationError(UploadcareException):
+class AuthenticationError(UploadCareException):
     """Authentication with Uploadcare's API errors."""
 
 
+class APIError(UploadCareException):
+    """API errors, e.g. bad json."""
+
+
+class InvalidRequestError(UploadCareException):
+    """Invalid parameters errors, e.g. status 404."""
