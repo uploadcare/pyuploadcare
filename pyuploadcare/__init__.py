@@ -14,7 +14,12 @@ from pyuploadcare.uploader import UploaderMixin
 
 
 logger = logging.getLogger("pyuploadcare")
-uuid_regex = re.compile(r'[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}')
+uuid_with_effects_regex = re.compile(ur'''
+    (?P<uuid>[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
+    (
+        /-/(?P<effects>.*)
+    )?
+''', re.VERBOSE)
 
 
 class UploadCareException(Exception):
@@ -56,12 +61,12 @@ class UploadCare(UploaderMixin):
         }
 
     def file(self, file_serialized):
-        m = uuid_regex.search(file_serialized)
+        m = uuid_with_effects_regex.search(file_serialized)
 
         if not m:
             raise ValueError("Couldn't find UUID")
-
-        f = File(m.group(0), self)
+        f = File(file_id=m.groupdict()['uuid'], ucare=self,
+                 default_effects=m.groupdict()['effects'])
 
         if file_serialized.startswith('http'):
             f._cached_url = file_serialized
