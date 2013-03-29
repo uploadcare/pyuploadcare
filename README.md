@@ -141,3 +141,12 @@ PYUPLOADCARE_UPLOAD_BASE_URL django settings
 
 [1]: https://uploadcare.com/
 [5]: https://uploadcare.com/documentation/reference/basic/cdn/
+
+
+## Testing
+
+Besides the [Travis CI](https://travis-ci.org/uploadcare/pyuploadcare) we use tox.
+In order to run tests just:
+
+    $ pip install tox
+    $ tox
