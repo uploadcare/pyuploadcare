@@ -3,7 +3,7 @@
 from django.conf import settings
 
 
-widget_version = settings.UPLOADCARE.get('widget_version', '0.6.2.1')
+widget_version = settings.UPLOADCARE.get('widget_version', '0.6.7')
 
 hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare-{version}.min.js'.format(
     version=widget_version)

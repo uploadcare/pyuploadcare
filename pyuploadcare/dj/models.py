@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -50,3 +52,37 @@ class FileField(models.Field):
 
         # yay for super!
         return super(FileField, self).formfield(**defaults)
+
+
+pattern_of_crop = re.compile(u'''
+    ^
+    (
+        disabled| # "disabled"
+        | # empty string
+        \d+:\d+| # "2:3"
+        \d+x\d+| # "200x300"
+        \d+x\d+\ upscale # "200x300 upscale"
+    )
+    $
+''', re.VERBOSE)
+
+
+class ImageField(FileField):
+
+    def __init__(self, manual_crop=None, *args, **kwargs):
+        is_crop_valid = (
+            isinstance(manual_crop, basestring) and
+            pattern_of_crop.match(manual_crop)
+        )
+        if not (manual_crop is None or is_crop_valid):
+            raise ValidationError('Invalid manual crop value')
+
+        self.manual_crop = manual_crop
+        super(ImageField, self).__init__(*args, **kwargs)
+
+    def formfield(self, **kwargs):
+        defaults = {'manual_crop': self.manual_crop}
+        defaults.update(kwargs)
+
+        return super(ImageField, self).formfield(form_class=forms.ImageField,
+                                                 **defaults)

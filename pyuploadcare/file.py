@@ -13,9 +13,10 @@ class File(object):
     _info = None
     _cached_url = None
 
-    def __init__(self, file_id, ucare):
+    def __init__(self, file_id, ucare, default_effects=''):
         self.file_id = file_id
         self.ucare = ucare
+        self.default_effects = default_effects
 
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
@@ -138,9 +139,17 @@ class File(object):
 
     @property
     def cdn_url(self):
-        fmt = self.ucare.cdn_base + '{uuid}/'
-        return fmt.format(uuid=self.file_id)
-
+        if self.default_effects:
+            return '{cdn_base}{uuid}/-/{effects}'.format(
+                cdn_base=self.ucare.cdn_base,
+                uuid=self.file_id,
+                effects=self.default_effects
+            )
+        else:
+            return '{cdn_base}{uuid}/'.format(
+                cdn_base=self.ucare.cdn_base,
+                uuid=self.file_id
+            )
 
     @property
     def filename(self):

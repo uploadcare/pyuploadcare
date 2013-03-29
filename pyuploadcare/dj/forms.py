@@ -32,3 +32,18 @@ class FileWidget(TextInput):
 
 class FileField(Field):
     widget = FileWidget
+
+
+class ImageField(Field):
+
+    widget = FileWidget
+
+    def __init__(self, manual_crop=None, *args, **kwargs):
+        self.manual_crop = manual_crop
+        super(ImageField, self).__init__(*args, **kwargs)
+
+    def widget_attrs(self, widget):
+        attrs = {'data-images-only': ''}
+        if self.manual_crop is not None:
+            attrs['data-crop'] = self.manual_crop
+        return attrs
