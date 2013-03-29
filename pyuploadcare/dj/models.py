@@ -4,6 +4,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from pyuploadcare.dj import forms, UploadCare
+from pyuploadcare.exceptions import InvalidRequestError
 from pyuploadcare.file import File
 
 
@@ -19,13 +20,20 @@ class FileField(models.Field):
         if not value:
             return None
 
-        if isinstance(value, basestring):
-            return UploadCare().file(value)
-
         if isinstance(value, File):
             return value
 
-        raise ValidationError('Invalid value for a field')
+        if not isinstance(value, basestring):
+            raise ValidationError(
+                u'Invalid value for a field: string was expected'
+            )
+
+        try:
+            return UploadCare().file(value)
+        except InvalidRequestError as exc:
+            raise ValidationError(
+                u'Invalid value for a field: {exc}'.format(exc=exc)
+            )
 
     def get_prep_value(self, value):
         return value.serialize()

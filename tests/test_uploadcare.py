@@ -1,6 +1,7 @@
 import unittest
 
 from pyuploadcare import UploadCare
+from pyuploadcare.exceptions import InvalidRequestError
 
 
 class FileTest(unittest.TestCase):
@@ -10,7 +11,7 @@ class FileTest(unittest.TestCase):
 
     def test_value_error_when_uuid_is_bad(self):
         file_serialized = 'blah'
-        self.assertRaises(ValueError, self.uc.file, file_serialized)
+        self.assertRaises(InvalidRequestError, self.uc.file, file_serialized)
 
     def test_only_uuid(self):
         file_serialized = '3addab78-6368-4c55-ac08-22412b6a2a4c'
