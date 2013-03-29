@@ -170,4 +170,4 @@ class UploadCare(UploaderMixin):
                 u'Invalid request error: {exc}'.format(exc=response.content)
             )
 
-        raise APIError(u'API error: {exc}'.format(exc=exc))
+        raise APIError(u'API error: {exc}'.format(exc=response.content))

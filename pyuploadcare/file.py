@@ -27,8 +27,18 @@ class File(object):
     def __getattr__(self, name):
         if name.startswith('resized_') or name.startswith('cropped_'):
             width, _, height = name[8:].partition('x')
-            width = int(width) if width else None
-            height = int(height) if height else None
+            try:
+                width = int(width) if width else None
+            except ValueError as exc:
+                raise InvalidRequestError(
+                    u'invalid width, {exc}'.format(exc=exc)
+                )
+            try:
+                height = int(height) if height else None
+            except ValueError as exc:
+                raise InvalidRequestError(
+                    u'invalid height, {exc}'.format(exc=exc)
+                )
             func = self.cropped if name.startswith('c') else self.resized
             return func(width, height)
 
