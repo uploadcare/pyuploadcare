@@ -55,7 +55,7 @@ class UploadCare(UploaderMixin):
         m = uuid_regex.search(file_serialized)
 
         if not m:
-            raise ValueError("Couldn't find UUID")
+            raise InvalidRequestError("Couldn't find UUID")
 
         f = File(m.group(0), self)
 

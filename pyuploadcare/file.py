@@ -3,7 +3,7 @@ import time
 import logging
 
 import requests
-from pyuploadcare.exceptions import TimeoutError
+from pyuploadcare.exceptions import TimeoutError, InvalidRequestError
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -77,9 +77,9 @@ class File(object):
 
     def ensure_on_cdn(self, timeout=5):
         if not self.is_on_s3:
-            raise Exception('file is not on s3 yet')
+            raise InvalidRequestError('file is not on s3 yet')
         if not self.is_stored:
-            raise Exception('file is private')
+            raise InvalidRequestError('file is private')
         time_started = time.time()
         while True:
             if time.time() - time_started > timeout:
@@ -152,7 +152,7 @@ class File(object):
         logger.warn("cropped() is deprecated, use cdn_url with "
                     "concatenated process command string")
         if not width or not height:
-            raise ValueError('Need both width and height to crop')
+            raise InvalidRequestError('Need both width and height to crop')
         dimensions = '{0}x{1}'.format(width, height)
 
         return '{0}-/crop/{1}/'.format(self.cdn_url, dimensions)
@@ -161,7 +161,7 @@ class File(object):
         logger.warn("resized() is deprecated, use cdn_url with "
                     "concatenated process command string")
         if not width and not height:
-            raise ValueError('Need width or height to resize')
+            raise InvalidRequestError('Need width or height to resize')
         dimensions = str(width) if width else ''
         if height:
             dimensions += 'x{0}'.format(height)

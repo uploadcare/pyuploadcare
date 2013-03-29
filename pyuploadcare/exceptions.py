@@ -21,5 +21,5 @@ class APIError(UploadCareException):
     """API errors, e.g. bad json."""
 
 
-class InvalidRequestError(UploadCareException):
+class InvalidRequestError(UploadCareException, ValueError):
     """Invalid parameters errors, e.g. status 404."""
