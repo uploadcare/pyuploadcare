@@ -8,7 +8,7 @@ env:
 install:
   - pip install $DJANGO --use-mirrors
   - python setup.py install
-script: nosetests tests.py
+script: nosetests tests
 notifications:
   email:
     recipients:
