@@ -154,11 +154,14 @@ class UploadCare(UploaderMixin):
         if response.status_code == 204:
             return
 
-        if response.status_code in (400, 403):
+        if response.status_code == 403:
             raise AuthenticationError(
                 u'Authentication error: {exc}'.format(exc=response.content)
             )
 
-        raise InvalidRequestError(
-            u'Invalid request error: {exc}'.format(exc=response.content)
-        )
+        if response.status_code in (400, 404):
+            raise InvalidRequestError(
+                u'Invalid request error: {exc}'.format(exc=response.content)
+            )
+
+        raise APIError(u'API error: {exc}'.format(exc=exc))
