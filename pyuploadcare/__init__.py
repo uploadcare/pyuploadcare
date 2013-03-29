@@ -11,6 +11,10 @@ import requests
 
 from pyuploadcare.file import File
 from pyuploadcare.uploader import UploaderMixin
+from pyuploadcare.exceptions import (
+    UploadCareException, APIConnectionError, AuthenticationError,
+    APIError, InvalidRequestError,
+)
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -20,14 +24,6 @@ uuid_with_effects_regex = re.compile(ur'''
         /-/(?P<effects>.*)
     )?
 ''', re.VERBOSE)
-
-
-class UploadCareException(Exception):
-    def __init__(self, response, data):
-        message = 'Response status is %i. Data: %s' % (response.status_code, data)
-        super(UploadCareException, self).__init__(message)
-        self.response = response
-        self.data = data
 
 
 class UploadCare(UploaderMixin):
@@ -64,7 +60,8 @@ class UploadCare(UploaderMixin):
         m = uuid_with_effects_regex.search(file_serialized)
 
         if not m:
-            raise ValueError("Couldn't find UUID")
+            raise InvalidRequestError("Couldn't find UUID")
+
         f = File(file_id=m.groupdict()['uuid'], ucare=self,
                  default_effects=m.groupdict()['effects'])
 
@@ -138,9 +135,12 @@ class UploadCare(UploaderMixin):
             data: {3}'''.format(verb, path, headers, content))
 
         uri = self._build_api_uri(path)
-        response = requests.request(verb, uri, allow_redirects=True,
-                                    verify=self.verify_api_ssl,
-                                    headers=headers, data=content)
+        try:
+            response = requests.request(verb, uri, allow_redirects=True,
+                                        verify=self.verify_api_ssl,
+                                        headers=headers, data=content)
+        except requests.RequestException as exc:
+            raise APIConnectionError(u'Network error: {exc}'.format(exc=exc))
 
         logger.debug('got: %s %s' % (response.status_code, response.content))
 
@@ -151,10 +151,23 @@ class UploadCare(UploaderMixin):
                     logger.warn('API Warning: {0}'.format(warning))
 
         # TODO: Add check for content-type.
-        if response.status_code == 200: # Ok
-            return response.json()
-
-        if response.status_code == 204: # No Content
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except ValueError as exc:
+                raise APIError(u'API error: {exc}'.format(exc=exc))
+        # No content.
+        if response.status_code == 204:
             return
 
-        raise UploadCareException(response, response.content)
+        if response.status_code == 403:
+            raise AuthenticationError(
+                u'Authentication error: {exc}'.format(exc=response.content)
+            )
+
+        if response.status_code in (400, 404):
+            raise InvalidRequestError(
+                u'Invalid request error: {exc}'.format(exc=response.content)
+            )
+
+        raise APIError(u'API error: {exc}'.format(exc=response.content))

@@ -1,7 +1,9 @@
+# coding: utf-8
 import time
 import logging
 
 import requests
+from pyuploadcare.exceptions import TimeoutError, InvalidRequestError
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -25,8 +27,18 @@ class File(object):
     def __getattr__(self, name):
         if name.startswith('resized_') or name.startswith('cropped_'):
             width, _, height = name[8:].partition('x')
-            width = int(width) if width else None
-            height = int(height) if height else None
+            try:
+                width = int(width) if width else None
+            except ValueError as exc:
+                raise InvalidRequestError(
+                    u'invalid width, {exc}'.format(exc=exc)
+                )
+            try:
+                height = int(height) if height else None
+            except ValueError as exc:
+                raise InvalidRequestError(
+                    u'invalid height, {exc}'.format(exc=exc)
+                )
             func = self.cropped if name.startswith('c') else self.resized
             return func(width, height)
 
@@ -48,7 +60,7 @@ class File(object):
             time_started = time.time()
             while not (self.is_on_s3 and self.is_stored):
                 if time.time() - time_started > timeout:
-                    raise Exception('timed out trying to store')
+                    raise TimeoutError('timed out trying to store')
                 self.update_info()
                 time.sleep(0.1)
             self.ensure_on_cdn()
@@ -61,7 +73,7 @@ class File(object):
             time_started = time.time()
             while not self.is_removed:
                 if time.time() - time_started > timeout:
-                    raise Exception('timed out trying to delete')
+                    raise TimeoutError('timed out trying to delete')
                 self.update_info()
                 time.sleep(0.1)
         self.update_info()
@@ -70,19 +82,19 @@ class File(object):
         time_started = time.time()
         while not self.is_on_s3:
             if time.time() - time_started > timeout:
-                raise Exception('timed out waiting for uploading to s3')
+                raise TimeoutError('timed out waiting for uploading to s3')
             self.update_info()
             time.sleep(0.1)
 
     def ensure_on_cdn(self, timeout=5):
         if not self.is_on_s3:
-            raise Exception('file is not on s3 yet')
+            raise InvalidRequestError('file is not on s3 yet')
         if not self.is_stored:
-            raise Exception('file is private')
+            raise InvalidRequestError('file is private')
         time_started = time.time()
         while True:
             if time.time() - time_started > timeout:
-                raise Exception('timed out waiting for file appear on cdn')
+                raise TimeoutError('timed out waiting for file appear on cdn')
             resp = requests.head(self.cdn_url, headers=self.ucare.default_headers)
             if resp.status_code == 200:
                 return
@@ -159,7 +171,7 @@ class File(object):
         logger.warn("cropped() is deprecated, use cdn_url with "
                     "concatenated process command string")
         if not width or not height:
-            raise ValueError('Need both width and height to crop')
+            raise InvalidRequestError('Need both width and height to crop')
         dimensions = '{0}x{1}'.format(width, height)
 
         return '{0}-/crop/{1}/'.format(self.cdn_url, dimensions)
@@ -168,7 +180,7 @@ class File(object):
         logger.warn("resized() is deprecated, use cdn_url with "
                     "concatenated process command string")
         if not width and not height:
-            raise ValueError('Need width or height to resize')
+            raise InvalidRequestError('Need width or height to resize')
         dimensions = str(width) if width else ''
         if height:
             dimensions += 'x{0}'.format(height)
