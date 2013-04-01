@@ -17,8 +17,8 @@ class FileField(models.Field):
         return "TextField"
 
     def to_python(self, value):
-        if not value:
-            return None
+        if value is None or value == '':
+            return value
 
         if isinstance(value, File):
             return value
@@ -36,12 +36,12 @@ class FileField(models.Field):
             )
 
     def get_prep_value(self, value):
-        return value.serialize()
+        return value.serialize() if value else value
 
     def get_db_prep_save(self, value, connection=None):
         if value:
             value.store()
-            return value.serialize()
+        return super(FileField, self).get_db_prep_save(value, connection)
 
     def value_to_string(self, obj):
         assert False
