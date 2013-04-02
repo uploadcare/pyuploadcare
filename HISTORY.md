@@ -1,3 +1,11 @@
+### 0.17
+    * ``ImageField`` was added. It provides uploading only image files. Moreover,
+      you can activate manual crop, e.g. ``ImageField(manual_crop='2:3')``.
+    * More apropriate exceptions were added.
+    * Tests were separated from library and were restructured.
+    * Widget was updated up to *0.6.7*.
+    * Issue of ``FileField``'s ``blank``, ``null`` attributes was fixed.
+
 ### 0.14
     * Replace accept header for old api version
 
