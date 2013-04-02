@@ -1,4 +1,8 @@
-import unittest
+# coding: utf-8
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from pyuploadcare import UploadCare
 from pyuploadcare.exceptions import InvalidRequestError
