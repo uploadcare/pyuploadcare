@@ -3,87 +3,21 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
-import json
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
-from django.test.utils import override_settings
-from django import forms
 
 from pyuploadcare import UploadCare
 from pyuploadcare.exceptions import (
-    APIError, InvalidRequestError, TimeoutError,
+    InvalidRequestError, TimeoutError,
 )
 from pyuploadcare.file import File
-from pyuploadcare.dj import forms as uc_forms
-
-
-class MockResponse():
-    def __init__(self, status, data='{}'):
-        self.status_code = status
-        self.content = data
-        self.headers = {}
-
-    def json(self):
-        """Returns the json-encoded content of a response, if any."""
-        return json.loads(self.content)
-
-
-class UploadCareTest(unittest.TestCase):
-
-    @patch('requests.request', autospec=True)
-    def test_raises(self, request):
-        ucare = UploadCare('pub', 'secret')
-
-        request.return_value = MockResponse(404, '{}')
-        with self.assertRaises(InvalidRequestError):
-            ucare.make_request('GET', '/files/')
-
-        request.return_value = MockResponse(200, 'meh')
-        with self.assertRaises(APIError) as cm:
-            ucare.make_request('GET', '/files/')
-
-        self.assertEqual('API error: No JSON object could be decoded',
-                         cm.exception.message)
-
-    @patch('requests.request', autospec=True)
-    def test_request_headers(self, request):
-
-        request.return_value = MockResponse(200, '[]')
-
-        ucare = UploadCare('pub', 'secret')
-        ucare.make_request('GET', '/files/')
-        headers = request.call_args[1]['headers']
-        self.assertIn('Accept', headers)
-        self.assertIn('User-Agent', headers)
-        self.assertEqual(headers['Accept'],
-                         'application/vnd.uploadcare-v0.2+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.14')
-
-        ucare = UploadCare('pub', 'secret', api_version='0.1')
-        ucare.make_request('GET', '/files/')
-        headers = request.call_args[1]['headers']
-        self.assertIn('Accept', headers)
-        self.assertIn('User-Agent', headers)
-        self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.14')
-
-    def test_uri_builders(self):
-        ucare = UploadCare('pub', 'secret')
-        path = ucare._build_api_path('/files/?asd=1')
-        uri = ucare._build_api_uri(path)
-        self.assertEqual(path, '/files/?asd=1')
-        self.assertEqual(uri, 'https://api.uploadcare.com/files/?asd=1')
-
-        ucare = UploadCare('pub', 'secret', api_base='http://example.com/api')
-        path = ucare._build_api_path('/files/?asd=1')
-        uri = ucare._build_api_uri(path)
-        self.assertEqual(path, '/api/files/?asd=1')
-        self.assertEqual(uri, 'http://example.com/api/files/?asd=1')
+from tests.utils import MockResponse
 
 
 class FileTest(unittest.TestCase):
+
     @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
     def test_store_timeout(self, request, head):
@@ -181,39 +115,3 @@ class FileTest(unittest.TestCase):
         with self.assertRaises(TimeoutError) as cm:
             f.store(wait=True, timeout=0.1)
         self.assertEqual('timed out waiting for file appear on cdn', cm.exception.message)
-
-
-class TestFormFields(unittest.TestCase):
-
-    @override_settings(UPLOADCARE={'pub_key': 'asdf', 'secret': 'qwer'})
-    def test_default_form_field(self):
-
-        class SomeForm(forms.Form):
-            cf = forms.CharField()
-            ff = uc_forms.FileField()
-
-        f = SomeForm()
-        self.assertRegexpMatches(
-            str(f.media),
-            'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
-        )
-        self.assertIn('role="uploadcare-uploader"', str(f['ff']))
-        self.assertIn('data-public-key="asdf"', str(f['ff']))
-        self.assertIn('type="hidden"', str(f['ff']))
-
-    @override_settings(UPLOADCARE={'pub_key': 'asdf', 'secret': 'qwer'})
-    def test_form_field_custom_attrs(self):
-
-        class SomeForm(forms.Form):
-            cf = forms.CharField()
-            ff = uc_forms.FileField(
-                widget=uc_forms.FileWidget(attrs={'role': 'role'}))
-
-        f = SomeForm()
-        self.assertRegexpMatches(
-            str(f.media),
-            'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
-        )
-        self.assertIn('role="role"', str(f['ff']))
-        self.assertIn('data-public-key="asdf"', str(f['ff']))
-        self.assertIn('type="hidden"', str(f['ff']))
