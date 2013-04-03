@@ -186,3 +186,19 @@ class File(object):
             dimensions += 'x{0}'.format(height)
 
         return '{0}-/resize/{1}/'.format(self.cdn_url, dimensions)
+
+
+class FileGroup(object):
+
+    def __init__(self, group_id, files_qty, ucare):
+        self.group_id = group_id
+        self.files_qty = files_qty
+        self.ucare = ucare
+
+    @property
+    def cdn_url(self):
+        return '{cdn_base}{group_id}/'.format(
+            cdn_base=self.ucare.cdn_base,
+            group_id=self.group_id
+        )
+

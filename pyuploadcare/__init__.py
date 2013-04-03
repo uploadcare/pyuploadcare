@@ -9,7 +9,7 @@ import logging
 import json
 import requests
 
-from pyuploadcare.file import File
+from pyuploadcare.file import File, FileGroup
 from pyuploadcare.uploader import UploaderMixin
 from pyuploadcare.exceptions import (
     UploadCareException, APIConnectionError, AuthenticationError,
@@ -23,6 +23,12 @@ uuid_with_effects_regex = re.compile(ur'''
     (
         /-/(?P<effects>.*)
     )?
+''', re.VERBOSE)
+
+group_id_regex = re.compile(ur'''
+    ([a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
+    ~
+    (?P<files_qty>\d+)
 ''', re.VERBOSE)
 
 
@@ -69,6 +75,20 @@ class UploadCare(UploaderMixin):
             f._cached_url = file_serialized
 
         return f
+
+    def file_group(self, group_id):
+        matches = group_id_regex.search(group_id)
+
+        if not matches:
+            raise InvalidRequestError("Couldn't find group UUID")
+
+        files_qty = int(matches.groupdict()['files_qty'])
+        if files_qty <= 0:
+            raise InvalidRequestError("Couldn't find group UUID")
+
+        group = FileGroup(group_id=group_id, files_qty=files_qty, ucare=self)
+
+        return group
 
     def file_from_url(self, url, wait=False, timeout=30):
         return self.upload_from_url(url, wait, timeout)
