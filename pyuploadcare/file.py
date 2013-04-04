@@ -190,15 +190,51 @@ class File(object):
 
 class FileGroup(object):
 
-    def __init__(self, group_id, files_qty, ucare):
+    def __init__(self, group_id, ucare):
         self.group_id = group_id
-        self.files_qty = files_qty
-        self.ucare = ucare
+
+        self._ucare = ucare
+        self._files_qty = int(group_id.split('~')[1])
+        self._info_cache = None
+
+    def __repr__(self):
+        return '<uploadcare.FileGroup {0}>'.format(self.group_id)
+
+    def __str__(self):
+        return self.cdn_url
+
+    def __len__(self):
+        return self._files_qty
+
+    def __getitem__(self, key):
+        return self.files[key]
+
+    @property
+    def files(self):
+        files = []
+        for file_info in self.info['files']:
+            file_ = File(file_id=file_info['uuid'], ucare=self._ucare)
+            file_._info = file_info
+
+            files.append(file_)
+        return files
+
+    @property
+    def info(self):
+        if self._info_cache is None:
+            self.update_info()
+        return self._info_cache
+
+    def update_info(self):
+        self._info_cache = self._ucare.make_request('GET', self.api_uri)
+
+    @property
+    def api_uri(self):
+        return '/groups/{0}/'.format(self.group_id)
 
     @property
     def cdn_url(self):
         return '{cdn_base}{group_id}/'.format(
-            cdn_base=self.ucare.cdn_base,
+            cdn_base=self._ucare.cdn_base,
             group_id=self.group_id
         )
-

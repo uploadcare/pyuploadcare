@@ -86,7 +86,7 @@ class UploadCare(UploaderMixin):
         if files_qty <= 0:
             raise InvalidRequestError("Couldn't find group UUID")
 
-        group = FileGroup(group_id=group_id, files_qty=files_qty, ucare=self)
+        group = FileGroup(group_id=group_id, ucare=self)
 
         return group
 

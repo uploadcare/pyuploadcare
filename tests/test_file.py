@@ -12,8 +12,8 @@ from pyuploadcare import UploadCare
 from pyuploadcare.exceptions import (
     InvalidRequestError, TimeoutError,
 )
-from pyuploadcare.file import File
-from tests.utils import MockResponse
+from pyuploadcare.file import File, FileGroup
+from tests.utils import MockResponse, api_response_from_file
 
 
 class FileTest(unittest.TestCase):
@@ -115,3 +115,45 @@ class FileTest(unittest.TestCase):
         with self.assertRaises(TimeoutError) as cm:
             f.store(wait=True, timeout=0.1)
         self.assertEqual('timed out waiting for file appear on cdn', cm.exception.message)
+
+
+class FileGroupAsContainerTypeTest(unittest.TestCase):
+
+    @patch('requests.request', autospec=True)
+    def setUp(self, request):
+        request.return_value = MockResponse(
+            status=200,
+            data=api_response_from_file('group_files.json')
+        )
+
+        self.group = FileGroup(
+            group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
+            ucare=UploadCare('pub', 'secret')
+        )
+        # It is necessary to avoid api call in tests below.
+        self.group.update_info()
+
+    def test_positive_index(self):
+        self.assertIsInstance(self.group[0], File)
+
+    def test_negative_index(self):
+        self.assertIsInstance(self.group[-1], File)
+
+    def test_index_is_out_of_range(self):
+        with self.assertRaises(IndexError):
+            self.group[2]
+
+    def test_non_int_index(self):
+        with self.assertRaises(TypeError):
+            self.group['a']
+
+    def test_slice(self):
+        for file_ in self.group[0:99]:
+            self.assertIsInstance(file_, File)
+
+    def test_len(self):
+        self.assertEqual(len(self.group), 2)
+
+    def test_immutability(self):
+        with self.assertRaises(TypeError):
+            self.group[0] = 123

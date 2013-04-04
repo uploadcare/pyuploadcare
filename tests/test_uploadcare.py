@@ -73,4 +73,4 @@ class FileGroupRegexTest(unittest.TestCase):
 
         group = self.uc.file_group(group_id)
         self.assertEqual(group.cdn_url, expected_cdn_url)
-        self.assertEqual(group.files_qty, 12)
+        self.assertEqual(group._files_qty, 12)
