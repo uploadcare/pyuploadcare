@@ -1,4 +1,4 @@
-__version__ = (0, 14)
+__version__ = '0.18'
 
 import email.utils
 import hashlib
@@ -53,7 +53,7 @@ class UploadCare(UploaderMixin):
         self.api_version = api_version
         self.accept = 'application/vnd.uploadcare-v{0}+json'.format(api_version)
         self.default_headers = {
-            'User-Agent': 'pyuploadcare/{0}.{1}'.format(*__version__),
+            'User-Agent': 'pyuploadcare/{0}'.format(__version__),
         }
 
     def file(self, file_serialized):

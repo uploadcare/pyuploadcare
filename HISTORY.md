@@ -1,3 +1,6 @@
+### 0.18
+    * Widget was updated up to *0.6.9.1*.
+
 ### 0.17
     * ``ImageField`` was added. It provides uploading only image files. Moreover,
       you can activate manual crop, e.g. ``ImageField(manual_crop='2:3')``.
