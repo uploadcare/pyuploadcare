@@ -26,9 +26,11 @@ uuid_with_effects_regex = re.compile(ur'''
 ''', re.VERBOSE)
 
 group_id_regex = re.compile(ur'''
-    ([a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
-    ~
-    (?P<files_qty>\d+)
+    (?P<group_id>
+        [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
+        ~
+        (?P<files_qty>\d+)
+    )
 ''', re.VERBOSE)
 
 
@@ -86,7 +88,7 @@ class UploadCare(UploaderMixin):
         if files_qty <= 0:
             raise InvalidRequestError("Couldn't find group UUID")
 
-        group = FileGroup(group_id=group_id, ucare=self)
+        group = FileGroup(group_id=matches.groupdict()['group_id'], ucare=self)
 
         return group
 

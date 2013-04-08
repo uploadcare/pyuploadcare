@@ -74,3 +74,11 @@ class FileGroupRegexTest(unittest.TestCase):
         group = self.uc.file_group(group_id)
         self.assertEqual(group.cdn_url, expected_cdn_url)
         self.assertEqual(group._files_qty, 12)
+
+    def test_extracting_group_id_from_url(self):
+        cdn_url = 'https://ucarecdn.com/d5f45851-3a58-41a4-b76c-356e22837a2f~12/'
+        expected_group_id = 'd5f45851-3a58-41a4-b76c-356e22837a2f~12'
+
+        group = self.uc.file_group(cdn_url)
+        self.assertEqual(group.group_id, expected_group_id)
+        self.assertEqual(group._files_qty, 12)
