@@ -188,6 +188,12 @@ class File(object):
         return '{0}-/resize/{1}/'.format(self.cdn_url, dimensions)
 
 
+def load_file_from_cache(file_info, ucare):
+    file_ = File(file_id=file_info['uuid'], ucare=ucare)
+    file_._info = file_info
+    return file_
+
+
 class FileGroup(object):
 
     def __init__(self, group_id, ucare):
@@ -207,15 +213,23 @@ class FileGroup(object):
         return self._files_qty
 
     def __getitem__(self, key):
-        return self.files[key]
+        """Returns files from group by key as ``File`` instances."""
+        if isinstance(key, slice):
+            files = []
+            for file_info in self.info['files'][key]:
+                file_ = load_file_from_cache(file_info, self._ucare)
+                files.append(file_)
+            return files
+        else:
+            file_info = self.info['files'][key]
+            return load_file_from_cache(file_info, self._ucare)
 
     @property
     def files(self):
+        """Returns all files from group as ``File`` instances."""
         files = []
         for file_info in self.info['files']:
-            file_ = File(file_id=file_info['uuid'], ucare=self._ucare)
-            file_._info = file_info
-
+            file_ = load_file_from_cache(file_info=file_info, ucare=self._ucare)
             files.append(file_)
         return files
 
