@@ -238,3 +238,22 @@ class FileGroup(object):
             cdn_base=self._ucare.cdn_base,
             group_id=self.group_id
         )
+
+    @property
+    def api_storage_uri(self):
+        return '/groups/{0}/storage/'.format(self.group_id)
+
+    @property
+    def is_stored(self):
+        return self.info['datetime_stored'] is not None
+
+    def store(self):
+        """Stores all group's files.
+
+        Uploaded files do not immediately appear on Uploadcare CDN.
+
+        """
+        if self.is_stored:
+            return
+
+        self._info_cache = self._ucare.make_request('PUT', self.api_storage_uri)

@@ -157,3 +157,36 @@ class FileGroupAsContainerTypeTest(unittest.TestCase):
     def test_immutability(self):
         with self.assertRaises(TypeError):
             self.group[0] = 123
+
+
+class StoreFileGroupTest(unittest.TestCase):
+
+    @patch('requests.request', autospec=True)
+    def test_successful_store(self, request):
+        group = FileGroup(
+            group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
+            ucare=UploadCare('pub', 'secret')
+        )
+        group._info_cache = {"datetime_stored": None}
+        # PUT /api/groups/{group_id}/storage/
+        request.return_value = MockResponse(
+            status=200,
+            data='{"datetime_stored": "2013-04-03T12:01:28.714Z"}')
+        group.store()
+
+        self.assertEqual(request.call_count, 1)
+
+    @patch('requests.request', autospec=True)
+    def test_do_not_store_twice(self, request):
+        group = FileGroup(
+            group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
+            ucare=UploadCare('pub', 'secret')
+        )
+        # GET /api/groups/{group_id}/
+        request.return_value = MockResponse(
+            status=200,
+            data='{"datetime_stored": "2013-04-03T12:01:28.714Z"}')
+        group.store()
+        group.store()
+
+        self.assertEqual(request.call_count, 1)
