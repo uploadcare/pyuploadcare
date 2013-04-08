@@ -111,7 +111,7 @@ class FileGroupField(models.Field):
             )
 
         try:
-            return UploadCare().file_group(group_id=value)
+            return UploadCare().file_group(value)
         except InvalidRequestError as exc:
             raise ValidationError(
                 u'Invalid value for a field: {exc}'.format(exc=exc)

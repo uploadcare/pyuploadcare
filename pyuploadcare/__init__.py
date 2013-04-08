@@ -18,20 +18,6 @@ from pyuploadcare.exceptions import (
 
 
 logger = logging.getLogger("pyuploadcare")
-uuid_with_effects_regex = re.compile(ur'''
-    (?P<uuid>[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
-    (
-        /-/(?P<effects>.*)
-    )?
-''', re.VERBOSE)
-
-group_id_regex = re.compile(ur'''
-    (?P<group_id>
-        [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
-        ~
-        (?P<files_qty>\d+)
-    )
-''', re.VERBOSE)
 
 
 class UploadCare(UploaderMixin):
@@ -65,32 +51,10 @@ class UploadCare(UploaderMixin):
         }
 
     def file(self, file_serialized):
-        m = uuid_with_effects_regex.search(file_serialized)
+        return File(cdn_url_or_file_id=file_serialized, ucare=self)
 
-        if not m:
-            raise InvalidRequestError("Couldn't find UUID")
-
-        f = File(file_id=m.groupdict()['uuid'], ucare=self,
-                 default_effects=m.groupdict()['effects'])
-
-        if file_serialized.startswith('http'):
-            f._cached_url = file_serialized
-
-        return f
-
-    def file_group(self, group_id):
-        matches = group_id_regex.search(group_id)
-
-        if not matches:
-            raise InvalidRequestError("Couldn't find group UUID")
-
-        files_qty = int(matches.groupdict()['files_qty'])
-        if files_qty <= 0:
-            raise InvalidRequestError("Couldn't find group UUID")
-
-        group = FileGroup(group_id=matches.groupdict()['group_id'], ucare=self)
-
-        return group
+    def file_group(self, cdn_url_or_group_id):
+        return FileGroup(cdn_url_or_group_id=cdn_url_or_group_id, ucare=self)
 
     def file_from_url(self, url, wait=False, timeout=30):
         return self.upload_from_url(url, wait, timeout)

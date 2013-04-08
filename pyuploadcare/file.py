@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 import time
 import logging
 
@@ -8,15 +9,38 @@ from pyuploadcare.exceptions import TimeoutError, InvalidRequestError
 
 logger = logging.getLogger("pyuploadcare")
 
+UUID_WITH_EFFECTS_REGEX = re.compile(ur'''
+    (?P<uuid>[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
+    (
+        /-/(?P<effects>.*)
+    )?
+''', re.VERBOSE)
+
+GROUP_ID_REGEX = re.compile(ur'''
+    (?P<group_id>
+        [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
+        ~
+        (?P<files_qty>\d+)
+    )
+''', re.VERBOSE)
+
 
 class File(object):
     _info = None
     _cached_url = None
 
-    def __init__(self, file_id, ucare, default_effects=''):
-        self.file_id = file_id
+    def __init__(self, cdn_url_or_file_id, ucare):
+        matches = UUID_WITH_EFFECTS_REGEX.search(cdn_url_or_file_id)
+
+        if not matches:
+            raise InvalidRequestError("Couldn't find UUID")
+
+        self.file_id = matches.groupdict()['uuid']
+        self.default_effects = matches.groupdict()['effects']
         self.ucare = ucare
-        self.default_effects = default_effects
+
+        if cdn_url_or_file_id.startswith('http'):
+            self._cached_url = cdn_url_or_file_id
 
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
@@ -189,18 +213,27 @@ class File(object):
 
 
 def load_file_from_cache(file_info, ucare):
-    file_ = File(file_id=file_info['uuid'], ucare=ucare)
+    file_ = File(cdn_url_or_file_id=file_info['uuid'], ucare=ucare)
     file_._info = file_info
     return file_
 
 
 class FileGroup(object):
 
-    def __init__(self, group_id, ucare):
-        self.group_id = group_id
+    def __init__(self, cdn_url_or_group_id, ucare):
+        matches = GROUP_ID_REGEX.search(cdn_url_or_group_id)
+
+        if not matches:
+            raise InvalidRequestError("Couldn't find group UUID")
+
+        files_qty = int(matches.groupdict()['files_qty'])
+        if files_qty <= 0:
+            raise InvalidRequestError("Couldn't find group UUID")
+
+        self.group_id = matches.groupdict()['group_id']
 
         self._ucare = ucare
-        self._files_qty = int(group_id.split('~')[1])
+        self._files_qty = files_qty
         self._info_cache = None
 
     def __repr__(self):

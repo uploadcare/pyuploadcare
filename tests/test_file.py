@@ -27,7 +27,7 @@ class FileTest(unittest.TestCase):
         cdn_response = MockResponse(200)
         head.return_value = cdn_response
 
-        f = File('uuid', ucare)
+        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342', ucare)
         with self.assertRaises(TimeoutError) as cm:
             f.store(wait=True, timeout=0.2)
         self.assertEqual('timed out trying to store',
@@ -43,7 +43,7 @@ class FileTest(unittest.TestCase):
         response = MockResponse(200, '{"removed": null}')
         request.return_value = response
 
-        f = File('uuid', ucare)
+        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342', ucare)
         with self.assertRaises(TimeoutError) as cm:
             f.delete(wait=True, timeout=0.2)
         self.assertEqual('timed out trying to delete',
@@ -127,7 +127,7 @@ class FileGroupAsContainerTypeTest(unittest.TestCase):
         )
 
         self.group = FileGroup(
-            group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
             ucare=UploadCare('pub', 'secret')
         )
         # It is necessary to avoid api call in tests below.
@@ -164,7 +164,7 @@ class StoreFileGroupTest(unittest.TestCase):
     @patch('requests.request', autospec=True)
     def test_successful_store(self, request):
         group = FileGroup(
-            group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
             ucare=UploadCare('pub', 'secret')
         )
         group._info_cache = {"datetime_stored": None}
@@ -179,7 +179,7 @@ class StoreFileGroupTest(unittest.TestCase):
     @patch('requests.request', autospec=True)
     def test_do_not_store_twice(self, request):
         group = FileGroup(
-            group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
             ucare=UploadCare('pub', 'secret')
         )
         # GET /api/groups/{group_id}/
