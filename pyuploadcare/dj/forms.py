@@ -47,3 +47,12 @@ class ImageField(Field):
         if self.manual_crop is not None:
             attrs['data-crop'] = self.manual_crop
         return attrs
+
+
+class FileGroupField(Field):
+
+    widget = FileWidget
+
+    def widget_attrs(self, widget):
+        attrs = {'data-multiple': ''}
+        return attrs
