@@ -115,7 +115,7 @@ def upload(args):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version',
-                        version='ucare {0}.{1}'.format(*__version__))
+                        version='ucare {0}'.format(__version__))
 
     subparsers = parser.add_subparsers()
 
