@@ -287,6 +287,18 @@ class FileGroup(object):
         )
 
     @property
+    def file_cdn_urls(self):
+        """Returns CDN urls of all files from group without API requesting."""
+        file_cdn_urls = []
+        for file_index in xrange(self._files_qty):
+            file_cdn_url = '{group_cdn_url}nth/{file_index}/'.format(
+                group_cdn_url=self.cdn_url,
+                file_index=file_index
+            )
+            file_cdn_urls.append(file_cdn_url)
+        return file_cdn_urls
+
+    @property
     def api_storage_uri(self):
         return '/groups/{0}/storage/'.format(self.group_id)
 

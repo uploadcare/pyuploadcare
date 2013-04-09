@@ -190,3 +190,26 @@ class StoreFileGroupTest(unittest.TestCase):
         group.store()
 
         self.assertEqual(request.call_count, 1)
+
+
+class FileCDNUrlsTest(unittest.TestCase):
+
+    def setUp(self):
+        self.group = FileGroup(
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
+            ucare=UploadCare('pub', 'secret')
+        )
+
+    @patch('requests.request', autospec=True)
+    def test_no_api_requests(self, request):
+        request.return_value = MockResponse(status=200, data='{}')
+        self.group.file_cdn_urls
+
+        self.assertFalse(request.called)
+
+    def test_two_files_are_in_group(self):
+        expected_file_cdn_urls = [
+            'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/0/',
+            'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/1/',
+        ]
+        self.assertEqual(self.group.file_cdn_urls, expected_file_cdn_urls)
