@@ -17,7 +17,9 @@ Get API Keys
 ------------
 
 First of all, you'll need API keys: public and private. You can get them
-at the `Uploadcare`_ website.
+at the `Uploadcare`_ website. If you don't have an account yet, you can use
+demo keys, as in example. However, the files on demo account are regularly
+deleted, so create an account as soon as Uploadcare catches your fancy.
 
 .. _quickstart-django-ref:
 
@@ -71,9 +73,9 @@ It looks nice in the admin interface as well:
 
 .. image:: https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/
 
-``ImageField`` works in every ``ModelForm`` well, even outside of the admin
-interface. But you must remember to add ``{{ form.media }}`` somewhere
-on your page, e.g. in the ``<head>``:
+Obviously, you would want to use Uploadcare field outside an admin.
+It's going to work just as well, but, however, you have to remember to add
+``{{ form.media }}`` in the ``<head>`` tag of your page:
 
 .. code-block:: django
 
