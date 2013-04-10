@@ -28,6 +28,7 @@ Contents:
    quickstart
    django-widget
    cli
+   deprecated
 
 API Reference
 -------------
