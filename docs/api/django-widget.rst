@@ -4,15 +4,6 @@
 Django Widget API
 =================
 
-.. _django-widget-api-settings-ref:
-
-Settings
---------
-
-.. automodule:: pyuploadcare.dj.conf
-   :members:
-   :undoc-members:
-
 .. _django-widget-api-models-ref:
 
 Model Fields
