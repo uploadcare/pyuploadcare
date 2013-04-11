@@ -260,12 +260,12 @@ class FileGroup(object):
         """Returns files from group by key as ``File`` instances."""
         if isinstance(key, slice):
             files = []
-            for file_info in self.info['files'][key]:
+            for file_info in self.info()['files'][key]:
                 file_ = File.construct_from(file_info, self._ucare)
                 files.append(file_)
             return files
         else:
-            file_info = self.info['files'][key]
+            file_info = self.info()['files'][key]
             return File.construct_from(file_info, self._ucare)
 
     @property
@@ -276,16 +276,18 @@ class FileGroup(object):
     def _api_storage_uri(self):
         return '/groups/{0}/storage/'.format(self.group_id)
 
-    @property
     def files(self):
-        """Returns all files from group as ``File`` instances."""
+        """Returns all files from group as ``File`` instances.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
         files = []
-        for file_info in self.info['files']:
+        for file_info in self.info()['files']:
             file_ = File.construct_from(file_info, self._ucare)
             files.append(file_)
         return files
 
-    @property
     def info(self):
         """Returns all available group information as ``dict``.
 
@@ -337,22 +339,21 @@ class FileGroup(object):
             file_cdn_urls.append(file_cdn_url)
         return file_cdn_urls
 
-    @property
     def is_stored(self):
         """Returns ``True`` if group is stored.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info['datetime_stored'] is not None
+        return self.info()['datetime_stored'] is not None
 
     def store(self):
-        """Stores all group's files.
+        """Stores all group's files by requesting Uploadcare API.
 
         Uploaded files do not immediately appear on Uploadcare CDN.
 
         """
-        if self.is_stored:
+        if self.is_stored():
             return
 
         self._info_cache = self._ucare.make_request('PUT', self._api_storage_uri)
