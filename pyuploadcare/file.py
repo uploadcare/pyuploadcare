@@ -221,9 +221,12 @@ class File(object):
 class FileGroup(object):
     """File Group resource for working with user-uploaded group of files.
 
-    You can iterate it or get ``File`` instance by key::
+    It can take group id or group CDN url::
 
         >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2', ucare)
+
+    You can iterate ``file_group`` or get ``File`` instance by key::
+
         >>> file_group[0]
         <uploadcare.File 6c5e9526-b0fe-4739-8975-72e8d5ee6342>
         >>> len(file_group)
@@ -276,33 +279,6 @@ class FileGroup(object):
     def _api_storage_uri(self):
         return '/groups/{0}/storage/'.format(self.group_id)
 
-    def files(self):
-        """Returns all files from group as ``File`` instances.
-
-        It might do API request once because it depends on ``info()``.
-
-        """
-        files = []
-        for file_info in self.info()['files']:
-            file_ = File.construct_from(file_info, self._ucare)
-            files.append(file_)
-        return files
-
-    def info(self):
-        """Returns all available group information as ``dict``.
-
-        First time it makes API request to get group information and keeps it
-        for further using.
-
-        """
-        if self._info_cache is None:
-            self.update_info()
-        return self._info_cache
-
-    def update_info(self):
-        """Updates group information by requesting Uploadcare API."""
-        self._info_cache = self._ucare.make_request('GET', self._api_uri)
-
     @property
     def cdn_url(self):
         """Returns group's CDN url.
@@ -338,6 +314,33 @@ class FileGroup(object):
             )
             file_cdn_urls.append(file_cdn_url)
         return file_cdn_urls
+
+    def files(self):
+        """Returns all files from group as ``File`` instances.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        files = []
+        for file_info in self.info()['files']:
+            file_ = File.construct_from(file_info, self._ucare)
+            files.append(file_)
+        return files
+
+    def info(self):
+        """Returns all available group information as ``dict``.
+
+        First time it makes API request to get group information and keeps it
+        for further using.
+
+        """
+        if self._info_cache is None:
+            self.update_info()
+        return self._info_cache
+
+    def update_info(self):
+        """Updates group information by requesting Uploadcare API."""
+        self._info_cache = self._ucare.make_request('GET', self._api_uri)
 
     def is_stored(self):
         """Returns ``True`` if group is stored.

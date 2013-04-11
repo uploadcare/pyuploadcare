@@ -22,6 +22,8 @@ File Group Object
    :members:
    :undoc-members:
 
+   .. attribute:: group_id
+
 .. _core_api-requestor-ref:
 
 Uploadcare API Requestor
