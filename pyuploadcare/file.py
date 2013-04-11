@@ -269,6 +269,14 @@ class FileGroup(object):
             return File.construct_from(file_info, self._ucare)
 
     @property
+    def _api_uri(self):
+        return '/groups/{0}/'.format(self.group_id)
+
+    @property
+    def _api_storage_uri(self):
+        return '/groups/{0}/storage/'.format(self.group_id)
+
+    @property
     def files(self):
         """Returns all files from group as ``File`` instances."""
         files = []
@@ -291,11 +299,7 @@ class FileGroup(object):
 
     def update_info(self):
         """Updates group information by requesting Uploadcare API."""
-        self._info_cache = self._ucare.make_request('GET', self.api_uri)
-
-    @property
-    def api_uri(self):
-        return '/groups/{0}/'.format(self.group_id)
+        self._info_cache = self._ucare.make_request('GET', self._api_uri)
 
     @property
     def cdn_url(self):
@@ -334,10 +338,6 @@ class FileGroup(object):
         return file_cdn_urls
 
     @property
-    def api_storage_uri(self):
-        return '/groups/{0}/storage/'.format(self.group_id)
-
-    @property
     def is_stored(self):
         """Returns ``True`` if group is stored.
 
@@ -355,4 +355,4 @@ class FileGroup(object):
         if self.is_stored:
             return
 
-        self._info_cache = self._ucare.make_request('PUT', self.api_storage_uri)
+        self._info_cache = self._ucare.make_request('PUT', self._api_storage_uri)
