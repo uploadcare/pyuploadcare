@@ -219,6 +219,17 @@ class File(object):
 
 
 class FileGroup(object):
+    """File Group resource for working with user-uploaded group of files.
+
+    You can iterate it or get ``File`` instance by key::
+
+        >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2', ucare)
+        >>> file_group[0]
+        <uploadcare.File 6c5e9526-b0fe-4739-8975-72e8d5ee6342>
+        >>> len(file_group)
+        2
+
+    """
 
     def __init__(self, cdn_url_or_group_id, ucare):
         matches = GROUP_ID_REGEX.search(cdn_url_or_group_id)
@@ -268,11 +279,18 @@ class FileGroup(object):
 
     @property
     def info(self):
+        """Returns all available group information as ``dict``.
+
+        First time it makes API request to get group information and keeps it
+        for further using.
+
+        """
         if self._info_cache is None:
             self.update_info()
         return self._info_cache
 
     def update_info(self):
+        """Updates group information by requesting Uploadcare API."""
         self._info_cache = self._ucare.make_request('GET', self.api_uri)
 
     @property
@@ -281,6 +299,15 @@ class FileGroup(object):
 
     @property
     def cdn_url(self):
+        """Returns group's CDN url.
+
+        Usage example::
+
+            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2', ucare)
+            >>> file_group.cdn_url
+            https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/
+
+        """
         return '{cdn_base}{group_id}/'.format(
             cdn_base=self._ucare.cdn_base,
             group_id=self.group_id
@@ -288,7 +315,15 @@ class FileGroup(object):
 
     @property
     def file_cdn_urls(self):
-        """Returns CDN urls of all files from group without API requesting."""
+        """Returns CDN urls of all files from group without API requesting.
+
+        Usage example::
+
+            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2', ucare)
+            >>> file_group.file_cdn_urls[0]
+            'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/0/'
+
+        """
         file_cdn_urls = []
         for file_index in xrange(self._files_qty):
             file_cdn_url = '{group_cdn_url}nth/{file_index}/'.format(
@@ -304,6 +339,11 @@ class FileGroup(object):
 
     @property
     def is_stored(self):
+        """Returns ``True`` if group is stored.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
         return self.info['datetime_stored'] is not None
 
     def store(self):
