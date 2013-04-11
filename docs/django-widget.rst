@@ -43,3 +43,55 @@ Model Fields
 ------------
 
 .. _Uploadcare widget: https://uploadcare.com/documentation/widget/
+
+As you will see, with Uploadcare, adding and working with a file field is
+just as simple as with a `TextField`_. To attach Uploadcare files to a model,
+you can use a :ref:`FileField <django-widget-models-filefield-ref>` or
+:ref:`ImageField <django-widget-models-imagefield-ref>`.
+These fields play by common Django rules. South migrations are supported.
+
+.. _django-widget-models-filefield-ref:
+
+FileField
+~~~~~~~~~
+
+``FileField`` does not require an uploaded file to be any certain format.
+
+.. code-block:: python
+
+    from django.db import models
+
+    from pyuploadcare.dj import FileField
+
+
+    class Candidate(models.Model):
+
+        resume = FileField()
+
+.. _django-widget-models-imagefield-ref:
+
+ImageField
+~~~~~~~~~~
+
+``ImageField`` requires an uploaded file to be an image. An optional parameter
+``manual_crop`` enables, if specified, a manual cropping tool: your user can
+select a part of an image she wants to use. If its value is an empty string,
+the user can select any part of an image; you can also use values like
+``"3:4"`` or ``"200x300"`` to get exact proportions or dimensions of resulting
+image. Consult `widget documentation`_ regarding setting up the manual crop:
+
+.. code-block:: python
+
+    from django.db import models
+
+    from pyuploadcare.dj import ImageField
+
+
+    class Candidate(models.Model):
+
+        photo = ImageField(blank=True, manual_crop="")
+
+.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/preview/manual_crop.png
+
+.. _widget documentation: https://uploadcare.com/documentation/widget/#crop
+.. _TextField: https://docs.djangoproject.com/en/1.5/ref/models/fields/#django.db.models.TextField
