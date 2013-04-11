@@ -42,6 +42,12 @@ class File(object):
         if cdn_url_or_file_id.startswith('http'):
             self._cached_url = cdn_url_or_file_id
 
+    @classmethod
+    def construct_from(cls, file_info, ucare):
+        file_ = cls(file_info['file_id'], ucare)
+        file_._info = file_info
+        return file_
+
     def __repr__(self):
         return '<uploadcare.File %s>' % self.file_id
 
@@ -212,12 +218,6 @@ class File(object):
         return '{0}-/resize/{1}/'.format(self.cdn_url, dimensions)
 
 
-def load_file_from_cache(file_info, ucare):
-    file_ = File(cdn_url_or_file_id=file_info['uuid'], ucare=ucare)
-    file_._info = file_info
-    return file_
-
-
 class FileGroup(object):
 
     def __init__(self, cdn_url_or_group_id, ucare):
@@ -250,19 +250,19 @@ class FileGroup(object):
         if isinstance(key, slice):
             files = []
             for file_info in self.info['files'][key]:
-                file_ = load_file_from_cache(file_info, self._ucare)
+                file_ = File.construct_from(file_info, self._ucare)
                 files.append(file_)
             return files
         else:
             file_info = self.info['files'][key]
-            return load_file_from_cache(file_info, self._ucare)
+            return File.construct_from(file_info, self._ucare)
 
     @property
     def files(self):
         """Returns all files from group as ``File`` instances."""
         files = []
         for file_info in self.info['files']:
-            file_ = load_file_from_cache(file_info=file_info, ucare=self._ucare)
+            file_ = File.construct_from(file_info, self._ucare)
             files.append(file_)
         return files
 
