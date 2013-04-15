@@ -135,3 +135,10 @@ class FileGroupField(models.Field):
     def formfield(self, **kwargs):
         return super(FileGroupField, self).formfield(
             form_class=forms.FileGroupField, **kwargs)
+
+
+class ImageGroupField(FileGroupField):
+
+    def formfield(self, **kwargs):
+        return super(ImageGroupField, self).formfield(
+            form_class=forms.ImageGroupField, **kwargs)

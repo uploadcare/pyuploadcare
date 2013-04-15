@@ -112,5 +112,24 @@ uploaded files as a group:
 
         pages = FileGroupField()
 
+.. _django-widget-models-imagegroupfield-ref:
+
+ImageGroupField
+~~~~~~~~~~~~~~~
+
+``ImageGroupField`` allows you to upload more than one **image** at a time.
+It stores uploaded images as a group:
+
+.. code-block:: python
+
+    from django.db import models
+
+    from pyuploadcare.dj import ImageGroupField
+
+
+    class Gallery(models.Model):
+
+        photos = ImageGroupField()
+
 .. _widget documentation: https://uploadcare.com/documentation/widget/#crop
 .. _TextField: https://docs.djangoproject.com/en/1.5/ref/models/fields/#django.db.models.TextField
