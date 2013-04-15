@@ -27,7 +27,7 @@ class File(object):
         if not matches:
             raise InvalidRequestError("Couldn't find UUID")
 
-        self.file_id = matches.groupdict()['uuid']
+        self.uuid = matches.groupdict()['uuid']
         self.default_effects = matches.groupdict()['effects']
         self.ucare = ucare
 
@@ -42,7 +42,7 @@ class File(object):
         return file_
 
     def __repr__(self):
-        return '<uploadcare.File %s>' % self.file_id
+        return '<uploadcare.File {uuid}>'.format(uuid=self.uuid)
 
     def __str__(self):
         return self.cdn_url
@@ -104,11 +104,11 @@ class File(object):
 
     @property
     def api_uri(self):
-        return '/files/{0}/'.format(self.file_id)
+        return '/files/{0}/'.format(self.uuid)
 
     @property
     def storage_uri(self):
-        return '/files/{0}/storage/'.format(self.file_id)
+        return '/files/{0}/storage/'.format(self.uuid)
 
     def serialize(self):
         """Returns a string suitable to be stored somewhere.
@@ -119,7 +119,7 @@ class File(object):
         if self._info and self.url:
             return self.url
 
-        return self.file_id
+        return self.uuid
 
     @property
     def url(self):
@@ -132,13 +132,13 @@ class File(object):
         if self.default_effects:
             return '{cdn_base}{uuid}/-/{effects}'.format(
                 cdn_base=self.ucare.cdn_base,
-                uuid=self.file_id,
+                uuid=self.uuid,
                 effects=self.default_effects
             )
         else:
             return '{cdn_base}{uuid}/'.format(
                 cdn_base=self.ucare.cdn_base,
-                uuid=self.file_id
+                uuid=self.uuid
             )
 
     @property
