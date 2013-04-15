@@ -52,7 +52,7 @@ class File(object):
 
         if wait:
             time_started = time.time()
-            while not (self.is_on_s3 and self.is_stored):
+            while not self.is_stored:
                 if time.time() - time_started > timeout:
                     raise TimeoutError('timed out trying to store')
                 self.update_info()
@@ -72,17 +72,7 @@ class File(object):
                 time.sleep(0.1)
         self.update_info()
 
-    def ensure_on_s3(self, timeout=5):
-        time_started = time.time()
-        while not self.is_on_s3:
-            if time.time() - time_started > timeout:
-                raise TimeoutError('timed out waiting for uploading to s3')
-            self.update_info()
-            time.sleep(0.1)
-
     def ensure_on_cdn(self, timeout=5):
-        if not self.is_on_s3:
-            raise InvalidRequestError('file is not on s3 yet')
         if not self.is_stored:
             raise InvalidRequestError('file is private')
         time_started = time.time()
@@ -103,10 +93,6 @@ class File(object):
 
     def update_info(self):
         self._info = self.ucare.make_request('GET', self.api_uri)
-
-    @property
-    def is_on_s3(self):
-        return self.info['on_s3']
 
     @property
     def is_stored(self):
