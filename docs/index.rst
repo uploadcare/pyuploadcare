@@ -2,7 +2,7 @@
 PyUploadcare: a Python library for Uploadcare
 =============================================
 
-The most importang thing for us at `Uploadcare`_ is to make file uploading on
+The most important thing for us at `Uploadcare`_ is to make file uploading on
 the web really easy. Everyone is used to the routine work, related to allowing
 users upload their userpics or attach resumes: from installing image processing
 libraries to creating folder with right permissions to ensuring the server
