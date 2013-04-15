@@ -47,35 +47,6 @@ class File(object):
     def __str__(self):
         return self.cdn_url
 
-    def __getattr__(self, name):
-        if name.startswith('resized_') or name.startswith('cropped_'):
-            width, _, height = name[8:].partition('x')
-            try:
-                width = int(width) if width else None
-            except ValueError as exc:
-                raise InvalidRequestError(
-                    u'invalid width, {exc}'.format(exc=exc)
-                )
-            try:
-                height = int(height) if height else None
-            except ValueError as exc:
-                raise InvalidRequestError(
-                    u'invalid height, {exc}'.format(exc=exc)
-                )
-            func = self.cropped if name.startswith('c') else self.resized
-            return func(width, height)
-
-        return super(File, self).__getattr__(name)
-
-    def keep(self, **kwargs):
-        """Deprecated method.
-
-        Use store instead.
-        Will be removed eventually.
-        """
-        logger.warn("keep() is deprecated, use store() instead")
-        return self.store(**kwargs)
-
     def store(self, wait=False, timeout=5):
         self.ucare.make_request('PUT', self.storage_uri)
 
@@ -189,26 +160,6 @@ class File(object):
         if not self.url:
             return ''
         return self.url.split('/')[-1]
-
-    def cropped(self, width=None, height=None):
-        logger.warn("cropped() is deprecated, use cdn_url with "
-                    "concatenated process command string")
-        if not width or not height:
-            raise InvalidRequestError('Need both width and height to crop')
-        dimensions = '{0}x{1}'.format(width, height)
-
-        return '{0}-/crop/{1}/'.format(self.cdn_url, dimensions)
-
-    def resized(self, width=None, height=None):
-        logger.warn("resized() is deprecated, use cdn_url with "
-                    "concatenated process command string")
-        if not width and not height:
-            raise InvalidRequestError('Need width or height to resize')
-        dimensions = str(width) if width else ''
-        if height:
-            dimensions += 'x{0}'.format(height)
-
-        return '{0}-/resize/{1}/'.format(self.cdn_url, dimensions)
 
 
 GROUP_ID_REGEX = re.compile(ur'''

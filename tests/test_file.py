@@ -89,16 +89,6 @@ class FileTest(unittest.TestCase):
         f.store(wait=True, timeout=1)
 
         self.assertEqual(f.cdn_url, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
-        self.assertEqual(f.resized_40x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40x40/')
-        self.assertEqual(f.resized_x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/x40/')
-        self.assertEqual(f.resized_40x, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/resize/40/')
-        self.assertEqual(f.cropped_40x40, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/-/crop/40x40/')
-        with self.assertRaises(InvalidRequestError):
-            f.cropped_40
-        with self.assertRaises(InvalidRequestError):
-            f.resized_
-        with self.assertRaises(InvalidRequestError):
-            f.resized_1x1x1
 
     @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
