@@ -22,7 +22,9 @@ File Group Object
    :members:
    :undoc-members:
 
-   .. attribute:: group_id
+   .. attribute:: uuid
+
+   Group id, e.g. ``0513dda0-582f-447d-846f-096e5df9e2bb~2``.
 
 .. _core_api-requestor-ref:
 

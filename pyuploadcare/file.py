@@ -244,14 +244,14 @@ class FileGroup(object):
         if files_qty <= 0:
             raise InvalidRequestError("Couldn't find group UUID")
 
-        self.group_id = matches.groupdict()['group_id']
+        self.uuid = matches.groupdict()['group_id']
 
         self._ucare = ucare
         self._files_qty = files_qty
         self._info_cache = None
 
     def __repr__(self):
-        return '<uploadcare.FileGroup {0}>'.format(self.group_id)
+        return '<uploadcare.FileGroup {0}>'.format(self.uuid)
 
     def __str__(self):
         return self.cdn_url
@@ -273,11 +273,11 @@ class FileGroup(object):
 
     @property
     def _api_uri(self):
-        return '/groups/{0}/'.format(self.group_id)
+        return '/groups/{0}/'.format(self.uuid)
 
     @property
     def _api_storage_uri(self):
-        return '/groups/{0}/storage/'.format(self.group_id)
+        return '/groups/{0}/storage/'.format(self.uuid)
 
     @property
     def cdn_url(self):
@@ -292,7 +292,7 @@ class FileGroup(object):
         """
         return '{cdn_base}{group_id}/'.format(
             cdn_base=self._ucare.cdn_base,
-            group_id=self.group_id
+            group_id=self.uuid
         )
 
     @property

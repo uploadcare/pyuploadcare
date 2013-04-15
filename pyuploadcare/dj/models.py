@@ -121,7 +121,7 @@ class FileGroupField(models.Field):
         if value is None or value == '':
             return value
         else:
-            return value.group_id
+            return value.uuid
 
     def get_db_prep_save(self, value, connection=None):
         if value:
