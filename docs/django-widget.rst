@@ -93,5 +93,24 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 
 .. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/preview/manual_crop.png
 
+.. _django-widget-models-filegroupfield-ref:
+
+FileGroupField
+~~~~~~~~~~~~~~
+
+``FileGroupField`` allows you to upload more than one file at a time. It stores
+uploaded files as a group:
+
+.. code-block:: python
+
+    from django.db import models
+
+    from pyuploadcare.dj import FileGroupField
+
+
+    class Book(models.Model):
+
+        pages = FileGroupField()
+
 .. _widget documentation: https://uploadcare.com/documentation/widget/#crop
 .. _TextField: https://docs.djangoproject.com/en/1.5/ref/models/fields/#django.db.models.TextField
