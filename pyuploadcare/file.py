@@ -232,6 +232,11 @@ class FileGroup(object):
         >>> len(file_group)
         2
 
+    If file was deleted then you will get ``None``::
+
+        >>> file_group[1]
+        None
+
     """
 
     def __init__(self, cdn_url_or_group_id, ucare):
@@ -264,12 +269,16 @@ class FileGroup(object):
         if isinstance(key, slice):
             files = []
             for file_info in self.info()['files'][key]:
-                file_ = File.construct_from(file_info, self._ucare)
+                if file_info is not None:
+                    file_ = File.construct_from(file_info, self._ucare)
+                else:
+                    file_ = None
                 files.append(file_)
             return files
         else:
             file_info = self.info()['files'][key]
-            return File.construct_from(file_info, self._ucare)
+            if file_info is not None:
+                return File.construct_from(file_info, self._ucare)
 
     @property
     def _api_uri(self):
@@ -323,7 +332,10 @@ class FileGroup(object):
         """
         files = []
         for file_info in self.info()['files']:
-            file_ = File.construct_from(file_info, self._ucare)
+            if file_info is not None:
+                file_ = File.construct_from(file_info, self._ucare)
+            else:
+                file_ = None
             files.append(file_)
         return files
 

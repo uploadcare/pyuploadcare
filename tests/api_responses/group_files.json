@@ -29,28 +29,6 @@
             "mime_type": "image/png",
             "original_file_url": "http://ubuntu:8888/0cea5a61-f976-47d9-815a-e787f52aeba1/37c48a6988bfd4ed4392f2951f76c9c9.png"
         },
-        {
-            "size": 217890,
-            "upload_date": "2013-03-15T15:32:39.016Z",
-            "last_keep_claim": "2013-03-15T15:49:55.513Z",
-            "on_s3": true,
-            "made_public": true,
-            "datetime_uploaded": "2013-03-15T15:32:39.016Z",
-            "url": "http://ubuntu/api/files/cf941a56-a921-4c9c-bb6c-726ef12e8147/",
-            "is_image": true,
-            "default_effects": "crop/200x/",
-            "uuid": "cf941a56-a921-4c9c-bb6c-726ef12e8147",
-            "datetime_stored": "2013-03-15T15:49:55.513Z",
-            "filename": "37c48a6988bfd4ed4392f2951f76c9c9.png",
-            "datetime_removed": null,
-            "is_ready": true,
-            "file_id": "cf941a56-a921-4c9c-bb6c-726ef12e8147",
-            "original_filename": "37c48a6988bfd4ed4392f2951f76c9c9.png",
-            "is_public": true,
-            "removed": null,
-            "original_file": "",
-            "mime_type": "image/png",
-            "original_file_url": "http://ubuntu:8888/cf941a56-a921-4c9c-bb6c-726ef12e8147/37c48a6988bfd4ed4392f2951f76c9c9.png"
-        }
+        null
     ]
 }
