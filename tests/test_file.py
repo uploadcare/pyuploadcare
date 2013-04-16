@@ -137,7 +137,7 @@ class FileGroupAsContainerTypeTest(unittest.TestCase):
         self.assertIsInstance(self.group[0], File)
 
     def test_negative_index(self):
-        self.assertIsInstance(self.group[-2], File)
+        self.assertIsNone(self.group[-1])
 
     def test_index_is_out_of_range(self):
         with self.assertRaises(IndexError):
@@ -147,10 +147,12 @@ class FileGroupAsContainerTypeTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.group['a']
 
-    def test_slice(self):
-        file_, deleted_file = self.group[0:99]
-        self.assertIsInstance(file_, File)
-        self.assertIsNone(deleted_file)
+    def test_iteration(self):
+        [file_ for file_ in self.group]
+
+    def test_slice_is_not_supported(self):
+        with self.assertRaises(TypeError):
+            self.group[0:99]
 
     def test_len(self):
         self.assertEqual(len(self.group), 2)

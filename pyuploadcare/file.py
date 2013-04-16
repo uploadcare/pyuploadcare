@@ -268,14 +268,7 @@ class FileGroup(object):
     def __getitem__(self, key):
         """Returns files from group by key as ``File`` instances."""
         if isinstance(key, slice):
-            files = []
-            for file_info in self.info()['files'][key]:
-                if file_info is not None:
-                    file_ = File.construct_from(file_info, self._ucare)
-                else:
-                    file_ = None
-                files.append(file_)
-            return files
+            raise TypeError('slicing is not supported')
         else:
             file_info = self.info()['files'][key]
             if file_info is not None:
