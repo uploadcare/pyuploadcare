@@ -39,7 +39,7 @@ def create_ucare():
     )
 
 
-def list(args):
+def list_files(args=None):
     ucare = create_ucare()
     query = {}
     for name in ['page', 'limit', 'kept', 'removed']:
@@ -57,15 +57,15 @@ def uc_file(url):
     return ucare.file(url)
 
 
-def get(args):
+def get_file(args):
     pp.pprint(uc_file(args.path).info)
 
 
-def store(args):
+def store_file(args):
     uc_file(args.path).store(wait=args.wait)
 
 
-def delete(args):
+def delete_file(args):
     uc_file(args.path).delete(wait=args.wait)
 
 
@@ -112,7 +112,7 @@ def upload(args):
     _handle_uploaded_file(_file, args)
 
 
-def get_args():
+def ucare_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version',
                         version='ucare {0}'.format(__version__))
@@ -121,7 +121,7 @@ def get_args():
 
     # list
     subparser = subparsers.add_parser('list', help='list all files')
-    subparser.set_defaults(func=list)
+    subparser.set_defaults(func=list_files)
     subparser.add_argument('--page', help='page to show')
     subparser.add_argument('--limit', help='files per page')
     subparser.add_argument('--kept', help='filter kept files',
@@ -131,35 +131,38 @@ def get_args():
 
     # get
     subparser = subparsers.add_parser('get', help='get file info')
-    subparser.set_defaults(func=get)
+    subparser.set_defaults(func=get_file)
     subparser.add_argument('path', help='file path')
-
 
     # common store and delete args
     waiting_parent = argparse.ArgumentParser(add_help=False)
     group = waiting_parent.add_mutually_exclusive_group()
-    group.add_argument('--wait',
+    group.add_argument(
+        '--wait',
         action='store_true',
         default=True,
         dest='wait',
-        help='Wait for operation to complete')
-    group.add_argument('--nowait',
+        help='Wait for operation to complete'
+    )
+    group.add_argument(
+        '--nowait',
         action='store_false',
         dest='wait',
-        help='Do not wait for operation to complete')
+        help='Do not wait for operation to complete'
+    )
 
     # store
     subparser = subparsers.add_parser('store',
                                       parents=[waiting_parent],
                                       help='store file')
-    subparser.set_defaults(func=store)
+    subparser.set_defaults(func=store_file)
     subparser.add_argument('path', help='file path')
 
     # delete
     subparser = subparsers.add_parser('delete',
                                       parents=[waiting_parent],
                                       help='request delete')
-    subparser.set_defaults(func=delete)
+    subparser.set_defaults(func=delete_file)
     subparser.add_argument('path', help='file path')
 
     # common upload args
@@ -185,8 +188,8 @@ def get_args():
                        dest='info',
                        help='Do not get uploaded file info')
     upload_parent.add_argument('--cdnurl',
-                           action='store_true',
-                           help='Store file and get CDN url.')
+                               action='store_true',
+                               help='Store file and get CDN url.')
 
     # upload from url
     subparser = subparsers.add_parser('upload_from_url',
@@ -217,7 +220,7 @@ def get_args():
                         help='API key, if not set is read from uploadcare.ini'
                              ' and ~/.uploadcare config files')
     parser.add_argument('--secret',
-                    help='API secret, if not set is read from uploadcare.ini'
+                        help='API secret, if not set is read from uploadcare.ini'
                              ' and ~/.uploadcare config files')
     parser.add_argument('--api_url',
                         help='API url, can be read from uploadcare.ini'
@@ -238,7 +241,7 @@ def get_args():
                              ' Can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.')
     parser.add_argument('--api_version',
-                    help='API version, can be read from uploadcare.ini'
+                        help='API version, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
                              ' default: 0.2')
     parser.add_argument('-H', '--header',
@@ -247,8 +250,7 @@ def get_args():
                              ' i.e. "ucare -H User-Agent:ie5 list"',
                         action='append')
 
-    args = parser.parse_args()
-    return args
+    return parser
 
 
 def load_config_from_file(filename):
@@ -282,7 +284,7 @@ def load_config_from_args(args):
 
 
 def main():
-    args = get_args()
+    args = ucare_argparser().parse_args()
     load_config_from_file('~/.uploadcare')
     load_config_from_file('uploadcare.ini')
     load_config_from_args(args)

@@ -1,4 +1,15 @@
+# coding: utf-8
+import sys
+
 from setuptools import setup
+
+
+PY_VERSION = sys.version_info[0], sys.version_info[1]
+
+requirements = ['requests>=1.0']
+
+if PY_VERSION == (2, 6):
+    requirements.append('argparse')
 
 
 setup(
@@ -19,7 +30,7 @@ setup(
             'ucare = pyuploadcare.ucare_cli:main',
         ],
     },
-    install_requires=['requests>=1.0'],
+    install_requires=requirements,
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
