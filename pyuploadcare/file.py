@@ -107,17 +107,6 @@ class File(object):
     def storage_uri(self):
         return '/files/{0}/storage/'.format(self.uuid)
 
-    def serialize(self):
-        """Returns a string suitable to be stored somewhere.
-
-        It's either an URL (to save a request) or just file-id.
-
-        """
-        if self._info and self.url():
-            return self.url()
-
-        return self.uuid
-
     def url(self):
         if self._cached_url:
             return self._cached_url

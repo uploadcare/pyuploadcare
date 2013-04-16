@@ -41,7 +41,7 @@ class FileField(models.Field):
         if value is None or value == '':
             return value
         else:
-            return value.serialize()
+            return value.uuid
 
     def get_db_prep_save(self, value, connection=None):
         if value:
