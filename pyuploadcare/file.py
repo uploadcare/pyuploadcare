@@ -318,21 +318,6 @@ class FileGroup(object):
             file_cdn_urls.append(file_cdn_url)
         return file_cdn_urls
 
-    def files(self):
-        """Returns all files from group as ``File`` instances.
-
-        It might do API request once because it depends on ``info()``.
-
-        """
-        files = []
-        for file_info in self.info()['files']:
-            if file_info is not None:
-                file_ = File.construct_from(file_info, self._ucare)
-            else:
-                file_ = None
-            files.append(file_)
-        return files
-
     def info(self):
         """Returns all available group information as ``dict``.
 
