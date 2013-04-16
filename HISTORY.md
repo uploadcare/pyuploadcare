@@ -1,5 +1,12 @@
+### 0.19
+    * Multiupload support was added.
+    * ``argparse`` was added into ``setup.py`` requirements.
+    * Documentation was added and published on https://pyuploadcare.readthedocs.org
+
+
 ### 0.18
     * Widget was updated up to *0.6.9.1*.
+
 
 ### 0.17
     * ``ImageField`` was added. It provides uploading only image files. Moreover,
@@ -8,6 +15,7 @@
     * Tests were separated from library and were restructured.
     * Widget was updated up to *0.6.7*.
     * Issue of ``FileField``'s ``blank``, ``null`` attributes was fixed.
+
 
 ### 0.14
     * Replace accept header for old api version
