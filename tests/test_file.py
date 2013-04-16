@@ -9,9 +9,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch
 
 from pyuploadcare import UploadCare
-from pyuploadcare.exceptions import (
-    InvalidRequestError, TimeoutError,
-)
+from pyuploadcare.exceptions import TimeoutError
 from pyuploadcare.file import File, FileGroup
 from tests.utils import MockResponse, api_response_from_file
 
@@ -67,12 +65,12 @@ class FileTest(unittest.TestCase):
         self.assertEqual(0, len(request.mock_calls))
 
         f = ucare.file(uuid)
-        self.assertEqual('meh', f.url)
+        self.assertEqual('meh', f.url())
         self.assertEqual(1, len(request.mock_calls))
 
         fake_url = 'http://i-am-the-file/{0}/'.format(uuid)
         f = ucare.file(fake_url)
-        self.assertEqual(fake_url, f.url)
+        self.assertEqual(fake_url, f.url())
         # no additional calls are made
         self.assertEqual(1, len(request.mock_calls))
 

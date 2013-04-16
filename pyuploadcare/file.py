@@ -52,7 +52,7 @@ class File(object):
 
         if wait:
             time_started = time.time()
-            while not self.is_stored:
+            while not self.is_stored():
                 if time.time() - time_started > timeout:
                     raise TimeoutError('timed out trying to store')
                 self.update_info()
@@ -65,7 +65,7 @@ class File(object):
 
         if wait:
             time_started = time.time()
-            while not self.is_removed:
+            while not self.is_removed():
                 if time.time() - time_started > timeout:
                     raise TimeoutError('timed out trying to delete')
                 self.update_info()
@@ -73,7 +73,7 @@ class File(object):
         self.update_info()
 
     def ensure_on_cdn(self, timeout=5):
-        if not self.is_stored:
+        if not self.is_stored():
             raise InvalidRequestError('file is private')
         time_started = time.time()
         while True:
@@ -85,7 +85,6 @@ class File(object):
             logger.debug(resp)
             time.sleep(0.1)
 
-    @property
     def info(self):
         if not self._info:
             self.update_info()
@@ -94,13 +93,11 @@ class File(object):
     def update_info(self):
         self._info = self.ucare.make_request('GET', self.api_uri)
 
-    @property
     def is_stored(self):
-        return self.info['last_keep_claim'] is not None
+        return self.info()['last_keep_claim'] is not None
 
-    @property
     def is_removed(self):
-        return self.info['removed'] is not None
+        return self.info()['removed'] is not None
 
     @property
     def api_uri(self):
@@ -116,16 +113,15 @@ class File(object):
         It's either an URL (to save a request) or just file-id.
 
         """
-        if self._info and self.url:
-            return self.url
+        if self._info and self.url():
+            return self.url()
 
         return self.uuid
 
-    @property
     def url(self):
         if self._cached_url:
             return self._cached_url
-        return self.info['original_file_url']
+        return self.info()['original_file_url']
 
     @property
     def cdn_url(self):
@@ -141,11 +137,10 @@ class File(object):
                 uuid=self.uuid
             )
 
-    @property
     def filename(self):
-        if not self.url:
+        if not self.url():
             return ''
-        return self.url.split('/')[-1]
+        return self.url().split('/')[-1]
 
 
 GROUP_ID_REGEX = re.compile(ur'''
