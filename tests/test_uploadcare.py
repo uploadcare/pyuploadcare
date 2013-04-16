@@ -80,5 +80,5 @@ class FileGroupRegexTest(unittest.TestCase):
         expected_group_id = 'd5f45851-3a58-41a4-b76c-356e22837a2f~12'
 
         group = self.uc.file_group(cdn_url)
-        self.assertEqual(group.uuid, expected_group_id)
+        self.assertEqual(group.id, expected_group_id)
         self.assertEqual(len(group), 12)

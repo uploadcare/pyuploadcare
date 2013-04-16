@@ -22,7 +22,7 @@ File Group Object
    :members:
    :undoc-members:
 
-   .. attribute:: uuid
+   .. attribute:: id
 
    Group id, e.g. ``0513dda0-582f-447d-846f-096e5df9e2bb~2``.
 

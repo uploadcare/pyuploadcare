@@ -16,14 +16,6 @@ UUID_WITH_EFFECTS_REGEX = re.compile(ur'''
     )?
 ''', re.VERBOSE)
 
-GROUP_ID_REGEX = re.compile(ur'''
-    (?P<group_id>
-        [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
-        ~
-        (?P<files_qty>\d+)
-    )
-''', re.VERBOSE)
-
 
 class File(object):
     _info = None
@@ -218,6 +210,15 @@ class File(object):
         return '{0}-/resize/{1}/'.format(self.cdn_url, dimensions)
 
 
+GROUP_ID_REGEX = re.compile(ur'''
+    (?P<group_id>
+        [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
+        ~
+        (?P<files_qty>\d+)
+    )
+''', re.VERBOSE)
+
+
 class FileGroup(object):
     """File Group resource for working with user-uploaded group of files.
 
@@ -243,20 +244,20 @@ class FileGroup(object):
         matches = GROUP_ID_REGEX.search(cdn_url_or_group_id)
 
         if not matches:
-            raise InvalidRequestError("Couldn't find group UUID")
+            raise InvalidRequestError("Couldn't find group id")
 
         files_qty = int(matches.groupdict()['files_qty'])
         if files_qty <= 0:
-            raise InvalidRequestError("Couldn't find group UUID")
+            raise InvalidRequestError("Couldn't find group id")
 
-        self.uuid = matches.groupdict()['group_id']
+        self.id = matches.groupdict()['group_id']
 
         self._ucare = ucare
         self._files_qty = files_qty
         self._info_cache = None
 
     def __repr__(self):
-        return '<uploadcare.FileGroup {0}>'.format(self.uuid)
+        return '<uploadcare.FileGroup {0}>'.format(self.id)
 
     def __str__(self):
         return self.cdn_url
@@ -282,11 +283,11 @@ class FileGroup(object):
 
     @property
     def _api_uri(self):
-        return '/groups/{0}/'.format(self.uuid)
+        return '/groups/{0}/'.format(self.id)
 
     @property
     def _api_storage_uri(self):
-        return '/groups/{0}/storage/'.format(self.uuid)
+        return '/groups/{0}/storage/'.format(self.id)
 
     @property
     def cdn_url(self):
@@ -301,7 +302,7 @@ class FileGroup(object):
         """
         return '{cdn_base}{group_id}/'.format(
             cdn_base=self._ucare.cdn_base,
-            group_id=self.uuid
+            group_id=self.id
         )
 
     @property
