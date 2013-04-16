@@ -57,7 +57,7 @@ def uc_file(url):
     return ucare.file(url)
 
 
-def get(args):
+def ucare_get(args):
     pp.pprint(uc_file(args.path).info)
 
 
@@ -131,7 +131,7 @@ def ucare_argparser():
 
     # get
     subparser = subparsers.add_parser('get', help='get file info')
-    subparser.set_defaults(func=get)
+    subparser.set_defaults(func=ucare_get)
     subparser.add_argument('path', help='file path')
 
     # common store and delete args

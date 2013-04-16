@@ -6,7 +6,9 @@ except ImportError:
 
 from mock import patch
 
-from pyuploadcare.ucare_cli import ucare_argparser, ucare_list
+from pyuploadcare.ucare_cli import (
+    ucare_argparser, ucare_list, ucare_get,
+)
 from .tests import MockResponse
 
 
@@ -113,4 +115,29 @@ class UcareListTest(unittest.TestCase):
         self.assertEqual(
             request.mock_calls[0][1],
             ('GET', 'https://api.uploadcare.com/files/?removed=false')
+        )
+
+
+class UcareGetTest(unittest.TestCase):
+
+    @patch('requests.request', autospec=True)
+    def test_get_by_uuid(self, request):
+        request.return_value = MockResponse(status=200)
+
+        ucare_get(arg_namespace('get 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
+
+        self.assertEqual(
+            request.mock_calls[0][1],
+            ('GET', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
+        )
+
+    @patch('requests.request', autospec=True)
+    def test_get_by_cdn_url(self, request):
+        request.return_value = MockResponse(status=200)
+
+        ucare_get(arg_namespace('get https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/'))
+
+        self.assertEqual(
+            request.mock_calls[0][1],
+            ('GET', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
         )
