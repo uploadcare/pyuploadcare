@@ -228,10 +228,17 @@ class FileGroup(object):
 
     You can iterate ``file_group`` or get ``File`` instance by key::
 
+        >>> [file_ for file_ in file_group]
+        [<uploadcare.File 6c5e9526-b0fe-4739-8975-72e8d5ee6342>, None]
         >>> file_group[0]
         <uploadcare.File 6c5e9526-b0fe-4739-8975-72e8d5ee6342>
         >>> len(file_group)
         2
+
+    But slicing is not supported because ``FileGroup`` is immutable::
+
+        >>> file_group[:]
+        TypeError: slicing is not supported
 
     If file was deleted then you will get ``None``::
 
@@ -266,7 +273,7 @@ class FileGroup(object):
         return self._files_qty
 
     def __getitem__(self, key):
-        """Returns files from group by key as ``File`` instances."""
+        """Returns file from group by key as ``File`` instance."""
         if isinstance(key, slice):
             raise TypeError('slicing is not supported')
         else:
