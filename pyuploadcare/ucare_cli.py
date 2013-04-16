@@ -61,7 +61,7 @@ def ucare_get(args):
     pp.pprint(uc_file(args.path).info)
 
 
-def store(args):
+def ucare_store(args):
     uc_file(args.path).store(wait=args.wait)
 
 
@@ -155,7 +155,7 @@ def ucare_argparser():
     subparser = subparsers.add_parser('store',
                                       parents=[waiting_parent],
                                       help='store file')
-    subparser.set_defaults(func=store)
+    subparser.set_defaults(func=ucare_store)
     subparser.add_argument('path', help='file path')
 
     # delete
