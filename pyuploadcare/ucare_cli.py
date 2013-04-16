@@ -65,7 +65,7 @@ def ucare_store(args):
     uc_file(args.path).store(wait=args.wait)
 
 
-def delete(args):
+def ucare_delete(args):
     uc_file(args.path).delete(wait=args.wait)
 
 
@@ -162,7 +162,7 @@ def ucare_argparser():
     subparser = subparsers.add_parser('delete',
                                       parents=[waiting_parent],
                                       help='request delete')
-    subparser.set_defaults(func=delete)
+    subparser.set_defaults(func=ucare_delete)
     subparser.add_argument('path', help='file path')
 
     # common upload args

@@ -7,7 +7,7 @@ except ImportError:
 from mock import patch
 
 from pyuploadcare.ucare_cli import (
-    ucare_argparser, ucare_list, ucare_get, ucare_store,
+    ucare_argparser, ucare_list, ucare_get, ucare_store, ucare_delete,
 )
 from .tests import MockResponse
 
@@ -169,4 +169,33 @@ class UcareStoreTest(unittest.TestCase):
         self.assertEqual(
             request.mock_calls[0][1],
             ('PUT', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/storage/')
+        )
+
+
+class UcareDeleteTest(unittest.TestCase):
+
+    def test_parse_wait_arg(self):
+        args = arg_namespace('delete --wait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        self.assertTrue(args.wait)
+
+    def test_wait_is_true_by_default(self):
+        args = arg_namespace('delete 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        self.assertTrue(args.wait)
+
+    def test_parse_no_wait_arg(self):
+        args = arg_namespace('delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        self.assertFalse(args.wait)
+
+    @patch('requests.request', autospec=True)
+    def test_no_wait(self, request):
+        request.return_value = MockResponse(
+            status=200,
+            data='{"on_s3": true, "last_keep_claim": "now"}'
+        )
+
+        ucare_delete(arg_namespace('delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
+
+        self.assertEqual(
+            request.mock_calls[0][1],
+            ('DELETE', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
         )
