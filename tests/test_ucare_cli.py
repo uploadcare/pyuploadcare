@@ -7,7 +7,7 @@ except ImportError:
 from mock import patch
 
 from pyuploadcare.ucare_cli import (
-    ucare_argparser, ucare_list, ucare_get, ucare_store, ucare_delete,
+    ucare_argparser, list_files, get_file, store_file, delete_file,
 )
 from .tests import MockResponse
 
@@ -22,7 +22,7 @@ class UcareListTest(unittest.TestCase):
     def test_no_args(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list'))
+        list_files(arg_namespace('list'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -33,7 +33,7 @@ class UcareListTest(unittest.TestCase):
     def test_page_2(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --page 2'))
+        list_files(arg_namespace('list --page 2'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -44,7 +44,7 @@ class UcareListTest(unittest.TestCase):
     def test_limit_10(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --limit 10'))
+        list_files(arg_namespace('list --limit 10'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -55,7 +55,7 @@ class UcareListTest(unittest.TestCase):
     def test_kept_all(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --kept all'))
+        list_files(arg_namespace('list --kept all'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -66,7 +66,7 @@ class UcareListTest(unittest.TestCase):
     def test_kept_true(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --kept true'))
+        list_files(arg_namespace('list --kept true'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -77,7 +77,7 @@ class UcareListTest(unittest.TestCase):
     def test_kept_false(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --kept false'))
+        list_files(arg_namespace('list --kept false'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -88,7 +88,7 @@ class UcareListTest(unittest.TestCase):
     def test_removed_all(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --removed all'))
+        list_files(arg_namespace('list --removed all'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -99,7 +99,7 @@ class UcareListTest(unittest.TestCase):
     def test_removed_true(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --removed true'))
+        list_files(arg_namespace('list --removed true'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -110,7 +110,7 @@ class UcareListTest(unittest.TestCase):
     def test_removed_false(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_list(arg_namespace('list --removed false'))
+        list_files(arg_namespace('list --removed false'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -124,7 +124,7 @@ class UcareGetTest(unittest.TestCase):
     def test_get_by_uuid(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_get(arg_namespace('get 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
+        get_file(arg_namespace('get 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -135,7 +135,7 @@ class UcareGetTest(unittest.TestCase):
     def test_get_by_cdn_url(self, request):
         request.return_value = MockResponse(status=200)
 
-        ucare_get(arg_namespace('get https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/'))
+        get_file(arg_namespace('get https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -164,7 +164,7 @@ class UcareStoreTest(unittest.TestCase):
             data='{"on_s3": true, "last_keep_claim": "now"}'
         )
 
-        ucare_store(arg_namespace('store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
+        store_file(arg_namespace('store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
 
         self.assertEqual(
             request.mock_calls[0][1],
@@ -193,7 +193,7 @@ class UcareDeleteTest(unittest.TestCase):
             data='{"on_s3": true, "last_keep_claim": "now"}'
         )
 
-        ucare_delete(arg_namespace('delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
+        delete_file(arg_namespace('delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
 
         self.assertEqual(
             request.mock_calls[0][1],
