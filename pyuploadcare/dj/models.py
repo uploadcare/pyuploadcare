@@ -53,8 +53,9 @@ class FileField(models.Field):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        return super(FileField, self).formfield(form_class=forms.FileField,
-                                                **kwargs)
+        kwargs['form_class'] = forms.FileField
+
+        return models.Field.formfield(self, **kwargs)
 
 
 pattern_of_crop = re.compile(u'''
@@ -84,11 +85,10 @@ class ImageField(FileField):
         super(ImageField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        defaults = {'manual_crop': self.manual_crop}
-        defaults.update(kwargs)
+        kwargs['manual_crop'] = self.manual_crop
+        kwargs['form_class'] = forms.ImageField
 
-        return super(ImageField, self).formfield(form_class=forms.ImageField,
-                                                 **defaults)
+        return models.Field.formfield(self, **kwargs)
 
 
 class FileGroupField(models.Field):
@@ -133,12 +133,14 @@ class FileGroupField(models.Field):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        return super(FileGroupField, self).formfield(
-            form_class=forms.FileGroupField, **kwargs)
+        kwargs['form_class'] = forms.FileGroupField
+
+        return models.Field.formfield(self, **kwargs)
 
 
 class ImageGroupField(FileGroupField):
 
     def formfield(self, **kwargs):
-        return super(ImageGroupField, self).formfield(
-            form_class=forms.ImageGroupField, **kwargs)
+        kwargs['form_class'] = forms.ImageGroupField
+
+        return models.Field.formfield(self, **kwargs)
