@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from gallery.models import Gallery, Photo
+from gallery.models import Gallery, Photo, GalleryMultiupload
 
 
 class PhotoInline(admin.StackedInline):
@@ -14,3 +14,4 @@ class GalleryAdmin(admin.ModelAdmin):
 
 admin.site.register(Photo)
 admin.site.register(Gallery, GalleryAdmin)
+admin.site.register(GalleryMultiupload)
