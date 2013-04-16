@@ -39,7 +39,7 @@ def create_ucare():
     )
 
 
-def list(args):
+def ucare_list(args=None):
     ucare = create_ucare()
     query = {}
     for name in ['page', 'limit', 'kept', 'removed']:
@@ -112,7 +112,7 @@ def upload(args):
     _handle_uploaded_file(_file, args)
 
 
-def get_args():
+def ucare_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version',
                         version='ucare {0}'.format(__version__))
@@ -121,7 +121,7 @@ def get_args():
 
     # list
     subparser = subparsers.add_parser('list', help='list all files')
-    subparser.set_defaults(func=list)
+    subparser.set_defaults(func=ucare_list)
     subparser.add_argument('--page', help='page to show')
     subparser.add_argument('--limit', help='files per page')
     subparser.add_argument('--kept', help='filter kept files',
@@ -134,19 +134,22 @@ def get_args():
     subparser.set_defaults(func=get)
     subparser.add_argument('path', help='file path')
 
-
     # common store and delete args
     waiting_parent = argparse.ArgumentParser(add_help=False)
     group = waiting_parent.add_mutually_exclusive_group()
-    group.add_argument('--wait',
+    group.add_argument(
+        '--wait',
         action='store_true',
         default=True,
         dest='wait',
-        help='Wait for operation to complete')
-    group.add_argument('--nowait',
+        help='Wait for operation to complete'
+    )
+    group.add_argument(
+        '--nowait',
         action='store_false',
         dest='wait',
-        help='Do not wait for operation to complete')
+        help='Do not wait for operation to complete'
+    )
 
     # store
     subparser = subparsers.add_parser('store',
@@ -247,8 +250,7 @@ def get_args():
                              ' i.e. "ucare -H User-Agent:ie5 list"',
                         action='append')
 
-    args = parser.parse_args()
-    return args
+    return parser
 
 
 def load_config_from_file(filename):
@@ -282,7 +284,7 @@ def load_config_from_args(args):
 
 
 def main():
-    args = get_args()
+    args = ucare_argparser().parse_args()
     load_config_from_file('~/.uploadcare')
     load_config_from_file('uploadcare.ini')
     load_config_from_args(args)
