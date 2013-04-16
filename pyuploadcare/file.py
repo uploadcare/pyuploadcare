@@ -37,6 +37,7 @@ class File(object):
     @classmethod
     def construct_from(cls, file_info, ucare):
         file_ = cls(file_info['file_id'], ucare)
+        file_.default_effects = file_info.get('default_effects')
         file_._info = file_info
         return file_
 
