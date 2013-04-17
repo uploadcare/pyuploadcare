@@ -1,147 +1,54 @@
-# PyUploadcare: a Python module for Uploadcare
+# PyUploadcare: a Python library for Uploadcare
 
 [![Build Status](https://travis-ci.org/uploadcare/pyuploadcare.png?branch=master)](https://travis-ci.org/uploadcare/pyuploadcare)
 
-This consists in API interface for [Uploadcare][1], and a couple of Django goodies.
+The most important thing for us at [Uploadcare][1] is to make file uploading on
+the web really easy. Everyone is used to the routine work, related to allowing
+users upload their userpics or attach resumes: from installing image processing
+libraries to creating folder with right permissions to ensuring the server
+never goes down or out of space to enabling CDN. Feature like ability to simply
+use a picture from Facebook or manual cropping are much more burdensome,
+hence rare. Uploadcare's goal is to change the status quo.
 
-To install it, just run
+This library consists of an API interface for [Uploadcare][1] and a couple
+of Django goodies.
 
-    pip install pyuploadcare
-
-(or `easy_install pyuploadcare` if you're into vintage)
-
-You can use `pyuploadcare` now:
-
-    >>> import pyuploadcare
-    >>> pyuploadcare.UploadCare
-    <class 'pyuploadcare.UploadCare'>
-
-You can also use our console utility, `ucare`:
-
-    $ ucare -h
-
-## How to use it with Django?
-
-First of all, you'll need API keys: public and private. You can get them at [the Uploadcare website][1].
-
-As soon as you get your API keys, add them to your Django settings file:
-
-### settings.py
-
-    UPLOADCARE = {
-
-        # Don't forget to change to real keys when it gets serious!
-
-        'pub_key': 'demopublickey',
-        'secret': 'demoprivatekey',
-    }
-
-You're all set now!
-
-Adding a Uploadcare file field to your model is really simple. Like that:
-
-### models.py
+A simple Uploadcare ``ImageField`` can be added to an existing Django project
+in just a couple of [simple steps][2]. As a result, your users
+are going to be able to see the progress of the upload, choose files from
+Google Drive or Instagram, and edit form while files are uploading
+asynchornously.
 
     from django.db import models
 
-    from pyuploadcare.dj import FileField
+    from pyuploadcare.dj import ImageField
 
 
-    class Photo(models.Model):
-        title = models.CharField(max_length=255)
-        photo = FileField()
+    class Candidate(models.Model):
 
-`FileField` doesn't require any arguments, file paths or whatever. It **just works**. That's the point of it all.
+        photo = ImageField(blank=True, manual_crop="")
 
-It looks nice in the admin interface
+![ImageField with crop tool](https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/preview/manual_crop.png)
 
-![Admin page](https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/)
+## Features
 
-### In the model form
+- Django widget with useful manual crop and multiupload;
+- *ucare* console utility;
+- hosted assets (Kudos to [Sławek Ehlert][3]!).
 
-`FileField` works in every `ModelForm` well,
-even outside of the admin interface.
+## Installation
 
-But you have to remember to add `{{ form.media }}`
-somewhere on your page, e.g. in the `<head>`:
+To install it, just run:
 
-    {{ form.media }}
+    $ pip install pyuploadcare
 
-    <form action="" method="POST">
-        {% csrf_token %}
+or, if you're into vintage:
 
-        {{ form.as_p }}
-
-        <input type="submit">
-    </form>
-
-This is a default Django form property which is going to render any scripts
-needed for the form to work, in our case – Uploadcare scripts.
-
-
-### Using it
-
-It's really simple, just use your Uploadcare-enabled models as any other models:
-
-    for p in Photo.objects.all():
-
-        # p.photo contains pyuploadcare.file.File object
-
-        print p.photo.cdn_url
-        print str(p.photo)
-
-        print p.photo.resized(200, 400) # returns the url of resized version of the image
-        print p.photo.resized(height=400)
-        print p.photo.cropped(150, 150)
-
-### Using it in templates
-
-You can contruct url with all effects manually:
-
-    {{ p.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
-
-Or just:
-
-    {{ p.photo }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
-
-Refer to [CDN docs][5] for more information.
-
-
-### Time settings
-
-Keep in mind that Uploadcare authentication will fail if computer clock is not synchronized.
-
-
-### Advanced settings
-
-If you don't want to use hosted assets (from fastatic.uploadcare.com) you
-should add 'pyuploadcare.dj' to INSTALLED_APPS setting and add
-
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
-
-
-to django settings file. (Kudos to [Sławek Ehlert][3] for the feature!)
-
-[3]: https://github.com/slafs
-
-If you want to provide custom url for widget, you should add 'pyuploadcare.dj'
-to INSTALLED_APPS setting and add
-
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
-    PYUPLOADCARE_WIDGET_URL = 'http://path.to.asset'
-
-
-to django settings file.
-
-Uploadcare widget will use default upload handler url, unless you specify
-PYUPLOADCARE_UPLOAD_BASE_URL django settings
-
-    PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to.your.upload.handler'
-
+    $ easy_install pyuploadcare
 
 [1]: https://uploadcare.com/
-[5]: https://uploadcare.com/documentation/reference/basic/cdn/
-
+[2]: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
+[3]: https://github.com/slafs
 
 ## Testing
 
