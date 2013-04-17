@@ -9,7 +9,7 @@ from mock import patch
 from pyuploadcare.ucare_cli import (
     ucare_argparser, list_files, get_file, store_file, delete_file,
 )
-from .tests import MockResponse
+from tests.utils import MockResponse
 
 
 def arg_namespace(arguments_str):

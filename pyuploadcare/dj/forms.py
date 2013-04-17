@@ -1,6 +1,4 @@
 from django.forms import Field, TextInput
-from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
 
 from pyuploadcare.dj import conf
 from pyuploadcare.dj import UploadCare
@@ -31,6 +29,7 @@ class FileWidget(TextInput):
 
 
 class FileField(Field):
+
     widget = FileWidget
 
 
@@ -46,4 +45,22 @@ class ImageField(Field):
         attrs = {'data-images-only': ''}
         if self.manual_crop is not None:
             attrs['data-crop'] = self.manual_crop
+        return attrs
+
+
+class FileGroupField(Field):
+
+    widget = FileWidget
+
+    def widget_attrs(self, widget):
+        attrs = {'data-multiple': ''}
+        return attrs
+
+
+class ImageGroupField(Field):
+
+    widget = FileWidget
+
+    def widget_attrs(self, widget):
+        attrs = {'data-multiple': '', 'data-images-only': ''}
         return attrs
