@@ -58,7 +58,7 @@ def uc_file(url):
 
 
 def get_file(args):
-    pp.pprint(uc_file(args.path).info)
+    pp.pprint(uc_file(args.path).info())
 
 
 def store_file(args):
@@ -82,7 +82,7 @@ def _handle_uploaded_file(uf, args):
         print 'File stored successfully.'
 
     if args.info:
-        pp.pprint(uf.info)
+        pp.pprint(uf.info())
 
     if args.cdnurl:
         print 'CDN url: {0}'.format(uf.cdn_url)
