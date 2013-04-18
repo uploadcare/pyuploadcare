@@ -19,7 +19,6 @@ UUID_WITH_EFFECTS_REGEX = re.compile(ur'''
 
 class File(object):
     _info = None
-    _cached_url = None
 
     def __init__(self, cdn_url_or_file_id, ucare):
         matches = UUID_WITH_EFFECTS_REGEX.search(cdn_url_or_file_id)
@@ -30,9 +29,6 @@ class File(object):
         self.uuid = matches.groupdict()['uuid']
         self.default_effects = matches.groupdict()['effects']
         self.ucare = ucare
-
-        if cdn_url_or_file_id.startswith('http'):
-            self._cached_url = cdn_url_or_file_id
 
     @classmethod
     def construct_from(cls, file_info, ucare):
@@ -106,11 +102,6 @@ class File(object):
     @property
     def storage_uri(self):
         return '/files/{0}/storage/'.format(self.uuid)
-
-    def url(self):
-        if self._cached_url:
-            return self._cached_url
-        return self.info()['original_file_url']
 
     @property
     def cdn_url(self):

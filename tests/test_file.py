@@ -51,29 +51,6 @@ class FileTest(unittest.TestCase):
         request.return_value = response
         f.delete(wait=True, timeout=1)
 
-    @patch('requests.request', autospec=True)
-    def test_url_caching(self, request):
-        """Test that known url is cached and no requests are made"""
-
-        ucare = UploadCare('pub', 'secret')
-        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
-        request.return_value = MockResponse(
-            status=200,
-            data='{"original_file_url": "meh"}'
-        )
-
-        self.assertEqual(0, len(request.mock_calls))
-
-        f = ucare.file(uuid)
-        self.assertEqual('meh', f.url())
-        self.assertEqual(1, len(request.mock_calls))
-
-        fake_url = 'http://i-am-the-file/{0}/'.format(uuid)
-        f = ucare.file(fake_url)
-        self.assertEqual(fake_url, f.url())
-        # no additional calls are made
-        self.assertEqual(1, len(request.mock_calls))
-
     @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
     def test_cdn_urls(self, request, head):
