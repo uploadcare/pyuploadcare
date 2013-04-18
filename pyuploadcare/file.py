@@ -18,7 +18,6 @@ UUID_WITH_EFFECTS_REGEX = re.compile(ur'''
 
 
 class File(object):
-    _info = None
 
     def __init__(self, cdn_url_or_file_id, ucare):
         matches = UUID_WITH_EFFECTS_REGEX.search(cdn_url_or_file_id)
@@ -28,13 +27,15 @@ class File(object):
 
         self.uuid = matches.groupdict()['uuid']
         self.default_effects = matches.groupdict()['effects']
-        self.ucare = ucare
+
+        self._ucare = ucare
+        self._info_cache = None
 
     @classmethod
     def construct_from(cls, file_info, ucare):
         file_ = cls(file_info['file_id'], ucare)
         file_.default_effects = file_info.get('default_effects')
-        file_._info = file_info
+        file_._info_cache = file_info
         return file_
 
     def __repr__(self):
@@ -43,8 +44,49 @@ class File(object):
     def __str__(self):
         return self.cdn_url
 
+    @property
+    def _api_uri(self):
+        return '/files/{0}/'.format(self.uuid)
+
+    @property
+    def _api_storage_uri(self):
+        return '/files/{0}/storage/'.format(self.uuid)
+
+    @property
+    def cdn_url(self):
+        if self.default_effects:
+            return '{cdn_base}{uuid}/-/{effects}'.format(
+                cdn_base=self._ucare.cdn_base,
+                uuid=self.uuid,
+                effects=self.default_effects
+            )
+        else:
+            return '{cdn_base}{uuid}/'.format(
+                cdn_base=self._ucare.cdn_base,
+                uuid=self.uuid
+            )
+
+    def info(self):
+        if self._info_cache is None:
+            self.update_info()
+        return self._info_cache
+
+    def update_info(self):
+        self._info_cache = self._ucare.make_request('GET', self._api_uri)
+
+    def is_stored(self):
+        return self.info()['last_keep_claim'] is not None
+
+    def is_removed(self):
+        return self.info()['removed'] is not None
+
+    def filename(self):
+        if not self.url():
+            return ''
+        return self.url().split('/')[-1]
+
     def store(self, wait=False, timeout=5):
-        self.ucare.make_request('PUT', self.storage_uri)
+        self._ucare.make_request('PUT', self._api_storage_uri)
 
         if wait:
             time_started = time.time()
@@ -57,7 +99,7 @@ class File(object):
         self.update_info()
 
     def delete(self, wait=False, timeout=5):
-        self.ucare.make_request('DELETE', self.api_uri)
+        self._ucare.make_request('DELETE', self._api_uri)
 
         if wait:
             time_started = time.time()
@@ -75,52 +117,11 @@ class File(object):
         while True:
             if time.time() - time_started > timeout:
                 raise TimeoutError('timed out waiting for file appear on cdn')
-            resp = requests.head(self.cdn_url, headers=self.ucare.default_headers)
+            resp = requests.head(self.cdn_url, headers=self._ucare.default_headers)
             if resp.status_code == 200:
                 return
             logger.debug(resp)
             time.sleep(0.1)
-
-    def info(self):
-        if not self._info:
-            self.update_info()
-        return self._info
-
-    def update_info(self):
-        self._info = self.ucare.make_request('GET', self.api_uri)
-
-    def is_stored(self):
-        return self.info()['last_keep_claim'] is not None
-
-    def is_removed(self):
-        return self.info()['removed'] is not None
-
-    @property
-    def api_uri(self):
-        return '/files/{0}/'.format(self.uuid)
-
-    @property
-    def storage_uri(self):
-        return '/files/{0}/storage/'.format(self.uuid)
-
-    @property
-    def cdn_url(self):
-        if self.default_effects:
-            return '{cdn_base}{uuid}/-/{effects}'.format(
-                cdn_base=self.ucare.cdn_base,
-                uuid=self.uuid,
-                effects=self.default_effects
-            )
-        else:
-            return '{cdn_base}{uuid}/'.format(
-                cdn_base=self.ucare.cdn_base,
-                uuid=self.uuid
-            )
-
-    def filename(self):
-        if not self.url():
-            return ''
-        return self.url().split('/')[-1]
 
 
 GROUP_ID_REGEX = re.compile(ur'''
