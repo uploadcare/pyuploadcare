@@ -9,6 +9,6 @@ __version__ = '0.19'
 from pyuploadcare.api_requestor import UploadCare
 from pyuploadcare.file import File, FileGroup
 from pyuploadcare.exceptions import (
-    UploadCareException, APIConnectionError, AuthenticationError, APIError,
+    UploadcareException, APIConnectionError, AuthenticationError, APIError,
     InvalidRequestError,
 )

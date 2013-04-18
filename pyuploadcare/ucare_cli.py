@@ -9,7 +9,7 @@ import pprint
 import ConfigParser
 import os.path
 
-from pyuploadcare import UploadCare, UploadCareException, __version__
+from pyuploadcare import UploadCare, UploadcareException, __version__
 
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -291,7 +291,7 @@ def main():
 
     try:
         args.func(args)
-    except UploadCareException as e:
+    except UploadcareException as e:
         print 'ERROR:'
         print e
 
