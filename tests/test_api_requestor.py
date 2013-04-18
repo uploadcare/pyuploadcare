@@ -43,7 +43,7 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.2+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.18')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.19')
 
         ucare = UploadCare('pub', 'secret', api_version='0.1')
         ucare.make_request('GET', '/files/')
@@ -51,7 +51,7 @@ class UploadCareTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.18')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.19')
 
     def test_uri_builders(self):
         ucare = UploadCare('pub', 'secret')
