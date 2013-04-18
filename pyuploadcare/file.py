@@ -75,15 +75,15 @@ class File(object):
         self._info_cache = self._ucare.make_request('GET', self._api_uri)
 
     def is_stored(self):
-        return self.info()['last_keep_claim'] is not None
+        return (self.info().get('datetime_stored') is not None or
+                self.info().get('last_keep_claim') is not None)
 
     def is_removed(self):
-        return self.info()['removed'] is not None
+        return (self.info().get('datetime_removed') is not None or
+                self.info().get('removed') is not None)
 
     def filename(self):
-        if not self.url():
-            return ''
-        return self.url().split('/')[-1]
+        return self.info().get('original_filename')
 
     def store(self, wait=False, timeout=5):
         self._ucare.make_request('PUT', self._api_storage_uri)
