@@ -1,6 +1,21 @@
-#TODO: make this compatible with django-appconf
-
+# coding: utf-8
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+
+import pyuploadcare.conf
+
+
+if not hasattr(settings, 'UPLOADCARE'):
+    raise ImproperlyConfigured('UPLOADCARE setting must be set')
+
+if 'pub_key' not in settings.UPLOADCARE:
+    raise ImproperlyConfigured('UPLOADCARE setting must have pub_key')
+
+if 'secret' not in settings.UPLOADCARE:
+    raise ImproperlyConfigured('UPLOADCARE setting must have secret')
+
+pyuploadcare.conf.pub_key = settings.UPLOADCARE['pub_key']
+pyuploadcare.conf.secret = settings.UPLOADCARE['secret']
 
 
 widget_version = settings.UPLOADCARE.get('widget_version', '0.8')

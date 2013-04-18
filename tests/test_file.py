@@ -8,7 +8,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
 
-from pyuploadcare import UploadCare
+from pyuploadcare import conf
 from pyuploadcare.exceptions import TimeoutError
 from pyuploadcare.file import File, FileGroup
 from tests.utils import MockResponse, api_response_from_file
@@ -16,16 +16,19 @@ from tests.utils import MockResponse, api_response_from_file
 
 class FileTest(unittest.TestCase):
 
+    def setUp(self):
+        conf.pub_key = 'pub'
+        conf.secret = 'secret'
+
     @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
     def test_store_timeout(self, request, head):
-        ucare = UploadCare('pub', 'secret')
         api_response = MockResponse(200, '{"on_s3": false, "last_keep_claim": null}')
         request.return_value = api_response
         cdn_response = MockResponse(200)
         head.return_value = cdn_response
 
-        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342', ucare)
+        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
         with self.assertRaises(TimeoutError) as cm:
             f.store(wait=True, timeout=0.2)
         self.assertEqual('timed out trying to store',
@@ -37,11 +40,10 @@ class FileTest(unittest.TestCase):
 
     @patch('requests.request', autospec=True)
     def test_delete_timeout(self, request):
-        ucare = UploadCare('pub', 'secret')
         response = MockResponse(200, '{"removed": null}')
         request.return_value = response
 
-        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342', ucare)
+        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
         with self.assertRaises(TimeoutError) as cm:
             f.delete(wait=True, timeout=0.2)
         self.assertEqual('timed out trying to delete',
@@ -54,9 +56,8 @@ class FileTest(unittest.TestCase):
     @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
     def test_cdn_urls(self, request, head):
-        ucare = UploadCare('pub', 'secret')
         uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
-        f = ucare.file(uuid)
+        f = File(uuid)
         api_response = MockResponse(200, '{"on_s3": true, "last_keep_claim": true}')
         request.return_value = api_response
         cdn_response = MockResponse(200)
@@ -68,9 +69,8 @@ class FileTest(unittest.TestCase):
     @patch('requests.head', autospec=True)
     @patch('requests.request', autospec=True)
     def test_ensure_on_cdn_raises(self, request, head):
-        ucare = UploadCare('pub', 'secret')
         uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
-        f = ucare.file(uuid)
+        f = File(uuid)
         api_response = MockResponse(
             status=200, data='{"on_s3": true, "last_keep_claim": true}'
         )
@@ -92,8 +92,7 @@ class FileGroupAsContainerTypeTest(unittest.TestCase):
         )
 
         self.group = FileGroup(
-            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
-            ucare=UploadCare('pub', 'secret')
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
         )
         # It is necessary to avoid api call in tests below.
         self.group.update_info()
@@ -132,8 +131,7 @@ class StoreFileGroupTest(unittest.TestCase):
     @patch('requests.request', autospec=True)
     def test_successful_store(self, request):
         group = FileGroup(
-            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
-            ucare=UploadCare('pub', 'secret')
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
         )
         group._info_cache = {"datetime_stored": None}
         # PUT /api/groups/{group_id}/storage/
@@ -147,8 +145,7 @@ class StoreFileGroupTest(unittest.TestCase):
     @patch('requests.request', autospec=True)
     def test_do_not_store_twice(self, request):
         group = FileGroup(
-            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
-            ucare=UploadCare('pub', 'secret')
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
         )
         # GET /api/groups/{group_id}/
         request.return_value = MockResponse(
@@ -164,8 +161,7 @@ class FileCDNUrlsTest(unittest.TestCase):
 
     def setUp(self):
         self.group = FileGroup(
-            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2',
-            ucare=UploadCare('pub', 'secret')
+            cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
         )
 
     @patch('requests.request', autospec=True)

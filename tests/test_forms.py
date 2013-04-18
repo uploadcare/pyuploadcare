@@ -6,17 +6,19 @@ except ImportError:
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
-from django.test.utils import override_settings
 from django import forms
 
+from pyuploadcare import conf
 from pyuploadcare.dj import forms as uc_forms
 
 
 class TestFormFields(unittest.TestCase):
 
-    @override_settings(UPLOADCARE={'pub_key': 'asdf', 'secret': 'qwer'})
-    def test_default_form_field(self):
+    def setUp(self):
+        conf.pub_key = 'asdf'
+        conf.secret = 'qwer'
 
+    def test_default_form_field(self):
         class SomeForm(forms.Form):
             cf = forms.CharField()
             ff = uc_forms.FileField()
@@ -30,7 +32,6 @@ class TestFormFields(unittest.TestCase):
         self.assertIn('data-public-key="asdf"', str(f['ff']))
         self.assertIn('type="hidden"', str(f['ff']))
 
-    @override_settings(UPLOADCARE={'pub_key': 'asdf', 'secret': 'qwer'})
     def test_form_field_custom_attrs(self):
 
         class SomeForm(forms.Form):

@@ -4,7 +4,7 @@ import re
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from pyuploadcare.dj import forms, UploadCare
+from pyuploadcare.dj import forms
 from pyuploadcare.exceptions import InvalidRequestError
 from pyuploadcare.file import File, FileGroup
 
@@ -31,7 +31,7 @@ class FileField(models.Field):
             )
 
         try:
-            return UploadCare().file(value)
+            return File(value)
         except InvalidRequestError as exc:
             raise ValidationError(
                 u'Invalid value for a field: {exc}'.format(exc=exc)
@@ -111,7 +111,7 @@ class FileGroupField(models.Field):
             )
 
         try:
-            return UploadCare().file_group(value)
+            return FileGroup(value)
         except InvalidRequestError as exc:
             raise ValidationError(
                 u'Invalid value for a field: {exc}'.format(exc=exc)
