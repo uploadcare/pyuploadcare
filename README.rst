@@ -47,9 +47,13 @@ Installation
 
 To install it, just run:
 
+.. code-block:: console
+
     $ pip install pyuploadcare
 
 or, if you're into vintage:
+
+.. code-block:: console
 
     $ easy_install pyuploadcare
 
@@ -57,6 +61,8 @@ Testing
 -------
 
 Besides the `Travis CI`_ we use tox. In order to run tests just:
+
+.. code-block:: console
 
     $ pip install tox
     $ tox
