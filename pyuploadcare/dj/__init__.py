@@ -9,7 +9,9 @@ def UploadCare(**kwargs):
 
     return pyuploadcare.UploadCare(**kws)
 
-from pyuploadcare.dj.models import FileField, ImageField
+from pyuploadcare.dj.models import (
+    FileField, ImageField, FileGroupField, ImageGroupField,
+)
 
 
 # making South happy

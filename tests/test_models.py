@@ -9,8 +9,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from pyuploadcare.dj.models import ImageField, FileField
-from pyuploadcare import File
+from pyuploadcare.dj.models import ImageField, FileField, FileGroupField
+from pyuploadcare import File, FileGroup
 
 
 class CropToolRegexTest(unittest.TestCase):
@@ -74,3 +74,36 @@ class FileFieldTest(unittest.TestCase):
             cv = FileField()
         emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
         self.assertIsInstance(emp.cv, File)
+
+
+class FileGroupFieldTest(unittest.TestCase):
+
+    def test_empty_str_is_allowed(self):
+        class Book(models.Model):
+            pages = FileGroupField(blank=True)
+        book = Book()
+        self.assertEqual(book.pages, '')
+
+    def test_null_is_allowed(self):
+        class Book(models.Model):
+            pages = FileGroupField(null=True)
+        book = Book(pages=None)
+        self.assertEqual(book.pages, None)
+
+    def test_validation_error_if_value_is_int(self):
+        class Book(models.Model):
+            pages = FileGroupField()
+        with self.assertRaises(ValidationError):
+            Book(pages=123)
+
+    def test_validation_error_if_group_id_is_invalid_str(self):
+        class Book(models.Model):
+            pages = FileGroupField()
+        with self.assertRaises(ValidationError):
+            Book(pages='123')
+
+    def test_file_group_instance_if_group_id_is_valid(self):
+        class Book(models.Model):
+            pages = FileGroupField()
+        book = Book(pages='0513dda0-582f-447d-846f-096e5df9e2bb~2')
+        self.assertIsInstance(book.pages, FileGroup)

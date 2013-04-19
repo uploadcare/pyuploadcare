@@ -1,3 +1,4 @@
+# coding: utf-8
 import re
 
 from django.db import models
@@ -5,10 +6,11 @@ from django.core.exceptions import ValidationError
 
 from pyuploadcare.dj import forms, UploadCare
 from pyuploadcare.exceptions import InvalidRequestError
-from pyuploadcare.file import File
+from pyuploadcare.file import File, FileGroup
 
 
 class FileField(models.Field):
+
     __metaclass__ = models.SubfieldBase
 
     description = "UploadCare file id/URI with cached data"
@@ -36,7 +38,10 @@ class FileField(models.Field):
             )
 
     def get_prep_value(self, value):
-        return value.serialize() if value else value
+        if value is None or value == '':
+            return value
+        else:
+            return value.serialize()
 
     def get_db_prep_save(self, value, connection=None):
         if value:
@@ -44,14 +49,13 @@ class FileField(models.Field):
         return super(FileField, self).get_db_prep_save(value, connection)
 
     def value_to_string(self, obj):
-        assert False
+        value = self._get_val_from_obj(obj)
+        return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        defaults = {'widget': forms.FileWidget, 'form_class': forms.FileField}
-        defaults.update(kwargs)
+        kwargs['form_class'] = forms.FileField
 
-        # yay for super!
-        return super(FileField, self).formfield(**defaults)
+        return models.Field.formfield(self, **kwargs)
 
 
 pattern_of_crop = re.compile(u'''
@@ -81,8 +85,62 @@ class ImageField(FileField):
         super(ImageField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        defaults = {'manual_crop': self.manual_crop}
-        defaults.update(kwargs)
+        kwargs['manual_crop'] = self.manual_crop
+        kwargs['form_class'] = forms.ImageField
 
-        return super(ImageField, self).formfield(form_class=forms.ImageField,
-                                                 **defaults)
+        return models.Field.formfield(self, **kwargs)
+
+
+class FileGroupField(models.Field):
+
+    __metaclass__ = models.SubfieldBase
+
+    def get_internal_type(self):
+        return "TextField"
+
+    def to_python(self, value):
+        if value is None or value == '':
+            return value
+
+        if isinstance(value, FileGroup):
+            return value
+
+        if not isinstance(value, basestring):
+            raise ValidationError(
+                u'Invalid value for a field: string was expected'
+            )
+
+        try:
+            return UploadCare().file_group(value)
+        except InvalidRequestError as exc:
+            raise ValidationError(
+                u'Invalid value for a field: {exc}'.format(exc=exc)
+            )
+
+    def get_prep_value(self, value):
+        if value is None or value == '':
+            return value
+        else:
+            return value.id
+
+    def get_db_prep_save(self, value, connection=None):
+        if value:
+            value.store()
+        return super(FileGroupField, self).get_db_prep_save(value, connection)
+
+    def value_to_string(self, obj):
+        value = self._get_val_from_obj(obj)
+        return self.get_prep_value(value)
+
+    def formfield(self, **kwargs):
+        kwargs['form_class'] = forms.FileGroupField
+
+        return models.Field.formfield(self, **kwargs)
+
+
+class ImageGroupField(FileGroupField):
+
+    def formfield(self, **kwargs):
+        kwargs['form_class'] = forms.ImageGroupField
+
+        return models.Field.formfield(self, **kwargs)

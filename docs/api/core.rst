@@ -9,9 +9,22 @@ Core API
 File Object
 -----------
 
-.. automodule:: pyuploadcare.file
+.. autoclass:: pyuploadcare.file.File
    :members:
    :undoc-members:
+
+.. _core_api-filegroup-ref:
+
+File Group Object
+-----------------
+
+.. autoclass:: pyuploadcare.file.FileGroup
+   :members:
+   :undoc-members:
+
+   .. attribute:: id
+
+   Group id, e.g. ``0513dda0-582f-447d-846f-096e5df9e2bb~2``.
 
 .. _core_api-requestor-ref:
 
