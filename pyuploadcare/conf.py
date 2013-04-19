@@ -1,4 +1,9 @@
 # coding: utf-8
+"""
+Configuration variables.
+
+"""
+
 pub_key = None
 secret = None
 
