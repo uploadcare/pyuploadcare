@@ -4,6 +4,9 @@ import time
 import logging
 
 import requests
+
+from pyuploadcare import conf
+from pyuploadcare.api_requestor import RESTClient
 from pyuploadcare.exceptions import TimeoutError, InvalidRequestError
 
 
@@ -19,7 +22,7 @@ UUID_WITH_EFFECTS_REGEX = re.compile(ur'''
 
 class File(object):
 
-    def __init__(self, cdn_url_or_file_id, ucare):
+    def __init__(self, cdn_url_or_file_id):
         matches = UUID_WITH_EFFECTS_REGEX.search(cdn_url_or_file_id)
 
         if not matches:
@@ -28,12 +31,11 @@ class File(object):
         self.uuid = matches.groupdict()['uuid']
         self.default_effects = matches.groupdict()['effects']
 
-        self._ucare = ucare
         self._info_cache = None
 
     @classmethod
-    def construct_from(cls, file_info, ucare):
-        file_ = cls(file_info['file_id'], ucare)
+    def construct_from(cls, file_info):
+        file_ = cls(file_info['file_id'])
         file_.default_effects = file_info.get('default_effects')
         file_._info_cache = file_info
         return file_
@@ -56,13 +58,13 @@ class File(object):
     def cdn_url(self):
         if self.default_effects:
             return '{cdn_base}{uuid}/-/{effects}'.format(
-                cdn_base=self._ucare.cdn_base,
+                cdn_base=conf.cdn_base,
                 uuid=self.uuid,
                 effects=self.default_effects
             )
         else:
             return '{cdn_base}{uuid}/'.format(
-                cdn_base=self._ucare.cdn_base,
+                cdn_base=conf.cdn_base,
                 uuid=self.uuid
             )
 
@@ -72,7 +74,7 @@ class File(object):
         return self._info_cache
 
     def update_info(self):
-        self._info_cache = self._ucare.make_request('GET', self._api_uri)
+        self._info_cache = RESTClient.make_request('GET', self._api_uri)
 
     def is_stored(self):
         return (self.info().get('datetime_stored') is not None or
@@ -86,7 +88,7 @@ class File(object):
         return self.info().get('original_filename')
 
     def store(self, wait=False, timeout=5):
-        self._ucare.make_request('PUT', self._api_storage_uri)
+        RESTClient.make_request('PUT', self._api_storage_uri)
 
         if wait:
             time_started = time.time()
@@ -99,7 +101,7 @@ class File(object):
         self.update_info()
 
     def delete(self, wait=False, timeout=5):
-        self._ucare.make_request('DELETE', self._api_uri)
+        RESTClient.make_request('DELETE', self._api_uri)
 
         if wait:
             time_started = time.time()
@@ -117,7 +119,7 @@ class File(object):
         while True:
             if time.time() - time_started > timeout:
                 raise TimeoutError('timed out waiting for file appear on cdn')
-            resp = requests.head(self.cdn_url, headers=self._ucare.default_headers)
+            resp = requests.head(self.cdn_url)
             if resp.status_code == 200:
                 return
             logger.debug(resp)
@@ -138,7 +140,7 @@ class FileGroup(object):
 
     It can take group id or group CDN url::
 
-        >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2', ucare)
+        >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
 
     You can iterate ``file_group`` or get ``File`` instance by key::
 
@@ -161,7 +163,7 @@ class FileGroup(object):
 
     """
 
-    def __init__(self, cdn_url_or_group_id, ucare):
+    def __init__(self, cdn_url_or_group_id):
         matches = GROUP_ID_REGEX.search(cdn_url_or_group_id)
 
         if not matches:
@@ -173,7 +175,6 @@ class FileGroup(object):
 
         self.id = matches.groupdict()['group_id']
 
-        self._ucare = ucare
         self._files_qty = files_qty
         self._info_cache = None
 
@@ -193,7 +194,7 @@ class FileGroup(object):
         else:
             file_info = self.info()['files'][key]
             if file_info is not None:
-                return File.construct_from(file_info, self._ucare)
+                return File.construct_from(file_info)
 
     @property
     def _api_uri(self):
@@ -209,13 +210,13 @@ class FileGroup(object):
 
         Usage example::
 
-            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2', ucare)
+            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
             >>> file_group.cdn_url
             https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/
 
         """
         return '{cdn_base}{group_id}/'.format(
-            cdn_base=self._ucare.cdn_base,
+            cdn_base=conf.cdn_base,
             group_id=self.id
         )
 
@@ -225,7 +226,7 @@ class FileGroup(object):
 
         Usage example::
 
-            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2', ucare)
+            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
             >>> file_group.file_cdn_urls[0]
             'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/0/'
 
@@ -252,7 +253,7 @@ class FileGroup(object):
 
     def update_info(self):
         """Updates group information by requesting Uploadcare API."""
-        self._info_cache = self._ucare.make_request('GET', self._api_uri)
+        self._info_cache = RESTClient.make_request('GET', self._api_uri)
 
     def is_stored(self):
         """Returns ``True`` if group is stored.
@@ -271,4 +272,4 @@ class FileGroup(object):
         if self.is_stored():
             return
 
-        self._info_cache = self._ucare.make_request('PUT', self._api_storage_uri)
+        self._info_cache = RESTClient.make_request('PUT', self._api_storage_uri)
