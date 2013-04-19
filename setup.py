@@ -14,8 +14,9 @@ if PY_VERSION == (2, 6):
 
 setup(
     name='pyuploadcare',
-    version='0.18',
-    description='UploadCare.com API library',
+    version='0.19',
+    description='Python library for Uploadcare.com',
+    long_description=open('README.rst').read(),
     author='Valentin Golev',
     author_email='v.golev@gmail.com',
     url='https://github.com/uploadcare/pyuploadcare',
