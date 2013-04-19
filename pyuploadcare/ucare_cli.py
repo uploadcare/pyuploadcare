@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # encoding: utf-8
-
 import argparse
 import urlparse
 import urllib
@@ -9,38 +8,24 @@ import pprint
 import ConfigParser
 import os.path
 
-from pyuploadcare import UploadCare, UploadcareException, __version__
+from pyuploadcare import conf, UploadcareException, File, __version__
+from pyuploadcare.api_requestor import RESTClient
 
 
 pp = pprint.PrettyPrinter(indent=2)
 logger = logging.getLogger('pyuploadcare')
-settings = {
-    'pub_key': None,
-    'secret': None,
-    'api_url': 'https://api.uploadcare.com/',
-    'upload_url': 'https://upload.uploadcare.com/',
-    'verify_api_ssl': True,
-    'verify_upload_ssl': True,
-    'api_version': '0.2',
-    'custom_headers': None,
-}
-
-
-def create_ucare():
-    return UploadCare(
-        pub_key=settings['pub_key'],
-        secret=settings['secret'],
-        api_base=settings['api_url'],
-        upload_base=settings['upload_url'],
-        verify_api_ssl=settings['verify_api_ssl'],
-        verify_upload_ssl=settings['verify_upload_ssl'],
-        api_version=settings['api_version'],
-        custom_headers=settings['custom_headers'],
-    )
+available_settings = [
+    'pub_key',
+    'secret',
+    'api_version',
+    'api_base',
+    'upload_base',
+    'verify_api_ssl',
+    'verify_upload_ssl',
+]
 
 
 def list_files(args=None):
-    ucare = create_ucare()
     query = {}
     for name in ['page', 'limit', 'kept', 'removed']:
         arg = getattr(args, name)
@@ -49,24 +34,19 @@ def list_files(args=None):
     q = urllib.urlencode(query)
     url = urlparse.urlunsplit(['', '', '/files/', q, ''])
 
-    pp.pprint(ucare.make_request('GET', url))
-
-
-def uc_file(url):
-    ucare = create_ucare()
-    return ucare.file(url)
+    pp.pprint(RESTClient.make_request('GET', url))
 
 
 def get_file(args):
-    pp.pprint(uc_file(args.path).info())
+    pp.pprint(File(args.path).info())
 
 
 def store_file(args):
-    uc_file(args.path).store(wait=args.wait)
+    File(args.path).store(wait=args.wait)
 
 
 def delete_file(args):
-    uc_file(args.path).delete(wait=args.wait)
+    File(args.path).delete(wait=args.wait)
 
 
 def _check_upload_args(args):
@@ -91,8 +71,7 @@ def _handle_uploaded_file(uf, args):
 def upload_from_url(args):
     if not _check_upload_args(args):
         return
-    ucare = create_ucare()
-    ufile = ucare.file_from_url(args.url, wait=(args.wait or args.store))
+    ufile = File.upload_from_url(args.url, wait=(args.wait or args.store))
     print 'token: {0.token}\nstatus: {0.status}'.format(ufile)
 
     if args.store or args.info:
@@ -107,8 +86,7 @@ def upload_from_url(args):
 def upload(args):
     if not _check_upload_args(args):
         return
-    ucare = create_ucare()
-    _file = ucare.upload(args.filename)
+    _file = File.upload(args.filename)
     _handle_uploaded_file(_file, args)
 
 
@@ -222,11 +200,11 @@ def ucare_argparser():
     parser.add_argument('--secret',
                         help='API secret, if not set is read from uploadcare.ini'
                              ' and ~/.uploadcare config files')
-    parser.add_argument('--api_url',
+    parser.add_argument('--api_base',
                         help='API url, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
                              ' default: https://api.uploadcare.com/')
-    parser.add_argument('--upload_url',
+    parser.add_argument('--upload_base',
                         help='Upload API url, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
                              ' default: https://upload.uploadcare.com/')
@@ -244,11 +222,6 @@ def ucare_argparser():
                         help='API version, can be read from uploadcare.ini'
                              ' and ~/.uploadcare config files.'
                              ' default: 0.2')
-    parser.add_argument('-H', '--header',
-                        help='Add custom HTTP headers, can be set several times.'
-                             ' header_name:value.'
-                             ' i.e. "ucare -H User-Agent:ie5 list"',
-                        action='append')
 
     return parser
 
@@ -261,26 +234,20 @@ def load_config_from_file(filename):
     config = ConfigParser.RawConfigParser()
     config.read(filename)
 
-    for name in settings.keys():
+    for name in available_settings:
         try:
-            settings[name] = config.get('ucare', name)
+            setattr(conf, name, config.get('ucare', name))
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
             pass
 
 
 def load_config_from_args(args):
-    for name in settings.keys():
+    for name in available_settings:
         arg = getattr(args, name, None)
         if arg is not None:
-            settings[name] = arg
-    custom_headers = {}
-    if getattr(args, 'header', None) is not None:
-        for header in args.header:
-            name, _, value = header.partition(':')
-            custom_headers[name] = value
+            setattr(conf, name, arg)
     if getattr(args, 'cdnurl', False):
         args.store = True
-    settings['custom_headers'] = custom_headers
 
 
 def main():

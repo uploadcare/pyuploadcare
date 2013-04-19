@@ -1,5 +1,3 @@
 [ucare]
 secret = -your secret here-
 pub_key = -your public key here-
-api_url = https://api.uploadcare.com/
-upload_url = https://upload.uploadcare.com/

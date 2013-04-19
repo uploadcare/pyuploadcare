@@ -28,7 +28,6 @@ logger = logging.getLogger("pyuploadcare")
 class RESTClient(object):
 
     verify_api_ssl = True
-    custom_headers = None
 
     @classmethod
     def _build_api_path(cls, path):
@@ -58,8 +57,6 @@ class RESTClient(object):
         }
         if headers is not None:
             result.update(headers)
-        if cls.custom_headers is not None:
-            result.update(cls.custom_headers)
         return result
 
     @classmethod

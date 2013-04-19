@@ -16,9 +16,7 @@ from tests.utils import MockResponse
 
 class UploadCareTest(unittest.TestCase):
 
-    def setUp(self):
-        conf.pub_key = 'pub'
-        conf.secret = 'secret'
+    def tearDown(self):
         conf.api_version = '0.2'
         conf.api_base = 'https://api.uploadcare.com/'
 
