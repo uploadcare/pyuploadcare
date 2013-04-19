@@ -6,6 +6,7 @@ except ImportError:
 
 from mock import patch
 
+from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
     ucare_argparser, list_files, get_file, store_file, delete_file,
 )
@@ -17,6 +18,13 @@ def arg_namespace(arguments_str):
 
 
 class UcareListTest(unittest.TestCase):
+
+    @patch('requests.request', autospec=True)
+    def test_secret_is_none(self, request):
+        conf.secret = None
+        request.return_value = MockResponse(status=200)
+
+        list_files(arg_namespace('list'))
 
     @patch('requests.request', autospec=True)
     def test_no_args(self, request):

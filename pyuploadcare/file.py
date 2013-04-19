@@ -6,8 +6,8 @@ import logging
 import requests
 
 from pyuploadcare import conf
-from pyuploadcare.api_requestor import RESTClient
 from pyuploadcare.exceptions import TimeoutError, InvalidRequestError
+from pyuploadcare.api import RESTClient
 
 
 logger = logging.getLogger("pyuploadcare")

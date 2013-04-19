@@ -9,7 +9,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch
 
 from pyuploadcare import conf
-from pyuploadcare.api_requestor import RESTClient
+from pyuploadcare.api import RESTClient, _build_api_path, _build_api_uri
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from tests.utils import MockResponse
 
@@ -54,13 +54,14 @@ class UploadCareTest(unittest.TestCase):
         self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.19')
 
     def test_uri_builders(self):
-        path = RESTClient._build_api_path('/files/?asd=1')
-        uri = RESTClient._build_api_uri(path)
+        api_base = 'https://api.uploadcare.com/'
+        path = _build_api_path(api_base, '/files/?asd=1')
+        uri = _build_api_uri(api_base, path)
         self.assertEqual(path, '/files/?asd=1')
         self.assertEqual(uri, 'https://api.uploadcare.com/files/?asd=1')
 
-        conf.api_base = 'http://example.com/api'
-        path = RESTClient._build_api_path('/files/?asd=1')
-        uri = RESTClient._build_api_uri(path)
+        api_base = 'http://example.com/api'
+        path = _build_api_path(api_base, '/files/?asd=1')
+        uri = _build_api_uri(api_base, path)
         self.assertEqual(path, '/api/files/?asd=1')
         self.assertEqual(uri, 'http://example.com/api/files/?asd=1')

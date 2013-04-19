@@ -25,43 +25,30 @@ from pyuploadcare.exceptions import (
 logger = logging.getLogger("pyuploadcare")
 
 
+def _build_api_path(api_base, path):
+    uri_parts = urlparse.urlsplit(path)
+    api_parts = urlparse.urlsplit(api_base)
+    parts = filter(None, api_parts.path.split('/') + uri_parts.path.split('/'))
+    path = '/'.join([''] + parts + [''])
+    api_path = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
+    return api_path
+
+
+def _build_api_uri(api_base, path):
+    api_parts = urlparse.urlsplit(api_base)
+    base = urlparse.urlunsplit([
+        api_parts.scheme,
+        api_parts.netloc,
+        '', '', ''
+    ])
+    return base + path
+
+
 class RESTClient(object):
-
-    verify_api_ssl = True
-
-    @classmethod
-    def _build_api_path(cls, path):
-        """Abomination"""
-        uri_parts = urlparse.urlsplit(path)
-        api_parts = urlparse.urlsplit(conf.api_base)
-        parts = filter(None, api_parts.path.split('/') + uri_parts.path.split('/'))
-        path = '/'.join([''] + parts + [''])
-        api_path = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
-        return api_path
-
-    @classmethod
-    def _build_api_uri(cls, path):
-        """Abomination"""
-        api_parts = urlparse.urlsplit(conf.api_base)
-        base = urlparse.urlunsplit([
-            api_parts.scheme,
-            api_parts.netloc,
-            '', '', ''
-        ])
-        return base + path
-
-    @classmethod
-    def _build_headers(cls, headers=None):
-        result = {
-            'User-Agent': 'pyuploadcare/{0}'.format(__version__),
-        }
-        if headers is not None:
-            result.update(headers)
-        return result
 
     @classmethod
     def make_request(cls, verb, path, data=None):
-        path = cls._build_api_path(path)
+        path = _build_api_path(conf.api_base, path)
         content = ''
 
         if data is not None:
@@ -79,27 +66,27 @@ class RESTClient(object):
             path,
         ])
 
-        sign = hmac.new(str(conf.secret),
-                        sign_string,
-                        hashlib.sha1).hexdigest()
+        sign = hmac.new(str(conf.secret), sign_string, hashlib.sha1) \
+            .hexdigest()
 
-        headers = cls._build_headers({
+        headers = {
             'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
             'Date': date,
             'Content-Type': content_type,
             'Content-Length': str(len(content)),
-            'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version)
-        })
+            'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
+            'User-Agent': 'pyuploadcare/{0}'.format(__version__),
+        }
         logger.debug('''sent:
             verb: {0}
             path: {1}
             headers: {2}
             data: {3}'''.format(verb, path, headers, content))
 
-        uri = cls._build_api_uri(path)
+        uri = _build_api_uri(conf.api_base, path)
         try:
             response = requests.request(verb, uri, allow_redirects=True,
-                                        verify=cls.verify_api_ssl,
+                                        verify=conf.verify_api_ssl,
                                         headers=headers, data=content)
         except requests.RequestException as exc:
             raise APIConnectionError(u'Network error: {exc}'.format(exc=exc))
@@ -126,6 +113,41 @@ class RESTClient(object):
             raise AuthenticationError(
                 u'Authentication error: {exc}'.format(exc=response.content)
             )
+
+        if response.status_code in (400, 404):
+            raise InvalidRequestError(
+                u'Invalid request error: {exc}'.format(exc=response.content)
+            )
+
+        raise APIError(u'API error: {exc}'.format(exc=response.content))
+
+
+class UploadingClient(object):
+
+    @classmethod
+    def make_request(cls, verb, path, data=None, files=None):
+        path = _build_api_path(conf.upload_base, path)
+        uri = _build_api_uri(conf.upload_base, path)
+
+        if data is None:
+            data = {}
+        else:
+            data['pub_key'] = conf.pub_key
+            data['UPLOADCARE_PUB_KEY'] = conf.pub_key
+
+        try:
+            response = requests.request(
+                verb, uri, allow_redirects=True, verify=conf.verify_upload_ssl,
+                data=data, files=files
+            )
+        except requests.RequestException as exc:
+            raise APIConnectionError(u'Network error: {exc}'.format(exc=exc))
+
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except ValueError as exc:
+                raise APIError(u'API error: {exc}'.format(exc=exc))
 
         if response.status_code in (400, 404):
             raise InvalidRequestError(
