@@ -30,3 +30,12 @@ class APIError(UploadcareException):
 
 class InvalidRequestError(UploadcareException, ValueError):
     """Invalid parameters errors, e.g. status 404."""
+
+
+class UploadError(UploadcareException):
+    """Upload errors.
+
+    It raises when user wants to wait the result of
+    ``File.upload_from_url(url, wait=True, timeout=30)``.
+
+    """

@@ -22,8 +22,6 @@ available_settings = [
     'api_version',
     'api_base',
     'upload_base',
-    'verify_api_ssl',
-    'verify_upload_ssl',
 ]
 
 
@@ -58,38 +56,40 @@ def _check_upload_args(args):
     return True
 
 
-def _handle_uploaded_file(uf, args):
+def _handle_uploaded_file(file_, args):
     if args.store:
-        uf.store(wait=True)
+        file_.store(wait=True)
         print 'File stored successfully.'
 
     if args.info:
-        pp.pprint(uf.info())
+        pp.pprint(file_.info())
 
     if args.cdnurl:
-        print 'CDN url: {0}'.format(uf.cdn_url)
+        print 'CDN url: {0}'.format(file_.cdn_url)
 
 
 def upload_from_url(args):
     if not _check_upload_args(args):
         return
-    ufile = File.upload_from_url(args.url, wait=(args.wait or args.store))
-    print 'token: {0.token}\nstatus: {0.status}'.format(ufile)
+    file_from_url = File.upload_from_url(args.url,
+                                         wait=args.wait or args.store)
+    print file_from_url
 
     if args.store or args.info:
-        _file = ufile.get_file()
-        if _file is None:
+        file_ = file_from_url.get_file()
+        if file_ is None:
             print 'Cannot store or get info.'
             return
 
-        _handle_uploaded_file(_file, args)
+        _handle_uploaded_file(file_, args)
 
 
 def upload(args):
     if not _check_upload_args(args):
         return
-    _file = File.upload(args.filename)
-    _handle_uploaded_file(_file, args)
+    with open(args.filename, 'rb') as fh:
+        file_ = File.upload(fh)
+        _handle_uploaded_file(file_, args)
 
 
 def ucare_argparser():
@@ -260,9 +260,8 @@ def main():
 
     try:
         args.func(args)
-    except UploadcareException as e:
-        print 'ERROR:'
-        print e
+    except UploadcareException as exc:
+        print 'ERROR: {0}'.format(exc)
 
 
 if __name__ == '__main__':

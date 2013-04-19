@@ -6,8 +6,10 @@ import logging
 import requests
 
 from pyuploadcare import conf
-from pyuploadcare.exceptions import TimeoutError, InvalidRequestError
-from pyuploadcare.api import RESTClient
+from pyuploadcare.api import RESTClient, UploadingClient
+from pyuploadcare.exceptions import (
+    TimeoutError, InvalidRequestError, APIError, UploadError,
+)
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -32,13 +34,6 @@ class File(object):
         self.default_effects = matches.groupdict()['effects']
 
         self._info_cache = None
-
-    @classmethod
-    def construct_from(cls, file_info):
-        file_ = cls(file_info['file_id'])
-        file_.default_effects = file_info.get('default_effects')
-        file_._info_cache = file_info
-        return file_
 
     def __repr__(self):
         return '<uploadcare.File {uuid}>'.format(uuid=self.uuid)
@@ -124,6 +119,79 @@ class File(object):
                 return
             logger.debug(resp)
             time.sleep(0.1)
+
+    @classmethod
+    def construct_from(cls, file_info):
+        file_ = cls(file_info['file_id'])
+        file_.default_effects = file_info.get('default_effects')
+        file_._info_cache = file_info
+        return file_
+
+    @classmethod
+    def upload(cls, file_obj):
+        """Uploads a file and returns ``File`` instance."""
+        files = UploadingClient.make_request('POST', '/base/',
+                                             files={'file': file_obj})
+        file_ = cls(files['file'])
+        return file_
+
+    @classmethod
+    def upload_from_url(cls, url, wait=False, timeout=30):
+        """Uploads file from given url and returns ``FileFromUrl`` instance.
+        """
+        result = UploadingClient.make_request('POST', '/from_url/',
+                                              data={'source_url': url})
+        if 'token' not in result:
+            raise APIError(
+                'could not find token in result: {0}'.format(result)
+            )
+        file_from_url = cls.FileFromUrl(result['token'])
+
+        if wait:
+            time_started = time.time()
+            while time.time() - time_started < timeout:
+                file_from_url.update_info()
+                status = file_from_url.info()['status']
+                if status == 'success':
+                    break
+                if status in ('failed', 'error'):
+                    raise UploadError(
+                        'could not upload file from url: {0}'.format(result)
+                    )
+                time.sleep(0.1)
+            else:
+                raise TimeoutError('timed out during upload')
+
+        return file_from_url
+
+    class FileFromUrl(object):
+
+        def __init__(self, token):
+            self.token = token
+
+            self._info_cache = None
+
+        def __repr__(self):
+            return '<uploadcare.File.FileFromUrl {0}>'.format(self.token)
+
+        def info(self):
+            if self._info_cache is None:
+                self.update_info()
+            return self._info_cache
+
+        def update_info(self):
+            result = UploadingClient.make_request('POST', '/from_url/status/',
+                                                  data={'token': self.token})
+            if 'status' not in result:
+                raise APIError(
+                    'could not find status in result: {0}'.format(result)
+                )
+            self._info_cache = result
+
+        def get_file(self):
+            """Returns ``File`` instance if upload is completed."""
+            if self.info()['status'] == 'success':
+                return File(self.info()['uuid'])
 
 
 GROUP_ID_REGEX = re.compile(ur'''

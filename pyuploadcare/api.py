@@ -131,9 +131,8 @@ class UploadingClient(object):
 
         if data is None:
             data = {}
-        else:
-            data['pub_key'] = conf.pub_key
-            data['UPLOADCARE_PUB_KEY'] = conf.pub_key
+        data['pub_key'] = conf.pub_key
+        data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
         try:
             response = requests.request(
