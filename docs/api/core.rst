@@ -6,41 +6,32 @@ Core API
 
 .. _core_api-file-ref:
 
-File Object
------------
+File API Resource
+-----------------
 
-.. autoclass:: pyuploadcare.file.File
+.. autoclass:: pyuploadcare.api_resources.File
    :members:
    :undoc-members:
 
 .. _core_api-filegroup-ref:
 
-File Group Object
------------------
+File Group API Resource
+-----------------------
 
-.. autoclass:: pyuploadcare.file.FileGroup
+.. autoclass:: pyuploadcare.api_resources.FileGroup
    :members:
    :undoc-members:
 
    .. attribute:: id
 
-   Group id, e.g. ``0513dda0-582f-447d-846f-096e5df9e2bb~2``.
+      Group id, e.g. ``0513dda0-582f-447d-846f-096e5df9e2bb~2``.
 
-.. _core_api-requestor-ref:
+.. _core_api-api-ref:
 
-Uploadcare API Requestor
-------------------------
+API Clients
+-----------
 
-.. automodule:: pyuploadcare
-   :members:
-   :undoc-members:
-
-.. _core_api-uploader-ref:
-
-File Uploader
--------------
-
-.. automodule:: pyuploadcare.uploader
+.. automodule:: pyuploadcare.api
    :members:
    :undoc-members:
 
