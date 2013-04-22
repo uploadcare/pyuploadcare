@@ -2,7 +2,7 @@
 """
 Uploadcare REST client.
 
-It is JSON REST request abstraction layer that is used by the ``resources``.
+It is JSON REST request abstraction layer that is used by the ``api_resources``.
 
 """
 

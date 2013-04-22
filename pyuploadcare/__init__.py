@@ -15,7 +15,7 @@ Usage example::
 
 __version__ = '0.19'
 
-from pyuploadcare.file import File, FileGroup
+from pyuploadcare.api_resources import File, FileGroup
 from pyuploadcare.exceptions import (
     UploadcareException, APIConnectionError, AuthenticationError, APIError,
     InvalidRequestError,

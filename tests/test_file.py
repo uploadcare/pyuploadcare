@@ -10,7 +10,7 @@ from mock import patch
 
 from pyuploadcare import conf
 from pyuploadcare.exceptions import TimeoutError
-from pyuploadcare.file import File, FileGroup
+from pyuploadcare.api_resources import File, FileGroup
 from tests.utils import MockResponse, api_response_from_file
 
 

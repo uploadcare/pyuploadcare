@@ -4,7 +4,7 @@ try:
 except ImportError:
     import unittest
 
-from pyuploadcare.file import File, FileGroup
+from pyuploadcare.api_resources import File, FileGroup
 from pyuploadcare.exceptions import InvalidRequestError
 
 

@@ -10,7 +10,7 @@ import os.path
 
 from pyuploadcare import __version__, conf
 from pyuploadcare.exceptions import UploadcareException
-from pyuploadcare.file import File
+from pyuploadcare.api_resources import File
 from pyuploadcare.api import RESTClient
 
 

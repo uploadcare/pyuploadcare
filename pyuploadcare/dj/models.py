@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 from pyuploadcare.dj import forms
 from pyuploadcare.exceptions import InvalidRequestError
-from pyuploadcare.file import File, FileGroup
+from pyuploadcare.api_resources import File, FileGroup
 
 
 class FileField(models.Field):
