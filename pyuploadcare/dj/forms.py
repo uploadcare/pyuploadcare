@@ -1,8 +1,8 @@
 # coding: utf-8
 from django.forms import Field, TextInput
 
-from pyuploadcare import conf
-from pyuploadcare.dj import conf as dj_conf
+from .. import conf
+from . import conf as dj_conf
 
 
 class FileWidget(TextInput):

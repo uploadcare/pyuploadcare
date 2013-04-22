@@ -1,5 +1,5 @@
 # coding: utf-8
-from pyuploadcare.dj.models import (
+from .models import (
     FileField, ImageField, FileGroupField, ImageGroupField,
 )
 

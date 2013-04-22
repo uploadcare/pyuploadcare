@@ -5,9 +5,9 @@ import logging
 
 import requests
 
-from pyuploadcare import conf
-from pyuploadcare.api import RESTClient, UploadingClient
-from pyuploadcare.exceptions import (
+from . import conf
+from .api import RESTClient, UploadingClient
+from .exceptions import (
     TimeoutError, InvalidRequestError, APIError, UploadError,
 )
 

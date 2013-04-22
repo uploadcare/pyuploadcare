@@ -8,10 +8,10 @@ import pprint
 import ConfigParser
 import os.path
 
-from pyuploadcare import __version__, conf
-from pyuploadcare.exceptions import UploadcareException
-from pyuploadcare.api_resources import File
-from pyuploadcare.api import RESTClient
+from . import conf, __version__
+from .api_resources import File
+from .exceptions import UploadcareException
+from .api import RESTClient
 
 
 pp = pprint.PrettyPrinter(indent=2)

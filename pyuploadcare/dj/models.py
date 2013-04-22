@@ -4,9 +4,9 @@ import re
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from pyuploadcare.dj import forms
-from pyuploadcare.exceptions import InvalidRequestError
-from pyuploadcare.api_resources import File, FileGroup
+from . import forms
+from ..exceptions import InvalidRequestError
+from ..api_resources import File, FileGroup
 
 
 class FileField(models.Field):

@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-import pyuploadcare.conf
+from .. import conf
 
 
 if not hasattr(settings, 'UPLOADCARE'):
@@ -14,8 +14,8 @@ if 'pub_key' not in settings.UPLOADCARE:
 if 'secret' not in settings.UPLOADCARE:
     raise ImproperlyConfigured('UPLOADCARE setting must have secret')
 
-pyuploadcare.conf.pub_key = settings.UPLOADCARE['pub_key']
-pyuploadcare.conf.secret = settings.UPLOADCARE['secret']
+conf.pub_key = settings.UPLOADCARE['pub_key']
+conf.secret = settings.UPLOADCARE['secret']
 
 
 widget_version = settings.UPLOADCARE.get('widget_version', '0.8')

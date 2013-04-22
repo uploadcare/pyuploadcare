@@ -16,8 +16,8 @@ import json
 
 import requests
 
-from pyuploadcare import conf, __version__
-from pyuploadcare.exceptions import (
+from . import conf, __version__
+from .exceptions import (
     APIConnectionError, AuthenticationError, APIError, InvalidRequestError,
 )
 
