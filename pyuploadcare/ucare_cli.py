@@ -22,6 +22,8 @@ available_settings = [
     'api_version',
     'api_base',
     'upload_base',
+    'verify_api_ssl',
+    'verify_upload_ssl',
 ]
 
 
@@ -252,8 +254,7 @@ def load_config_from_args(args):
         args.store = True
 
 
-def main():
-    args = ucare_argparser().parse_args()
+def main(args):
     load_config_from_file('~/.uploadcare')
     load_config_from_file('uploadcare.ini')
     load_config_from_args(args)
@@ -271,4 +272,5 @@ if __name__ == '__main__':
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    main()
+    args = ucare_argparser().parse_args()
+    main(args)

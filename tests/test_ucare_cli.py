@@ -8,7 +8,7 @@ from mock import patch
 
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
-    ucare_argparser, list_files, get_file, store_file, delete_file,
+    ucare_argparser, list_files, get_file, store_file, delete_file, main,
 )
 from tests.utils import MockResponse
 
@@ -207,3 +207,79 @@ class UcareDeleteTest(unittest.TestCase):
             request.mock_calls[0][1],
             ('DELETE', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
         )
+
+
+class UcareCommonArgsTest(unittest.TestCase):
+
+    def setUp(self):
+        conf.pub_key = None
+        conf.secret = None
+
+        conf.api_base = 'https://api.uploadcare.com/'
+        conf.upload_base = 'https://upload.uploadcare.com/'
+
+        conf.verify_api_ssl = True
+        conf.verify_upload_ssl = True
+
+    def tearDown(self):
+        self.setUp()
+
+    @patch('requests.request', autospec=True)
+    def test_change_pub_key_in_conf(self, request):
+        request.return_value = MockResponse(status=200)
+
+        main(arg_namespace('--pub_key demopublickey list'))
+
+        self.assertEqual(conf.pub_key, 'demopublickey')
+
+    @patch('requests.request', autospec=True)
+    def test_change_secret_in_conf(self, request):
+        request.return_value = MockResponse(status=200)
+
+        main(arg_namespace('--secret demosecretkey list'))
+
+        self.assertEqual(conf.secret, 'demosecretkey')
+
+    @patch('requests.request', autospec=True)
+    def test_change_api_base_in_conf(self, request):
+        request.return_value = MockResponse(status=200)
+
+        main(arg_namespace('--api_base https://uploadcare.com/api/ list'))
+
+        self.assertEqual(conf.api_base, 'https://uploadcare.com/api/')
+
+    @patch('requests.request', autospec=True)
+    def test_change_upload_base_in_conf(self, request):
+        request.return_value = MockResponse(status=200)
+
+        main(arg_namespace('--upload_base https://uploadcare.com/upload/ list'))
+
+        self.assertEqual(conf.upload_base, 'https://uploadcare.com/upload/')
+
+    @patch('requests.request', autospec=True)
+    def test_change_verify_api_ssl_in_conf(self, request):
+        request.return_value = MockResponse(status=200)
+
+        main(arg_namespace('list'))
+        self.assertFalse(conf.verify_api_ssl)
+
+        main(arg_namespace('--verify_api_ssl list'))
+        self.assertTrue(conf.verify_api_ssl)
+
+    @patch('requests.request', autospec=True)
+    def test_change_verify_upload_ssl_in_conf(self, request):
+        request.return_value = MockResponse(status=200)
+
+        main(arg_namespace('list'))
+        self.assertFalse(conf.verify_upload_ssl)
+
+        main(arg_namespace('--verify_upload_ssl list'))
+        self.assertTrue(conf.verify_upload_ssl)
+
+    @patch('requests.request', autospec=True)
+    def test_change_api_version_in_conf(self, request):
+        request.return_value = MockResponse(status=200)
+
+        main(arg_namespace('--api_version 0.777 list'))
+
+        self.assertEqual(conf.api_version, '0.777')
