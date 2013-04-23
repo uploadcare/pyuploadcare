@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # encoding: utf-8
+import time
 import argparse
 import urlparse
 import urllib
@@ -10,7 +11,7 @@ import os.path
 
 from . import conf, __version__
 from .api_resources import File
-from .exceptions import UploadcareException
+from .exceptions import UploadcareException, TimeoutError, UploadError
 from .api import RESTClient
 
 
@@ -54,7 +55,7 @@ def delete_file(args):
 
 
 def _check_upload_args(args):
-    if not args.secret and (args.store or args.info):
+    if not conf.secret and (args.store or args.info):
         print 'Cannot store or get info without "--secret" key'
         return False
     return True
@@ -75,9 +76,23 @@ def _handle_uploaded_file(file_, args):
 def upload_from_url(args):
     if not _check_upload_args(args):
         return
-    file_from_url = File.upload_from_url(args.url,
-                                         wait=args.wait or args.store)
+    file_from_url = File.upload_from_url(args.url)
     print file_from_url
+
+    if args.wait or args.store:
+        timeout = args.timeout
+        time_started = time.time()
+        while time.time() - time_started < timeout:
+            status = file_from_url.update_info()['status']
+            if status == 'success':
+                break
+            if status in ('failed', 'error'):
+                raise UploadError(
+                    'could not upload file from url: {0}'.format(file_from_url.info())
+                )
+            time.sleep(1)
+        else:
+            raise TimeoutError('timed out during upload')
 
     if args.store or args.info:
         file_ = file_from_url.get_file()
@@ -152,28 +167,33 @@ def ucare_argparser():
     # common upload args
     upload_parent = argparse.ArgumentParser(add_help=False)
     group = upload_parent.add_mutually_exclusive_group()
-    group.add_argument('--store',
-                       action='store_true',
-                       default=False,
-                       dest='store',
-                       help='Store uploaded file')
-    group.add_argument('--nostore',
-                       action='store_false',
-                       dest='store',
-                       help='Do not store uploaded file')
+    group.add_argument(
+        '--store',
+        action='store_true',
+        default=False,
+        dest='store',
+        help='Store uploaded file')
+    group.add_argument(
+        '--nostore',
+        action='store_false',
+        dest='store',
+        help='Do not store uploaded file')
     group = upload_parent.add_mutually_exclusive_group()
-    group.add_argument('--info',
-                       action='store_true',
-                       default=False,
-                       dest='info',
-                       help='Get uploaded file info')
-    group.add_argument('--noinfo',
-                       action='store_false',
-                       dest='info',
-                       help='Do not get uploaded file info')
-    upload_parent.add_argument('--cdnurl',
-                               action='store_true',
-                               help='Store file and get CDN url.')
+    group.add_argument(
+        '--info',
+        action='store_true',
+        default=False,
+        dest='info',
+        help='Get uploaded file info')
+    group.add_argument(
+        '--noinfo',
+        action='store_false',
+        dest='info',
+        help='Do not get uploaded file info')
+    upload_parent.add_argument(
+        '--cdnurl',
+        action='store_true',
+        help='Store file and get CDN url.')
 
     # upload from url
     subparser = subparsers.add_parser('upload_from_url',
@@ -181,20 +201,28 @@ def ucare_argparser():
                                       help='upload file from url')
     subparser.set_defaults(func=upload_from_url)
     subparser.add_argument('url', help='file url')
+    subparser.add_argument(
+        '--timeout',
+        type=int,
+        dest='timeout',
+        default=30,
+        help='Set wait seconds file uploading from url.'
+             ' Default value is 30 seconds')
     group = subparser.add_mutually_exclusive_group()
-    group.add_argument('--wait',
-                       action='store_true',
-                       default=True,
-                       dest='wait',
-                       help='Wait for upload status')
-    group.add_argument('--nowait',
-                       action='store_false',
-                       dest='wait',
-                       help='Do not wait for upload status')
+    group.add_argument(
+        '--wait',
+        action='store_true',
+        default=True,
+        dest='wait',
+        help='Wait for upload status')
+    group.add_argument(
+        '--nowait',
+        action='store_false',
+        dest='wait',
+        help='Do not wait for upload status')
 
     # upload
-    subparser = subparsers.add_parser('upload',
-                                      parents=[upload_parent],
+    subparser = subparsers.add_parser('upload', parents=[upload_parent],
                                       help='upload file')
     subparser.set_defaults(func=upload)
     subparser.add_argument('filename', help='filename')

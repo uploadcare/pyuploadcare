@@ -8,7 +8,7 @@ import requests
 from . import conf
 from .api import RESTClient, UploadingClient
 from .exceptions import (
-    TimeoutError, InvalidRequestError, APIError, UploadError,
+    TimeoutError, InvalidRequestError, APIError,
 )
 
 
@@ -136,7 +136,7 @@ class File(object):
         return file_
 
     @classmethod
-    def upload_from_url(cls, url, wait=False, timeout=30):
+    def upload_from_url(cls, url):
         """Uploads file from given url and returns ``FileFromUrl`` instance.
         """
         result = UploadingClient.make_request('POST', '/from_url/',
@@ -146,22 +146,6 @@ class File(object):
                 'could not find token in result: {0}'.format(result)
             )
         file_from_url = cls.FileFromUrl(result['token'])
-
-        if wait:
-            time_started = time.time()
-            while time.time() - time_started < timeout:
-                file_from_url.update_info()
-                status = file_from_url.info()['status']
-                if status == 'success':
-                    break
-                if status in ('failed', 'error'):
-                    raise UploadError(
-                        'could not upload file from url: {0}'.format(result)
-                    )
-                time.sleep(0.1)
-            else:
-                raise TimeoutError('timed out during upload')
-
         return file_from_url
 
     class FileFromUrl(object):
@@ -187,6 +171,7 @@ class File(object):
                     'could not find status in result: {0}'.format(result)
                 )
             self._info_cache = result
+            return result
 
         def get_file(self):
             """Returns ``File`` instance if upload is completed."""

@@ -1,3 +1,3 @@
 [ucare]
-secret = -your secret here-
-pub_key = -your public key here-
+pub_key = demopublickey
+secret = demoprivatekey
