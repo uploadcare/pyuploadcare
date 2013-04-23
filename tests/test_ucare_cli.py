@@ -5,6 +5,7 @@ except ImportError:
     import unittest
 
 from mock import patch
+from tempfile import NamedTemporaryFile
 
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
@@ -225,7 +226,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         self.setUp()
 
     @patch('requests.request', autospec=True)
-    def test_change_pub_key_in_conf(self, request):
+    def test_change_pub_key(self, request):
         request.return_value = MockResponse(status=200)
 
         main(arg_namespace('--pub_key demopublickey list'))
@@ -233,7 +234,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         self.assertEqual(conf.pub_key, 'demopublickey')
 
     @patch('requests.request', autospec=True)
-    def test_change_secret_in_conf(self, request):
+    def test_change_secret(self, request):
         request.return_value = MockResponse(status=200)
 
         main(arg_namespace('--secret demosecretkey list'))
@@ -241,7 +242,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         self.assertEqual(conf.secret, 'demosecretkey')
 
     @patch('requests.request', autospec=True)
-    def test_change_api_base_in_conf(self, request):
+    def test_change_api_base(self, request):
         request.return_value = MockResponse(status=200)
 
         main(arg_namespace('--api_base https://uploadcare.com/api/ list'))
@@ -249,7 +250,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         self.assertEqual(conf.api_base, 'https://uploadcare.com/api/')
 
     @patch('requests.request', autospec=True)
-    def test_change_upload_base_in_conf(self, request):
+    def test_change_upload_base(self, request):
         request.return_value = MockResponse(status=200)
 
         main(arg_namespace('--upload_base https://uploadcare.com/upload/ list'))
@@ -257,29 +258,160 @@ class UcareCommonArgsTest(unittest.TestCase):
         self.assertEqual(conf.upload_base, 'https://uploadcare.com/upload/')
 
     @patch('requests.request', autospec=True)
-    def test_change_verify_api_ssl_in_conf(self, request):
+    def test_change_verify_api_ssl(self, request):
         request.return_value = MockResponse(status=200)
 
         main(arg_namespace('list'))
-        self.assertFalse(conf.verify_api_ssl)
-
-        main(arg_namespace('--verify_api_ssl list'))
         self.assertTrue(conf.verify_api_ssl)
 
+        main(arg_namespace('--no_check_api_certificate list'))
+        self.assertFalse(conf.verify_api_ssl)
+
     @patch('requests.request', autospec=True)
-    def test_change_verify_upload_ssl_in_conf(self, request):
+    def test_change_verify_upload_ssl(self, request):
         request.return_value = MockResponse(status=200)
 
         main(arg_namespace('list'))
-        self.assertFalse(conf.verify_upload_ssl)
-
-        main(arg_namespace('--verify_upload_ssl list'))
         self.assertTrue(conf.verify_upload_ssl)
 
+        main(arg_namespace('--no_check_upload_certificate list'))
+        self.assertFalse(conf.verify_upload_ssl)
+
     @patch('requests.request', autospec=True)
-    def test_change_api_version_in_conf(self, request):
+    def test_change_api_version(self, request):
         request.return_value = MockResponse(status=200)
 
         main(arg_namespace('--api_version 0.777 list'))
 
         self.assertEqual(conf.api_version, '0.777')
+
+
+class UcareCommonConfigFileTest(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp_config_file = NamedTemporaryFile(delete=False)
+
+    def tearDown(self):
+        conf.pub_key = None
+        conf.secret = None
+
+        conf.api_base = 'https://api.uploadcare.com/'
+        conf.upload_base = 'https://upload.uploadcare.com/'
+
+        conf.verify_api_ssl = True
+        conf.verify_upload_ssl = True
+
+    @patch('requests.request', autospec=True)
+    def test_use_pub_key_from_config_file(self, request):
+        request.return_value = MockResponse(status=200)
+
+        self.tmp_config_file.write(
+            '[ucare]\n'
+            'pub_key = demopublickey'
+        )
+        self.tmp_config_file.close()
+
+        main(arg_namespace('list'), [self.tmp_config_file.name])
+
+        self.assertEqual(conf.pub_key, 'demopublickey')
+
+    @patch('requests.request', autospec=True)
+    def test_redefine_pub_key_by_second_config_file(self, request):
+        request.return_value = MockResponse(status=200)
+
+        self.tmp_config_file.write(
+            '[ucare]\n'
+            'pub_key = demopublickey'
+        )
+        self.tmp_config_file.close()
+
+        second_tmp_conf_file = NamedTemporaryFile(delete=False)
+        second_tmp_conf_file.write(
+            '[ucare]\n'
+            'pub_key = demopublickey_modified'
+        )
+        second_tmp_conf_file.close()
+
+        main(arg_namespace('list'),
+             [self.tmp_config_file.name, second_tmp_conf_file.name])
+
+        self.assertEqual(conf.pub_key, 'demopublickey_modified')
+
+    @patch('requests.request', autospec=True)
+    def test_use_available_pub_key_from_config_files(self, request):
+        request.return_value = MockResponse(status=200)
+
+        self.tmp_config_file.write(
+            '[ucare]\n'
+            'pub_key = demopublickey'
+        )
+        self.tmp_config_file.close()
+
+        second_tmp_conf_file = NamedTemporaryFile(delete=False)
+        second_tmp_conf_file.write(
+            '[ucare]\n'
+            'secret = demosecretkey'
+        )
+        second_tmp_conf_file.close()
+
+        main(arg_namespace('list'),
+             [self.tmp_config_file.name, second_tmp_conf_file.name])
+
+        self.assertEqual(conf.pub_key, 'demopublickey')
+
+    @patch('requests.request', autospec=True)
+    def test_redefine_config_pub_key_by_args(self, request):
+        request.return_value = MockResponse(status=200)
+
+        self.tmp_config_file.write(
+            '[ucare]\n'
+            'pub_key = demopublickey'
+        )
+        self.tmp_config_file.close()
+
+        main(arg_namespace('--pub_key pub list'), [self.tmp_config_file.name])
+
+        self.assertEqual(conf.pub_key, 'pub')
+
+    @patch('requests.request', autospec=True)
+    def test_load_verify_api_ssl_false_value_from_config(self, request):
+        request.return_value = MockResponse(status=200)
+
+        self.tmp_config_file.write(
+            '[ucare]\n'
+            'verify_api_ssl = false'
+        )
+        self.tmp_config_file.close()
+
+        main(arg_namespace('list'), [self.tmp_config_file.name])
+
+        self.assertFalse(conf.verify_api_ssl)
+
+    @patch('requests.request', autospec=True)
+    def test_load_verify_api_ssl_true_value_from_config(self, request):
+        request.return_value = MockResponse(status=200)
+
+        self.tmp_config_file.write(
+            '[ucare]\n'
+            'verify_api_ssl = true'
+        )
+        self.tmp_config_file.close()
+
+        main(arg_namespace('list'), [self.tmp_config_file.name])
+
+        self.assertTrue(conf.verify_api_ssl)
+
+    @patch('requests.request', autospec=True)
+    def test_redefine_config_verify_api_ssl_by_args(self, request):
+        request.return_value = MockResponse(status=200)
+
+        self.tmp_config_file.write(
+            '[ucare]\n'
+            'verify_api_ssl = true'
+        )
+        self.tmp_config_file.close()
+
+        main(arg_namespace('--no_check_api_certificate list'),
+             [self.tmp_config_file.name])
+
+        self.assertFalse(conf.verify_api_ssl)

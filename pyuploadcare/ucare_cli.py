@@ -16,15 +16,17 @@ from .api import RESTClient
 
 pp = pprint.PrettyPrinter(indent=2)
 logger = logging.getLogger('pyuploadcare')
-available_settings = [
+str_settings = (
     'pub_key',
     'secret',
     'api_version',
     'api_base',
     'upload_base',
+)
+bool_settings = (
     'verify_api_ssl',
     'verify_upload_ssl',
-]
+)
 
 
 def list_files(args=None):
@@ -198,34 +200,41 @@ def ucare_argparser():
     subparser.add_argument('filename', help='filename')
 
     # common arguments
-    parser.add_argument('--pub_key',
-                        help='API key, if not set is read from uploadcare.ini'
-                             ' and ~/.uploadcare config files')
-    parser.add_argument('--secret',
-                        help='API secret, if not set is read from uploadcare.ini'
-                             ' and ~/.uploadcare config files')
-    parser.add_argument('--api_base',
-                        help='API url, can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.'
-                             ' default: https://api.uploadcare.com/')
-    parser.add_argument('--upload_base',
-                        help='Upload API url, can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.'
-                             ' default: https://upload.uploadcare.com/')
-    parser.add_argument('--verify_upload_ssl',
-                        action='store_true',
-                        help='Verify ssl certificate of upload API url.'
-                             ' Can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.')
-    parser.add_argument('--verify_api_ssl',
-                        action='store_true',
-                        help='Verify ssl certificate of API url.'
-                             ' Can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.')
-    parser.add_argument('--api_version',
-                        help='API version, can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.'
-                             ' default: 0.2')
+    parser.add_argument(
+        '--pub_key',
+        help='API key, if not set is read from uploadcare.ini'
+             ' and ~/.uploadcare config files')
+    parser.add_argument(
+        '--secret',
+        help='API secret, if not set is read from uploadcare.ini'
+             ' and ~/.uploadcare config files')
+    parser.add_argument(
+        '--api_base',
+        help='API url, can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.'
+             ' Default value is {0}'.format(conf.api_base))
+    parser.add_argument(
+        '--upload_base',
+        help='Upload API url, can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.'
+             ' Default value is {0}'.format(conf.upload_base))
+    parser.add_argument(
+        '--no_check_upload_certificate',
+        action='store_true',
+        help="Don't check the uploading API server certificate."
+             ' Can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.')
+    parser.add_argument(
+        '--no_check_api_certificate',
+        action='store_true',
+        help="Don't check the REST API server certificate."
+             ' Can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.')
+    parser.add_argument(
+        '--api_version',
+        help='API version, can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.'
+             ' Default value is {0}'.format(conf.api_version))
 
     return parser
 
@@ -238,29 +247,41 @@ def load_config_from_file(filename):
     config = ConfigParser.RawConfigParser()
     config.read(filename)
 
-    for name in available_settings:
+    for name in str_settings:
         try:
             setattr(conf, name, config.get('ucare', name))
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            pass
+    for name in bool_settings:
+        try:
+            setattr(conf, name, config.getboolean('ucare', name))
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
             pass
 
 
 def load_config_from_args(args):
-    for name in available_settings:
+    for name in str_settings:
         arg = getattr(args, name, None)
         if arg is not None:
             setattr(conf, name, arg)
+
+    if args.no_check_upload_certificate:
+        conf.verify_upload_ssl = False
+    if args.no_check_api_certificate:
+        conf.verify_api_ssl = False
+
     if getattr(args, 'cdnurl', False):
         args.store = True
 
 
-def main(args):
-    load_config_from_file('~/.uploadcare')
-    load_config_from_file('uploadcare.ini')
-    load_config_from_args(args)
+def main(arg_namespace=None, config_file_names=None):
+    if config_file_names:
+        for file_name in config_file_names:
+            load_config_from_file(file_name)
+    load_config_from_args(arg_namespace)
 
     try:
-        args.func(args)
+        arg_namespace.func(arg_namespace)
     except UploadcareException as exc:
         print 'ERROR: {0}'.format(exc)
 
@@ -272,5 +293,5 @@ if __name__ == '__main__':
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    args = ucare_argparser().parse_args()
-    main(args)
+    main(arg_namespace=ucare_argparser().parse_args(),
+         config_file_names=('~/.uploadcare', 'uploadcare.ini'))
