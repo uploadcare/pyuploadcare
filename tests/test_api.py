@@ -9,7 +9,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch
 
 from pyuploadcare import conf
-from pyuploadcare.api import RESTClient, _build_api_path, _build_api_uri
+from pyuploadcare.api import rest_request, _build_api_path, _build_api_uri
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from tests.utils import MockResponse
 
@@ -24,11 +24,11 @@ class RESTClientTest(unittest.TestCase):
     def test_raises(self, request):
         request.return_value = MockResponse(404, '{}')
         with self.assertRaises(InvalidRequestError):
-            RESTClient.make_request('GET', '/files/')
+            rest_request('GET', '/files/')
 
         request.return_value = MockResponse(200, 'meh')
         with self.assertRaises(APIError) as cm:
-            RESTClient.make_request('GET', '/files/')
+            rest_request('GET', '/files/')
 
         self.assertEqual('API error: No JSON object could be decoded',
                          cm.exception.message)
@@ -37,7 +37,7 @@ class RESTClientTest(unittest.TestCase):
     def test_request_headers(self, request):
         request.return_value = MockResponse(200, '[]')
 
-        RESTClient.make_request('GET', '/files/')
+        rest_request('GET', '/files/')
         headers = request.call_args[1]['headers']
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
@@ -46,7 +46,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.19')
 
         conf.api_version = '0.1'
-        RESTClient.make_request('GET', '/files/')
+        rest_request('GET', '/files/')
         headers = request.call_args[1]['headers']
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)

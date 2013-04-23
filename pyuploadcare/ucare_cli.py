@@ -12,7 +12,7 @@ import os.path
 from . import conf, __version__
 from .api_resources import File
 from .exceptions import UploadcareException, TimeoutError, UploadError
-from .api import RESTClient
+from .api import rest_request
 
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -39,7 +39,7 @@ def list_files(arg_namespace=None):
     q = urllib.urlencode(query)
     url = urlparse.urlunsplit(['', '', '/files/', q, ''])
 
-    pp.pprint(RESTClient.make_request('GET', url))
+    pp.pprint(rest_request('GET', url))
 
 
 def get_file(arg_namespace):

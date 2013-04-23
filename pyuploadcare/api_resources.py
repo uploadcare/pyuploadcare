@@ -1,15 +1,10 @@
 # coding: utf-8
 import re
-import time
 import logging
 
-import requests
-
 from . import conf
-from .api import RESTClient, UploadingClient
-from .exceptions import (
-    TimeoutError, InvalidRequestError, APIError,
-)
+from .api import rest_request, uploading_request
+from .exceptions import InvalidRequestError, APIError
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -69,7 +64,7 @@ class File(object):
         return self._info_cache
 
     def update_info(self):
-        self._info_cache = RESTClient.make_request('GET', self._api_uri)
+        self._info_cache = rest_request('GET', self._api_uri)
         return self._info_cache
 
     def is_stored(self):
@@ -84,10 +79,10 @@ class File(object):
         return self.info().get('original_filename')
 
     def store(self):
-        self._info_cache = RESTClient.make_request('PUT', self._api_storage_uri)
+        self._info_cache = rest_request('PUT', self._api_storage_uri)
 
     def delete(self):
-        self._info_cache = RESTClient.make_request('DELETE', self._api_uri)
+        self._info_cache = rest_request('DELETE', self._api_uri)
 
     @classmethod
     def construct_from(cls, file_info):
@@ -99,8 +94,7 @@ class File(object):
     @classmethod
     def upload(cls, file_obj):
         """Uploads a file and returns ``File`` instance."""
-        files = UploadingClient.make_request('POST', '/base/',
-                                             files={'file': file_obj})
+        files = uploading_request('POST', '/base/', files={'file': file_obj})
         file_ = cls(files['file'])
         return file_
 
@@ -108,8 +102,8 @@ class File(object):
     def upload_from_url(cls, url):
         """Uploads file from given url and returns ``FileFromUrl`` instance.
         """
-        result = UploadingClient.make_request('POST', '/from_url/',
-                                              data={'source_url': url})
+        result = uploading_request('POST', '/from_url/',
+                                   data={'source_url': url})
         if 'token' not in result:
             raise APIError(
                 'could not find token in result: {0}'.format(result)
@@ -133,8 +127,8 @@ class File(object):
             return self._info_cache
 
         def update_info(self):
-            result = UploadingClient.make_request('POST', '/from_url/status/',
-                                                  data={'token': self.token})
+            result = uploading_request('POST', '/from_url/status/',
+                                       data={'token': self.token})
             if 'status' not in result:
                 raise APIError(
                     'could not find status in result: {0}'.format(result)
@@ -275,7 +269,7 @@ class FileGroup(object):
 
     def update_info(self):
         """Updates group information by requesting Uploadcare API."""
-        self._info_cache = RESTClient.make_request('GET', self._api_uri)
+        self._info_cache = rest_request('GET', self._api_uri)
         return self._info_cache
 
     def is_stored(self):
@@ -295,4 +289,4 @@ class FileGroup(object):
         if self.is_stored():
             return
 
-        self._info_cache = RESTClient.make_request('PUT', self._api_storage_uri)
+        self._info_cache = rest_request('PUT', self._api_storage_uri)
