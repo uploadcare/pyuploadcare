@@ -17,8 +17,8 @@ setup(
     version='0.19',
     description='Python library for Uploadcare.com',
     long_description=open('README.rst').read(),
-    author='Valentin Golev',
-    author_email='v.golev@gmail.com',
+    author='Uploadcare Ltd',
+    author_email='hello@uploadcare.com',
     url='https://github.com/uploadcare/pyuploadcare',
     packages=['pyuploadcare', 'pyuploadcare.dj'],
     package_data={
