@@ -14,7 +14,7 @@ from pyuploadcare.exceptions import APIError, InvalidRequestError
 from tests.utils import MockResponse
 
 
-class UploadCareTest(unittest.TestCase):
+class RESTClientTest(unittest.TestCase):
 
     def tearDown(self):
         conf.api_version = '0.2'
