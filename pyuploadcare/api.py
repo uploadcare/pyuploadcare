@@ -2,7 +2,8 @@
 """
 Uploadcare REST client.
 
-It is JSON REST request abstraction layer that is used by the ``api_resources``.
+It is JSON REST request abstraction layer that is used by the
+``pyuploadcare.api_resources``.
 
 """
 

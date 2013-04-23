@@ -35,7 +35,8 @@ class InvalidRequestError(UploadcareException, ValueError):
 class UploadError(UploadcareException):
     """Upload errors.
 
-    It raises when user wants to wait the result of
-    ``File.upload_from_url(url, wait=True, timeout=30)``.
+    It raises when user wants to wait the result of::
+
+        $ ucare upload_from_url --wait http://path.to/file.jpg
 
     """

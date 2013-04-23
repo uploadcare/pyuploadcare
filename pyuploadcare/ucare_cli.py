@@ -30,10 +30,10 @@ bool_settings = (
 )
 
 
-def list_files(args=None):
+def list_files(arg_namespace=None):
     query = {}
     for name in ['page', 'limit', 'kept', 'removed']:
-        arg = getattr(args, name)
+        arg = getattr(arg_namespace, name)
         if arg is not None:
             query[name] = arg
     q = urllib.urlencode(query)
@@ -42,45 +42,45 @@ def list_files(args=None):
     pp.pprint(RESTClient.make_request('GET', url))
 
 
-def get_file(args):
-    pp.pprint(File(args.path).info())
+def get_file(arg_namespace):
+    pp.pprint(File(arg_namespace.path).info())
 
 
-def store_file(args):
-    File(args.path).store(wait=args.wait)
+def store_file(arg_namespace):
+    File(arg_namespace.path).store(wait=arg_namespace.wait)
 
 
-def delete_file(args):
-    File(args.path).delete(wait=args.wait)
+def delete_file(arg_namespace):
+    File(arg_namespace.path).delete(wait=arg_namespace.wait)
 
 
-def _check_upload_args(args):
-    if not conf.secret and (args.store or args.info):
+def _check_upload_args(arg_namespace):
+    if not conf.secret and (arg_namespace.store or arg_namespace.info):
         print 'Cannot store or get info without "--secret" key'
         return False
     return True
 
 
-def _handle_uploaded_file(file_, args):
-    if args.store:
+def _handle_uploaded_file(file_, arg_namespace):
+    if arg_namespace.store:
         file_.store(wait=True)
         print 'File stored successfully.'
 
-    if args.info:
+    if arg_namespace.info:
         pp.pprint(file_.info())
 
-    if args.cdnurl:
+    if arg_namespace.cdnurl:
         print 'CDN url: {0}'.format(file_.cdn_url)
 
 
-def upload_from_url(args):
-    if not _check_upload_args(args):
+def upload_from_url(arg_namespace):
+    if not _check_upload_args(arg_namespace):
         return
-    file_from_url = File.upload_from_url(args.url)
+    file_from_url = File.upload_from_url(arg_namespace.url)
     print file_from_url
 
-    if args.wait or args.store:
-        timeout = args.timeout
+    if arg_namespace.wait or arg_namespace.store:
+        timeout = arg_namespace.timeout
         time_started = time.time()
         while time.time() - time_started < timeout:
             status = file_from_url.update_info()['status']
@@ -94,21 +94,21 @@ def upload_from_url(args):
         else:
             raise TimeoutError('timed out during upload')
 
-    if args.store or args.info:
+    if arg_namespace.store or arg_namespace.info:
         file_ = file_from_url.get_file()
         if file_ is None:
             print 'Cannot store or get info.'
             return
 
-        _handle_uploaded_file(file_, args)
+        _handle_uploaded_file(file_, arg_namespace)
 
 
-def upload(args):
-    if not _check_upload_args(args):
+def upload(arg_namespace):
+    if not _check_upload_args(arg_namespace):
         return
-    with open(args.filename, 'rb') as fh:
+    with open(arg_namespace.filename, 'rb') as fh:
         file_ = File.upload(fh)
-        _handle_uploaded_file(file_, args)
+        _handle_uploaded_file(file_, arg_namespace)
 
 
 def ucare_argparser():
@@ -287,19 +287,19 @@ def load_config_from_file(filename):
             pass
 
 
-def load_config_from_args(args):
+def load_config_from_args(arg_namespace):
     for name in str_settings:
-        arg = getattr(args, name, None)
+        arg = getattr(arg_namespace, name, None)
         if arg is not None:
             setattr(conf, name, arg)
 
-    if args.no_check_upload_certificate:
+    if arg_namespace.no_check_upload_certificate:
         conf.verify_upload_ssl = False
-    if args.no_check_api_certificate:
+    if arg_namespace.no_check_api_certificate:
         conf.verify_api_ssl = False
 
-    if getattr(args, 'cdnurl', False):
-        args.store = True
+    if getattr(arg_namespace, 'cdnurl', False):
+        arg_namespace.store = True
 
 
 def main(arg_namespace=None, config_file_names=None):

@@ -9,15 +9,25 @@ Django Widget API
 Model Fields
 ------------
 
-.. automodule:: pyuploadcare.dj.models
-   :members:
-   :undoc-members:
+.. autoclass:: pyuploadcare.dj.models.FileField(*args, **kwargs)
+
+.. autoclass:: pyuploadcare.dj.models.ImageField(manual_crop=None, *args, **kwargs)
+
+.. autoclass:: pyuploadcare.dj.models.FileGroupField(*args, **kwargs)
+
+.. autoclass:: pyuploadcare.dj.models.ImageGroupField(*args, **kwargs)
 
 .. _django-widget-api-forms-ref:
 
 Form Fields
 -----------
 
-.. automodule:: pyuploadcare.dj.forms
-   :members:
-   :undoc-members:
+.. autoclass:: pyuploadcare.dj.forms.FileWidget(attrs=None)
+
+.. autoclass:: pyuploadcare.dj.forms.FileField(*args, **kwargs)
+
+.. autoclass:: pyuploadcare.dj.forms.ImageField(manual_crop=None, *args, **kwargs)
+
+.. autoclass:: pyuploadcare.dj.forms.FileGroupField(*args, **kwargs)
+
+.. autoclass:: pyuploadcare.dj.forms.ImageGroupField(*args, **kwargs)

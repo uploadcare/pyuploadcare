@@ -6,6 +6,12 @@ from . import conf as dj_conf
 
 
 class FileWidget(TextInput):
+    """Django form widget that sets up Uploadcare Widget.
+
+    It adds js and hidden input with basic Widget's params, e.g.
+    *data-public-key*.
+
+    """
 
     input_type = 'hidden'
 
@@ -31,11 +37,15 @@ class FileWidget(TextInput):
 
 
 class FileField(Field):
+    """Django form field that uses ``FileWidget`` with default arguments.
+    """
 
     widget = FileWidget
 
 
 class ImageField(Field):
+    """Django form field that sets up ``FileWidget`` to work with images.
+    """
 
     widget = FileWidget
 
@@ -51,6 +61,8 @@ class ImageField(Field):
 
 
 class FileGroupField(Field):
+    """Django form field that sets up ``FileWidget`` in multiupload mode.
+    """
 
     widget = FileWidget
 
@@ -60,6 +72,8 @@ class FileGroupField(Field):
 
 
 class ImageGroupField(Field):
+    """Django form field that sets up ``FileWidget`` in image multiupload mode.
+    """
 
     widget = FileWidget
 
