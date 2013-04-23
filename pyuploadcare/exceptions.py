@@ -12,10 +12,9 @@ class APIConnectionError(UploadcareException):
 class TimeoutError(UploadcareException):
     """Timed out errors.
 
-    It raises when user wants to wait the result of api requests, e.g.:
+    It raises when user wants to wait the result of api requests, e.g.::
 
-        >>> file_ = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-        >>> file_.store(wait=True)
+        $ ucare store --wait 6c5e9526-b0fe-4739-8975-72e8d5ee6342
 
     """
 

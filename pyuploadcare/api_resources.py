@@ -70,6 +70,7 @@ class File(object):
 
     def update_info(self):
         self._info_cache = RESTClient.make_request('GET', self._api_uri)
+        return self._info_cache
 
     def is_stored(self):
         return (self.info().get('datetime_stored') is not None or
@@ -82,43 +83,11 @@ class File(object):
     def filename(self):
         return self.info().get('original_filename')
 
-    def store(self, wait=False, timeout=5):
-        RESTClient.make_request('PUT', self._api_storage_uri)
+    def store(self):
+        self._info_cache = RESTClient.make_request('PUT', self._api_storage_uri)
 
-        if wait:
-            time_started = time.time()
-            while not self.is_stored():
-                if time.time() - time_started > timeout:
-                    raise TimeoutError('timed out trying to store')
-                self.update_info()
-                time.sleep(0.1)
-            self.ensure_on_cdn()
-        self.update_info()
-
-    def delete(self, wait=False, timeout=5):
-        RESTClient.make_request('DELETE', self._api_uri)
-
-        if wait:
-            time_started = time.time()
-            while not self.is_removed():
-                if time.time() - time_started > timeout:
-                    raise TimeoutError('timed out trying to delete')
-                self.update_info()
-                time.sleep(0.1)
-        self.update_info()
-
-    def ensure_on_cdn(self, timeout=5):
-        if not self.is_stored():
-            raise InvalidRequestError('file is private')
-        time_started = time.time()
-        while True:
-            if time.time() - time_started > timeout:
-                raise TimeoutError('timed out waiting for file appear on cdn')
-            resp = requests.head(self.cdn_url)
-            if resp.status_code == 200:
-                return
-            logger.debug(resp)
-            time.sleep(0.1)
+    def delete(self):
+        self._info_cache = RESTClient.make_request('DELETE', self._api_uri)
 
     @classmethod
     def construct_from(cls, file_info):
@@ -307,6 +276,7 @@ class FileGroup(object):
     def update_info(self):
         """Updates group information by requesting Uploadcare API."""
         self._info_cache = RESTClient.make_request('GET', self._api_uri)
+        return self._info_cache
 
     def is_stored(self):
         """Returns ``True`` if group is stored.

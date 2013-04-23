@@ -47,11 +47,31 @@ def get_file(arg_namespace):
 
 
 def store_file(arg_namespace):
-    File(arg_namespace.path).store(wait=arg_namespace.wait)
+    file_ = File(arg_namespace.path)
+    file_.store()
+
+    if arg_namespace.wait:
+        timeout = arg_namespace.timeout
+        time_started = time.time()
+        while not file_.is_stored():
+            if time.time() - time_started > timeout:
+                raise TimeoutError('timed out trying to store')
+            file_.update_info()
+            time.sleep(0.1)
 
 
 def delete_file(arg_namespace):
-    File(arg_namespace.path).delete(wait=arg_namespace.wait)
+    file_ = File(arg_namespace.path)
+    file_.delete()
+
+    if arg_namespace.wait:
+        timeout = arg_namespace.timeout
+        time_started = time.time()
+        while not file_.is_removed():
+            if time.time() - time_started > timeout:
+                raise TimeoutError('timed out trying to delete')
+            file_.update_info()
+            time.sleep(0.1)
 
 
 def _check_upload_args(arg_namespace):
@@ -63,7 +83,7 @@ def _check_upload_args(arg_namespace):
 
 def _handle_uploaded_file(file_, arg_namespace):
     if arg_namespace.store:
-        file_.store(wait=True)
+        file_.store()
         print 'File stored successfully.'
 
     if arg_namespace.info:
@@ -135,19 +155,26 @@ def ucare_argparser():
 
     # common store and delete args
     waiting_parent = argparse.ArgumentParser(add_help=False)
+    waiting_parent.add_argument(
+        '--timeout',
+        type=int,
+        dest='timeout',
+        default=5,
+        help='Set wait seconds until operation completed.'
+             ' Default value is 5 seconds')
     group = waiting_parent.add_mutually_exclusive_group()
     group.add_argument(
         '--wait',
         action='store_true',
         default=True,
         dest='wait',
-        help='Wait for operation to complete'
+        help='Wait for operation to be completed'
     )
     group.add_argument(
         '--nowait',
         action='store_false',
         dest='wait',
-        help='Do not wait for operation to complete'
+        help='Do not wait for operation to be completed'
     )
 
     # store

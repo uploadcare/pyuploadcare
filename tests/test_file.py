@@ -8,78 +8,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
 
-from pyuploadcare import conf
-from pyuploadcare.exceptions import TimeoutError
 from pyuploadcare.api_resources import File, FileGroup
 from tests.utils import MockResponse, api_response_from_file
-
-
-class FileTest(unittest.TestCase):
-
-    def setUp(self):
-        conf.pub_key = 'pub'
-        conf.secret = 'secret'
-
-    @patch('requests.head', autospec=True)
-    @patch('requests.request', autospec=True)
-    def test_store_timeout(self, request, head):
-        api_response = MockResponse(200, '{"on_s3": false, "last_keep_claim": null}')
-        request.return_value = api_response
-        cdn_response = MockResponse(200)
-        head.return_value = cdn_response
-
-        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-        with self.assertRaises(TimeoutError) as cm:
-            f.store(wait=True, timeout=0.2)
-        self.assertEqual('timed out trying to store',
-                         cm.exception.message)
-
-        response = MockResponse(200, '{"on_s3": true, "last_keep_claim": "now"}')
-        request.return_value = response
-        f.store(wait=True, timeout=1)
-
-    @patch('requests.request', autospec=True)
-    def test_delete_timeout(self, request):
-        response = MockResponse(200, '{"removed": null}')
-        request.return_value = response
-
-        f = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-        with self.assertRaises(TimeoutError) as cm:
-            f.delete(wait=True, timeout=0.2)
-        self.assertEqual('timed out trying to delete',
-                         cm.exception.message)
-
-        response = MockResponse(200, '{"removed": "now"}')
-        request.return_value = response
-        f.delete(wait=True, timeout=1)
-
-    @patch('requests.head', autospec=True)
-    @patch('requests.request', autospec=True)
-    def test_cdn_urls(self, request, head):
-        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
-        f = File(uuid)
-        api_response = MockResponse(200, '{"on_s3": true, "last_keep_claim": true}')
-        request.return_value = api_response
-        cdn_response = MockResponse(200)
-        head.return_value = cdn_response
-        f.store(wait=True, timeout=1)
-
-        self.assertEqual(f.cdn_url, 'https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
-
-    @patch('requests.head', autospec=True)
-    @patch('requests.request', autospec=True)
-    def test_ensure_on_cdn_raises(self, request, head):
-        uuid = '6c5e9526-b0fe-4739-8975-72e8d5ee6342'
-        f = File(uuid)
-        api_response = MockResponse(
-            status=200, data='{"on_s3": true, "last_keep_claim": true}'
-        )
-        request.return_value = api_response
-        cdn_response = MockResponse(404)
-        head.return_value = cdn_response
-        with self.assertRaises(TimeoutError) as cm:
-            f.store(wait=True, timeout=0.1)
-        self.assertEqual('timed out waiting for file appear on cdn', cm.exception.message)
 
 
 class FileGroupAsContainerTypeTest(unittest.TestCase):
