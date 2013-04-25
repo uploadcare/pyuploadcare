@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # encoding: utf-8
-
+import time
 import argparse
 import urlparse
 import urllib
@@ -9,107 +9,126 @@ import pprint
 import ConfigParser
 import os.path
 
-from pyuploadcare import UploadCare, UploadCareException, __version__
+from . import conf, __version__
+from .api_resources import File
+from .exceptions import UploadcareException, TimeoutError, UploadError
+from .api import rest_request
 
 
 pp = pprint.PrettyPrinter(indent=2)
 logger = logging.getLogger('pyuploadcare')
-settings = {
-    'pub_key': None,
-    'secret': None,
-    'api_url': 'https://api.uploadcare.com/',
-    'upload_url': 'https://upload.uploadcare.com/',
-    'verify_api_ssl': True,
-    'verify_upload_ssl': True,
-    'api_version': '0.2',
-    'custom_headers': None,
-}
+str_settings = (
+    'pub_key',
+    'secret',
+    'api_version',
+    'api_base',
+    'upload_base',
+)
+bool_settings = (
+    'verify_api_ssl',
+    'verify_upload_ssl',
+)
 
 
-def create_ucare():
-    return UploadCare(
-        pub_key=settings['pub_key'],
-        secret=settings['secret'],
-        api_base=settings['api_url'],
-        upload_base=settings['upload_url'],
-        verify_api_ssl=settings['verify_api_ssl'],
-        verify_upload_ssl=settings['verify_upload_ssl'],
-        api_version=settings['api_version'],
-        custom_headers=settings['custom_headers'],
-    )
-
-
-def list_files(args=None):
-    ucare = create_ucare()
+def list_files(arg_namespace=None):
     query = {}
     for name in ['page', 'limit', 'kept', 'removed']:
-        arg = getattr(args, name)
+        arg = getattr(arg_namespace, name)
         if arg is not None:
             query[name] = arg
     q = urllib.urlencode(query)
-    url = urlparse.urlunsplit(['', '', '/files/', q, ''])
+    url = urlparse.urlunsplit(['', '', 'files/', q, ''])
 
-    pp.pprint(ucare.make_request('GET', url))
-
-
-def uc_file(url):
-    ucare = create_ucare()
-    return ucare.file(url)
+    pp.pprint(rest_request('GET', url))
 
 
-def get_file(args):
-    pp.pprint(uc_file(args.path).info)
+def get_file(arg_namespace):
+    pp.pprint(File(arg_namespace.path).info())
 
 
-def store_file(args):
-    uc_file(args.path).store(wait=args.wait)
+def store_file(arg_namespace):
+    file_ = File(arg_namespace.path)
+    file_.store()
+
+    if arg_namespace.wait:
+        timeout = arg_namespace.timeout
+        time_started = time.time()
+        while not file_.is_stored():
+            if time.time() - time_started > timeout:
+                raise TimeoutError('timed out trying to store')
+            file_.update_info()
+            time.sleep(0.1)
 
 
-def delete_file(args):
-    uc_file(args.path).delete(wait=args.wait)
+def delete_file(arg_namespace):
+    file_ = File(arg_namespace.path)
+    file_.delete()
+
+    if arg_namespace.wait:
+        timeout = arg_namespace.timeout
+        time_started = time.time()
+        while not file_.is_removed():
+            if time.time() - time_started > timeout:
+                raise TimeoutError('timed out trying to delete')
+            file_.update_info()
+            time.sleep(0.1)
 
 
-def _check_upload_args(args):
-    if not args.secret and (args.store or args.info):
+def _check_upload_args(arg_namespace):
+    if not conf.secret and (arg_namespace.store or arg_namespace.info):
         print 'Cannot store or get info without "--secret" key'
         return False
     return True
 
 
-def _handle_uploaded_file(uf, args):
-    if args.store:
-        uf.store(wait=True)
+def _handle_uploaded_file(file_, arg_namespace):
+    if arg_namespace.store:
+        file_.store()
         print 'File stored successfully.'
 
-    if args.info:
-        pp.pprint(uf.info)
+    if arg_namespace.info:
+        pp.pprint(file_.info())
 
-    if args.cdnurl:
-        print 'CDN url: {0}'.format(uf.cdn_url)
+    if arg_namespace.cdnurl:
+        print 'CDN url: {0}'.format(file_.cdn_url)
 
 
-def upload_from_url(args):
-    if not _check_upload_args(args):
+def upload_from_url(arg_namespace):
+    if not _check_upload_args(arg_namespace):
         return
-    ucare = create_ucare()
-    ufile = ucare.file_from_url(args.url, wait=(args.wait or args.store))
-    print 'token: {0.token}\nstatus: {0.status}'.format(ufile)
+    file_from_url = File.upload_from_url(arg_namespace.url)
+    print file_from_url
 
-    if args.store or args.info:
-        _file = ufile.get_file()
-        if _file is None:
+    if arg_namespace.wait or arg_namespace.store:
+        timeout = arg_namespace.timeout
+        time_started = time.time()
+        while time.time() - time_started < timeout:
+            status = file_from_url.update_info()['status']
+            if status == 'success':
+                break
+            if status in ('failed', 'error'):
+                raise UploadError(
+                    'could not upload file from url: {0}'.format(file_from_url.info())
+                )
+            time.sleep(1)
+        else:
+            raise TimeoutError('timed out during upload')
+
+    if arg_namespace.store or arg_namespace.info:
+        file_ = file_from_url.get_file()
+        if file_ is None:
             print 'Cannot store or get info.'
             return
 
-        _handle_uploaded_file(_file, args)
+        _handle_uploaded_file(file_, arg_namespace)
 
 
-def upload(args):
-    if not _check_upload_args(args):
+def upload(arg_namespace):
+    if not _check_upload_args(arg_namespace):
         return
-    ucare = create_ucare()
-    _file = ucare.upload(args.filename)
-    _handle_uploaded_file(_file, args)
+    with open(arg_namespace.filename, 'rb') as fh:
+        file_ = File.upload(fh)
+        _handle_uploaded_file(file_, arg_namespace)
 
 
 def ucare_argparser():
@@ -136,19 +155,26 @@ def ucare_argparser():
 
     # common store and delete args
     waiting_parent = argparse.ArgumentParser(add_help=False)
+    waiting_parent.add_argument(
+        '--timeout',
+        type=int,
+        dest='timeout',
+        default=5,
+        help='Set wait seconds until operation completed.'
+             ' Default value is 5 seconds')
     group = waiting_parent.add_mutually_exclusive_group()
     group.add_argument(
         '--wait',
         action='store_true',
         default=True,
         dest='wait',
-        help='Wait for operation to complete'
+        help='Wait for operation to be completed'
     )
     group.add_argument(
         '--nowait',
         action='store_false',
         dest='wait',
-        help='Do not wait for operation to complete'
+        help='Do not wait for operation to be completed'
     )
 
     # store
@@ -168,28 +194,33 @@ def ucare_argparser():
     # common upload args
     upload_parent = argparse.ArgumentParser(add_help=False)
     group = upload_parent.add_mutually_exclusive_group()
-    group.add_argument('--store',
-                       action='store_true',
-                       default=False,
-                       dest='store',
-                       help='Store uploaded file')
-    group.add_argument('--nostore',
-                       action='store_false',
-                       dest='store',
-                       help='Do not store uploaded file')
+    group.add_argument(
+        '--store',
+        action='store_true',
+        default=False,
+        dest='store',
+        help='Store uploaded file')
+    group.add_argument(
+        '--nostore',
+        action='store_false',
+        dest='store',
+        help='Do not store uploaded file')
     group = upload_parent.add_mutually_exclusive_group()
-    group.add_argument('--info',
-                       action='store_true',
-                       default=False,
-                       dest='info',
-                       help='Get uploaded file info')
-    group.add_argument('--noinfo',
-                       action='store_false',
-                       dest='info',
-                       help='Do not get uploaded file info')
-    upload_parent.add_argument('--cdnurl',
-                               action='store_true',
-                               help='Store file and get CDN url.')
+    group.add_argument(
+        '--info',
+        action='store_true',
+        default=False,
+        dest='info',
+        help='Get uploaded file info')
+    group.add_argument(
+        '--noinfo',
+        action='store_false',
+        dest='info',
+        help='Do not get uploaded file info')
+    upload_parent.add_argument(
+        '--cdnurl',
+        action='store_true',
+        help='Store file and get CDN url.')
 
     # upload from url
     subparser = subparsers.add_parser('upload_from_url',
@@ -197,58 +228,68 @@ def ucare_argparser():
                                       help='upload file from url')
     subparser.set_defaults(func=upload_from_url)
     subparser.add_argument('url', help='file url')
+    subparser.add_argument(
+        '--timeout',
+        type=int,
+        dest='timeout',
+        default=30,
+        help='Set wait seconds file uploading from url.'
+             ' Default value is 30 seconds')
     group = subparser.add_mutually_exclusive_group()
-    group.add_argument('--wait',
-                       action='store_true',
-                       default=True,
-                       dest='wait',
-                       help='Wait for upload status')
-    group.add_argument('--nowait',
-                       action='store_false',
-                       dest='wait',
-                       help='Do not wait for upload status')
+    group.add_argument(
+        '--wait',
+        action='store_true',
+        default=True,
+        dest='wait',
+        help='Wait for upload status')
+    group.add_argument(
+        '--nowait',
+        action='store_false',
+        dest='wait',
+        help='Do not wait for upload status')
 
     # upload
-    subparser = subparsers.add_parser('upload',
-                                      parents=[upload_parent],
+    subparser = subparsers.add_parser('upload', parents=[upload_parent],
                                       help='upload file')
     subparser.set_defaults(func=upload)
     subparser.add_argument('filename', help='filename')
 
     # common arguments
-    parser.add_argument('--pub_key',
-                        help='API key, if not set is read from uploadcare.ini'
-                             ' and ~/.uploadcare config files')
-    parser.add_argument('--secret',
-                        help='API secret, if not set is read from uploadcare.ini'
-                             ' and ~/.uploadcare config files')
-    parser.add_argument('--api_url',
-                        help='API url, can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.'
-                             ' default: https://api.uploadcare.com/')
-    parser.add_argument('--upload_url',
-                        help='Upload API url, can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.'
-                             ' default: https://upload.uploadcare.com/')
-    parser.add_argument('--verify_upload_ssl',
-                        action='store_true',
-                        help='Verify ssl certificate of upload API url.'
-                             ' Can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.')
-    parser.add_argument('--verify_api_ssl',
-                        action='store_true',
-                        help='Verify ssl certificate of API url.'
-                             ' Can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.')
-    parser.add_argument('--api_version',
-                        help='API version, can be read from uploadcare.ini'
-                             ' and ~/.uploadcare config files.'
-                             ' default: 0.2')
-    parser.add_argument('-H', '--header',
-                        help='Add custom HTTP headers, can be set several times.'
-                             ' header_name:value.'
-                             ' i.e. "ucare -H User-Agent:ie5 list"',
-                        action='append')
+    parser.add_argument(
+        '--pub_key',
+        help='API key, if not set is read from uploadcare.ini'
+             ' and ~/.uploadcare config files')
+    parser.add_argument(
+        '--secret',
+        help='API secret, if not set is read from uploadcare.ini'
+             ' and ~/.uploadcare config files')
+    parser.add_argument(
+        '--api_base',
+        help='API url, can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.'
+             ' Default value is {0}'.format(conf.api_base))
+    parser.add_argument(
+        '--upload_base',
+        help='Upload API url, can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.'
+             ' Default value is {0}'.format(conf.upload_base))
+    parser.add_argument(
+        '--no_check_upload_certificate',
+        action='store_true',
+        help="Don't check the uploading API server certificate."
+             ' Can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.')
+    parser.add_argument(
+        '--no_check_api_certificate',
+        action='store_true',
+        help="Don't check the REST API server certificate."
+             ' Can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.')
+    parser.add_argument(
+        '--api_version',
+        help='API version, can be read from uploadcare.ini'
+             ' and ~/.uploadcare config files.'
+             ' Default value is {0}'.format(conf.api_version))
 
     return parser
 
@@ -261,39 +302,43 @@ def load_config_from_file(filename):
     config = ConfigParser.RawConfigParser()
     config.read(filename)
 
-    for name in settings.keys():
+    for name in str_settings:
         try:
-            settings[name] = config.get('ucare', name)
+            setattr(conf, name, config.get('ucare', name))
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            pass
+    for name in bool_settings:
+        try:
+            setattr(conf, name, config.getboolean('ucare', name))
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
             pass
 
 
-def load_config_from_args(args):
-    for name in settings.keys():
-        arg = getattr(args, name, None)
+def load_config_from_args(arg_namespace):
+    for name in str_settings:
+        arg = getattr(arg_namespace, name, None)
         if arg is not None:
-            settings[name] = arg
-    custom_headers = {}
-    if getattr(args, 'header', None) is not None:
-        for header in args.header:
-            name, _, value = header.partition(':')
-            custom_headers[name] = value
-    if getattr(args, 'cdnurl', False):
-        args.store = True
-    settings['custom_headers'] = custom_headers
+            setattr(conf, name, arg)
+
+    if arg_namespace.no_check_upload_certificate:
+        conf.verify_upload_ssl = False
+    if arg_namespace.no_check_api_certificate:
+        conf.verify_api_ssl = False
+
+    if getattr(arg_namespace, 'cdnurl', False):
+        arg_namespace.store = True
 
 
-def main():
-    args = ucare_argparser().parse_args()
-    load_config_from_file('~/.uploadcare')
-    load_config_from_file('uploadcare.ini')
-    load_config_from_args(args)
+def main(arg_namespace=None, config_file_names=None):
+    if config_file_names:
+        for file_name in config_file_names:
+            load_config_from_file(file_name)
+    load_config_from_args(arg_namespace)
 
     try:
-        args.func(args)
-    except UploadCareException as e:
-        print 'ERROR:'
-        print e
+        arg_namespace.func(arg_namespace)
+    except UploadcareException as exc:
+        print 'ERROR: {0}'.format(exc)
 
 
 if __name__ == '__main__':
@@ -303,4 +348,5 @@ if __name__ == '__main__':
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    main()
+    main(arg_namespace=ucare_argparser().parse_args(),
+         config_file_names=('~/.uploadcare', 'uploadcare.ini'))
