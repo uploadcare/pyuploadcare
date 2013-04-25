@@ -18,6 +18,17 @@ UUID_WITH_EFFECTS_REGEX = re.compile(ur'''
 
 
 class File(object):
+    """File resource for working with user-uploaded files.
+
+    It can take file UUID or group CDN url::
+
+        >>> file_ = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+        >>> file_.cdn_url
+        https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
+        >>> print File('http://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/')
+        https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/
+
+    """
 
     def __init__(self, cdn_url_or_file_id):
         matches = UUID_WITH_EFFECTS_REGEX.search(cdn_url_or_file_id)
@@ -46,6 +57,21 @@ class File(object):
 
     @property
     def cdn_url(self):
+        """Returns file's CDN url.
+
+        Usage example::
+
+            >>> file_ = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+            >>> file_.cdn_url
+            https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
+
+        You can set default effects::
+
+            >>> file_.default_effects = 'effect/flip/-/effect/mirror/'
+            >>> file_.cdn_url
+            https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
+
+        """
         if self.default_effects:
             return '{cdn_base}{uuid}/-/{effects}'.format(
                 cdn_base=conf.cdn_base,
@@ -59,34 +85,77 @@ class File(object):
             )
 
     def info(self):
+        """Returns all available file information as ``dict``.
+
+        First time it makes API request to get file information and keeps it
+        for further using.
+
+        """
         if self._info_cache is None:
             self.update_info()
         return self._info_cache
 
     def update_info(self):
+        """Updates and returns file information by requesting Uploadcare API.
+        """
         self._info_cache = rest_request('GET', self._api_uri)
         return self._info_cache
 
     def is_stored(self):
+        """Returns ``True`` if file is stored.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
         return (self.info().get('datetime_stored') is not None or
                 self.info().get('last_keep_claim') is not None)
 
     def is_removed(self):
+        """Returns ``True`` if file is removed.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
         return (self.info().get('datetime_removed') is not None or
                 self.info().get('removed') is not None)
 
     def filename(self):
+        """Returns original file name.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
         return self.info().get('original_filename')
 
     def store(self):
+        """Stores file by requesting Uploadcare API.
+
+        Uploaded files do not immediately appear on Uploadcare CDN.
+
+        """
         self._info_cache = rest_request('PUT', self._api_storage_uri)
 
     def delete(self):
+        """Deletes file by requesting Uploadcare API."""
         self._info_cache = rest_request('DELETE', self._api_uri)
 
     @classmethod
     def construct_from(cls, file_info):
-        file_ = cls(file_info['file_id'])
+        """Constructs ``File`` instance from file information.
+
+        For example you have result of
+        ``/files/1921953c-5d94-4e47-ba36-c2e1dd165e1a/`` API request::
+
+            >>> file_info = {
+                    # ...
+                    'uuid': '1921953c-5d94-4e47-ba36-c2e1dd165e1a',
+                    # ...
+                }
+            >>> File.construct_from(file_info)
+            <uploadcare.File 1921953c-5d94-4e47-ba36-c2e1dd165e1a>
+
+        """
+        file_ = cls(file_info['uuid'])
         file_.default_effects = file_info.get('default_effects')
         file_._info_cache = file_info
         return file_
@@ -112,6 +181,41 @@ class File(object):
         return file_from_url
 
     class FileFromUrl(object):
+        """Contains the logic around an upload from url.
+
+        It expects uploading token, for instance::
+
+            >>> ffu = FileFromUrl(token='a6a2db73-2aaf-4124-b2e7-039aec022e18')
+            >>> ffu.info()
+            {
+                "status': "progress",
+                "done": 226038,
+                "total": 452076
+            }
+            >>> ffu.update_info()
+            {
+                "status": "success",
+                "file_id": "63f652fd-3f40-4b54-996c-f17dc7db5bf1",
+                "is_stored": false,
+                "done": 452076,
+                "uuid": "63f652fd-3f40-4b54-996c-f17dc7db5bf1",
+                "original_filename": "olympia.jpg",
+                "is_image": true,
+                "total": 452076,
+                "size": 452076
+            }
+            >>> ffu.get_file()
+            <uploadcare.File 63f652fd-3f40-4b54-996c-f17dc7db5bf1>
+
+        But it could be failed::
+
+            >>> ffu.update_info()
+            {
+                "status": "error",
+                "error": "some error message"
+            }
+
+        """
 
         def __init__(self, token):
             self.token = token
@@ -122,11 +226,18 @@ class File(object):
             return '<uploadcare.File.FileFromUrl {0}>'.format(self.token)
 
         def info(self):
+            """Returns actual information about uploading as ``dict``.
+
+            First time it makes API request to get information and keeps
+            it for further using.
+
+            """
             if self._info_cache is None:
                 self.update_info()
             return self._info_cache
 
         def update_info(self):
+            """Updates and returns information by requesting Uploadcare API."""
             result = uploading_request('POST', '/from_url/status/',
                                        data={'token': self.token})
             if 'status' not in result:
@@ -268,7 +379,8 @@ class FileGroup(object):
         return self._info_cache
 
     def update_info(self):
-        """Updates group information by requesting Uploadcare API."""
+        """Updates and returns group information by requesting Uploadcare API.
+        """
         self._info_cache = rest_request('GET', self._api_uri)
         return self._info_cache
 

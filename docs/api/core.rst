@@ -13,6 +13,15 @@ File API Resource
    :members:
    :undoc-members:
 
+   .. attribute:: uuid
+
+      File UUID [#uuid]_, e.g. ``a771f854-c2cb-408a-8c36-71af77811f3b``.
+
+   .. attribute:: default_effects
+
+      String of default effects that is used by ``File.cdn_url``, e.g.
+      ``effect/flip/-/effect/mirror/``.
+
 .. _core_api-filegroup-ref:
 
 File Group API Resource
@@ -43,3 +52,5 @@ Exceptions
 .. automodule:: pyuploadcare.exceptions
    :members:
    :undoc-members:
+
+.. [#] Universally unique identifier according to RFC 4122.
