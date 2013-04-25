@@ -107,8 +107,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return (self.info().get('datetime_stored') is not None or
-                self.info().get('last_keep_claim') is not None)
+        return self.info().get('datetime_stored') is not None
 
     def is_removed(self):
         """Returns ``True`` if file is removed.
@@ -116,8 +115,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return (self.info().get('datetime_removed') is not None or
-                self.info().get('removed') is not None)
+        return self.info().get('datetime_removed') is not None
 
     def filename(self):
         """Returns original file name.
