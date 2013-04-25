@@ -33,7 +33,7 @@ asynchornously.
 
         photo = ImageField(blank=True, manual_crop="")
 
-.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/preview/manual_crop.png
+.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
 
 Features
 --------

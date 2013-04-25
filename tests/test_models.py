@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from pyuploadcare.dj.models import ImageField, FileField, FileGroupField
-from pyuploadcare import File, FileGroup
+from pyuploadcare.api_resources import File, FileGroup
 
 
 class CropToolRegexTest(unittest.TestCase):

@@ -1,23 +1,31 @@
+# coding: utf-8
 from django.forms import Field, TextInput
 
-from pyuploadcare.dj import conf
-from pyuploadcare.dj import UploadCare
+from .. import conf
+from . import conf as dj_conf
 
 
 class FileWidget(TextInput):
+    """Django form widget that sets up Uploadcare Widget.
+
+    It adds js and hidden input with basic Widget's params, e.g.
+    *data-public-key*.
+
+    """
+
     input_type = 'hidden'
 
     class Media:
-        js = (conf.UPLOADCARE_JS,)
+        js = (dj_conf.UPLOADCARE_JS,)
 
     def __init__(self, attrs=None):
         default_attrs = {
             'role': 'uploadcare-uploader',
-            'data-public-key': UploadCare().pub_key,
+            'data-public-key': conf.pub_key,
         }
 
-        if conf.UPLOAD_BASE_URL is not None:
-            default_attrs['data-upload-base-url'] = conf.UPLOAD_BASE_URL
+        if dj_conf.UPLOAD_BASE_URL is not None:
+            default_attrs['data-upload-base-url'] = dj_conf.UPLOAD_BASE_URL
 
         if attrs is not None:
             default_attrs.update(attrs)
@@ -29,11 +37,15 @@ class FileWidget(TextInput):
 
 
 class FileField(Field):
+    """Django form field that uses ``FileWidget`` with default arguments.
+    """
 
     widget = FileWidget
 
 
 class ImageField(Field):
+    """Django form field that sets up ``FileWidget`` to work with images.
+    """
 
     widget = FileWidget
 
@@ -49,6 +61,8 @@ class ImageField(Field):
 
 
 class FileGroupField(Field):
+    """Django form field that sets up ``FileWidget`` in multiupload mode.
+    """
 
     widget = FileWidget
 
@@ -58,6 +72,8 @@ class FileGroupField(Field):
 
 
 class ImageGroupField(Field):
+    """Django form field that sets up ``FileWidget`` in image multiupload mode.
+    """
 
     widget = FileWidget
 

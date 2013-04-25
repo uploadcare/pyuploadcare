@@ -4,16 +4,16 @@ import re
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from pyuploadcare.dj import forms, UploadCare
-from pyuploadcare.exceptions import InvalidRequestError
-from pyuploadcare.file import File, FileGroup
+from . import forms
+from ..exceptions import InvalidRequestError
+from ..api_resources import File, FileGroup
 
 
 class FileField(models.Field):
+    """Django model field that stores uploaded file as Uploadcare CDN url.
+    """
 
     __metaclass__ = models.SubfieldBase
-
-    description = "UploadCare file id/URI with cached data"
 
     def get_internal_type(self):
         return "TextField"
@@ -31,7 +31,7 @@ class FileField(models.Field):
             )
 
         try:
-            return UploadCare().file(value)
+            return File(value)
         except InvalidRequestError as exc:
             raise ValidationError(
                 u'Invalid value for a field: {exc}'.format(exc=exc)
@@ -41,7 +41,7 @@ class FileField(models.Field):
         if value is None or value == '':
             return value
         else:
-            return value.serialize()
+            return value.cdn_url
 
     def get_db_prep_save(self, value, connection=None):
         if value:
@@ -72,6 +72,21 @@ pattern_of_crop = re.compile(u'''
 
 
 class ImageField(FileField):
+    """Django model field that stores uploaded image as Uploadcare CDN url.
+
+    It supports manual crop as well. *manual_crop* can be set to one
+    of the following values:
+
+    - ``None``, ``"disabled"`` — crop disabled;
+    - ``""`` — crop is enabled and the user will be able to select any area
+      on an image;
+    - ``"2:3"`` — user will be able to select an area with aspect ratio *2:3*;
+    - ``"200x300"`` — same as previous, but if the selected area is bigger
+      than *200x300*, it will be scaled down to these dimensions;
+    - ``"200x300 upscale"`` — same as previous, but the selected area
+      will be scaled even if it is smaller than the specified size.
+
+    """
 
     def __init__(self, manual_crop=None, *args, **kwargs):
         is_crop_valid = (
@@ -92,6 +107,11 @@ class ImageField(FileField):
 
 
 class FileGroupField(models.Field):
+    """Django model field that stores uploaded file group as Uploadcare CDN url.
+
+    It provides multiple file uploading.
+
+    """
 
     __metaclass__ = models.SubfieldBase
 
@@ -111,7 +131,7 @@ class FileGroupField(models.Field):
             )
 
         try:
-            return UploadCare().file_group(value)
+            return FileGroup(value)
         except InvalidRequestError as exc:
             raise ValidationError(
                 u'Invalid value for a field: {exc}'.format(exc=exc)
@@ -121,7 +141,7 @@ class FileGroupField(models.Field):
         if value is None or value == '':
             return value
         else:
-            return value.id
+            return value.cdn_url
 
     def get_db_prep_save(self, value, connection=None):
         if value:
@@ -139,6 +159,11 @@ class FileGroupField(models.Field):
 
 
 class ImageGroupField(FileGroupField):
+    """Django model field that stores uploaded image group as Uploadcare CDN url.
+
+    It provides multiple image uploading.
+
+    """
 
     def formfield(self, **kwargs):
         kwargs['form_class'] = forms.ImageGroupField
