@@ -29,7 +29,7 @@ logger = logging.getLogger("pyuploadcare")
 def rest_request(verb, path, data=None):
     assert not path.startswith('/'), path
     url = urlparse.urljoin(conf.api_base, path)
-    url_parts = urlparse.urlparse(url)
+    url_parts = urlparse.urlsplit(url)
     path = '{path}?{query}'.format(path=url_parts.path, query=url_parts.query)
 
     content = ''
