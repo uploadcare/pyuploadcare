@@ -21,34 +21,19 @@ from . import conf, __version__
 from .exceptions import (
     APIConnectionError, AuthenticationError, APIError, InvalidRequestError,
 )
+from .utils import urljoin
 
 
 logger = logging.getLogger("pyuploadcare")
 
 
-def _build_api_path(api_base, path):
-    uri_parts = urlparse.urlsplit(path)
-    api_parts = urlparse.urlsplit(api_base)
-    parts = filter(None, api_parts.path.split('/') + uri_parts.path.split('/'))
-    path = '/'.join([''] + parts + [''])
-    api_path = urlparse.urlunsplit(['', '', path, uri_parts.query, ''])
-    return api_path
-
-
-def _build_api_uri(api_base, path):
-    api_parts = urlparse.urlsplit(api_base)
-    base = urlparse.urlunsplit([
-        api_parts.scheme,
-        api_parts.netloc,
-        '', '', ''
-    ])
-    return base + path
-
-
 def rest_request(verb, path, data=None):
-    path = _build_api_path(conf.api_base, path)
-    content = ''
+    url = urljoin(conf.api_base, path)
+    url_parts = urlparse.urlparse(url)
+    path = '{path}?{query}'.format(path=url_parts.path, query=url_parts.query)
+    print path
 
+    content = ''
     if data is not None:
         content = json.dumps(data)
 
@@ -81,9 +66,8 @@ def rest_request(verb, path, data=None):
         headers: {2}
         data: {3}'''.format(verb, path, headers, content))
 
-    uri = _build_api_uri(conf.api_base, path)
     try:
-        response = requests.request(verb, uri, allow_redirects=True,
+        response = requests.request(verb, url, allow_redirects=True,
                                     verify=conf.verify_api_ssl,
                                     headers=headers, data=content)
     except requests.RequestException as exc:
@@ -121,8 +105,7 @@ def rest_request(verb, path, data=None):
 
 
 def uploading_request(verb, path, data=None, files=None):
-    path = _build_api_path(conf.upload_base, path)
-    uri = _build_api_uri(conf.upload_base, path)
+    url = urljoin(conf.upload_base, path)
 
     if data is None:
         data = {}
@@ -131,7 +114,7 @@ def uploading_request(verb, path, data=None, files=None):
 
     try:
         response = requests.request(
-            verb, uri, allow_redirects=True, verify=conf.verify_upload_ssl,
+            verb, url, allow_redirects=True, verify=conf.verify_upload_ssl,
             data=data, files=files
         )
     except requests.RequestException as exc:
