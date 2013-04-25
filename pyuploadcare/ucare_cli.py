@@ -37,7 +37,7 @@ def list_files(arg_namespace=None):
         if arg is not None:
             query[name] = arg
     q = urllib.urlencode(query)
-    url = urlparse.urlunsplit(['', '', '/files/', q, ''])
+    url = urlparse.urlunsplit(['', '', 'files/', q, ''])
 
     pp.pprint(rest_request('GET', url))
 

@@ -21,17 +21,16 @@ from . import conf, __version__
 from .exceptions import (
     APIConnectionError, AuthenticationError, APIError, InvalidRequestError,
 )
-from .utils import urljoin
 
 
 logger = logging.getLogger("pyuploadcare")
 
 
 def rest_request(verb, path, data=None):
-    url = urljoin(conf.api_base, path)
+    assert not path.startswith('/'), path
+    url = urlparse.urljoin(conf.api_base, path)
     url_parts = urlparse.urlparse(url)
     path = '{path}?{query}'.format(path=url_parts.path, query=url_parts.query)
-    print path
 
     content = ''
     if data is not None:
@@ -105,7 +104,8 @@ def rest_request(verb, path, data=None):
 
 
 def uploading_request(verb, path, data=None, files=None):
-    url = urljoin(conf.upload_base, path)
+    assert not path.startswith('/'), path
+    url = urlparse.urljoin(conf.upload_base, path)
 
     if data is None:
         data = {}

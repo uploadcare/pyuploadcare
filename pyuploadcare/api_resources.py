@@ -49,11 +49,11 @@ class File(object):
 
     @property
     def _api_uri(self):
-        return '/files/{0}/'.format(self.uuid)
+        return 'files/{0}/'.format(self.uuid)
 
     @property
     def _api_storage_uri(self):
-        return '/files/{0}/storage/'.format(self.uuid)
+        return 'files/{0}/storage/'.format(self.uuid)
 
     @property
     def cdn_url(self):
@@ -161,7 +161,7 @@ class File(object):
     @classmethod
     def upload(cls, file_obj):
         """Uploads a file and returns ``File`` instance."""
-        files = uploading_request('POST', '/base/', files={'file': file_obj})
+        files = uploading_request('POST', 'base/', files={'file': file_obj})
         file_ = cls(files['file'])
         return file_
 
@@ -169,7 +169,7 @@ class File(object):
     def upload_from_url(cls, url):
         """Uploads file from given url and returns ``FileFromUrl`` instance.
         """
-        result = uploading_request('POST', '/from_url/',
+        result = uploading_request('POST', 'from_url/',
                                    data={'source_url': url})
         if 'token' not in result:
             raise APIError(
@@ -236,7 +236,7 @@ class File(object):
 
         def update_info(self):
             """Updates and returns information by requesting Uploadcare API."""
-            result = uploading_request('POST', '/from_url/status/',
+            result = uploading_request('POST', 'from_url/status/',
                                        data={'token': self.token})
             if 'status' not in result:
                 raise APIError(
@@ -323,11 +323,11 @@ class FileGroup(object):
 
     @property
     def _api_uri(self):
-        return '/groups/{0}/'.format(self.id)
+        return 'groups/{0}/'.format(self.id)
 
     @property
     def _api_storage_uri(self):
-        return '/groups/{0}/storage/'.format(self.id)
+        return 'groups/{0}/storage/'.format(self.id)
 
     @property
     def cdn_url(self):
