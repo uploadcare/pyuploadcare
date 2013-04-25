@@ -27,6 +27,34 @@ logger = logging.getLogger("pyuploadcare")
 
 
 def rest_request(verb, path, data=None):
+    """Makes REST API request and returns response as ``dict``.
+
+    It provides auth headers as well and takes settings from ``conf`` module.
+
+    Make sure that given ``path`` does not contain leading slash.
+
+    Usage example::
+
+        >>> rest_request('GET', 'files/?limit=10')
+        {
+            'next': 'https://api.uploadcare.com/files/?limit=10&page=2',
+            'total': 1241,
+            'page': 1,
+            'pages': 125,
+            'per_page': 10,
+            'previous': None,
+            'results': [
+                # ...
+                {
+                    # ...
+                    'uuid': 1921953c-5d94-4e47-ba36-c2e1dd165e1a,
+                    # ...
+                },
+                # ...
+            ]
+        }
+
+    """
     assert not path.startswith('/'), path
     url = urlparse.urljoin(conf.api_base, path)
     url_parts = urlparse.urlsplit(url)
@@ -104,6 +132,22 @@ def rest_request(verb, path, data=None):
 
 
 def uploading_request(verb, path, data=None, files=None):
+    """Makes Uploading API request and returns response as ``dict``.
+
+    It takes settings from ``conf`` module.
+
+    Make sure that given ``path`` does not contain leading slash.
+
+    Usage example::
+
+        >>> file_obj = open('photo.jpg', 'rb')
+        >>> uploading_request('POST', 'base/', files={'file': file_obj})
+        {
+            'file': '9b9f4483-77b8-40ae-a198-272ba6280004'
+        }
+        >>> File('9b9f4483-77b8-40ae-a198-272ba6280004')
+
+    """
     assert not path.startswith('/'), path
     url = urlparse.urljoin(conf.upload_base, path)
 
