@@ -2,6 +2,8 @@
 import re
 import logging
 
+import dateutil.parser
+
 from . import conf
 from .api import rest_request, uploading_request
 from .exceptions import InvalidRequestError, APIError
@@ -101,22 +103,6 @@ class File(object):
         self._info_cache = rest_request('GET', self._api_uri)
         return self._info_cache
 
-    def is_stored(self):
-        """Returns ``True`` if file is stored.
-
-        It might do API request once because it depends on ``info()``.
-
-        """
-        return self.info().get('datetime_stored') is not None
-
-    def is_removed(self):
-        """Returns ``True`` if file is removed.
-
-        It might do API request once because it depends on ``info()``.
-
-        """
-        return self.info().get('datetime_removed') is not None
-
     def filename(self):
         """Returns original file name.
 
@@ -124,6 +110,33 @@ class File(object):
 
         """
         return self.info().get('original_filename')
+
+    def datetime_stored(self):
+        """Returns file's store aware *datetime* in UTC format.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        if self.info().get('datetime_stored'):
+            return dateutil.parser.parse(self.info()['datetime_stored'])
+
+    def datetime_removed(self):
+        """Returns file's remove aware *datetime* in UTC format.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        if self.info().get('datetime_removed'):
+            return dateutil.parser.parse(self.info()['datetime_removed'])
+
+    def datetime_uploaded(self):
+        """Returns file's upload aware *datetime* in UTC format.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        if self.info().get('datetime_uploaded'):
+            return dateutil.parser.parse(self.info()['datetime_uploaded'])
 
     def store(self):
         """Stores file by requesting Uploadcare API.
@@ -382,13 +395,15 @@ class FileGroup(object):
         self._info_cache = rest_request('GET', self._api_uri)
         return self._info_cache
 
-    def is_stored(self):
-        """Returns ``True`` if group is stored.
+    def datetime_stored(self):
+        """Returns file group's store aware *datetime* in UTC format."""
+        if self.info().get('datetime_stored'):
+            return dateutil.parser.parse(self.info()['datetime_stored'])
 
-        It might do API request once because it depends on ``info()``.
-
-        """
-        return self.info()['datetime_stored'] is not None
+    def datetime_created(self):
+        """Returns file group's create aware *datetime* in UTC format."""
+        if self.info().get('datetime_created'):
+            return dateutil.parser.parse(self.info()['datetime_created'])
 
     def store(self):
         """Stores all group's files by requesting Uploadcare API.
@@ -396,7 +411,7 @@ class FileGroup(object):
         Uploaded files do not immediately appear on Uploadcare CDN.
 
         """
-        if self.is_stored():
+        if self.datetime_stored():
             return
 
         self._info_cache = rest_request('PUT', self._api_storage_uri)

@@ -3,10 +3,12 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
+import datetime
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
+from dateutil.tz import tzutc
 
 from pyuploadcare.api_resources import File, FileGroup
 from pyuploadcare.exceptions import InvalidRequestError
@@ -48,6 +50,45 @@ class FileRegexTest(unittest.TestCase):
         self.assertEqual(file_.cdn_url, expected_cdn_url)
 
 
+class FileDateMethodsTest(unittest.TestCase):
+
+    def setUp(self):
+        self.file = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+
+    def test_datetime_stored_is_none(self):
+        self.file._info_cache = {'datetime_stored': ''}
+        self.assertIsNone(self.file.datetime_stored())
+
+    def test_datetime_stored_is_utc(self):
+        self.file._info_cache = {'datetime_stored': '2013-02-05T12:56:12.006Z'}
+        expected_datetime = datetime.datetime(
+            year=2013, month=2, day=5, hour=12, minute=56, second=12,
+            microsecond=6000, tzinfo=tzutc())
+        self.assertEqual(self.file.datetime_stored(), expected_datetime)
+
+    def test_datetime_removed_is_none(self):
+        self.file._info_cache = {}
+        self.assertIsNone(self.file.datetime_removed())
+
+    def test_datetime_removed_is_utc(self):
+        self.file._info_cache = {'datetime_removed': '2013-02-05T12:56:12.006Z'}
+        expected_datetime = datetime.datetime(
+            year=2013, month=2, day=5, hour=12, minute=56, second=12,
+            microsecond=6000, tzinfo=tzutc())
+        self.assertEqual(self.file.datetime_removed(), expected_datetime)
+
+    def test_datetime_uploaded_is_none(self):
+        self.file._info_cache = {'datetime_uploaded': None}
+        self.assertIsNone(self.file.datetime_uploaded())
+
+    def test_datetime_uploaded_is_utc(self):
+        self.file._info_cache = {'datetime_uploaded': '2013-02-05T12:56:12.006Z'}
+        expected_datetime = datetime.datetime(
+            year=2013, month=2, day=5, hour=12, minute=56, second=12,
+            microsecond=6000, tzinfo=tzutc())
+        self.assertEqual(self.file.datetime_uploaded(), expected_datetime)
+
+
 class FileGroupRegexTest(unittest.TestCase):
 
     def test_value_error_when_uuid_is_bad(self):
@@ -81,6 +122,34 @@ class FileGroupRegexTest(unittest.TestCase):
         group = FileGroup(cdn_url)
         self.assertEqual(group.id, expected_group_id)
         self.assertEqual(len(group), 12)
+
+
+class FileGroupDateMethodsTest(unittest.TestCase):
+
+    def setUp(self):
+        self.group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+
+    def test_datetime_stored_is_none(self):
+        self.group._info_cache = {'datetime_stored': ''}
+        self.assertIsNone(self.group.datetime_stored())
+
+    def test_datetime_stored_is_utc(self):
+        self.group._info_cache = {'datetime_stored': '2013-04-03T12:01:28.714Z'}
+        expected_datetime = datetime.datetime(
+            year=2013, month=4, day=3, hour=12, minute=1, second=28,
+            microsecond=714000, tzinfo=tzutc())
+        self.assertEqual(self.group.datetime_stored(), expected_datetime)
+
+    def test_datetime_created_is_none(self):
+        self.group._info_cache = {'datetime_created': ''}
+        self.assertIsNone(self.group.datetime_created())
+
+    def test_datetime_created_is_utc(self):
+        self.group._info_cache = {'datetime_created': '2013-04-03T12:01:28.714Z'}
+        expected_datetime = datetime.datetime(
+            year=2013, month=4, day=3, hour=12, minute=1, second=28,
+            microsecond=714000, tzinfo=tzutc())
+        self.assertEqual(self.group.datetime_created(), expected_datetime)
 
 
 class FileGroupAsContainerTypeTest(unittest.TestCase):

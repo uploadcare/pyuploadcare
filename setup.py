@@ -6,7 +6,7 @@ from setuptools import setup
 
 PY_VERSION = sys.version_info[0], sys.version_info[1]
 
-requirements = ['requests>=1.0']
+requirements = ['requests>=1.0', 'python-dateutil>=2.1']
 
 if PY_VERSION == (2, 6):
     requirements.append('argparse')
