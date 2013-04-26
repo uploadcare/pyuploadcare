@@ -138,6 +138,22 @@ class File(object):
         if self.info().get('datetime_uploaded'):
             return dateutil.parser.parse(self.info()['datetime_uploaded'])
 
+    def is_stored(self):
+        """Returns ``True`` if file is stored.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        return self.info().get('datetime_stored') is not None
+
+    def is_removed(self):
+        """Returns ``True`` if file is removed.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        return self.info().get('datetime_removed') is not None
+
     def is_image(self):
         """Returns ``True`` if the file is an image.
 
@@ -444,13 +460,21 @@ class FileGroup(object):
         if self.info().get('datetime_created'):
             return dateutil.parser.parse(self.info()['datetime_created'])
 
+    def is_stored(self):
+        """Returns ``True`` if file is stored.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        return self.info().get('datetime_stored') is not None
+
     def store(self):
         """Stores all group's files by requesting Uploadcare API.
 
         Uploaded files do not immediately appear on Uploadcare CDN.
 
         """
-        if self.datetime_stored():
+        if self.is_stored():
             return
 
         self._info_cache = rest_request('PUT', self._api_storage_uri)
