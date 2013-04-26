@@ -58,7 +58,11 @@ def rest_request(verb, path, data=None):
     assert not path.startswith('/'), path
     url = urlparse.urljoin(conf.api_base, path)
     url_parts = urlparse.urlsplit(url)
-    path = '{path}?{query}'.format(path=url_parts.path, query=url_parts.query)
+
+    if url_parts.query:
+        path = url_parts.path + '?' + url_parts.query
+    else:
+        path = url_parts.path
 
     content = ''
     if data is not None:
