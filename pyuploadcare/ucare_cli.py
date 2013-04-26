@@ -10,7 +10,7 @@ import ConfigParser
 import os.path
 
 from . import conf, __version__
-from .api_resources import File
+from .api_resources import File, FileGroup
 from .exceptions import UploadcareException, TimeoutError, UploadError
 from .api import rest_request
 
@@ -129,6 +129,12 @@ def upload(arg_namespace):
     with open(arg_namespace.filename, 'rb') as fh:
         file_ = File.upload(fh)
         _handle_uploaded_file(file_, arg_namespace)
+
+
+def create_group(arg_namespace):
+    files = [File(uuid) for uuid in arg_namespace.paths]
+    group = FileGroup.create(files)
+    pp.pprint(group)
 
 
 def ucare_argparser():
@@ -253,6 +259,11 @@ def ucare_argparser():
                                       help='upload file')
     subparser.set_defaults(func=upload)
     subparser.add_argument('filename', help='filename')
+
+    # Create file group.
+    subparser = subparsers.add_parser('create_group', help='create file group')
+    subparser.set_defaults(func=create_group)
+    subparser.add_argument('paths', nargs='+', help='file paths')
 
     # common arguments
     parser.add_argument(
