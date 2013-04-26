@@ -10,6 +10,7 @@ from tempfile import NamedTemporaryFile
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
     ucare_argparser, list_files, get_file, store_file, delete_file, main,
+    create_group,
 )
 from tests.utils import MockResponse
 
@@ -415,3 +416,29 @@ class UcareCommonConfigFileTest(unittest.TestCase):
              [self.tmp_config_file.name])
 
         self.assertFalse(conf.verify_api_ssl)
+
+
+class CreateFileGroupTest(unittest.TestCase):
+
+    @patch('requests.request', autospec=True)
+    def test_uuid_and_cdn_url(self, request):
+        json_response = """{
+            "id": "0513dda0-582f-447d-846f-096e5df9e2bb~2",
+            "files_count": 2,
+            "files": [
+                {"uuid": "44fc352e-7503-4826-b87b-a137404b9c53"},
+                {"uuid": "a771f854-c2cb-408a-8c36-71af77811f3b"}
+            ]
+        }
+        """
+        request.return_value = MockResponse(status=200, data=json_response)
+
+        create_group(arg_namespace(
+            'create_group 44fc352e-7503-4826-b87b-a137404b9c53'
+            ' https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/'
+        ))
+
+        self.assertEqual(
+            request.mock_calls[0][1],
+            ('POST', 'https://upload.uploadcare.com/group/')
+        )
