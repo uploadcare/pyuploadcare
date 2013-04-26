@@ -13,7 +13,7 @@ Usage example::
 
 """
 
-__version__ = '0.19'
+__version__ = u'0.19'
 
 from .api_resources import File, FileGroup
 from .exceptions import (

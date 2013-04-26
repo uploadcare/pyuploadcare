@@ -16,6 +16,7 @@ import logging
 import json
 
 import requests
+import six
 
 from . import conf, __version__
 from .exceptions import (
@@ -23,7 +24,7 @@ from .exceptions import (
 )
 
 
-logger = logging.getLogger("pyuploadcare")
+logger = logging.getLogger(u"pyuploadcare")
 
 
 def rest_request(verb, path, data=None):
@@ -55,24 +56,24 @@ def rest_request(verb, path, data=None):
         }
 
     """
-    assert not path.startswith('/'), path
+    assert not path.startswith(u'/'), path
     url = urlparse.urljoin(conf.api_base, path)
     url_parts = urlparse.urlsplit(url)
 
     if url_parts.query:
-        path = url_parts.path + '?' + url_parts.query
+        path = url_parts.path + u'?' + url_parts.query
     else:
         path = url_parts.path
 
-    content = ''
+    content = u''
     if data is not None:
         content = json.dumps(data)
 
-    content_type = 'application/json'
+    content_type = u'application/json'
     content_md5 = hashlib.md5(content).hexdigest()
     date = email.utils.formatdate(usegmt=True)
 
-    sign_string = '\n'.join([
+    sign_string = u'\n'.join([
         verb,
         content_md5,
         content_type,
@@ -80,18 +81,18 @@ def rest_request(verb, path, data=None):
         path,
     ])
 
-    sign = hmac.new(str(conf.secret), sign_string, hashlib.sha1) \
+    sign = hmac.new(bytes(conf.secret), sign_string, hashlib.sha1) \
         .hexdigest()
 
     headers = {
-        'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
-        'Date': date,
-        'Content-Type': content_type,
-        'Content-Length': str(len(content)),
-        'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
-        'User-Agent': 'pyuploadcare/{0}'.format(__version__),
+        u'Authorization': u'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
+        u'Date': date,
+        u'Content-Type': content_type,
+        u'Content-Length': six.u(str(len(content))),
+        u'Accept': u'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
+        u'User-Agent': u'pyuploadcare/{0}'.format(__version__),
     }
-    logger.debug('''sent:
+    logger.debug(u'''sent:
         verb: {0}
         path: {1}
         headers: {2}
@@ -102,37 +103,35 @@ def rest_request(verb, path, data=None):
                                     verify=conf.verify_api_ssl,
                                     headers=headers, data=content)
     except requests.RequestException as exc:
-        raise APIConnectionError(u'Network error: {exc}'.format(exc=exc))
+        raise APIConnectionError(exc.args[0])
 
-    logger.debug('got: %s %s' % (response.status_code, response.content))
+    logger.debug(
+        u'got: {0} {1}'.format(response.status_code, response.content)
+    )
 
-    if 'warning' in response.headers:
-        match = re.search('"(.+)"', response.headers['warning'])
+    if u'warning' in response.headers:
+        match = re.search(u'"(.+)"', response.headers[u'warning'])
         if match:
             for warning in match.group(1).split('; '):
-                logger.warn('API Warning: {0}'.format(warning))
+                logger.warn(u'API Warning: {0}'.format(warning))
 
     # TODO: Add check for content-type.
     if response.status_code == 200:
         try:
             return response.json()
         except ValueError as exc:
-            raise APIError(u'API error: {exc}'.format(exc=exc))
+            raise APIError(exc.args[0])
     # No content.
     if response.status_code == 204:
         return
 
     if response.status_code == 403:
-        raise AuthenticationError(
-            u'Authentication error: {exc}'.format(exc=response.content)
-        )
+        raise AuthenticationError(response.content)
 
     if response.status_code in (400, 404):
-        raise InvalidRequestError(
-            u'Invalid request error: {exc}'.format(exc=response.content)
-        )
+        raise InvalidRequestError(response.content)
 
-    raise APIError(u'API error: {exc}'.format(exc=response.content))
+    raise APIError(response.content)
 
 
 def uploading_request(verb, path, data=None, files=None):
@@ -152,13 +151,13 @@ def uploading_request(verb, path, data=None, files=None):
         >>> File('9b9f4483-77b8-40ae-a198-272ba6280004')
 
     """
-    assert not path.startswith('/'), path
+    assert not path.startswith(u'/'), path
     url = urlparse.urljoin(conf.upload_base, path)
 
     if data is None:
         data = {}
-    data['pub_key'] = conf.pub_key
-    data['UPLOADCARE_PUB_KEY'] = conf.pub_key
+    data[u'pub_key'] = conf.pub_key
+    data[u'UPLOADCARE_PUB_KEY'] = conf.pub_key
 
     try:
         response = requests.request(
@@ -166,17 +165,15 @@ def uploading_request(verb, path, data=None, files=None):
             data=data, files=files
         )
     except requests.RequestException as exc:
-        raise APIConnectionError(u'Network error: {exc}'.format(exc=exc))
+        raise APIConnectionError(exc.args[0])
 
     if response.status_code == 200:
         try:
             return response.json()
         except ValueError as exc:
-            raise APIError(u'API error: {exc}'.format(exc=exc))
+            raise APIError(exc.args[0])
 
     if response.status_code in (400, 404):
-        raise InvalidRequestError(
-            u'Invalid request error: {exc}'.format(exc=response.content)
-        )
+        raise InvalidRequestError(response.content)
 
-    raise APIError(u'API error: {exc}'.format(exc=response.content))
+    raise APIError(response.content)

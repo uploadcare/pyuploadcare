@@ -13,19 +13,19 @@ class FileWidget(TextInput):
 
     """
 
-    input_type = 'hidden'
+    input_type = u'hidden'
 
     class Media:
         js = (dj_conf.UPLOADCARE_JS,)
 
     def __init__(self, attrs=None):
         default_attrs = {
-            'role': 'uploadcare-uploader',
-            'data-public-key': conf.pub_key,
+            u'role': u'uploadcare-uploader',
+            u'data-public-key': conf.pub_key,
         }
 
         if dj_conf.UPLOAD_BASE_URL is not None:
-            default_attrs['data-upload-base-url'] = dj_conf.UPLOAD_BASE_URL
+            default_attrs[u'data-upload-base-url'] = dj_conf.UPLOAD_BASE_URL
 
         if attrs is not None:
             default_attrs.update(attrs)
@@ -54,9 +54,9 @@ class ImageField(Field):
         super(ImageField, self).__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
-        attrs = {'data-images-only': ''}
+        attrs = {u'data-images-only': u''}
         if self.manual_crop is not None:
-            attrs['data-crop'] = self.manual_crop
+            attrs[u'data-crop'] = self.manual_crop
         return attrs
 
 
@@ -67,7 +67,7 @@ class FileGroupField(Field):
     widget = FileWidget
 
     def widget_attrs(self, widget):
-        attrs = {'data-multiple': ''}
+        attrs = {u'data-multiple': u''}
         return attrs
 
 
@@ -78,5 +78,5 @@ class ImageGroupField(Field):
     widget = FileWidget
 
     def widget_attrs(self, widget):
-        attrs = {'data-multiple': '', 'data-images-only': ''}
+        attrs = {u'data-multiple': u'', u'data-images-only': u''}
         return attrs

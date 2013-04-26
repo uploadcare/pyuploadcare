@@ -16,30 +16,30 @@ from .api import rest_request
 
 
 pp = pprint.PrettyPrinter(indent=2)
-logger = logging.getLogger('pyuploadcare')
+logger = logging.getLogger(u'pyuploadcare')
 str_settings = (
-    'pub_key',
-    'secret',
-    'api_version',
-    'api_base',
-    'upload_base',
+    u'pub_key',
+    u'secret',
+    u'api_version',
+    u'api_base',
+    u'upload_base',
 )
 bool_settings = (
-    'verify_api_ssl',
-    'verify_upload_ssl',
+    u'verify_api_ssl',
+    u'verify_upload_ssl',
 )
 
 
 def list_files(arg_namespace=None):
     query = {}
-    for name in ['page', 'limit', 'kept', 'removed']:
+    for name in [u'page', u'limit', u'kept', u'removed']:
         arg = getattr(arg_namespace, name)
         if arg is not None:
             query[name] = arg
     q = urllib.urlencode(query)
-    url = urlparse.urlunsplit(['', '', 'files/', q, ''])
+    url = urlparse.urlunsplit([u'', u'', u'files/', q, u''])
 
-    pp.pprint(rest_request('GET', url))
+    pp.pprint(rest_request(u'GET', url))
 
 
 def get_file(arg_namespace):
@@ -55,7 +55,7 @@ def store_file(arg_namespace):
         time_started = time.time()
         while not file_.is_stored():
             if time.time() - time_started > timeout:
-                raise TimeoutError('timed out trying to store')
+                raise TimeoutError(u'timed out trying to store')
             file_.update_info()
             time.sleep(0.1)
 
@@ -69,14 +69,14 @@ def delete_file(arg_namespace):
         time_started = time.time()
         while not file_.is_removed():
             if time.time() - time_started > timeout:
-                raise TimeoutError('timed out trying to delete')
+                raise TimeoutError(u'timed out trying to delete')
             file_.update_info()
             time.sleep(0.1)
 
 
 def _check_upload_args(arg_namespace):
     if not conf.secret and (arg_namespace.store or arg_namespace.info):
-        pp.pprint('Cannot store or get info without "--secret" key')
+        pp.pprint(u'Cannot store or get info without "--secret" key')
         return False
     return True
 
@@ -84,13 +84,13 @@ def _check_upload_args(arg_namespace):
 def _handle_uploaded_file(file_, arg_namespace):
     if arg_namespace.store:
         file_.store()
-        pp.pprint('File stored successfully.')
+        pp.pprint(u'File stored successfully.')
 
     if arg_namespace.info:
         pp.pprint(file_.info())
 
     if arg_namespace.cdnurl:
-        pp.pprint('CDN url: {0}'.format(file_.cdn_url))
+        pp.pprint(u'CDN url: {0}'.format(file_.cdn_url))
 
 
 def upload_from_url(arg_namespace):
@@ -103,21 +103,21 @@ def upload_from_url(arg_namespace):
         timeout = arg_namespace.timeout
         time_started = time.time()
         while time.time() - time_started < timeout:
-            status = file_from_url.update_info()['status']
-            if status == 'success':
+            status = file_from_url.update_info()[u'status']
+            if status == u'success':
                 break
-            if status in ('failed', 'error'):
+            if status in (u'failed', u'error'):
                 raise UploadError(
-                    'could not upload file from url: {0}'.format(file_from_url.info())
+                    u'could not upload file from url: {0}'.format(file_from_url.info())
                 )
             time.sleep(1)
         else:
-            raise TimeoutError('timed out during upload')
+            raise TimeoutError(u'timed out during upload')
 
     if arg_namespace.store or arg_namespace.info:
         file_ = file_from_url.get_file()
         if file_ is None:
-            pp.pprint('Cannot store or get info.')
+            pp.pprint(u'Cannot store or get info.')
             return
 
         _handle_uploaded_file(file_, arg_namespace)
@@ -126,7 +126,7 @@ def upload_from_url(arg_namespace):
 def upload(arg_namespace):
     if not _check_upload_args(arg_namespace):
         return
-    with open(arg_namespace.filename, 'rb') as fh:
+    with open(arg_namespace.filename, u'rb') as fh:
         file_ = File.upload(fh)
         _handle_uploaded_file(file_, arg_namespace)
 
@@ -139,168 +139,168 @@ def create_group(arg_namespace):
 
 def ucare_argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--version', action='version',
-                        version='ucare {0}'.format(__version__))
+    parser.add_argument(u'--version', action=u'version',
+                        version=u'ucare {0}'.format(__version__))
 
     subparsers = parser.add_subparsers()
 
     # list
-    subparser = subparsers.add_parser('list', help='list all files')
+    subparser = subparsers.add_parser(u'list', help=u'list all files')
     subparser.set_defaults(func=list_files)
-    subparser.add_argument('--page', help='page to show')
-    subparser.add_argument('--limit', help='files per page')
-    subparser.add_argument('--kept', help='filter kept files',
-                           choices=['all', 'true', 'false'])
-    subparser.add_argument('--removed', help='filter removed files',
-                           choices=['all', 'true', 'false'])
+    subparser.add_argument(u'--page', help=u'page to show')
+    subparser.add_argument(u'--limit', help=u'files per page')
+    subparser.add_argument(u'--kept', help=u'filter kept files',
+                           choices=[u'all', u'true', u'false'])
+    subparser.add_argument(u'--removed', help=u'filter removed files',
+                           choices=[u'all', u'true', u'false'])
 
     # get
-    subparser = subparsers.add_parser('get', help='get file info')
+    subparser = subparsers.add_parser(u'get', help=u'get file info')
     subparser.set_defaults(func=get_file)
-    subparser.add_argument('path', help='file path')
+    subparser.add_argument(u'path', help=u'file path')
 
     # common store and delete args
     waiting_parent = argparse.ArgumentParser(add_help=False)
     waiting_parent.add_argument(
-        '--timeout',
+        u'--timeout',
         type=int,
-        dest='timeout',
+        dest=u'timeout',
         default=5,
-        help='Set wait seconds until operation completed.'
-             ' Default value is 5 seconds')
+        help=u'Set wait seconds until operation completed.'
+             u' Default value is 5 seconds')
     group = waiting_parent.add_mutually_exclusive_group()
     group.add_argument(
-        '--wait',
-        action='store_true',
+        u'--wait',
+        action=u'store_true',
         default=True,
-        dest='wait',
-        help='Wait for operation to be completed'
+        dest=u'wait',
+        help=u'Wait for operation to be completed'
     )
     group.add_argument(
-        '--nowait',
-        action='store_false',
-        dest='wait',
-        help='Do not wait for operation to be completed'
+        u'--nowait',
+        action=u'store_false',
+        dest=u'wait',
+        help=u'Do not wait for operation to be completed'
     )
 
     # store
-    subparser = subparsers.add_parser('store',
+    subparser = subparsers.add_parser(u'store',
                                       parents=[waiting_parent],
-                                      help='store file')
+                                      help=u'store file')
     subparser.set_defaults(func=store_file)
-    subparser.add_argument('path', help='file path')
+    subparser.add_argument(u'path', help=u'file path')
 
     # delete
-    subparser = subparsers.add_parser('delete',
+    subparser = subparsers.add_parser(u'delete',
                                       parents=[waiting_parent],
-                                      help='request delete')
+                                      help=u'request delete')
     subparser.set_defaults(func=delete_file)
-    subparser.add_argument('path', help='file path')
+    subparser.add_argument(u'path', help=u'file path')
 
     # common upload args
     upload_parent = argparse.ArgumentParser(add_help=False)
     group = upload_parent.add_mutually_exclusive_group()
     group.add_argument(
-        '--store',
-        action='store_true',
+        u'--store',
+        action=u'store_true',
         default=False,
-        dest='store',
-        help='Store uploaded file')
+        dest=u'store',
+        help=u'Store uploaded file')
     group.add_argument(
-        '--nostore',
-        action='store_false',
-        dest='store',
-        help='Do not store uploaded file')
+        u'--nostore',
+        action=u'store_false',
+        dest=u'store',
+        help=u'Do not store uploaded file')
     group = upload_parent.add_mutually_exclusive_group()
     group.add_argument(
-        '--info',
-        action='store_true',
+        u'--info',
+        action=u'store_true',
         default=False,
-        dest='info',
-        help='Get uploaded file info')
+        dest=u'info',
+        help=u'Get uploaded file info')
     group.add_argument(
-        '--noinfo',
-        action='store_false',
-        dest='info',
-        help='Do not get uploaded file info')
+        u'--noinfo',
+        action=u'store_false',
+        dest=u'info',
+        help=u'Do not get uploaded file info')
     upload_parent.add_argument(
-        '--cdnurl',
-        action='store_true',
-        help='Store file and get CDN url.')
+        u'--cdnurl',
+        action=u'store_true',
+        help=u'Store file and get CDN url.')
 
     # upload from url
-    subparser = subparsers.add_parser('upload_from_url',
+    subparser = subparsers.add_parser(u'upload_from_url',
                                       parents=[upload_parent],
-                                      help='upload file from url')
+                                      help=u'upload file from url')
     subparser.set_defaults(func=upload_from_url)
-    subparser.add_argument('url', help='file url')
+    subparser.add_argument(u'url', help=u'file url')
     subparser.add_argument(
-        '--timeout',
+        u'--timeout',
         type=int,
-        dest='timeout',
+        dest=u'timeout',
         default=30,
-        help='Set wait seconds file uploading from url.'
-             ' Default value is 30 seconds')
+        help=u'Set wait seconds file uploading from url.'
+             u' Default value is 30 seconds')
     group = subparser.add_mutually_exclusive_group()
     group.add_argument(
-        '--wait',
-        action='store_true',
+        u'--wait',
+        action=u'store_true',
         default=True,
-        dest='wait',
-        help='Wait for upload status')
+        dest=u'wait',
+        help=u'Wait for upload status')
     group.add_argument(
-        '--nowait',
-        action='store_false',
-        dest='wait',
-        help='Do not wait for upload status')
+        u'--nowait',
+        action=u'store_false',
+        dest=u'wait',
+        help=u'Do not wait for upload status')
 
     # upload
-    subparser = subparsers.add_parser('upload', parents=[upload_parent],
-                                      help='upload file')
+    subparser = subparsers.add_parser(u'upload', parents=[upload_parent],
+                                      help=u'upload file')
     subparser.set_defaults(func=upload)
-    subparser.add_argument('filename', help='filename')
+    subparser.add_argument(u'filename', help=u'filename')
 
     # Create file group.
-    subparser = subparsers.add_parser('create_group', help='create file group')
+    subparser = subparsers.add_parser(u'create_group', help=u'create file group')
     subparser.set_defaults(func=create_group)
-    subparser.add_argument('paths', nargs='+', help='file paths')
+    subparser.add_argument(u'paths', nargs=u'+', help=u'file paths')
 
     # common arguments
     parser.add_argument(
-        '--pub_key',
-        help='API key, if not set is read from uploadcare.ini'
-             ' and ~/.uploadcare config files')
+        u'--pub_key',
+        help=u'API key, if not set is read from uploadcare.ini'
+             u' and ~/.uploadcare config files')
     parser.add_argument(
-        '--secret',
-        help='API secret, if not set is read from uploadcare.ini'
-             ' and ~/.uploadcare config files')
+        u'--secret',
+        help=u'API secret, if not set is read from uploadcare.ini'
+             u' and ~/.uploadcare config files')
     parser.add_argument(
-        '--api_base',
-        help='API url, can be read from uploadcare.ini'
-             ' and ~/.uploadcare config files.'
-             ' Default value is {0}'.format(conf.api_base))
+        u'--api_base',
+        help=u'API url, can be read from uploadcare.ini'
+             u' and ~/.uploadcare config files.'
+             u' Default value is {0}'.format(conf.api_base))
     parser.add_argument(
-        '--upload_base',
-        help='Upload API url, can be read from uploadcare.ini'
-             ' and ~/.uploadcare config files.'
-             ' Default value is {0}'.format(conf.upload_base))
+        u'--upload_base',
+        help=u'Upload API url, can be read from uploadcare.ini'
+             u' and ~/.uploadcare config files.'
+             u' Default value is {0}'.format(conf.upload_base))
     parser.add_argument(
-        '--no_check_upload_certificate',
-        action='store_true',
-        help="Don't check the uploading API server certificate."
-             ' Can be read from uploadcare.ini'
-             ' and ~/.uploadcare config files.')
+        u'--no_check_upload_certificate',
+        action=u'store_true',
+        help=u"Don't check the uploading API server certificate."
+             u' Can be read from uploadcare.ini'
+             u' and ~/.uploadcare config files.')
     parser.add_argument(
-        '--no_check_api_certificate',
-        action='store_true',
-        help="Don't check the REST API server certificate."
-             ' Can be read from uploadcare.ini'
-             ' and ~/.uploadcare config files.')
+        u'--no_check_api_certificate',
+        action=u'store_true',
+        help=u"Don't check the REST API server certificate."
+             u' Can be read from uploadcare.ini'
+             u' and ~/.uploadcare config files.')
     parser.add_argument(
-        '--api_version',
-        help='API version, can be read from uploadcare.ini'
-             ' and ~/.uploadcare config files.'
-             ' Default value is {0}'.format(conf.api_version))
+        u'--api_version',
+        help=u'API version, can be read from uploadcare.ini'
+             u' and ~/.uploadcare config files.'
+             u' Default value is {0}'.format(conf.api_version))
 
     return parser
 
@@ -315,12 +315,12 @@ def load_config_from_file(filename):
 
     for name in str_settings:
         try:
-            setattr(conf, name, config.get('ucare', name))
+            setattr(conf, name, config.get(u'ucare', name))
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
             pass
     for name in bool_settings:
         try:
-            setattr(conf, name, config.getboolean('ucare', name))
+            setattr(conf, name, config.getboolean(u'ucare', name))
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
             pass
 
@@ -336,7 +336,7 @@ def load_config_from_args(arg_namespace):
     if arg_namespace.no_check_api_certificate:
         conf.verify_api_ssl = False
 
-    if getattr(arg_namespace, 'cdnurl', False):
+    if getattr(arg_namespace, u'cdnurl', False):
         arg_namespace.store = True
 
 
@@ -349,15 +349,15 @@ def main(arg_namespace=None, config_file_names=None):
     try:
         arg_namespace.func(arg_namespace)
     except UploadcareException as exc:
-        pp.pprint('ERROR: {0}'.format(exc))
+        pp.pprint(u'ERROR: {0}'.format(exc))
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     ch = logging.StreamHandler()
-    fmt = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fmt = logging.Formatter(u'%(asctime)s - %(levelname)s - %(message)s')
     ch.setFormatter(fmt)
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
     main(arg_namespace=ucare_argparser().parse_args(),
-         config_file_names=('~/.uploadcare', 'uploadcare.ini'))
+         config_file_names=(u'~/.uploadcare', u'uploadcare.ini'))

@@ -15,16 +15,16 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
     """
 
     def get_internal_type(self):
-        return "TextField"
+        return u"TextField"
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == u'':
             return value
 
         if isinstance(value, File):
             return value
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, six.string_types):
             raise ValidationError(
                 u'Invalid value for a field: string was expected'
             )
@@ -37,7 +37,7 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
             )
 
     def get_prep_value(self, value):
-        if value is None or value == '':
+        if value is None or value == u'':
             return value
         else:
             return value.cdn_url
@@ -52,7 +52,7 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        kwargs['form_class'] = forms.FileField
+        kwargs[u'form_class'] = forms.FileField
 
         return models.Field.formfield(self, **kwargs)
 
@@ -89,18 +89,18 @@ class ImageField(FileField):
 
     def __init__(self, manual_crop=None, *args, **kwargs):
         is_crop_valid = (
-            isinstance(manual_crop, basestring) and
+            isinstance(manual_crop, six.string_types) and
             pattern_of_crop.match(manual_crop)
         )
         if not (manual_crop is None or is_crop_valid):
-            raise ValidationError('Invalid manual crop value')
+            raise ValidationError(u'Invalid manual crop value')
 
         self.manual_crop = manual_crop
         super(ImageField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        kwargs['manual_crop'] = self.manual_crop
-        kwargs['form_class'] = forms.ImageField
+        kwargs[u'manual_crop'] = self.manual_crop
+        kwargs[u'form_class'] = forms.ImageField
 
         return models.Field.formfield(self, **kwargs)
 
@@ -113,16 +113,16 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
     """
 
     def get_internal_type(self):
-        return "TextField"
+        return u"TextField"
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == u'':
             return value
 
         if isinstance(value, FileGroup):
             return value
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, six.string_types):
             raise ValidationError(
                 u'Invalid value for a field: string was expected'
             )
@@ -135,7 +135,7 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
             )
 
     def get_prep_value(self, value):
-        if value is None or value == '':
+        if value is None or value == u'':
             return value
         else:
             return value.cdn_url
@@ -150,7 +150,7 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        kwargs['form_class'] = forms.FileGroupField
+        kwargs[u'form_class'] = forms.FileGroupField
 
         return models.Field.formfield(self, **kwargs)
 
@@ -163,6 +163,6 @@ class ImageGroupField(FileGroupField):
     """
 
     def formfield(self, **kwargs):
-        kwargs['form_class'] = forms.ImageGroupField
+        kwargs[u'form_class'] = forms.ImageGroupField
 
         return models.Field.formfield(self, **kwargs)

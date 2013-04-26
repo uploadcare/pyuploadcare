@@ -30,7 +30,7 @@ class RESTClientTest(unittest.TestCase):
         with self.assertRaises(APIError) as cm:
             rest_request('GET', 'files/')
 
-        self.assertEqual('API error: No JSON object could be decoded',
+        self.assertEqual('No JSON object could be decoded',
                          cm.exception.message)
 
     @patch('requests.request', autospec=True)
