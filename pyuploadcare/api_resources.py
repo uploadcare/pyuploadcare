@@ -502,7 +502,7 @@ class FileGroup(object):
         for index, file_ in enumerate(files):
             if isinstance(file_, File):
                 file_index = 'files[{index}]'.format(index=index)
-                data[file_index] = file_.uuid
+                data[file_index] = unicode(file_)
             else:
                 raise InvalidRequestError(
                     'all items have to be ``File`` instance'
