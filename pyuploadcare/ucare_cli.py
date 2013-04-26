@@ -76,7 +76,7 @@ def delete_file(arg_namespace):
 
 def _check_upload_args(arg_namespace):
     if not conf.secret and (arg_namespace.store or arg_namespace.info):
-        print 'Cannot store or get info without "--secret" key'
+        pp.pprint('Cannot store or get info without "--secret" key')
         return False
     return True
 
@@ -84,20 +84,20 @@ def _check_upload_args(arg_namespace):
 def _handle_uploaded_file(file_, arg_namespace):
     if arg_namespace.store:
         file_.store()
-        print 'File stored successfully.'
+        pp.pprint('File stored successfully.')
 
     if arg_namespace.info:
         pp.pprint(file_.info())
 
     if arg_namespace.cdnurl:
-        print 'CDN url: {0}'.format(file_.cdn_url)
+        pp.pprint('CDN url: {0}'.format(file_.cdn_url))
 
 
 def upload_from_url(arg_namespace):
     if not _check_upload_args(arg_namespace):
         return
     file_from_url = File.upload_from_url(arg_namespace.url)
-    print file_from_url
+    pp.pprint(file_from_url)
 
     if arg_namespace.wait or arg_namespace.store:
         timeout = arg_namespace.timeout
@@ -117,7 +117,7 @@ def upload_from_url(arg_namespace):
     if arg_namespace.store or arg_namespace.info:
         file_ = file_from_url.get_file()
         if file_ is None:
-            print 'Cannot store or get info.'
+            pp.pprint('Cannot store or get info.')
             return
 
         _handle_uploaded_file(file_, arg_namespace)
@@ -349,7 +349,7 @@ def main(arg_namespace=None, config_file_names=None):
     try:
         arg_namespace.func(arg_namespace)
     except UploadcareException as exc:
-        print 'ERROR: {0}'.format(exc)
+        pp.pprint('ERROR: {0}'.format(exc))
 
 
 if __name__ == '__main__':
