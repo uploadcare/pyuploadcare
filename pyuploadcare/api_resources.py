@@ -425,7 +425,7 @@ class FileGroup(object):
 
         """
         file_cdn_urls = []
-        for file_index in xrange(self._files_qty):
+        for file_index in xrange(len(self)):
             file_cdn_url = '{group_cdn_url}nth/{file_index}/'.format(
                 group_cdn_url=self.cdn_url,
                 file_index=file_index
@@ -478,3 +478,39 @@ class FileGroup(object):
             return
 
         self._info_cache = rest_request('PUT', self._api_storage_uri)
+
+    @classmethod
+    def construct_from(cls, group_info):
+        """Constructs ``FileGroup`` instance from group information."""
+        group = cls(group_info['id'])
+        group._info_cache = group_info
+        return group
+
+    @classmethod
+    def create(cls, files):
+        """Creates file group and returns ``FileGroup`` instance.
+
+        It expects iterable object that contains ``File`` instances, e.g.::
+
+            >>> file_1 = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+            >>> file_2 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+            >>> FileGroup.create((file_1, file_2))
+            <uploadcare.FileGroup 0513dda0-6666-447d-846f-096e5df9e2bb~2>
+
+        """
+        data = {}
+        for index, file_ in enumerate(files):
+            if isinstance(file_, File):
+                file_index = 'files[{index}]'.format(index=index)
+                data[file_index] = file_.uuid
+            else:
+                raise InvalidRequestError(
+                    'all items have to be ``File`` instance'
+                )
+        if not data:
+            raise InvalidRequestError('set of files is empty')
+
+        group_info = uploading_request('POST', 'group/', data=data)
+
+        group = cls.construct_from(group_info)
+        return group
