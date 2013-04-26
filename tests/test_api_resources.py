@@ -247,3 +247,47 @@ class FileCDNUrlsTest(unittest.TestCase):
             'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/1/',
         ]
         self.assertEqual(self.group.file_cdn_urls, expected_file_cdn_urls)
+
+
+class FileGroupCreateTest(unittest.TestCase):
+
+    def test_invalid_request_error_if_iterable_is_empty(self):
+        self.assertRaises(InvalidRequestError, FileGroup.create, [])
+
+    def test_type_error_if_non_iterable(self):
+        self.assertRaises(TypeError, FileGroup.create, None)
+
+    def test_invalid_request_error_if_non_file_instance(self):
+        files = (
+            File('6c5e9526-b0fe-4739-8975-72e8d5ee6342'),
+            None,
+        )
+        self.assertRaises(InvalidRequestError, FileGroup.create, files)
+
+    def test_invalid_request_error_if_iterable_is_dict(self):
+        files = {
+            'file_1': File('6c5e9526-b0fe-4739-8975-72e8d5ee6342'),
+            'file_2': File('a771f854-c2cb-408a-8c36-71af77811f3b'),
+        }
+        self.assertRaises(InvalidRequestError, FileGroup.create, files)
+
+    @patch('requests.request', autospec=True)
+    def test_group_successfully_created(self, request):
+        json_response = """{
+            "id": "0513dda0-582f-447d-846f-096e5df9e2bb~1",
+            "files_count": 1,
+            "files": [
+                {"uuid": "0cea5a61-f976-47d9-815a-e787f52aeba1"}
+            ]
+        }
+        """
+        request.return_value = MockResponse(status=200, data=json_response)
+
+        files = (
+            File('0cea5a61-f976-47d9-815a-e787f52aeba1'),
+        )
+        group = FileGroup.create(files)
+
+        self.assertIsInstance(group, FileGroup)
+        self.assertEqual(len(group), 1)
+        self.assertEqual(group[0].uuid, '0cea5a61-f976-47d9-815a-e787f52aeba1')
