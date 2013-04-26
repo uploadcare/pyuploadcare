@@ -3,17 +3,16 @@ import re
 
 from django.db import models
 from django.core.exceptions import ValidationError
+import six
 
 from . import forms
 from ..exceptions import InvalidRequestError
 from ..api_resources import File, FileGroup
 
 
-class FileField(models.Field):
+class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
     """Django model field that stores uploaded file as Uploadcare CDN url.
     """
-
-    __metaclass__ = models.SubfieldBase
 
     def get_internal_type(self):
         return "TextField"
@@ -106,14 +105,12 @@ class ImageField(FileField):
         return models.Field.formfield(self, **kwargs)
 
 
-class FileGroupField(models.Field):
+class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
     """Django model field that stores uploaded file group as Uploadcare CDN url.
 
     It provides multiple file uploading.
 
     """
-
-    __metaclass__ = models.SubfieldBase
 
     def get_internal_type(self):
         return "TextField"
