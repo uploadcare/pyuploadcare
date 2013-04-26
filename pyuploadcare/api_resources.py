@@ -104,7 +104,7 @@ class File(object):
         return self._info_cache
 
     def filename(self):
-        """Returns original file name.
+        """Returns original file name, e.g. ``"olympia.jpg"``.
 
         It might do API request once because it depends on ``info()``.
 
@@ -138,10 +138,49 @@ class File(object):
         if self.info().get('datetime_uploaded'):
             return dateutil.parser.parse(self.info()['datetime_uploaded'])
 
+    def is_image(self):
+        """Returns ``True`` if the file is an image.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        return self.info().get('is_image')
+
+    def is_ready(self):
+        """Returns ``True`` if the file is fully uploaded on S3.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        return self.info().get('is_ready')
+
+    def size(self):
+        """Returns the file size in bytes.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        return self.info().get('size')
+
+    def mime_type(self):
+        """Returns the file MIME type, e.g. ``"image/png"``.
+
+        It might do API request once because it depends on ``info()``.
+
+        """
+        return self.info().get('mime_type')
+
     def store(self):
         """Stores file by requesting Uploadcare API.
 
         Uploaded files do not immediately appear on Uploadcare CDN.
+        Let's consider steps until file appears on CDN:
+
+        - first file is uploaded into https://upload.uploadcare.com/;
+        - after that file is available by API and its ``is_public``,
+          ``is_ready`` are ``False``. Now you can store it;
+        - ``is_ready`` will be ``True`` when file will be fully uploaded
+          on S3.
 
         """
         self._info_cache = rest_request('PUT', self._api_storage_uri)
