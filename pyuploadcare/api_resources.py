@@ -426,7 +426,7 @@ class FileGroup(object):
 
         """
         file_cdn_urls = []
-        for file_index in xrange(len(self)):
+        for file_index in six.moves.xrange(len(self)):
             file_cdn_url = u'{group_cdn_url}nth/{file_index}/'.format(
                 group_cdn_url=self.cdn_url,
                 file_index=file_index

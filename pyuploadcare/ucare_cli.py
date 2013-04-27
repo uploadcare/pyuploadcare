@@ -2,12 +2,18 @@
 # encoding: utf-8
 import time
 import argparse
-import urlparse
-import urllib
 import logging
 import pprint
-import ConfigParser
 import os.path
+
+import six
+from six.moves import configparser
+
+if six.PY3:
+    from urllib.parse import urlunsplit, urlencode
+else:
+    from urlparse import urlunsplit
+    from urllib import urlencode
 
 from . import conf, __version__
 from .api_resources import File, FileGroup
@@ -36,8 +42,8 @@ def list_files(arg_namespace=None):
         arg = getattr(arg_namespace, name)
         if arg is not None:
             query[name] = arg
-    q = urllib.urlencode(query)
-    url = urlparse.urlunsplit([u'', u'', u'files/', q, u''])
+    q = urlencode(query)
+    url = urlunsplit([u'', u'', u'files/', q, u''])
 
     pp.pprint(rest_request(u'GET', url))
 
@@ -310,18 +316,18 @@ def load_config_from_file(filename):
     if not os.path.exists(filename):
         return
 
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read(filename)
 
     for name in str_settings:
         try:
             setattr(conf, name, config.get(u'ucare', name))
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             pass
     for name in bool_settings:
         try:
             setattr(conf, name, config.getboolean(u'ucare', name))
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             pass
 
 

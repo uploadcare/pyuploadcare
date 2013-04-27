@@ -10,13 +10,17 @@ It is JSON REST request abstraction layer that is used by the
 import email.utils
 import hashlib
 import hmac
-import urlparse
 import re
 import logging
 import json
 
 import requests
 import six
+
+if six.PY3:
+    from urllib.parse import urljoin, urlsplit
+else:
+    from urlparse import urljoin, urlsplit
 
 from . import conf, __version__
 from .exceptions import (
@@ -57,8 +61,8 @@ def rest_request(verb, path, data=None):
 
     """
     assert not path.startswith(u'/'), path
-    url = urlparse.urljoin(conf.api_base, path)
-    url_parts = urlparse.urlsplit(url)
+    url = urljoin(conf.api_base, path)
+    url_parts = urlsplit(url)
 
     if url_parts.query:
         path = url_parts.path + u'?' + url_parts.query
@@ -152,7 +156,7 @@ def uploading_request(verb, path, data=None, files=None):
 
     """
     assert not path.startswith(u'/'), path
-    url = urlparse.urljoin(conf.upload_base, path)
+    url = urljoin(conf.upload_base, path)
 
     if data is None:
         data = {}
