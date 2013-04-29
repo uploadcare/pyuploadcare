@@ -504,7 +504,7 @@ class FileGroup(object):
         for index, file_ in enumerate(files):
             if isinstance(file_, File):
                 file_index = 'files[{index}]'.format(index=index)
-                data[file_index] = six.u(str(file_))
+                data[file_index] = six.text_type(file_)
             else:
                 raise InvalidRequestError(
                     'all items have to be ``File`` instance'
