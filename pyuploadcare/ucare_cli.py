@@ -338,25 +338,30 @@ def load_config_from_args(arg_namespace):
         if arg is not None:
             setattr(conf, name, arg)
 
-    if arg_namespace.no_check_upload_certificate:
+    if arg_namespace and arg_namespace.no_check_upload_certificate:
         conf.verify_upload_ssl = False
-    if arg_namespace.no_check_api_certificate:
+    if arg_namespace and arg_namespace.no_check_api_certificate:
         conf.verify_api_ssl = False
 
     if getattr(arg_namespace, 'cdnurl', False):
         arg_namespace.store = True
 
 
-def main(arg_namespace=None, config_file_names=None):
+def main(arg_namespace=None,
+         config_file_names=('~/.uploadcare', 'uploadcare.ini')):
+    if arg_namespace is None:
+        arg_namespace = ucare_argparser().parse_args()
+
     if config_file_names:
         for file_name in config_file_names:
             load_config_from_file(file_name)
     load_config_from_args(arg_namespace)
 
-    try:
-        arg_namespace.func(arg_namespace)
-    except UploadcareException as exc:
-        pp.pprint('ERROR: {0}'.format(exc))
+    if hasattr(arg_namespace, 'func'):
+        try:
+            arg_namespace.func(arg_namespace)
+        except UploadcareException as exc:
+            pp.pprint('ERROR: {0}'.format(exc))
 
 
 if __name__ == '__main__':
@@ -366,5 +371,4 @@ if __name__ == '__main__':
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    main(arg_namespace=ucare_argparser().parse_args(),
-         config_file_names=('~/.uploadcare', 'uploadcare.ini'))
+    main()
