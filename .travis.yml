@@ -4,11 +4,15 @@ python:
   - 2.7
   - 3.3
 env:
-  - DJANGO=django==1.4
-  - DJANGO=django==1.5
+  - DJANGO=1.4
+  - DJANGO=1.5
+matrix:
+  exclude:
+    - python: 3.3
+      env: DJANGO=1.4
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors unittest2; fi
-  - pip install $DJANGO --use-mirrors
+  - pip install django==$DJANGO --use-mirrors
   - python setup.py install
 script: nosetests tests
 notifications:
