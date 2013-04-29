@@ -74,7 +74,7 @@ def rest_request(verb, path, data=None):
         content = json.dumps(data)
 
     content_type = u'application/json'
-    content_md5 = hashlib.md5(content).hexdigest()
+    content_md5 = hashlib.md5(content.encode('utf-8')).hexdigest()
     date = email.utils.formatdate(usegmt=True)
 
     sign_string = u'\n'.join([
@@ -84,8 +84,13 @@ def rest_request(verb, path, data=None):
         date,
         path,
     ])
+    sign_string_as_bytes = sign_string.encode('utf-8')
 
-    sign = hmac.new(bytes(conf.secret), sign_string, hashlib.sha1) \
+    try:
+        secret_as_bytes = conf.secret.encode('utf-8')
+    except AttributeError:
+        secret_as_bytes = bytes()
+    sign = hmac.new(secret_as_bytes, sign_string_as_bytes, hashlib.sha1) \
         .hexdigest()
 
     headers = {

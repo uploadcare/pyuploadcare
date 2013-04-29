@@ -290,7 +290,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 class UcareCommonConfigFileTest(unittest.TestCase):
 
     def setUp(self):
-        self.tmp_config_file = NamedTemporaryFile(delete=False)
+        self.tmp_config_file = NamedTemporaryFile(mode='w+t', delete=False)
 
     def tearDown(self):
         conf.pub_key = None
@@ -326,7 +326,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        second_tmp_conf_file = NamedTemporaryFile(delete=False)
+        second_tmp_conf_file = NamedTemporaryFile(mode='w+t', delete=False)
         second_tmp_conf_file.write(
             '[ucare]\n'
             'pub_key = demopublickey_modified'
@@ -348,7 +348,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        second_tmp_conf_file = NamedTemporaryFile(delete=False)
+        second_tmp_conf_file = NamedTemporaryFile(mode='w+t', delete=False)
         second_tmp_conf_file.write(
             '[ucare]\n'
             'secret = demosecretkey'
