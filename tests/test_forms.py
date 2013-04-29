@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 try:
     import unittest2 as unittest
 except ImportError:

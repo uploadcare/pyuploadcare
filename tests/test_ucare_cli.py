@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 try:
     import unittest2 as unittest
 except ImportError:
@@ -12,7 +13,7 @@ from pyuploadcare.ucare_cli import (
     ucare_argparser, list_files, get_file, store_file, delete_file, main,
     create_group,
 )
-from tests.utils import MockResponse
+from .utils import MockResponse
 
 
 def arg_namespace(arguments_str):
@@ -156,29 +157,29 @@ class UcareGetTest(unittest.TestCase):
 class UcareStoreTest(unittest.TestCase):
 
     def test_parse_wait_arg(self):
-        args = arg_namespace(u'store --wait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        args = arg_namespace('store --wait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
         self.assertTrue(args.wait)
 
     def test_wait_is_true_by_default(self):
-        args = arg_namespace(u'store 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        args = arg_namespace('store 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
         self.assertTrue(args.wait)
 
     def test_parse_no_wait_arg(self):
-        args = arg_namespace(u'store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        args = arg_namespace('store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
         self.assertFalse(args.wait)
 
-    @patch(u'requests.request', autospec=True)
+    @patch('requests.request', autospec=True)
     def test_no_wait(self, request):
         request.return_value = MockResponse(
             status=200,
-            data=u'{"on_s3": true, "last_keep_claim": "now"}'
+            data='{"on_s3": true, "last_keep_claim": "now"}'
         )
 
-        store_file(arg_namespace(u'store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
+        store_file(arg_namespace('store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
 
         self.assertEqual(
             request.mock_calls[0][1],
-            (u'PUT', u'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/storage/')
+            ('PUT', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/storage/')
         )
 
 

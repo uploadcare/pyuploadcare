@@ -7,6 +7,7 @@ It is JSON REST request abstraction layer that is used by the
 
 """
 
+from __future__ import unicode_literals
 import email.utils
 import hashlib
 import hmac
@@ -28,7 +29,7 @@ from .exceptions import (
 )
 
 
-logger = logging.getLogger(u"pyuploadcare")
+logger = logging.getLogger("pyuploadcare")
 
 
 def rest_request(verb, path, data=None):
@@ -60,24 +61,24 @@ def rest_request(verb, path, data=None):
         }
 
     """
-    assert not path.startswith(u'/'), path
+    assert not path.startswith('/'), path
     url = urljoin(conf.api_base, path)
     url_parts = urlsplit(url)
 
     if url_parts.query:
-        path = url_parts.path + u'?' + url_parts.query
+        path = url_parts.path + '?' + url_parts.query
     else:
         path = url_parts.path
 
-    content = u''
+    content = ''
     if data is not None:
         content = json.dumps(data)
 
-    content_type = u'application/json'
+    content_type = 'application/json'
     content_md5 = hashlib.md5(content.encode('utf-8')).hexdigest()
     date = email.utils.formatdate(usegmt=True)
 
-    sign_string = u'\n'.join([
+    sign_string = '\n'.join([
         verb,
         content_md5,
         content_type,
@@ -94,14 +95,14 @@ def rest_request(verb, path, data=None):
         .hexdigest()
 
     headers = {
-        u'Authorization': u'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
-        u'Date': date,
-        u'Content-Type': content_type,
-        u'Content-Length': six.u(str(len(content))),
-        u'Accept': u'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
-        u'User-Agent': u'pyuploadcare/{0}'.format(__version__),
+        'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
+        'Date': date,
+        'Content-Type': content_type,
+        'Content-Length': six.text_type(len(content)),
+        'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
+        'User-Agent': 'pyuploadcare/{0}'.format(__version__),
     }
-    logger.debug(u'''sent:
+    logger.debug('''sent:
         verb: {0}
         path: {1}
         headers: {2}
@@ -115,14 +116,14 @@ def rest_request(verb, path, data=None):
         raise APIConnectionError(exc.args[0])
 
     logger.debug(
-        u'got: {0} {1}'.format(response.status_code, response.content)
+        'got: {0} {1}'.format(response.status_code, response.content)
     )
 
-    if u'warning' in response.headers:
-        match = re.search(u'"(.+)"', response.headers[u'warning'])
+    if 'warning' in response.headers:
+        match = re.search('"(.+)"', response.headers['warning'])
         if match:
             for warning in match.group(1).split('; '):
-                logger.warn(u'API Warning: {0}'.format(warning))
+                logger.warn('API Warning: {0}'.format(warning))
 
     # TODO: Add check for content-type.
     if response.status_code == 200:
@@ -160,13 +161,13 @@ def uploading_request(verb, path, data=None, files=None):
         >>> File('9b9f4483-77b8-40ae-a198-272ba6280004')
 
     """
-    assert not path.startswith(u'/'), path
+    assert not path.startswith('/'), path
     url = urljoin(conf.upload_base, path)
 
     if data is None:
         data = {}
-    data[u'pub_key'] = conf.pub_key
-    data[u'UPLOADCARE_PUB_KEY'] = conf.pub_key
+    data['pub_key'] = conf.pub_key
+    data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
     try:
         response = requests.request(

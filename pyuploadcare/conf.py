@@ -4,13 +4,15 @@ Configuration variables.
 
 """
 
+from __future__ import unicode_literals
+
 pub_key = None
 secret = None
 
-api_version = u'0.2'
-api_base = u'https://api.uploadcare.com/'
-upload_base = u'https://upload.uploadcare.com/'
-cdn_base = u'https://ucarecdn.com/'
+api_version = '0.2'
+api_base = 'https://api.uploadcare.com/'
+upload_base = 'https://upload.uploadcare.com/'
+cdn_base = 'https://ucarecdn.com/'
 
 verify_api_ssl = True
 verify_upload_ssl = True

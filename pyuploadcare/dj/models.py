@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 import re
 
 from django.db import models
@@ -15,10 +16,10 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
     """
 
     def get_internal_type(self):
-        return u"TextField"
+        return "TextField"
 
     def to_python(self, value):
-        if value is None or value == u'':
+        if value is None or value == '':
             return value
 
         if isinstance(value, File):
@@ -26,18 +27,18 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
 
         if not isinstance(value, six.string_types):
             raise ValidationError(
-                u'Invalid value for a field: string was expected'
+                'Invalid value for a field: string was expected'
             )
 
         try:
             return File(value)
         except InvalidRequestError as exc:
             raise ValidationError(
-                u'Invalid value for a field: {exc}'.format(exc=exc)
+                'Invalid value for a field: {exc}'.format(exc=exc)
             )
 
     def get_prep_value(self, value):
-        if value is None or value == u'':
+        if value is None or value == '':
             return value
         else:
             return value.cdn_url
@@ -52,12 +53,12 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        kwargs[u'form_class'] = forms.FileField
+        kwargs['form_class'] = forms.FileField
 
         return models.Field.formfield(self, **kwargs)
 
 
-pattern_of_crop = re.compile(u'''
+pattern_of_crop = re.compile('''
     ^
     (
         disabled| # "disabled"
@@ -93,14 +94,14 @@ class ImageField(FileField):
             pattern_of_crop.match(manual_crop)
         )
         if not (manual_crop is None or is_crop_valid):
-            raise ValidationError(u'Invalid manual crop value')
+            raise ValidationError('Invalid manual crop value')
 
         self.manual_crop = manual_crop
         super(ImageField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        kwargs[u'manual_crop'] = self.manual_crop
-        kwargs[u'form_class'] = forms.ImageField
+        kwargs['manual_crop'] = self.manual_crop
+        kwargs['form_class'] = forms.ImageField
 
         return models.Field.formfield(self, **kwargs)
 
@@ -113,10 +114,10 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
     """
 
     def get_internal_type(self):
-        return u"TextField"
+        return "TextField"
 
     def to_python(self, value):
-        if value is None or value == u'':
+        if value is None or value == '':
             return value
 
         if isinstance(value, FileGroup):
@@ -124,18 +125,18 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
 
         if not isinstance(value, six.string_types):
             raise ValidationError(
-                u'Invalid value for a field: string was expected'
+                'Invalid value for a field: string was expected'
             )
 
         try:
             return FileGroup(value)
         except InvalidRequestError as exc:
             raise ValidationError(
-                u'Invalid value for a field: {exc}'.format(exc=exc)
+                'Invalid value for a field: {exc}'.format(exc=exc)
             )
 
     def get_prep_value(self, value):
-        if value is None or value == u'':
+        if value is None or value == '':
             return value
         else:
             return value.cdn_url
@@ -150,7 +151,7 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        kwargs[u'form_class'] = forms.FileGroupField
+        kwargs['form_class'] = forms.FileGroupField
 
         return models.Field.formfield(self, **kwargs)
 
@@ -163,6 +164,6 @@ class ImageGroupField(FileGroupField):
     """
 
     def formfield(self, **kwargs):
-        kwargs[u'form_class'] = forms.ImageGroupField
+        kwargs['form_class'] = forms.ImageGroupField
 
         return models.Field.formfield(self, **kwargs)

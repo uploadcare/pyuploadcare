@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 try:
     import unittest2 as unittest
 except ImportError:
@@ -11,7 +12,7 @@ from mock import patch
 from pyuploadcare import conf
 from pyuploadcare.api import rest_request
 from pyuploadcare.exceptions import APIError, InvalidRequestError
-from tests.utils import MockResponse
+from .utils import MockResponse
 
 
 class RESTClientTest(unittest.TestCase):
@@ -31,7 +32,7 @@ class RESTClientTest(unittest.TestCase):
             rest_request('GET', 'files/')
 
         self.assertEqual('No JSON object could be decoded',
-                         cm.exception.message)
+                         cm.exception.args[0])
 
     @patch('requests.request', autospec=True)
     def test_request_headers(self, request):
