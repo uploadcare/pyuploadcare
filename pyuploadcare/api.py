@@ -98,7 +98,6 @@ def rest_request(verb, path, data=None):
         'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
         'Date': date,
         'Content-Type': content_type,
-        'Content-Length': six.text_type(len(content)),
         'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
         'User-Agent': 'pyuploadcare/{0}'.format(__version__),
     }
