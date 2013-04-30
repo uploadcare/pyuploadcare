@@ -99,14 +99,14 @@ class FileInfoTest(unittest.TestCase):
     def test_file_is_not_image(self):
         self.assertFalse(self.file_.is_image())
 
-    def test_file_should_be_ready_in_1_second_after_upload(self):
-        timeout = 1
+    def test_file_should_be_ready_in_5_seconds_after_upload(self):
+        timeout = 5
         time_started = time.time()
 
         while time.time() - time_started < timeout:
             if self.file_.is_ready():
                 break
-            time.sleep(0.1)
+            time.sleep(1)
             self.file_.update_info()
 
         self.assertTrue(self.file_.is_ready())
