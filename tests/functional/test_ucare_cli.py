@@ -4,9 +4,9 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
+from tempfile import NamedTemporaryFile
 
 from mock import patch
-from tempfile import NamedTemporaryFile
 
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
@@ -218,6 +218,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         conf.pub_key = None
         conf.secret = None
 
+        conf.api_version = '0.2'
         conf.api_base = 'https://api.uploadcare.com/'
         conf.upload_base = 'https://upload.uploadcare.com/'
 

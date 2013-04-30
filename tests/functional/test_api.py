@@ -19,7 +19,6 @@ class RESTClientTest(unittest.TestCase):
 
     def tearDown(self):
         conf.api_version = '0.2'
-        conf.api_base = 'https://api.uploadcare.com/'
 
     @patch('requests.request', autospec=True)
     def test_raises(self, request):

@@ -19,6 +19,10 @@ class TestFormFields(unittest.TestCase):
         conf.pub_key = 'asdf'
         conf.secret = 'qwer'
 
+    def tearDown(self):
+        conf.pub_key = None
+        conf.secret = None
+
     def test_default_form_field(self):
         class SomeForm(forms.Form):
             cf = forms.CharField()
