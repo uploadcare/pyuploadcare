@@ -50,7 +50,7 @@ class FileUploadFromUrlTest(unittest.TestCase):
             'https://github.com/images/error/angry_unicorn.png'
         )
 
-        timeout = 5
+        timeout = 30
         time_started = time.time()
 
         while time.time() - time_started < timeout:
