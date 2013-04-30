@@ -11,7 +11,7 @@ import time
 from pyuploadcare import conf
 from pyuploadcare.api_resources import File, FileGroup
 
-from .utils import upload_tmp_txt_file, create_file_group
+from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
 
 
 class FileUploadTest(unittest.TestCase):
@@ -45,6 +45,7 @@ class FileUploadFromUrlTest(unittest.TestCase):
         )
         self.assertTrue(file_from_url.token)
 
+    @skip_on_travis
     def test_successful_upload_from_url(self):
         file_from_url = File.upload_from_url(
             'https://github.com/images/error/angry_unicorn.png'
@@ -99,6 +100,7 @@ class FileInfoTest(unittest.TestCase):
     def test_file_is_not_image(self):
         self.assertFalse(self.file_.is_image())
 
+    @skip_on_travis
     def test_file_should_be_ready_in_5_seconds_after_upload(self):
         timeout = 5
         time_started = time.time()
