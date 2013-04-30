@@ -13,6 +13,8 @@ Usage example::
 
 """
 
+from __future__ import unicode_literals
+
 __version__ = '0.19'
 
 from .api_resources import File, FileGroup

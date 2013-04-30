@@ -1,8 +1,10 @@
 # coding: utf-8
+from __future__ import unicode_literals
 import re
 import logging
 
 import dateutil.parser
+import six
 
 from . import conf
 from .api import rest_request, uploading_request
@@ -11,7 +13,7 @@ from .exceptions import InvalidRequestError, APIError
 
 logger = logging.getLogger("pyuploadcare")
 
-UUID_WITH_EFFECTS_REGEX = re.compile(ur'''
+UUID_WITH_EFFECTS_REGEX = re.compile('''
     (?P<uuid>[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
     (
         /-/(?P<effects>.*)
@@ -36,7 +38,7 @@ class File(object):
         matches = UUID_WITH_EFFECTS_REGEX.search(cdn_url_or_file_id)
 
         if not matches:
-            raise InvalidRequestError("Couldn't find UUID")
+            raise InvalidRequestError("couldn't find UUID")
 
         self.uuid = matches.groupdict()['uuid']
         self.default_effects = matches.groupdict()['effects']
@@ -319,7 +321,7 @@ class File(object):
                 return File(self.info()['uuid'])
 
 
-GROUP_ID_REGEX = re.compile(ur'''
+GROUP_ID_REGEX = re.compile('''
     (?P<group_id>
         [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
         ~
@@ -360,11 +362,11 @@ class FileGroup(object):
         matches = GROUP_ID_REGEX.search(cdn_url_or_group_id)
 
         if not matches:
-            raise InvalidRequestError("Couldn't find group id")
+            raise InvalidRequestError("couldn't find group id")
 
         files_qty = int(matches.groupdict()['files_qty'])
         if files_qty <= 0:
-            raise InvalidRequestError("Couldn't find group id")
+            raise InvalidRequestError("couldn't find group id")
 
         self.id = matches.groupdict()['group_id']
 
@@ -425,7 +427,7 @@ class FileGroup(object):
 
         """
         file_cdn_urls = []
-        for file_index in xrange(len(self)):
+        for file_index in six.moves.xrange(len(self)):
             file_cdn_url = '{group_cdn_url}nth/{file_index}/'.format(
                 group_cdn_url=self.cdn_url,
                 file_index=file_index
@@ -502,7 +504,7 @@ class FileGroup(object):
         for index, file_ in enumerate(files):
             if isinstance(file_, File):
                 file_index = 'files[{index}]'.format(index=index)
-                data[file_index] = unicode(file_)
+                data[file_index] = six.text_type(file_)
             else:
                 raise InvalidRequestError(
                     'all items have to be ``File`` instance'

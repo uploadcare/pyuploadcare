@@ -6,7 +6,7 @@ from setuptools import setup
 
 PY_VERSION = sys.version_info[0], sys.version_info[1]
 
-requirements = ['requests>=1.0', 'python-dateutil>=2.1']
+requirements = ['requests>=1.0', 'python-dateutil>=2.1', 'six>=1.2.0']
 
 if PY_VERSION == (2, 6):
     requirements.append('argparse')
@@ -36,5 +36,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
     ],
 )

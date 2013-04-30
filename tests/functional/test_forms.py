@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 try:
     import unittest2 as unittest
 except ImportError:
@@ -17,6 +18,10 @@ class TestFormFields(unittest.TestCase):
     def setUp(self):
         conf.pub_key = 'asdf'
         conf.secret = 'qwer'
+
+    def tearDown(self):
+        conf.pub_key = None
+        conf.secret = None
 
     def test_default_form_field(self):
         class SomeForm(forms.Form):

@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 try:
     import unittest2 as unittest
 except ImportError:
@@ -22,7 +23,7 @@ class CropToolRegexTest(unittest.TestCase):
         ImageField("")
 
     def test_crop_tool_is_empty_unicode(self):
-        ImageField(u"")
+        ImageField("")
 
     def test_crop_tool_is_disabled(self):
         ImageField("disabled")
@@ -37,7 +38,7 @@ class CropToolRegexTest(unittest.TestCase):
         ImageField("200x300 upscale")
 
     def test_validation_error_when_crop_tool_is_200colon300_upscale(self):
-        self.assertRaises(ValidationError, ImageField, u"200:300 upscale")
+        self.assertRaises(ValidationError, ImageField, "200:300 upscale")
 
     def test_validation_error_when_crop_tool_is_int(self):
         self.assertRaises(ValidationError, ImageField, 123)

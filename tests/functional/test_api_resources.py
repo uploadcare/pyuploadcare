@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 try:
     import unittest2 as unittest
 except ImportError:
@@ -12,7 +13,7 @@ from dateutil.tz import tzutc
 
 from pyuploadcare.api_resources import File, FileGroup
 from pyuploadcare.exceptions import InvalidRequestError
-from tests.utils import MockResponse, api_response_from_file
+from .utils import MockResponse, api_response_from_file
 
 
 class FileRegexTest(unittest.TestCase):
