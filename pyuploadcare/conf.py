@@ -4,6 +4,8 @@ Configuration variables.
 
 """
 
+from __future__ import unicode_literals
+
 pub_key = None
 secret = None
 

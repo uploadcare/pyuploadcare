@@ -1,18 +1,19 @@
 # coding: utf-8
+from __future__ import unicode_literals
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
+from tempfile import NamedTemporaryFile
 
 from mock import patch
-from tempfile import NamedTemporaryFile
 
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
     ucare_argparser, list_files, get_file, store_file, delete_file, main,
     create_group,
 )
-from tests.utils import MockResponse
+from .utils import MockResponse
 
 
 def arg_namespace(arguments_str):
@@ -217,6 +218,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         conf.pub_key = None
         conf.secret = None
 
+        conf.api_version = '0.2'
         conf.api_base = 'https://api.uploadcare.com/'
         conf.upload_base = 'https://upload.uploadcare.com/'
 
@@ -290,7 +292,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 class UcareCommonConfigFileTest(unittest.TestCase):
 
     def setUp(self):
-        self.tmp_config_file = NamedTemporaryFile(delete=False)
+        self.tmp_config_file = NamedTemporaryFile(mode='w+t', delete=False)
 
     def tearDown(self):
         conf.pub_key = None
@@ -326,7 +328,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        second_tmp_conf_file = NamedTemporaryFile(delete=False)
+        second_tmp_conf_file = NamedTemporaryFile(mode='w+t', delete=False)
         second_tmp_conf_file.write(
             '[ucare]\n'
             'pub_key = demopublickey_modified'
@@ -348,7 +350,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        second_tmp_conf_file = NamedTemporaryFile(delete=False)
+        second_tmp_conf_file = NamedTemporaryFile(mode='w+t', delete=False)
         second_tmp_conf_file.write(
             '[ucare]\n'
             'secret = demosecretkey'

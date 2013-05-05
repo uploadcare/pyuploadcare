@@ -1,13 +1,20 @@
 #!/usr/bin/python
 # encoding: utf-8
+from __future__ import unicode_literals
 import time
 import argparse
-import urlparse
-import urllib
 import logging
 import pprint
-import ConfigParser
 import os.path
+
+import six
+from six.moves import configparser
+
+if six.PY3:
+    from urllib.parse import urlunsplit, urlencode
+else:
+    from urlparse import urlunsplit
+    from urllib import urlencode
 
 from . import conf, __version__
 from .api_resources import File, FileGroup
@@ -36,8 +43,8 @@ def list_files(arg_namespace=None):
         arg = getattr(arg_namespace, name)
         if arg is not None:
             query[name] = arg
-    q = urllib.urlencode(query)
-    url = urlparse.urlunsplit(['', '', 'files/', q, ''])
+    q = urlencode(query)
+    url = urlunsplit(['', '', 'files/', q, ''])
 
     pp.pprint(rest_request('GET', url))
 
@@ -76,7 +83,7 @@ def delete_file(arg_namespace):
 
 def _check_upload_args(arg_namespace):
     if not conf.secret and (arg_namespace.store or arg_namespace.info):
-        print 'Cannot store or get info without "--secret" key'
+        pp.pprint('Cannot store or get info without "--secret" key')
         return False
     return True
 
@@ -84,20 +91,20 @@ def _check_upload_args(arg_namespace):
 def _handle_uploaded_file(file_, arg_namespace):
     if arg_namespace.store:
         file_.store()
-        print 'File stored successfully.'
+        pp.pprint('File stored successfully.')
 
     if arg_namespace.info:
         pp.pprint(file_.info())
 
     if arg_namespace.cdnurl:
-        print 'CDN url: {0}'.format(file_.cdn_url)
+        pp.pprint('CDN url: {0}'.format(file_.cdn_url))
 
 
 def upload_from_url(arg_namespace):
     if not _check_upload_args(arg_namespace):
         return
     file_from_url = File.upload_from_url(arg_namespace.url)
-    print file_from_url
+    pp.pprint(file_from_url)
 
     if arg_namespace.wait or arg_namespace.store:
         timeout = arg_namespace.timeout
@@ -117,7 +124,7 @@ def upload_from_url(arg_namespace):
     if arg_namespace.store or arg_namespace.info:
         file_ = file_from_url.get_file()
         if file_ is None:
-            print 'Cannot store or get info.'
+            pp.pprint('Cannot store or get info.')
             return
 
         _handle_uploaded_file(file_, arg_namespace)
@@ -310,18 +317,18 @@ def load_config_from_file(filename):
     if not os.path.exists(filename):
         return
 
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read(filename)
 
     for name in str_settings:
         try:
             setattr(conf, name, config.get('ucare', name))
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             pass
     for name in bool_settings:
         try:
             setattr(conf, name, config.getboolean('ucare', name))
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             pass
 
 
@@ -331,25 +338,30 @@ def load_config_from_args(arg_namespace):
         if arg is not None:
             setattr(conf, name, arg)
 
-    if arg_namespace.no_check_upload_certificate:
+    if arg_namespace and arg_namespace.no_check_upload_certificate:
         conf.verify_upload_ssl = False
-    if arg_namespace.no_check_api_certificate:
+    if arg_namespace and arg_namespace.no_check_api_certificate:
         conf.verify_api_ssl = False
 
     if getattr(arg_namespace, 'cdnurl', False):
         arg_namespace.store = True
 
 
-def main(arg_namespace=None, config_file_names=None):
+def main(arg_namespace=None,
+         config_file_names=('~/.uploadcare', 'uploadcare.ini')):
+    if arg_namespace is None:
+        arg_namespace = ucare_argparser().parse_args()
+
     if config_file_names:
         for file_name in config_file_names:
             load_config_from_file(file_name)
     load_config_from_args(arg_namespace)
 
-    try:
-        arg_namespace.func(arg_namespace)
-    except UploadcareException as exc:
-        print 'ERROR: {0}'.format(exc)
+    if hasattr(arg_namespace, 'func'):
+        try:
+            arg_namespace.func(arg_namespace)
+        except UploadcareException as exc:
+            pp.pprint('ERROR: {0}'.format(exc))
 
 
 if __name__ == '__main__':
@@ -359,5 +371,4 @@ if __name__ == '__main__':
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    main(arg_namespace=ucare_argparser().parse_args(),
-         config_file_names=('~/.uploadcare', 'uploadcare.ini'))
+    main()
