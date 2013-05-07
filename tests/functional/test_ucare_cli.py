@@ -37,7 +37,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20')
         )
 
     @patch('requests.request', autospec=True)
@@ -48,7 +48,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?page=2')
+            ('GET', 'https://api.uploadcare.com/files/?page=2&limit=20')
         )
 
     @patch('requests.request', autospec=True)
@@ -59,7 +59,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?limit=10')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=10')
         )
 
     @patch('requests.request', autospec=True)
@@ -70,7 +70,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?stored=all')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20')
         )
 
     @patch('requests.request', autospec=True)
@@ -81,7 +81,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?stored=true')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&stored=true')
         )
 
     @patch('requests.request', autospec=True)
@@ -92,7 +92,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?stored=false')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&stored=false')
         )
 
     @patch('requests.request', autospec=True)
@@ -103,7 +103,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?removed=all')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20')
         )
 
     @patch('requests.request', autospec=True)
@@ -114,7 +114,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?removed=true')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&removed=true')
         )
 
     @patch('requests.request', autospec=True)
@@ -125,7 +125,7 @@ class UcareListTest(unittest.TestCase):
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?removed=false')
+            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&removed=false')
         )
 
 

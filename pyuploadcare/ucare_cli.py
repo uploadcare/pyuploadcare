@@ -7,19 +7,11 @@ import logging
 import pprint
 import os.path
 
-import six
 from six.moves import configparser
 
-if six.PY3:
-    from urllib.parse import urlunsplit, urlencode
-else:
-    from urlparse import urlunsplit
-    from urllib import urlencode
-
 from . import conf, __version__
-from .api_resources import File, FileGroup
+from .api_resources import File, FileGroup, FileList
 from .exceptions import UploadcareException, TimeoutError, UploadError
-from .api import rest_request
 
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -38,15 +30,26 @@ bool_settings = (
 
 
 def list_files(arg_namespace=None):
-    query = {}
-    for name in ['page', 'limit', 'stored', 'removed']:
-        arg = getattr(arg_namespace, name)
-        if arg is not None:
-            query[name] = arg
-    q = urlencode(query)
-    url = urlunsplit(['', '', 'files/', q, ''])
+    page = getattr(arg_namespace, 'page') or 1
 
-    pp.pprint(rest_request('GET', url))
+    limit = getattr(arg_namespace, 'limit') or 20
+
+    if getattr(arg_namespace, 'stored') == 'true':
+        stored = True
+    elif getattr(arg_namespace, 'stored') == 'false':
+        stored = False
+    else:
+        stored = None
+
+    if getattr(arg_namespace, 'removed') == 'true':
+        removed = True
+    elif getattr(arg_namespace, 'removed') == 'false':
+        removed = False
+    else:
+        removed = None
+
+    result = FileList.retrieve(page, limit, stored, removed)
+    pp.pprint(result)
 
 
 def get_file(arg_namespace):
