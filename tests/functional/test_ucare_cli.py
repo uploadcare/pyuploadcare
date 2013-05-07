@@ -63,36 +63,36 @@ class UcareListTest(unittest.TestCase):
         )
 
     @patch('requests.request', autospec=True)
-    def test_kept_all(self, request):
+    def test_stored_all(self, request):
         request.return_value = MockResponse(status=200)
 
-        list_files(arg_namespace('list --kept all'))
+        list_files(arg_namespace('list --stored all'))
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?kept=all')
+            ('GET', 'https://api.uploadcare.com/files/?stored=all')
         )
 
     @patch('requests.request', autospec=True)
-    def test_kept_true(self, request):
+    def test_stored_true(self, request):
         request.return_value = MockResponse(status=200)
 
-        list_files(arg_namespace('list --kept true'))
+        list_files(arg_namespace('list --stored true'))
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?kept=true')
+            ('GET', 'https://api.uploadcare.com/files/?stored=true')
         )
 
     @patch('requests.request', autospec=True)
-    def test_kept_false(self, request):
+    def test_stored_false(self, request):
         request.return_value = MockResponse(status=200)
 
-        list_files(arg_namespace('list --kept false'))
+        list_files(arg_namespace('list --stored false'))
 
         self.assertEqual(
             request.mock_calls[0][1],
-            ('GET', 'https://api.uploadcare.com/files/?kept=false')
+            ('GET', 'https://api.uploadcare.com/files/?stored=false')
         )
 
     @patch('requests.request', autospec=True)

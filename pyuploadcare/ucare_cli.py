@@ -39,7 +39,7 @@ bool_settings = (
 
 def list_files(arg_namespace=None):
     query = {}
-    for name in ['page', 'limit', 'kept', 'removed']:
+    for name in ['page', 'limit', 'stored', 'removed']:
         arg = getattr(arg_namespace, name)
         if arg is not None:
             query[name] = arg
@@ -156,7 +156,7 @@ def ucare_argparser():
     subparser.set_defaults(func=list_files)
     subparser.add_argument('--page', help='page to show')
     subparser.add_argument('--limit', help='files per page')
-    subparser.add_argument('--kept', help='filter kept files',
+    subparser.add_argument('--stored', help='filter stored files',
                            choices=['all', 'true', 'false'])
     subparser.add_argument('--removed', help='filter removed files',
                            choices=['all', 'true', 'false'])
