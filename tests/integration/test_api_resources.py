@@ -285,6 +285,12 @@ class FileListIterationTest(unittest.TestCase):
         files = list(file_ for file_ in FileList())
         self.assertTrue(len(files) >= 0)
 
+    def test_iteration_over_limited_count_of_files(self):
+        create_file_group(files_qty=3)
+
+        files = list(file_ for file_ in FileList(count=2))
+        self.assertEqual(len(files), 2)
+
     def test_iteration_over_stored_files(self):
         for file_ in FileList(stored=True):
             self.assertTrue(file_.is_stored())

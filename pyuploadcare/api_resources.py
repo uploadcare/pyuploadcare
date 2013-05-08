@@ -328,6 +328,7 @@ class FileList(object):
     This class provides iteration over all uploaded files. You can specify:
 
     - ``offset`` -- an offset into the list of returned items;
+    - ``count`` -- a limit on the number of objects to be returned;
     - ``stored`` -- ``True`` to include only removed files,
       ``False`` to exclude;
     - ``removed`` -- ``True`` to include only stored files,
@@ -335,24 +336,41 @@ class FileList(object):
 
     Usage example::
 
-        >>> files_from_second_to_end = FileList(offset=2)
+        >>> files_from_second_to_end = FileList(offset=1)
         >>> for file_ in files_from_second_to_end:
         >>>     print file_
 
     """
 
-    def __init__(self, offset=0, stored=None, removed=None):
+    def __init__(self, offset=0, count=None, stored=None, removed=None):
+        if offset < 0:
+            raise InvalidRequestError(
+                'offset has to be greater than or equal to zero'
+            )
         self.offset = offset
+
+        if count is not None and count < 0:
+            raise InvalidRequestError(
+                'count has to be greater than or equal to zero'
+            )
+        self.count = count
+
         self.stored = stored
         self.removed = removed
 
     def __iter__(self):
-        return FileList.FileListIterator(self.offset, self.stored, self.removed)
+        return FileList.FileListIterator(self.offset, self.count,
+                                         self.stored, self.removed)
 
     @classmethod
     def retrieve(cls, page, limit=20, stored=None, removed=None):
         """Returns list of files' raw information by requesting Uploadcare API.
         """
+        if page < 1:
+            raise InvalidRequestError(
+                'page has to be greater than or equal to one'
+            )
+
         url = 'files/?page={page}&limit={limit}'.format(page=page, limit=limit)
         if stored is not None:
             url += '&stored={stored}'.format(
@@ -371,19 +389,25 @@ class FileList(object):
 
         _count_per_request = 20
 
-        def __init__(self, offset, stored=None, removed=None):
+        def __init__(self, offset, count=None, stored=None, removed=None):
             # ``+1`` is a zero numbering correction.
             self._page = int(math.ceil(
                 (offset + 1) / self._count_per_request
             ))
             self._position_in_page = offset % self._count_per_request
 
+            self._count = count
             self._stored = stored
             self._removed = removed
 
+            self._count_of_constructed_files = 0
             self._result_cache = None
 
         def next(self):
+            if (self._count is not None and
+                self._count == self._count_of_constructed_files):
+                raise StopIteration
+
             if self._result_cache is None or self._result_cache['page'] != self._page:
                 try:
                     self._result_cache = FileList.retrieve(
@@ -405,6 +429,8 @@ class FileList(object):
             else:
                 self._page += 1
                 self._position_in_page = 0
+
+            self._count_of_constructed_files += 1
 
             return File.construct_from(file_info)
 
