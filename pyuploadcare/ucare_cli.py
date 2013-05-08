@@ -29,26 +29,17 @@ bool_settings = (
 )
 
 
+def bool_or_none(value):
+    return {'true': True, 'false': False}.get(value)
+
+
 def list_files(arg_namespace=None):
-    page = getattr(arg_namespace, 'page') or 1
-
-    limit = getattr(arg_namespace, 'limit') or 20
-
-    if getattr(arg_namespace, 'stored') == 'true':
-        stored = True
-    elif getattr(arg_namespace, 'stored') == 'false':
-        stored = False
-    else:
-        stored = None
-
-    if getattr(arg_namespace, 'removed') == 'true':
-        removed = True
-    elif getattr(arg_namespace, 'removed') == 'false':
-        removed = False
-    else:
-        removed = None
-
-    result = FileList.retrieve(page, limit, stored, removed)
+    result = FileList.retrieve(
+        page=arg_namespace.page or 1,
+        limit=arg_namespace.limit or 20,
+        stored=bool_or_none(arg_namespace.stored),
+        removed=bool_or_none(arg_namespace.removed)
+    )
     pp.pprint(result)
 
 
@@ -157,8 +148,8 @@ def ucare_argparser():
     # list
     subparser = subparsers.add_parser('list', help='list all files')
     subparser.set_defaults(func=list_files)
-    subparser.add_argument('--page', help='page to show')
-    subparser.add_argument('--limit', help='files per page')
+    subparser.add_argument('--page', help='page to show', type=int)
+    subparser.add_argument('--limit', help='files per page', type=int)
     subparser.add_argument('--stored', help='filter stored files',
                            choices=['all', 'true', 'false'])
     subparser.add_argument('--removed', help='filter removed files',
