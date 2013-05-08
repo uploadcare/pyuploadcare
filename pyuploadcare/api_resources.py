@@ -372,13 +372,11 @@ class FileList(object):
         _count_per_request = 20
 
         def __init__(self, offset, stored=None, removed=None):
-            self._page = int(math.ceil(offset / self._count_per_request))
-            # If modulo is zero then we need last list item.
-            # "-1" is a zero numbering correction.
-            if offset % self._count_per_request == 0:
-                self._position_in_page = self._count_per_request - 1
-            else:
-                self._position_in_page = (offset % self._count_per_request) - 1
+            # ``+1`` is a zero numbering correction.
+            self._page = int(math.ceil(
+                (offset + 1) / self._count_per_request
+            ))
+            self._position_in_page = offset % self._count_per_request
 
             self._stored = stored
             self._removed = removed
@@ -401,6 +399,7 @@ class FileList(object):
             except IndexError:
                 raise StopIteration
 
+            # ``-1`` is a zero numbering correction.
             if self._position_in_page < self._count_per_request - 1:
                 self._position_in_page += 1
             else:
