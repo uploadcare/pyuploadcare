@@ -16,7 +16,9 @@ setup(
     name='pyuploadcare',
     version='1.0',
     description='Python library for Uploadcare.com',
-    long_description=open('README.rst').read(),
+    long_description=(
+        open('README.rst').read() + '\n\n' + open('HISTORY.rst').read()
+    ),
     author='Uploadcare Ltd',
     author_email='hello@uploadcare.com',
     url='https://github.com/uploadcare/pyuploadcare',
