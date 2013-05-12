@@ -34,5 +34,4 @@ if use_hosted_assets:
 else:
     UPLOADCARE_JS = getattr(settings, 'PYUPLOADCARE_WIDGET_URL', local_url)
 
-AVAIL_ASSET_LANG = ('en', 'ru', 'pl')
 UPLOAD_BASE_URL = getattr(settings, 'PYUPLOADCARE_UPLOAD_BASE_URL', None)
