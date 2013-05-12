@@ -1,3 +1,12 @@
+### 1.0
+    * Python 3.2, 3.3 support were added.
+    * File Group creating was added.
+    * Methods per API field for File, FileGroup were added.
+    * Deprecated things were deleted. This version is not backward compatible.
+      For detailed information see
+      https://pyuploadcare.readthedocs.org/en/v0.19/deprecated.html
+
+
 ### 0.19
     * Multiupload support was added.
     * ``argparse`` was added into ``setup.py`` requirements.
