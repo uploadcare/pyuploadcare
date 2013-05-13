@@ -51,14 +51,15 @@ you can use a :ref:`FileField <django-widget-models-filefield-ref>` or
 These fields play by common Django rules. South migrations are supported.
 
 .. note::
-    When you call ``form.is_valid()`` (accessing the ``form.errors`` attribute
-    or calling ``form.full_clean()`` directly) it invocates ``File.store()``
-    method automatically. In other cases you should store objects manually, e.g:
+    When you call ``your_model_form.is_valid()`` or call ``photo.full_clean()``
+    directly it invokes ``File.store()`` method automatically. In other cases
+    you should store objects manually, e.g:
 
     .. code-block:: python
 
         photo.photo_2x3 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
         photo.save()
+
         photo.photo_2x3.store()
 
 .. _django-widget-models-filefield-ref:

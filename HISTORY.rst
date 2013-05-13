@@ -7,18 +7,17 @@ History
 ~~~~~
 
 - Widget was updated up to *0.8.1.2*.
-- It was invocating ``File.store()``, ``FileGroup.store()`` methods on every
-  model instance saving into database, e.g.:
+- It was invoking ``File.store()``, ``FileGroup.store()`` methods on every
+  model instance saving, e.g.:
 
   .. code-block:: python
 
       photo.title = 'new title'
       photo.save()
 
-  Now it happens while saving by form only, namely by calling
-  ``form.is_valid()``. There are other things that can trigger storing
-  (accessing the ``form.errors`` attribute or calling ``form.full_clean()``
-  directly).
+  Now it happens while saving by form, namely by calling
+  ``your_model_form.is_valid()``. There is other thing that can trigger
+  storing -- calling ``photo.full_clean()`` directly.
 
 1.0
 ~~~
