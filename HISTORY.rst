@@ -3,6 +3,22 @@
 History
 -------
 
+1.0.1
+~~~~~
+
+- Widget was updated up to *0.8.1.2*.
+- It was invoking ``File.store()``, ``FileGroup.store()`` methods on every
+  model instance saving, e.g.:
+
+  .. code-block:: python
+
+      photo.title = 'new title'
+      photo.save()
+
+  Now it happens while saving by form, namely by calling
+  ``your_model_form.is_valid()``. There is other thing that can trigger
+  storing -- calling ``photo.full_clean()`` directly.
+
 1.0
 ~~~
 
