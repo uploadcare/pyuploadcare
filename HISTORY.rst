@@ -3,6 +3,19 @@
 History
 -------
 
+1.0.2
+~~~~~
+
+``UnicodeDecodeError`` was fixed. This bug appears when
+`request <https://pypi.python.org/pypi/requests/>`_'s ``method``
+param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
+
+.. code-block:: python
+
+    >>> requests.request(u'post', u'http://httpbin.org/post',
+    ...                  files={u'file': open('README.rst', 'rb')})
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc5 ...
+
 1.0.1
 ~~~~~
 

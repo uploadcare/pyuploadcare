@@ -170,8 +170,8 @@ def uploading_request(verb, path, data=None, files=None):
 
     try:
         response = requests.request(
-            verb, url, allow_redirects=True, verify=conf.verify_upload_ssl,
-            data=data, files=files
+            str(verb), url, allow_redirects=True,
+            verify=conf.verify_upload_ssl, data=data, files=files
         )
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
