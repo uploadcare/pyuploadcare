@@ -14,7 +14,7 @@ if PY_VERSION == (2, 6):
 
 setup(
     name='pyuploadcare',
-    version='1.0.1',
+    version='1.0.2',
     description='Python library for Uploadcare.com',
     long_description=(
         open('README.rst').read() + '\n\n' + open('HISTORY.rst').read()
