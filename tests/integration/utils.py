@@ -14,11 +14,11 @@ from pyuploadcare.api_resources import File, FileGroup
 def upload_tmp_txt_file(content=''):
     conf.pub_key = 'demopublickey'
 
-    tmp_config_file = NamedTemporaryFile(mode='w+t', delete=False)
-    tmp_config_file.write(content)
-    tmp_config_file.close()
+    tmp_txt_file = NamedTemporaryFile(mode='wb', delete=False)
+    tmp_txt_file.write(content.encode('utf-8'))
+    tmp_txt_file.close()
 
-    with open(tmp_config_file.name) as fh:
+    with open(tmp_txt_file.name, 'rb') as fh:
         file_ = File.upload(fh)
     return file_
 
