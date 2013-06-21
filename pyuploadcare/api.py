@@ -146,7 +146,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
     if response.status_code == 204:
         return
 
-    if response.status_code == 403:
+    if response.status_code in (401, 403):
         raise AuthenticationError(response.content)
 
     if response.status_code in (400, 404):
