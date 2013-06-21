@@ -20,7 +20,7 @@ class RESTClientTest(unittest.TestCase):
     def tearDown(self):
         conf.api_version = '0.2'
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
         request.return_value = MockResponse(404, '{}')
         with self.assertRaises(InvalidRequestError):
@@ -33,7 +33,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertEqual('No JSON object could be decoded',
                          cm.exception.args[0])
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
         request.return_value = MockResponse(200, '[]')
 

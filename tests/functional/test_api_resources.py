@@ -155,7 +155,7 @@ class FileGroupDateMethodsTest(unittest.TestCase):
 
 class FileGroupAsContainerTypeTest(unittest.TestCase):
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def setUp(self, request):
         request.return_value = MockResponse(
             status=200,
@@ -199,7 +199,7 @@ class FileGroupAsContainerTypeTest(unittest.TestCase):
 
 class StoreFileGroupTest(unittest.TestCase):
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_successful_store(self, request):
         group = FileGroup(
             cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
@@ -213,7 +213,7 @@ class StoreFileGroupTest(unittest.TestCase):
 
         self.assertEqual(request.call_count, 1)
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_do_not_store_twice(self, request):
         group = FileGroup(
             cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
@@ -235,7 +235,7 @@ class FileCDNUrlsTest(unittest.TestCase):
             cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
         )
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_no_api_requests(self, request):
         request.return_value = MockResponse(status=200, data='{}')
         self.group.file_cdn_urls
@@ -272,7 +272,7 @@ class FileGroupCreateTest(unittest.TestCase):
         }
         self.assertRaises(InvalidRequestError, FileGroup.create, files)
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_group_successfully_created(self, request):
         json_response = """{
             "id": "0513dda0-582f-447d-846f-096e5df9e2bb~1",
