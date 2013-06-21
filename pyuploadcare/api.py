@@ -31,6 +31,8 @@ from .exceptions import (
 
 logger = logging.getLogger("pyuploadcare")
 
+# Use session for keep-alive connections.
+session = requests.session()
 
 def rest_request(verb, path, data=None):
     """Makes REST API request and returns response as ``dict``.
@@ -108,9 +110,9 @@ def rest_request(verb, path, data=None):
         data: {3}'''.format(verb, path, headers, content))
 
     try:
-        response = requests.request(verb, url, allow_redirects=True,
-                                    verify=conf.verify_api_ssl,
-                                    headers=headers, data=content)
+        response = session.request(verb, url, allow_redirects=True,
+                                   verify=conf.verify_api_ssl,
+                                   headers=headers, data=content)
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
 
@@ -169,9 +171,9 @@ def uploading_request(verb, path, data=None, files=None):
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
     try:
-        response = requests.request(
+        response = session.request(
             str(verb), url, allow_redirects=True,
-            verify=conf.verify_upload_ssl, data=data, files=files
+            verify=conf.verify_upload_ssl, data=data, files=files,
         )
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
