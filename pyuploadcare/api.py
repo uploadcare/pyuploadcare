@@ -14,6 +14,7 @@ import hmac
 import re
 import logging
 import json
+import socket
 
 import requests
 import six
@@ -31,8 +32,18 @@ from .exceptions import (
 
 logger = logging.getLogger("pyuploadcare")
 
+# Use session for keep-alive connections.
+session = requests.session()
 
-def rest_request(verb, path, data=None):
+def _get_timeout(timeout):
+    if timeout is not conf.DEFAULT:
+        return timeout
+    if conf.timeout is not conf.DEFAULT:
+        return conf.timeout
+    return socket.getdefaulttimeout()
+
+
+def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
     """Makes REST API request and returns response as ``dict``.
 
     It provides auth headers as well and takes settings from ``conf`` module.
@@ -108,9 +119,10 @@ def rest_request(verb, path, data=None):
         data: {3}'''.format(verb, path, headers, content))
 
     try:
-        response = requests.request(verb, url, allow_redirects=True,
-                                    verify=conf.verify_api_ssl,
-                                    headers=headers, data=content)
+        response = session.request(verb, url, allow_redirects=True,
+                                   verify=conf.verify_api_ssl,
+                                   headers=headers, data=content,
+                                   timeout=_get_timeout(timeout))
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
 
@@ -134,7 +146,7 @@ def rest_request(verb, path, data=None):
     if response.status_code == 204:
         return
 
-    if response.status_code == 403:
+    if response.status_code in (401, 403):
         raise AuthenticationError(response.content)
 
     if response.status_code in (400, 404):
@@ -143,7 +155,7 @@ def rest_request(verb, path, data=None):
     raise APIError(response.content)
 
 
-def uploading_request(verb, path, data=None, files=None):
+def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     """Makes Uploading API request and returns response as ``dict``.
 
     It takes settings from ``conf`` module.
@@ -169,9 +181,10 @@ def uploading_request(verb, path, data=None, files=None):
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
     try:
-        response = requests.request(
+        response = session.request(
             str(verb), url, allow_redirects=True,
-            verify=conf.verify_upload_ssl, data=data, files=files
+            verify=conf.verify_upload_ssl, data=data, files=files,
+            timeout=_get_timeout(timeout),
         )
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
