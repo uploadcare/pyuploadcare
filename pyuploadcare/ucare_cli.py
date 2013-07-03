@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 import time
 import argparse
-import logging
 import pprint
 import os.path
 
@@ -23,7 +22,6 @@ from .api import rest_request
 
 
 pp = pprint.PrettyPrinter(indent=2)
-logger = logging.getLogger('pyuploadcare')
 str_settings = (
     'pub_key',
     'secret',
@@ -365,10 +363,4 @@ def main(arg_namespace=None,
 
 
 if __name__ == '__main__':
-    ch = logging.StreamHandler()
-    fmt = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    ch.setFormatter(fmt)
-    logger.addHandler(ch)
-    logger.setLevel(logging.INFO)
-
     main()
