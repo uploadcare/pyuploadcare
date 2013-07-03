@@ -27,23 +27,20 @@ hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare-{versi
 local_url = 'uploadcare/assets/uploaders/uploadcare-{version}.min.js'.format(
     version=widget_version)
 
-if 'use_hosted_assets' in settings.UPLOADCARE:
-    use_hosted_assets = getattr(settings.UPLOADCARE, 'use_hosted_assets', True)
-else:
-    # Deprecated.
-    use_hosted_assets = getattr(settings, 'PYUPLOADCARE_USE_HOSTED_ASSETS', True)
+use_hosted_assets = settings.UPLOADCARE.get(
+    'use_hosted_assets',
+    getattr(settings, 'PYUPLOADCARE_USE_HOSTED_ASSETS', True)
+)
 
 if use_hosted_assets:
     UPLOADCARE_JS = hosted_url
 else:
-    if 'widget_url' in settings.UPLOADCARE:
-        UPLOADCARE_JS = getattr(settings.UPLOADCARE, 'widget_url', local_url)
-    else:
-        # Deprecated.
-        UPLOADCARE_JS = getattr(settings, 'PYUPLOADCARE_WIDGET_URL', local_url)
+    UPLOADCARE_JS = settings.UPLOADCARE.get(
+        'widget_url',
+        getattr(settings, 'PYUPLOADCARE_WIDGET_URL', local_url)
+    )
 
-if 'upload_base_url' in settings.UPLOADCARE:
-    UPLOAD_BASE_URL = getattr(settings.UPLOADCARE, 'upload_base_url', None)
-else:
-    # Deprecated.
-    UPLOAD_BASE_URL = getattr(settings, 'PYUPLOADCARE_UPLOAD_BASE_URL', None)
+UPLOAD_BASE_URL = settings.UPLOADCARE.get(
+    'upload_base_url',
+    getattr(settings, 'PYUPLOADCARE_UPLOAD_BASE_URL', None)
+)
