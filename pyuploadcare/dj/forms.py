@@ -18,7 +18,7 @@ class FileWidget(TextInput):
     input_type = 'hidden'
 
     class Media:
-        js = (dj_conf.UPLOADCARE_JS,)
+        js = (dj_conf.uploadcare_js,)
 
     def __init__(self, attrs=None):
         default_attrs = {
@@ -26,8 +26,8 @@ class FileWidget(TextInput):
             'data-public-key': conf.pub_key,
         }
 
-        if dj_conf.UPLOAD_BASE_URL is not None:
-            default_attrs['data-upload-base-url'] = dj_conf.UPLOAD_BASE_URL
+        if dj_conf.upload_base_url is not None:
+            default_attrs['data-upload-base-url'] = dj_conf.upload_base_url
 
         if attrs is not None:
             default_attrs.update(attrs)

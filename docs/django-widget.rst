@@ -9,6 +9,17 @@ Django Widget
 Settings
 --------
 
+Besides required ``pub_key``, ``secret`` settings there are optional settings,
+for example, ``widget_version``:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        'pub_key': 'demopublickey',
+        'secret': 'demoprivatekey',
+        'widget_version': '0.10',
+    }
+
 PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
 
 .. code-block:: html
@@ -19,7 +30,10 @@ If you don't want to use hosted assets you have to turn off this feature:
 
 .. code-block:: python
 
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
+    UPLOADCARE = {
+        # ...
+        'use_hosted_assets': False,
+    }
 
 In this case local assets will be used.
 
@@ -28,14 +42,20 @@ widget url:
 
 .. code-block:: python
 
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
-    PYUPLOADCARE_WIDGET_URL = 'http://path.to/your/widget.js'
+    UPLOADCARE = {
+        # ...
+        'use_hosted_assets': False,
+        'widget_url': 'http://path.to/your/widget.js',
+    }
 
 `Uploadcare widget`_ will use default upload handler url, unless you specify:
 
 .. code-block:: python
 
-    PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to/your/upload/handler'
+    UPLOADCARE = {
+        # ...
+        'upload_base_url' = 'http://path.to/your/upload/handler',
+    }
 
 .. _django-widget-models-ref:
 
