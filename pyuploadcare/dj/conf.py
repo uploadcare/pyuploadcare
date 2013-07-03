@@ -33,14 +33,14 @@ use_hosted_assets = settings.UPLOADCARE.get(
 )
 
 if use_hosted_assets:
-    UPLOADCARE_JS = hosted_url
+    uploadcare_js = hosted_url
 else:
-    UPLOADCARE_JS = settings.UPLOADCARE.get(
+    uploadcare_js = settings.UPLOADCARE.get(
         'widget_url',
         getattr(settings, 'PYUPLOADCARE_WIDGET_URL', local_url)
     )
 
-UPLOAD_BASE_URL = settings.UPLOADCARE.get(
+upload_base_url = settings.UPLOADCARE.get(
     'upload_base_url',
     getattr(settings, 'PYUPLOADCARE_UPLOAD_BASE_URL', None)
 )
