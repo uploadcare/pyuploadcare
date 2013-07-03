@@ -43,13 +43,6 @@ def _get_timeout(timeout):
     return socket.getdefaulttimeout()
 
 
-def _remove_leading_slash(path):
-    if path.startswith('/'):
-        return path[1:]
-    else:
-        return path
-
-
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
     """Makes REST API request and returns response as ``dict``.
 
@@ -79,8 +72,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
         }
 
     """
-    path = _remove_leading_slash(path)
-    assert not path.startswith('/'), path
+    path = path.lstrip('/')
     url = urljoin(conf.api_base, path)
     url_parts = urlsplit(url)
 
@@ -180,8 +172,7 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
         >>> File('9b9f4483-77b8-40ae-a198-272ba6280004')
 
     """
-    path = _remove_leading_slash(path)
-    assert not path.startswith('/'), path
+    path = path.lstrip('/')
     url = urljoin(conf.upload_base, path)
 
     if data is None:
