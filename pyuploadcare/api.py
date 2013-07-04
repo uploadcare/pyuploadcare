@@ -72,7 +72,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
         }
 
     """
-    assert not path.startswith('/'), path
+    path = path.lstrip('/')
     url = urljoin(conf.api_base, path)
     url_parts = urlsplit(url)
 
@@ -172,7 +172,7 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
         >>> File('9b9f4483-77b8-40ae-a198-272ba6280004')
 
     """
-    assert not path.startswith('/'), path
+    path = path.lstrip('/')
     url = urljoin(conf.upload_base, path)
 
     if data is None:
