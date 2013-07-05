@@ -218,7 +218,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         conf.pub_key = None
         conf.secret = None
 
-        conf.api_version = '0.2'
+        conf.api_version = '0.3'
         conf.api_base = 'https://api.uploadcare.com/'
         conf.upload_base = 'https://upload.uploadcare.com/'
 
