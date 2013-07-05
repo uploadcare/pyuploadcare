@@ -3,6 +3,14 @@
 History
 -------
 
+1.0.3
+~~~~~
+
+- Widget was updated up to *0.10*.
+- Default API version was updated up to *0.3*.
+- Django settings were merged into UPLOADCARE dictionary.
+- Performance was improved by reusing requests' session.
+
 1.0.2
 ~~~~~
 
