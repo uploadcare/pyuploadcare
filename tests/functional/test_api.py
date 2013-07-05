@@ -18,7 +18,7 @@ from .utils import MockResponse
 class RESTClientTest(unittest.TestCase):
 
     def tearDown(self):
-        conf.api_version = '0.2'
+        conf.api_version = '0.3'
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
@@ -42,7 +42,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
-                         'application/vnd.uploadcare-v0.2+json')
+                         'application/vnd.uploadcare-v0.3+json')
         self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.0.2')
 
         conf.api_version = '0.1'
