@@ -43,7 +43,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.3+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.0.3')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.1')
 
         conf.api_version = '0.1'
         rest_request('GET', 'files/')
@@ -51,4 +51,4 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.0.3')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.1')

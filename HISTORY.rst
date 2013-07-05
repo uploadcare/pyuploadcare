@@ -3,8 +3,8 @@
 History
 -------
 
-1.0.3
-~~~~~
+1.1
+~~~
 
 - Widget was updated up to *0.10*.
 - Default API version was updated up to *0.3*.
