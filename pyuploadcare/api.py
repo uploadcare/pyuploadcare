@@ -11,8 +11,6 @@ from __future__ import unicode_literals
 import email.utils
 import hashlib
 import hmac
-import re
-import logging
 import json
 import socket
 
@@ -30,10 +28,9 @@ from .exceptions import (
 )
 
 
-logger = logging.getLogger("pyuploadcare")
-
 # Use session for keep-alive connections.
 session = requests.session()
+
 
 def _get_timeout(timeout):
     if timeout is not conf.DEFAULT:
@@ -112,11 +109,6 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
         'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
         'User-Agent': 'pyuploadcare/{0}'.format(__version__),
     }
-    logger.debug('''sent:
-        verb: {0}
-        path: {1}
-        headers: {2}
-        data: {3}'''.format(verb, path, headers, content))
 
     try:
         response = session.request(verb, url, allow_redirects=True,
@@ -125,16 +117,6 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
                                    timeout=_get_timeout(timeout))
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
-
-    logger.debug(
-        'got: {0} {1}'.format(response.status_code, response.content)
-    )
-
-    if 'warning' in response.headers:
-        match = re.search('"(.+)"', response.headers['warning'])
-        if match:
-            for warning in match.group(1).split('; '):
-                logger.warn('API Warning: {0}'.format(warning))
 
     # TODO: Add check for content-type.
     if response.status_code == 200:
