@@ -146,7 +146,7 @@ class UcareGetTest(unittest.TestCase):
     def test_get_by_cdn_url(self, request):
         request.return_value = MockResponse(status=200)
 
-        get_file(arg_namespace('get https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/'))
+        get_file(arg_namespace('get http://www.ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/'))
 
         self.assertEqual(
             request.mock_calls[0][1][1:],
@@ -437,7 +437,7 @@ class CreateFileGroupTest(unittest.TestCase):
 
         create_group(arg_namespace(
             'create_group 44fc352e-7503-4826-b87b-a137404b9c53'
-            ' https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/'
+            ' http://www.ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/'
         ))
 
         self.assertEqual(
