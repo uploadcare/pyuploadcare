@@ -3,6 +3,12 @@
 History
 -------
 
+1.2.1
+~~~~~
+
+``https://ucarecdn.com/`` URL was returned to serve widget's assets.
+
+
 1.2
 ~~~
 
