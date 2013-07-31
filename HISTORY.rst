@@ -3,6 +3,13 @@
 History
 -------
 
+1.2
+~~~
+
+- CDN URL has been changed to ``http://www.ucarecdn.com/``. Previous URL
+  ``https://ucarecdn.com/`` is depricated.
+- Widget was updated up to *0.10.1*.
+
 1.1
 ~~~
 
