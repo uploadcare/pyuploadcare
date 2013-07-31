@@ -24,7 +24,7 @@ PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
 
 .. code-block:: html
 
-    <script src="https://ucarecdn.com/widget/x.y.z/uploadcare/uploadcare-x.y.z.min.js"></script>
+    <script src="http://www.ucarecdn.com/widget/x.y.z/uploadcare/uploadcare-x.y.z.min.js"></script>
 
 If you don't want to use hosted assets you have to turn off this feature:
 
@@ -123,7 +123,7 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 
         photo = ImageField(blank=True, manual_crop="")
 
-.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
+.. image:: http://www.ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
 
 .. _django-widget-models-filegroupfield-ref:
 

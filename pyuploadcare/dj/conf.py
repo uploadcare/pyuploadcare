@@ -22,7 +22,7 @@ conf.secret = settings.UPLOADCARE['secret']
 
 widget_version = settings.UPLOADCARE.get('widget_version', '0.10.1')
 
-hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare-{version}.min.js'.format(
+hosted_url = 'http://www.ucarecdn.com/widget/{version}/uploadcare/uploadcare-{version}.min.js'.format(
     version=widget_version)
 local_url = 'uploadcare/assets/uploaders/uploadcare-{version}.min.js'.format(
     version=widget_version)
