@@ -71,7 +71,7 @@ Like that:
 **It just works.** That's the point of it all.
 It looks nice in the admin interface as well:
 
-.. image:: https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/
+.. image:: http://www.ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/
 
 Obviously, you would want to use Uploadcare field outside an admin.
 It's going to work just as well, but, however, you have to remember to add

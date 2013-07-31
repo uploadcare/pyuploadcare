@@ -31,7 +31,7 @@ class TestFormFields(unittest.TestCase):
         f = SomeForm()
         self.assertRegexpMatches(
             str(f.media),
-            'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
+            'http://www.ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
         )
         self.assertIn('role="uploadcare-uploader"', str(f['ff']))
         self.assertIn('data-public-key="asdf"', str(f['ff']))
@@ -47,7 +47,7 @@ class TestFormFields(unittest.TestCase):
         f = SomeForm()
         self.assertRegexpMatches(
             str(f.media),
-            'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
+            'http://www.ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
         )
         self.assertIn('role="role"', str(f['ff']))
         self.assertIn('data-public-key="asdf"', str(f['ff']))
