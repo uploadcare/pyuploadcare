@@ -24,7 +24,7 @@ PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
 
 .. code-block:: html
 
-    <script src="http://www.ucarecdn.com/widget/x.y.z/uploadcare/uploadcare-x.y.z.min.js"></script>
+    <script src="https://ucarecdn.com/widget/x.y.z/uploadcare/uploadcare-x.y.z.min.js"></script>
 
 If you don't want to use hosted assets you have to turn off this feature:
 
