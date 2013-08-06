@@ -1,5 +1,5 @@
 # Django settings for test_project project.
-import os
+import os.path
 
 PROJECT_PATH = os.path.dirname(__file__)
 
@@ -12,6 +12,9 @@ DATABASES = {
         'NAME': 'temp.db',
     }
 }
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 
 STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
