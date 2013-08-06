@@ -1,4 +1,7 @@
 # Django settings for test_project project.
+import os
+
+PROJECT_PATH = os.path.dirname(__file__)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -29,6 +32,10 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'test_project.urls'
+
+TEMPLATE_DIRS = (
+    os.path.join(PROJECT_PATH, 'templates'),
+)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -69,7 +76,3 @@ UPLOADCARE = {
     'pub_key': 'demopublickey',
     'secret': 'demoprivatekey',
 }
-
-#PYUPLOADCARE_USE_HOSTED_ASSETS = False
-#PYUPLOADCARE_WIDGET_URL = 'http://static.example.com/widget.js'
-#PYUPLOADCARE_UPLOAD_BASE_URL = 'http://other.upload.handler/'
