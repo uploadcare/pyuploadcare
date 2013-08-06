@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'pyuploadcare.dj',
+    'djcelery',
 
     'gallery',
 )
@@ -68,6 +69,12 @@ LOGGING = {
     }
 }
 
+BROKER_URL = 'redis://localhost/0'
+CELERY_RESULT_BACKEND = 'redis://localhost/1'
+CELERY_DISABLE_RATE_LIMITS = True
+
+import djcelery
+djcelery.setup_loader()
 
 # upload care stuff starts here
 # NB: files uploaded by demo account are removed daily, use it to fool around or
