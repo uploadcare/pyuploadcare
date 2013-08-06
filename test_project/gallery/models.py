@@ -29,3 +29,8 @@ class GalleryMultiupload(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class LocalPhoto(models.Model):
+
+    photo = models.FileField(upload_to='photos_from_uploadcare')
