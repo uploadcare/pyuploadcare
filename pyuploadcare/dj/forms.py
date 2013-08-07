@@ -1,9 +1,12 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+from django.core.exceptions import ValidationError
 from django.forms import Field, TextInput
 
 from .. import conf
+from ..exceptions import InvalidRequestError
+from ..api_resources import File
 from . import conf as dj_conf
 
 
@@ -40,9 +43,23 @@ class FileWidget(TextInput):
 
 class FileField(Field):
     """Django form field that uses ``FileWidget`` with default arguments.
+
+    It always returns URL.
+
     """
 
     widget = FileWidget
+
+    def to_python(self, value):
+        if value is None or value == '':
+            return value
+
+        try:
+            return File(value).cdn_url
+        except InvalidRequestError as exc:
+            raise ValidationError(
+                'Invalid value for a field: {exc}'.format(exc=exc)
+            )
 
 
 class ImageField(Field):
