@@ -1,9 +1,12 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+from django.core.exceptions import ValidationError
 from django.forms import Field, TextInput
 
 from .. import conf
+from ..exceptions import InvalidRequestError
+from ..api_resources import File, FileGroup
 from . import conf as dj_conf
 
 
@@ -40,16 +43,28 @@ class FileWidget(TextInput):
 
 class FileField(Field):
     """Django form field that uses ``FileWidget`` with default arguments.
+
+    It always returns URL.
+
     """
 
     widget = FileWidget
 
+    def to_python(self, value):
+        if value is None or value == '':
+            return value
 
-class ImageField(Field):
+        try:
+            return File(value).cdn_url
+        except InvalidRequestError as exc:
+            raise ValidationError(
+                'Invalid value for a field: {exc}'.format(exc=exc)
+            )
+
+
+class ImageField(FileField):
     """Django form field that sets up ``FileWidget`` to work with images.
     """
-
-    widget = FileWidget
 
     def __init__(self, manual_crop=None, *args, **kwargs):
         self.manual_crop = manual_crop
@@ -68,16 +83,25 @@ class FileGroupField(Field):
 
     widget = FileWidget
 
+    def to_python(self, value):
+        if value is None or value == '':
+            return value
+
+        try:
+            return FileGroup(value).cdn_url
+        except InvalidRequestError as exc:
+            raise ValidationError(
+                'Invalid value for a field: {exc}'.format(exc=exc)
+            )
+
     def widget_attrs(self, widget):
         attrs = {'data-multiple': ''}
         return attrs
 
 
-class ImageGroupField(Field):
+class ImageGroupField(FileGroupField):
     """Django form field that sets up ``FileWidget`` in image multiupload mode.
     """
-
-    widget = FileWidget
 
     def widget_attrs(self, widget):
         attrs = {'data-multiple': '', 'data-images-only': ''}
