@@ -80,3 +80,30 @@ class FileFieldURLTest(unittest.TestCase):
 
         self.assertEqual(file_field.clean(''), '')
         self.assertIsNone(file_field.clean(None))
+
+
+class FileGroupFieldURLTest(unittest.TestCase):
+
+    def test_returns_url_if_uuid_is_given(self):
+        cdn_url = uc_forms.FileGroupField().clean(
+            '0513dda0-582f-447d-846f-096e5df9e2bb~2')
+        expected_cdn_url = 'http://www.ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/'
+
+        self.assertEqual(cdn_url, expected_cdn_url)
+
+    def test_returns_url_if_url_has_aleady_been_given(self):
+        cdn_url = uc_forms.FileGroupField().clean(
+            'ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/')
+        expected_cdn_url = 'http://www.ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/'
+
+        self.assertEqual(cdn_url, expected_cdn_url)
+
+    def test_raises_exc_if_value_is_invalid(self):
+        with self.assertRaises(ValidationError):
+            uc_forms.FileGroupField().clean('blah')
+
+    def test_empty_values_are_allowed(self):
+        file_group_field = uc_forms.FileGroupField(required=False)
+
+        self.assertEqual(file_group_field.clean(''), '')
+        self.assertIsNone(file_group_field.clean(None))

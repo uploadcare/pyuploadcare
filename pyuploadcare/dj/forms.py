@@ -6,7 +6,7 @@ from django.forms import Field, TextInput
 
 from .. import conf
 from ..exceptions import InvalidRequestError
-from ..api_resources import File
+from ..api_resources import File, FileGroup
 from . import conf as dj_conf
 
 
@@ -82,6 +82,17 @@ class FileGroupField(Field):
     """
 
     widget = FileWidget
+
+    def to_python(self, value):
+        if value is None or value == '':
+            return value
+
+        try:
+            return FileGroup(value).cdn_url
+        except InvalidRequestError as exc:
+            raise ValidationError(
+                'Invalid value for a field: {exc}'.format(exc=exc)
+            )
 
     def widget_attrs(self, widget):
         attrs = {'data-multiple': ''}
