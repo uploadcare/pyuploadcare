@@ -99,11 +99,9 @@ class FileGroupField(Field):
         return attrs
 
 
-class ImageGroupField(Field):
+class ImageGroupField(FileGroupField):
     """Django form field that sets up ``FileWidget`` in image multiupload mode.
     """
-
-    widget = FileWidget
 
     def widget_attrs(self, widget):
         attrs = {'data-multiple': '', 'data-images-only': ''}
