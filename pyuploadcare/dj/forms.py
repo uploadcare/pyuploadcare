@@ -62,11 +62,9 @@ class FileField(Field):
             )
 
 
-class ImageField(Field):
+class ImageField(FileField):
     """Django form field that sets up ``FileWidget`` to work with images.
     """
-
-    widget = FileWidget
 
     def __init__(self, manual_crop=None, *args, **kwargs):
         self.manual_crop = manual_crop
