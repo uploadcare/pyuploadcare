@@ -136,15 +136,15 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
             for warning in match.group(1).split('; '):
                 logger.warn('API Warning: {0}'.format(warning))
 
-    # TODO: Add check for content-type.
-    if response.status_code == 200:
+    # No content.
+    if response.status_code == 204:
+        return {}
+
+    if 200 <= response.status_code < 300:
         try:
             return response.json()
         except ValueError as exc:
             raise APIError(exc.args[0])
-    # No content.
-    if response.status_code == 204:
-        return
 
     if response.status_code in (401, 403):
         raise AuthenticationError(response.content)
@@ -152,6 +152,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
 
+    # Not json or unknown status code.
     raise APIError(response.content)
 
 
@@ -189,7 +190,11 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
 
-    if response.status_code == 200:
+    # No content.
+    if response.status_code == 204:
+        return {}
+
+    if 200 <= response.status_code < 300:
         try:
             return response.json()
         except ValueError as exc:
@@ -198,4 +203,5 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
 
+    # Not json or unknown status code.
     raise APIError(response.content)
