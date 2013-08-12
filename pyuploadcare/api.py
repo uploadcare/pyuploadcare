@@ -15,6 +15,7 @@ import re
 import logging
 import json
 import socket
+import cgi
 
 import requests
 import six
@@ -41,6 +42,12 @@ def _get_timeout(timeout):
     if conf.timeout is not conf.DEFAULT:
         return conf.timeout
     return socket.getdefaulttimeout()
+
+
+def _content_type_from_response(response):
+    content_type = response.headers.get('Content-Type', '')
+    content_type, _ = cgi.parse_header(content_type)
+    return content_type
 
 
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
@@ -136,15 +143,16 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
             for warning in match.group(1).split('; '):
                 logger.warn('API Warning: {0}'.format(warning))
 
-    # TODO: Add check for content-type.
-    if response.status_code == 200:
-        try:
-            return response.json()
-        except ValueError as exc:
-            raise APIError(exc.args[0])
     # No content.
     if response.status_code == 204:
-        return
+        return {}
+
+    if 200 <= response.status_code < 300:
+        if _content_type_from_response(response).endswith(('/json', '+json')):
+            try:
+                return response.json()
+            except ValueError as exc:
+                raise APIError(exc.args[0])
 
     if response.status_code in (401, 403):
         raise AuthenticationError(response.content)
@@ -152,6 +160,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
 
+    # Not json or unknown status code.
     raise APIError(response.content)
 
 
@@ -189,13 +198,19 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
 
-    if response.status_code == 200:
-        try:
-            return response.json()
-        except ValueError as exc:
-            raise APIError(exc.args[0])
+    # No content.
+    if response.status_code == 204:
+        return {}
+
+    if 200 <= response.status_code < 300:
+        if _content_type_from_response(response).endswith(('/json', '+json')):
+            try:
+                return response.json()
+            except ValueError as exc:
+                raise APIError(exc.args[0])
 
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
 
+    # Not json or unknown status code.
     raise APIError(response.content)
