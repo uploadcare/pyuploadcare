@@ -8,7 +8,9 @@ from tempfile import NamedTemporaryFile
 from datetime import datetime
 import time
 
+import requests
 from pyuploadcare import conf
+from pyuploadcare.api import InvalidRequestError
 from pyuploadcare.api_resources import File, FileGroup
 
 from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
@@ -231,3 +233,48 @@ class FileGroupStoreTest(unittest.TestCase):
         self.group.store()
 
         self.assertTrue(self.group.is_stored())
+
+
+class FileCopyTest(unittest.TestCase):
+    def setUp(self):
+        conf.pub_key = 'demopublickey'
+        conf.secret = 'demoprivatekey'
+
+        # create file to copy from
+        file_from_url = File.upload_from_url(
+            'https://github.com/images/error/angry_unicorn.png'
+        )
+
+        timeout = 30
+        time_started = time.time()
+
+        while time.time() - time_started < timeout:
+            status = file_from_url.update_info()['status']
+            if status in ('success', 'failed', 'error'):
+                break
+            time.sleep(1)
+
+        self.f = file_from_url.get_file()
+        self.assertIsInstance(self.f, File)
+
+    def test_errors(self):
+        with self.assertRaises(InvalidRequestError) as cm:
+            self.f.copy(target='nonexistent')
+
+        self.assertIn('Project has no storage with provided name',
+                      cm.exception.message)
+
+    def test_local_copy(self):
+        response = self.f.copy()
+        self.assertEqual('file', response['type'])
+
+        response = self.f.copy(effects='resize/50x/')
+        self.assertEqual('file', response['type'])
+
+    def test_remote_copy(self):
+        response = self.f.copy(target='default', effects='resize/50x/')
+        self.assertEqual('url', response['type'])
+
+        url = response['result'].replace('s3://', 'http://s3.amazonaws.com/')
+        resp = requests.head(url)
+        self.assertEqual(200, resp.status_code)
