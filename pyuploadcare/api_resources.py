@@ -13,12 +13,18 @@ from .exceptions import InvalidRequestError, APIError
 
 logger = logging.getLogger("pyuploadcare")
 
+
+RE_UUID = '[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}'
+RE_EFFECTS = '(?:[^/]+/)+'  # -/resize/(200x300/)*
 UUID_WITH_EFFECTS_REGEX = re.compile('''
-    (?P<uuid>[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
-    (
-        /-/(?P<effects>.*)
+    /?
+    (?P<uuid>{uuid})  # required
+    (?:
+        /
+        (?:-/(?P<effects>{effects}))?
+        ([^/]*)  # filename
     )?
-''', re.VERBOSE)
+$'''.format(uuid=RE_UUID, effects=RE_EFFECTS), re.VERBOSE)
 
 
 class File(object):
