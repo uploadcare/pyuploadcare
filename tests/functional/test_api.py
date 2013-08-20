@@ -31,7 +31,7 @@ class RESTClientTest(unittest.TestCase):
             rest_request('GET', 'files/')
 
         self.assertEqual('No JSON object could be decoded',
-                         cm.exception.args[0])
+                         cm.exception.data)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):

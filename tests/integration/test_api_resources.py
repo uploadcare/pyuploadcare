@@ -262,7 +262,7 @@ class FileCopyTest(unittest.TestCase):
             self.f.copy(target='nonexistent')
 
         self.assertIn('Project has no storage with provided name',
-                      cm.exception.message)
+                      cm.exception.data)
 
     def test_local_copy(self):
         response = self.f.copy()
