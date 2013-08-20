@@ -4,6 +4,18 @@
 Core API
 ========
 
+You can use pyuploadcare in any Python project. At first you need assign
+your project keys to conf object. After that you will be able
+to do direct api calls or use api resources::
+
+    >>> import pyuploadcare
+    >>> pyuploadcare.conf.pub_key = '<your public key>'
+    >>> pyuploadcare.conf.secret = '<your private key>'
+    >>> f = pyuploadcare.File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+    >>> f.cdn_url
+    http://www.ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/
+
+
 .. _core_api-file-ref:
 
 File API Resource

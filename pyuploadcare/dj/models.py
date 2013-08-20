@@ -43,11 +43,6 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
         else:
             return value.cdn_url
 
-    def get_db_prep_save(self, value, connection=None):
-        if value:
-            value.store()
-        return super(FileField, self).get_db_prep_save(value, connection)
-
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         return self.get_prep_value(value)
@@ -56,6 +51,12 @@ class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
         kwargs['form_class'] = forms.FileField
 
         return models.Field.formfield(self, **kwargs)
+
+    def clean(self, value, model_instance):
+        cleaned_value = super(FileField, self).clean(value, model_instance)
+        if cleaned_value:
+            cleaned_value.store()
+        return cleaned_value
 
 
 pattern_of_crop = re.compile('''
@@ -141,11 +142,6 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
         else:
             return value.cdn_url
 
-    def get_db_prep_save(self, value, connection=None):
-        if value:
-            value.store()
-        return super(FileGroupField, self).get_db_prep_save(value, connection)
-
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         return self.get_prep_value(value)
@@ -154,6 +150,12 @@ class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
         kwargs['form_class'] = forms.FileGroupField
 
         return models.Field.formfield(self, **kwargs)
+
+    def clean(self, value, model_instance):
+        cleaned_value = super(FileGroupField, self).clean(value, model_instance)
+        if cleaned_value:
+            cleaned_value.store()
+        return cleaned_value
 
 
 class ImageGroupField(FileGroupField):

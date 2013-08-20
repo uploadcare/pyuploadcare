@@ -19,15 +19,24 @@ class FileUploadTest(unittest.TestCase):
     def setUp(self):
         conf.pub_key = 'demopublickey'
 
-        self.tmp_config_file = NamedTemporaryFile(mode='w+t')
+        self.tmp_txt_file = NamedTemporaryFile(mode='wb', delete=False)
+        content = 'привет'
+        self.tmp_txt_file.write(content.encode('utf-8'))
+        self.tmp_txt_file.close()
 
     def tearDown(self):
         conf.pub_key = None
 
-        self.tmp_config_file.close()
+    def test_successful_upload_when_file_is_opened_in_txt_mode(self):
+        with open(self.tmp_txt_file.name, 'rt') as fh:
+            file_ = File.upload(fh)
 
-    def test_successful_upload(self):
-        file_ = File.upload(self.tmp_config_file)
+        self.assertIsInstance(file_, File)
+
+    def test_successful_upload_when_file_is_opened_in_binary_mode(self):
+        with open(self.tmp_txt_file.name, 'rb') as fh:
+            file_ = File.upload(fh)
+
         self.assertIsInstance(file_, File)
 
 
@@ -127,7 +136,7 @@ class FileStoreTest(unittest.TestCase):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
 
-        self.file_ = upload_tmp_txt_file(content='hello')
+        self.file_ = upload_tmp_txt_file(content='пока')
 
     def tearDown(self):
         conf.pub_key = None
@@ -147,7 +156,7 @@ class FileDeleteTest(unittest.TestCase):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
 
-        self.file_ = upload_tmp_txt_file(content='hello')
+        self.file_ = upload_tmp_txt_file(content='привет')
 
     def tearDown(self):
         conf.pub_key = None
@@ -172,7 +181,7 @@ class FileGroupCreateTest(unittest.TestCase):
 
     def test_successful_create(self):
         files = [
-            upload_tmp_txt_file(content='hello'),
+            upload_tmp_txt_file(content='пока'),
         ]
         group = FileGroup.create(files)
         self.assertIsInstance(group, FileGroup)

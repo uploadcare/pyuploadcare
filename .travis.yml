@@ -16,6 +16,7 @@ matrix:
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors unittest2; fi
   - pip install django==$DJANGO --use-mirrors
+  - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0' --use-mirrors
   - python setup.py install
 script: nosetests tests
 notifications:

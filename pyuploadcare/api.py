@@ -14,6 +14,8 @@ import hmac
 import re
 import logging
 import json
+import socket
+import cgi
 
 import requests
 import six
@@ -31,8 +33,24 @@ from .exceptions import (
 
 logger = logging.getLogger("pyuploadcare")
 
+# Use session for keep-alive connections.
+session = requests.session()
 
-def rest_request(verb, path, data=None):
+def _get_timeout(timeout):
+    if timeout is not conf.DEFAULT:
+        return timeout
+    if conf.timeout is not conf.DEFAULT:
+        return conf.timeout
+    return socket.getdefaulttimeout()
+
+
+def _content_type_from_response(response):
+    content_type = response.headers.get('Content-Type', '')
+    content_type, _ = cgi.parse_header(content_type)
+    return content_type
+
+
+def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
     """Makes REST API request and returns response as ``dict``.
 
     It provides auth headers as well and takes settings from ``conf`` module.
@@ -61,7 +79,7 @@ def rest_request(verb, path, data=None):
         }
 
     """
-    assert not path.startswith('/'), path
+    path = path.lstrip('/')
     url = urljoin(conf.api_base, path)
     url_parts = urlsplit(url)
 
@@ -108,9 +126,10 @@ def rest_request(verb, path, data=None):
         data: {3}'''.format(verb, path, headers, content))
 
     try:
-        response = requests.request(verb, url, allow_redirects=True,
-                                    verify=conf.verify_api_ssl,
-                                    headers=headers, data=content)
+        response = session.request(verb, url, allow_redirects=True,
+                                   verify=conf.verify_api_ssl,
+                                   headers=headers, data=content,
+                                   timeout=_get_timeout(timeout))
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
 
@@ -124,26 +143,28 @@ def rest_request(verb, path, data=None):
             for warning in match.group(1).split('; '):
                 logger.warn('API Warning: {0}'.format(warning))
 
-    # TODO: Add check for content-type.
-    if response.status_code == 200:
-        try:
-            return response.json()
-        except ValueError as exc:
-            raise APIError(exc.args[0])
     # No content.
     if response.status_code == 204:
-        return
+        return {}
 
-    if response.status_code == 403:
+    if 200 <= response.status_code < 300:
+        if _content_type_from_response(response).endswith(('/json', '+json')):
+            try:
+                return response.json()
+            except ValueError as exc:
+                raise APIError(exc.args[0])
+
+    if response.status_code in (401, 403):
         raise AuthenticationError(response.content)
 
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
 
+    # Not json or unknown status code.
     raise APIError(response.content)
 
 
-def uploading_request(verb, path, data=None, files=None):
+def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     """Makes Uploading API request and returns response as ``dict``.
 
     It takes settings from ``conf`` module.
@@ -160,7 +181,7 @@ def uploading_request(verb, path, data=None, files=None):
         >>> File('9b9f4483-77b8-40ae-a198-272ba6280004')
 
     """
-    assert not path.startswith('/'), path
+    path = path.lstrip('/')
     url = urljoin(conf.upload_base, path)
 
     if data is None:
@@ -169,20 +190,27 @@ def uploading_request(verb, path, data=None, files=None):
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
     try:
-        response = requests.request(
-            verb, url, allow_redirects=True, verify=conf.verify_upload_ssl,
-            data=data, files=files
+        response = session.request(
+            str(verb), url, allow_redirects=True,
+            verify=conf.verify_upload_ssl, data=data, files=files,
+            timeout=_get_timeout(timeout),
         )
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
 
-    if response.status_code == 200:
-        try:
-            return response.json()
-        except ValueError as exc:
-            raise APIError(exc.args[0])
+    # No content.
+    if response.status_code == 204:
+        return {}
+
+    if 200 <= response.status_code < 300:
+        if _content_type_from_response(response).endswith(('/json', '+json')):
+            try:
+                return response.json()
+            except ValueError as exc:
+                raise APIError(exc.args[0])
 
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
 
+    # Not json or unknown status code.
     raise APIError(response.content)

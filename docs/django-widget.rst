@@ -9,6 +9,17 @@ Django Widget
 Settings
 --------
 
+Besides required ``pub_key``, ``secret`` settings there are optional settings,
+for example, ``widget_version``:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        'pub_key': 'demopublickey',
+        'secret': 'demoprivatekey',
+        'widget_version': '0.10',
+    }
+
 PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
 
 .. code-block:: html
@@ -19,7 +30,10 @@ If you don't want to use hosted assets you have to turn off this feature:
 
 .. code-block:: python
 
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
+    UPLOADCARE = {
+        # ...
+        'use_hosted_assets': False,
+    }
 
 In this case local assets will be used.
 
@@ -28,14 +42,20 @@ widget url:
 
 .. code-block:: python
 
-    PYUPLOADCARE_USE_HOSTED_ASSETS = False
-    PYUPLOADCARE_WIDGET_URL = 'http://path.to/your/widget.js'
+    UPLOADCARE = {
+        # ...
+        'use_hosted_assets': False,
+        'widget_url': 'http://path.to/your/widget.js',
+    }
 
 `Uploadcare widget`_ will use default upload handler url, unless you specify:
 
 .. code-block:: python
 
-    PYUPLOADCARE_UPLOAD_BASE_URL = 'http://path.to/your/upload/handler'
+    UPLOADCARE = {
+        # ...
+        'upload_base_url' = 'http://path.to/your/upload/handler',
+    }
 
 .. _django-widget-models-ref:
 
@@ -49,6 +69,18 @@ just as simple as with a `TextField`_. To attach Uploadcare files to a model,
 you can use a :ref:`FileField <django-widget-models-filefield-ref>` or
 :ref:`ImageField <django-widget-models-imagefield-ref>`.
 These fields play by common Django rules. South migrations are supported.
+
+.. note::
+    When you call ``your_model_form.is_valid()`` or call ``photo.full_clean()``
+    directly it invokes ``File.store()`` method automatically. In other cases
+    you should store objects manually, e.g:
+
+    .. code-block:: python
+
+        photo.photo_2x3 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+        photo.save()
+
+        photo.photo_2x3.store()
 
 .. _django-widget-models-filefield-ref:
 
@@ -91,7 +123,7 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 
         photo = ImageField(blank=True, manual_crop="")
 
-.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
+.. image:: http://www.ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
 
 .. _django-widget-models-filegroupfield-ref:
 

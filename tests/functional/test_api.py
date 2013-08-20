@@ -18,9 +18,9 @@ from .utils import MockResponse
 class RESTClientTest(unittest.TestCase):
 
     def tearDown(self):
-        conf.api_version = '0.2'
+        conf.api_version = '0.3'
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
         request.return_value = MockResponse(404, '{}')
         with self.assertRaises(InvalidRequestError):
@@ -33,7 +33,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertEqual('No JSON object could be decoded',
                          cm.exception.args[0])
 
-    @patch('requests.request', autospec=True)
+    @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
         request.return_value = MockResponse(200, '[]')
 
@@ -42,8 +42,8 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
-                         'application/vnd.uploadcare-v0.2+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.19')
+                         'application/vnd.uploadcare-v0.3+json')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.2.1')
 
         conf.api_version = '0.1'
         rest_request('GET', 'files/')
@@ -51,4 +51,4 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/0.19')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.2.1')
