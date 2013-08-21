@@ -75,14 +75,14 @@ class FileUploadFromUrlTest(unittest.TestCase):
 
 
 class FileInfoTest(unittest.TestCase):
-
-    file_ = upload_tmp_txt_file(content='hello')
-
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
+        cls.file_ = upload_tmp_txt_file(content='hello')
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
@@ -192,13 +192,14 @@ class FileGroupCreateTest(unittest.TestCase):
 
 class FileGroupInfoTest(unittest.TestCase):
 
-    group = create_file_group(files_qty=1)
-
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
+        cls.group = create_file_group(files_qty=1)
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
@@ -237,7 +238,9 @@ class FileGroupStoreTest(unittest.TestCase):
 
 
 class FileCopyTest(unittest.TestCase):
-    def setUp(self):
+
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
 
@@ -255,11 +258,11 @@ class FileCopyTest(unittest.TestCase):
                 break
             time.sleep(1)
 
-        self.f = file_from_url.get_file()
-        self.assertIsInstance(self.f, File)
+        cls.f = file_from_url.get_file()
 
-    def tearDown(self):
-        self.f.delete()
+    @classmethod
+    def tearDownClass(cls):
+        cls.f.delete()
         conf.pub_key = None
         conf.secret = None
 
@@ -288,11 +291,13 @@ class FileCopyTest(unittest.TestCase):
 
 class FileListRetrieveTest(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
@@ -335,11 +340,13 @@ class FileListRetrieveTest(unittest.TestCase):
 
 class FileListIterationTest(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
