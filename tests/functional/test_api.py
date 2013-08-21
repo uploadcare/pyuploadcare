@@ -31,7 +31,7 @@ class RESTClientTest(unittest.TestCase):
             rest_request('GET', 'files/')
 
         self.assertEqual('No JSON object could be decoded',
-                         cm.exception.args[0])
+                         cm.exception.data)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
@@ -43,7 +43,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.3+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.2.1')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.2.2')
 
         conf.api_version = '0.1'
         rest_request('GET', 'files/')
@@ -51,4 +51,4 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
-        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.2.1')
+        self.assertEqual(headers['User-Agent'], 'pyuploadcare/1.2.2')

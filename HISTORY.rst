@@ -3,6 +3,13 @@
 History
 -------
 
+1.2.2
+~~~~~
+
+- add File.copy()
+- add data attribute to UploadcareException
+
+
 1.2.1
 ~~~~~
 

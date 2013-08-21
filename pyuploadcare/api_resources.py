@@ -14,12 +14,18 @@ from .exceptions import InvalidRequestError, APIError
 
 logger = logging.getLogger("pyuploadcare")
 
+
+RE_UUID = '[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}'
+RE_EFFECTS = '(?:[^/]+/)+'  # -/resize/(200x300/)*
 UUID_WITH_EFFECTS_REGEX = re.compile('''
-    (?P<uuid>[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12})
-    (
-        /-/(?P<effects>.*)
+    /?
+    (?P<uuid>{uuid})  # required
+    (?:
+        /
+        (?:-/(?P<effects>{effects}))?
+        ([^/]*)  # filename
     )?
-''', re.VERBOSE)
+$'''.format(uuid=RE_UUID, effects=RE_EFFECTS), re.VERBOSE)
 
 
 class File(object):
@@ -60,6 +66,13 @@ class File(object):
     def _api_storage_uri(self):
         return 'files/{0}/storage/'.format(self.uuid)
 
+    def cdn_path(self, effects=None):
+        ptn = '{uuid}/-/{effects}' if effects else '{uuid}/'
+        return ptn.format(
+            uuid=self.uuid,
+            effects=effects
+        )
+
     @property
     def cdn_url(self):
         """Returns file's CDN url.
@@ -77,17 +90,8 @@ class File(object):
             http://www.ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
 
         """
-        if self.default_effects:
-            return '{cdn_base}{uuid}/-/{effects}'.format(
-                cdn_base=conf.cdn_base,
-                uuid=self.uuid,
-                effects=self.default_effects
-            )
-        else:
-            return '{cdn_base}{uuid}/'.format(
-                cdn_base=conf.cdn_base,
-                uuid=self.uuid
-            )
+        return '{cdn_base}{path}'.format(cdn_base=conf.cdn_base,
+                                         path=self.cdn_path(self.default_effects))
 
     def info(self):
         """Returns all available file information as ``dict``.
@@ -203,6 +207,25 @@ class File(object):
 
         """
         self._info_cache = rest_request('PUT', self._api_storage_uri)
+
+    def copy(self, effects=None, target=None):
+        """Creates File copy
+
+        If ``target`` is ``None``, copy file to Uploadcare storage otherwise
+        copy to target associated with project.
+        Add ``effects`` to ``self.default_effects`` if any.
+        """
+        effects = effects or ''
+        if self.default_effects is not None:
+            effects = '{head}-/{tail}'.format(head=self.default_effects,
+                                              tail=effects)
+        data = {
+            'source': self.cdn_path(effects)
+        }
+        if target is not None:
+            data['target'] = target
+
+        return rest_request('POST', 'files/', data=data)
 
     def delete(self):
         """Deletes file by requesting Uploadcare API."""

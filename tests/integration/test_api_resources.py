@@ -8,7 +8,9 @@ from tempfile import NamedTemporaryFile
 from datetime import datetime
 import time
 
+import requests
 from pyuploadcare import conf
+from pyuploadcare.api import InvalidRequestError
 from pyuploadcare.api_resources import File, FileGroup, FileList
 
 from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
@@ -73,14 +75,14 @@ class FileUploadFromUrlTest(unittest.TestCase):
 
 
 class FileInfoTest(unittest.TestCase):
-
-    file_ = upload_tmp_txt_file(content='hello')
-
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
+        cls.file_ = upload_tmp_txt_file(content='hello')
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
@@ -139,6 +141,7 @@ class FileStoreTest(unittest.TestCase):
         self.file_ = upload_tmp_txt_file(content='пока')
 
     def tearDown(self):
+        self.file_.delete()
         conf.pub_key = None
         conf.secret = None
 
@@ -189,13 +192,14 @@ class FileGroupCreateTest(unittest.TestCase):
 
 class FileGroupInfoTest(unittest.TestCase):
 
-    group = create_file_group(files_qty=1)
-
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
+        cls.group = create_file_group(files_qty=1)
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
@@ -233,13 +237,67 @@ class FileGroupStoreTest(unittest.TestCase):
         self.assertTrue(self.group.is_stored())
 
 
-class FileListRetrieveTest(unittest.TestCase):
+class FileCopyTest(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
 
-    def tearDown(self):
+        # create file to copy from
+        file_from_url = File.upload_from_url(
+            'https://github.com/images/error/angry_unicorn.png'
+        )
+
+        timeout = 30
+        time_started = time.time()
+
+        while time.time() - time_started < timeout:
+            status = file_from_url.update_info()['status']
+            if status in ('success', 'failed', 'error'):
+                break
+            time.sleep(1)
+
+        cls.f = file_from_url.get_file()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.f.delete()
+        conf.pub_key = None
+        conf.secret = None
+
+    def test_errors(self):
+        with self.assertRaises(InvalidRequestError) as cm:
+            self.f.copy(target='nonexistent')
+
+        self.assertIn('Project has no storage with provided name',
+                      cm.exception.data)
+
+    def test_local_copy(self):
+        response = self.f.copy()
+        self.assertEqual('file', response['type'])
+
+        response = self.f.copy(effects='resize/50x/')
+        self.assertEqual('file', response['type'])
+
+    def test_remote_copy(self):
+        response = self.f.copy(target='default', effects='resize/50x/')
+        self.assertEqual('url', response['type'])
+
+        url = response['result'].replace('s3://', 'http://s3.amazonaws.com/')
+        resp = requests.head(url)
+        self.assertEqual(200, resp.status_code)
+
+
+class FileListRetrieveTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        conf.pub_key = 'demopublickey'
+        conf.secret = 'demoprivatekey'
+
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
@@ -282,11 +340,13 @@ class FileListRetrieveTest(unittest.TestCase):
 
 class FileListIterationTest(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         conf.pub_key = 'demopublickey'
         conf.secret = 'demoprivatekey'
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         conf.pub_key = None
         conf.secret = None
 
