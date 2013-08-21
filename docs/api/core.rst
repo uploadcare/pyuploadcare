@@ -34,6 +34,21 @@ File API Resource
       String of default effects that is used by ``File.cdn_url``, e.g.
       ``effect/flip/-/effect/mirror/``.
 
+.. _core_api-filelist-ref:
+
+File List API Resource
+----------------------
+
+.. autoclass:: pyuploadcare.api_resources.FileList
+   :members:
+   :undoc-members:
+
+   .. attribute:: offset
+
+   .. attribute:: stored
+
+   .. attribute:: removed
+
 .. _core_api-filegroup-ref:
 
 File Group API Resource

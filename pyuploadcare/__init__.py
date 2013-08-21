@@ -17,7 +17,7 @@ from __future__ import unicode_literals
 
 __version__ = '1.2.2'
 
-from .api_resources import File, FileGroup
+from .api_resources import File, FileList, FileGroup
 from .exceptions import (
     UploadcareException, APIConnectionError, AuthenticationError, APIError,
     InvalidRequestError,
