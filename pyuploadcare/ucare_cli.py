@@ -7,19 +7,11 @@ import logging
 import pprint
 import os.path
 
-import six
 from six.moves import configparser
 
-if six.PY3:
-    from urllib.parse import urlunsplit, urlencode
-else:
-    from urlparse import urlunsplit
-    from urllib import urlencode
-
 from . import conf, __version__
-from .api_resources import File, FileGroup
+from .api_resources import File, FileGroup, FileList
 from .exceptions import UploadcareException, TimeoutError, UploadError
-from .api import rest_request
 
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -37,16 +29,18 @@ bool_settings = (
 )
 
 
-def list_files(arg_namespace=None):
-    query = {}
-    for name in ['page', 'limit', 'kept', 'removed']:
-        arg = getattr(arg_namespace, name)
-        if arg is not None:
-            query[name] = arg
-    q = urlencode(query)
-    url = urlunsplit(['', '', 'files/', q, ''])
+def bool_or_none(value):
+    return {'true': True, 'false': False}.get(value)
 
-    pp.pprint(rest_request('GET', url))
+
+def list_files(arg_namespace=None):
+    result = FileList.retrieve(
+        page=arg_namespace.page or 1,
+        limit=arg_namespace.limit or 20,
+        stored=bool_or_none(arg_namespace.stored),
+        removed=bool_or_none(arg_namespace.removed)
+    )
+    pp.pprint(result)
 
 
 def get_file(arg_namespace):
@@ -154,9 +148,9 @@ def ucare_argparser():
     # list
     subparser = subparsers.add_parser('list', help='list all files')
     subparser.set_defaults(func=list_files)
-    subparser.add_argument('--page', help='page to show')
-    subparser.add_argument('--limit', help='files per page')
-    subparser.add_argument('--kept', help='filter kept files',
+    subparser.add_argument('--page', help='page to show', type=int)
+    subparser.add_argument('--limit', help='files per page', type=int)
+    subparser.add_argument('--stored', help='filter stored files',
                            choices=['all', 'true', 'false'])
     subparser.add_argument('--removed', help='filter removed files',
                            choices=['all', 'true', 'false'])
