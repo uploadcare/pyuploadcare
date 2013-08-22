@@ -4,6 +4,9 @@ from __future__ import unicode_literals
 
 class UploadcareException(Exception):
     """Base exception class of library."""
+    def __init__(self, data='', *args, **kwargs):
+        self.data = str(data)
+        super(UploadcareException, self).__init__(*args, **kwargs)
 
 
 class APIConnectionError(UploadcareException):

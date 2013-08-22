@@ -36,6 +36,7 @@ logger = logging.getLogger("pyuploadcare")
 # Use session for keep-alive connections.
 session = requests.session()
 
+
 def _get_timeout(timeout):
     if timeout is not conf.DEFAULT:
         return timeout
