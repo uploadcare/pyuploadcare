@@ -66,7 +66,8 @@ pattern_of_crop = re.compile('''
         | # empty string
         \d+:\d+| # "2:3"
         \d+x\d+| # "200x300"
-        \d+x\d+\ upscale # "200x300 upscale"
+        \d+x\d+\ upscale| # "200x300 upscale"
+        \d+x\d+\ minimum  # "200x300 minimum"
     )
     $
 ''', re.VERBOSE)
