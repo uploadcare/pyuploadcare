@@ -8,6 +8,8 @@ History
 
 - add File.copy()
 - add data attribute to UploadcareException
+- update widget to 0.13.2
+- update pyuploadcare.dj.models.ImageField crop validation
 
 
 1.2.1

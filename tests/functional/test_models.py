@@ -37,6 +37,12 @@ class CropToolRegexTest(unittest.TestCase):
     def test_crop_tool_is_200x300_upscale(self):
         ImageField("200x300 upscale")
 
+    def test_crop_tool_is_200x300_minimum(self):
+        ImageField("200x300 minimum")
+
+    def test_validation_error_when_crop_tool_is_200x300_maximum(self):
+        self.assertRaises(ValidationError, ImageField, "200x300 maximum")
+
     def test_validation_error_when_crop_tool_is_200colon300_upscale(self):
         self.assertRaises(ValidationError, ImageField, "200:300 upscale")
 
