@@ -351,7 +351,7 @@ class FileListIterationTest(unittest.TestCase):
         conf.secret = None
 
     def test_iteration_over_all_files(self):
-        files = list(file_ for file_ in FileList())
+        files = list(file_ for file_ in FileList(count=10))
         self.assertTrue(len(files) >= 0)
 
     def test_iteration_over_limited_count_of_files(self):
@@ -361,14 +361,14 @@ class FileListIterationTest(unittest.TestCase):
         self.assertEqual(len(files), 2)
 
     def test_iteration_over_stored_files(self):
-        for file_ in FileList(stored=True):
+        for file_ in FileList(stored=True, count=10):
             self.assertTrue(file_.is_stored())
 
     def test_iteration_over_removed_files(self):
-        for file_ in FileList(removed=True):
+        for file_ in FileList(removed=True, count=10):
             self.assertTrue(file_.is_removed())
 
     def test_iteration_over_stored_removed_files(self):
-        for file_ in FileList(stored=True, removed=True):
+        for file_ in FileList(stored=True, removed=True, count=10):
             self.assertTrue(file_.is_stored())
             self.assertTrue(file_.is_removed())
