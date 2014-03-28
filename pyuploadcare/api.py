@@ -135,7 +135,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
         raise APIConnectionError(exc.args[0])
 
     logger.debug(
-        'got: {0} {1}'.format(response.status_code, response.content)
+        'got: {0} {1}'.format(response.status_code, response.text)
     )
 
     if 'warning' in response.headers:
