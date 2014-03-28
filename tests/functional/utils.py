@@ -6,7 +6,7 @@ import json
 
 class MockResponse(object):
 
-    def __init__(self, status, data='{}'):
+    def __init__(self, status, data=b'{}'):
         self.status_code = status
         self.content = data
         self.text = data.decode('utf-8')
@@ -14,12 +14,12 @@ class MockResponse(object):
 
     def json(self):
         """Returns the json-encoded content of a response, if any."""
-        return json.loads(self.content)
+        return json.loads(self.text)
 
 
 def api_response_from_file(filename):
     path_to_tests_dir = os.path.dirname(__file__)
     path_to_file = os.path.join(path_to_tests_dir, 'api_responses', filename)
 
-    with open(path_to_file) as fp:
+    with open(path_to_file, 'rb') as fp:
         return fp.read()

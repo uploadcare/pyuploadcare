@@ -221,7 +221,7 @@ class StoreFileGroupTest(unittest.TestCase):
         # GET /api/groups/{group_id}/
         request.return_value = MockResponse(
             status=200,
-            data='{"datetime_stored": "2013-04-03T12:01:28.714Z"}')
+            data=b'{"datetime_stored": "2013-04-03T12:01:28.714Z"}')
         group.store()
         group.store()
 
