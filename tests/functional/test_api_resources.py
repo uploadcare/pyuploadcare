@@ -208,7 +208,7 @@ class StoreFileGroupTest(unittest.TestCase):
         # PUT /api/groups/{group_id}/storage/
         request.return_value = MockResponse(
             status=200,
-            data='{"datetime_stored": "2013-04-03T12:01:28.714Z"}')
+            data=b'{"datetime_stored": "2013-04-03T12:01:28.714Z"}')
         group.store()
 
         self.assertEqual(request.call_count, 1)
@@ -237,7 +237,7 @@ class FileCDNUrlsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_no_api_requests(self, request):
-        request.return_value = MockResponse(status=200, data='{}')
+        request.return_value = MockResponse(status=200, data=b'{}')
         self.group.file_cdn_urls
 
         self.assertFalse(request.called)
@@ -274,7 +274,7 @@ class FileGroupCreateTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_group_successfully_created(self, request):
-        json_response = """{
+        json_response = b"""{
             "id": "0513dda0-582f-447d-846f-096e5df9e2bb~1",
             "files_count": 1,
             "files": [

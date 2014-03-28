@@ -9,6 +9,7 @@ class MockResponse(object):
     def __init__(self, status, data='{}'):
         self.status_code = status
         self.content = data
+        self.text = data.decode('utf-8')
         self.headers = {'Content-Type': 'application/vnd.uploadcare+json'}
 
     def json(self):

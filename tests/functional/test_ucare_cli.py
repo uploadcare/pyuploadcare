@@ -172,7 +172,7 @@ class UcareStoreTest(unittest.TestCase):
     def test_no_wait(self, request):
         request.return_value = MockResponse(
             status=200,
-            data='{"on_s3": true, "last_keep_claim": "now"}'
+            data=b'{"on_s3": true, "last_keep_claim": "now"}'
         )
 
         store_file(arg_namespace('store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
@@ -201,7 +201,7 @@ class UcareDeleteTest(unittest.TestCase):
     def test_no_wait(self, request):
         request.return_value = MockResponse(
             status=200,
-            data='{"on_s3": true, "last_keep_claim": "now"}'
+            data=b'{"on_s3": true, "last_keep_claim": "now"}'
         )
 
         delete_file(arg_namespace('delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
@@ -424,7 +424,7 @@ class CreateFileGroupTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_uuid_and_cdn_url(self, request):
-        json_response = """{
+        json_response = b"""{
             "id": "0513dda0-582f-447d-846f-096e5df9e2bb~2",
             "files_count": 2,
             "files": [

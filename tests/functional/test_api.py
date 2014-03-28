@@ -22,11 +22,11 @@ class RESTClientTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
-        request.return_value = MockResponse(404, '{}')
+        request.return_value = MockResponse(404, b'{}')
         with self.assertRaises(InvalidRequestError):
             rest_request('GET', 'files/')
 
-        request.return_value = MockResponse(200, 'meh')
+        request.return_value = MockResponse(200, b'meh')
         with self.assertRaises(APIError) as cm:
             rest_request('GET', 'files/')
 
@@ -35,7 +35,7 @@ class RESTClientTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
-        request.return_value = MockResponse(200, '[]')
+        request.return_value = MockResponse(200, b'[]')
 
         rest_request('GET', 'files/')
         headers = request.call_args[1]['headers']
