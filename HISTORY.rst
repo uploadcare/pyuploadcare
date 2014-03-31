@@ -3,6 +3,12 @@
 History
 -------
 
+1.2.4
+~~~~~
+
+- update widget to 1.0.1
+- fixed logging when response contains unicode chars
+
 
 1.2.3
 ~~~~~
