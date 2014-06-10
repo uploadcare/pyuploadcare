@@ -16,6 +16,7 @@ import logging
 import json
 import socket
 import cgi
+import time
 
 import requests
 import six
@@ -28,6 +29,7 @@ else:
 from . import conf, __version__
 from .exceptions import (
     APIConnectionError, AuthenticationError, APIError, InvalidRequestError,
+    ThrottledRequestError,
 )
 
 
@@ -51,7 +53,8 @@ def _content_type_from_response(response):
     return content_type
 
 
-def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
+def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
+                 retry_throttled=1):
     """Makes REST API request and returns response as ``dict``.
 
     It provides auth headers as well and takes settings from ``conf`` module.
@@ -95,74 +98,90 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT):
 
     content_type = 'application/json'
     content_md5 = hashlib.md5(content.encode('utf-8')).hexdigest()
-    date = email.utils.formatdate(usegmt=True)
 
-    sign_string = '\n'.join([
-        verb,
-        content_md5,
-        content_type,
-        date,
-        path,
-    ])
-    sign_string_as_bytes = sign_string.encode('utf-8')
+    def _request():
+        date = email.utils.formatdate(usegmt=True)
+        sign_string = '\n'.join([
+            verb,
+            content_md5,
+            content_type,
+            date,
+            path,
+        ])
+        sign_string_as_bytes = sign_string.encode('utf-8')
 
-    try:
-        secret_as_bytes = conf.secret.encode('utf-8')
-    except AttributeError:
-        secret_as_bytes = bytes()
-    sign = hmac.new(secret_as_bytes, sign_string_as_bytes, hashlib.sha1) \
-        .hexdigest()
+        try:
+            secret_as_bytes = conf.secret.encode('utf-8')
+        except AttributeError:
+            secret_as_bytes = bytes()
+        sign = hmac.new(secret_as_bytes, sign_string_as_bytes, hashlib.sha1) \
+            .hexdigest()
 
-    headers = {
-        'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
-        'Date': date,
-        'Content-Type': content_type,
-        'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
-        'User-Agent': 'pyuploadcare/{0}'.format(__version__),
-    }
-    logger.debug('''sent:
-        verb: {0}
-        path: {1}
-        headers: {2}
-        data: {3}'''.format(verb, path, headers, content))
+        headers = {
+            'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
+            'Date': date,
+            'Content-Type': content_type,
+            'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
+            'User-Agent': 'pyuploadcare/{0}'.format(__version__),
+        }
+        logger.debug('''sent:
+            verb: {0}
+            path: {1}
+            headers: {2}
+            data: {3}'''.format(verb, path, headers, content))
 
-    try:
-        response = session.request(verb, url, allow_redirects=True,
-                                   verify=conf.verify_api_ssl,
-                                   headers=headers, data=content,
-                                   timeout=_get_timeout(timeout))
-    except requests.RequestException as exc:
-        raise APIConnectionError(exc.args[0])
+        try:
+            response = session.request(verb, url, allow_redirects=True,
+                                       verify=conf.verify_api_ssl,
+                                       headers=headers, data=content,
+                                       timeout=_get_timeout(timeout))
+        except requests.RequestException as exc:
+            raise APIConnectionError(exc.args[0])
 
-    logger.debug(
-        'got: {0} {1}'.format(response.status_code, response.text)
-    )
+        logger.debug(
+            'got: {0} {1}'.format(response.status_code, response.text)
+        )
 
-    if 'warning' in response.headers:
-        match = re.search('"(.+)"', response.headers['warning'])
-        if match:
-            for warning in match.group(1).split('; '):
-                logger.warn('API Warning: {0}'.format(warning))
+        if 'warning' in response.headers:
+            match = re.search('"(.+)"', response.headers['warning'])
+            if match:
+                for warning in match.group(1).split('; '):
+                    logger.warn('API Warning: {0}'.format(warning))
 
-    # No content.
-    if response.status_code == 204:
-        return {}
+        # No content.
+        if response.status_code == 204:
+            return {}
 
-    if 200 <= response.status_code < 300:
-        if _content_type_from_response(response).endswith(('/json', '+json')):
-            try:
-                return response.json()
-            except ValueError as exc:
-                raise APIError(exc.args[0])
+        if 200 <= response.status_code < 300:
+            if _content_type_from_response(response).endswith(('/json', '+json')):
+                try:
+                    return response.json()
+                except ValueError as exc:
+                    raise APIError(exc.args[0])
 
-    if response.status_code in (401, 403):
-        raise AuthenticationError(response.content)
+        if response.status_code in (401, 403):
+            raise AuthenticationError(response.content)
 
-    if response.status_code in (400, 404):
-        raise InvalidRequestError(response.content)
+        if response.status_code in (400, 404):
+            raise InvalidRequestError(response.content)
 
-    # Not json or unknown status code.
-    raise APIError(response.content)
+        if response.status_code == 429:
+            raise ThrottledRequestError(response)
+
+        # Not json or unknown status code.
+        raise APIError(response.content)
+
+    while True:
+        try:
+            return _request()
+        except ThrottledRequestError as e:
+            if retry_throttled:
+                logger.debug('Throttled, retry in {} seconds'.format(e.wait))
+                time.sleep(e.wait)
+                retry_throttled -= 1
+                continue
+            else:
+                raise
 
 
 def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
