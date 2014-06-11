@@ -176,7 +176,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             return _request()
         except ThrottledRequestError as e:
             if retry_throttled:
-                logger.debug('Throttled, retry in {} seconds'.format(e.wait))
+                logger.debug('Throttled, retry in {0} seconds'.format(e.wait))
                 time.sleep(e.wait)
                 retry_throttled -= 1
                 continue
