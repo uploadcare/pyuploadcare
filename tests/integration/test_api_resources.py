@@ -259,6 +259,12 @@ class FileCopyTest(unittest.TestCase):
             time.sleep(1)
 
         cls.f = file_from_url.get_file()
+        time_started = time.time()
+        while time.time() - time_started < timeout:
+            if cls.f.is_ready():
+                break
+            time.sleep(1)
+            cls.f.update_info()
 
     @classmethod
     def tearDownClass(cls):
