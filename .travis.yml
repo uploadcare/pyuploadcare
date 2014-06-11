@@ -16,13 +16,13 @@ matrix:
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors unittest2; fi
   - pip install django==$DJANGO --use-mirrors
-  - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0' --use-mirrors
+  - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0,<1.4' --use-mirrors
   - python setup.py install
 script: nosetests tests
 notifications:
   email:
     recipients:
-      - valya@whitescape.com
-      - dm@whitescape.com
+      - ak@whitescape.com
+      - dm@uploadcare.com
     on_success: change
     on_failure: change

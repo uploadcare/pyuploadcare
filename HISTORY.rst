@@ -3,6 +3,19 @@
 History
 -------
 
+1.2.6
+~~~~~
+
+- update widget to 1.2.3
+- handle rest api throttling
+
+
+1.2.5
+~~~~~
+
+- fixed setup script
+
+
 1.2.4
 ~~~~~
 

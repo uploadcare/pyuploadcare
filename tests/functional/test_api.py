@@ -9,14 +9,14 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
 
-from pyuploadcare import conf
+from pyuploadcare import conf, __version__
 from pyuploadcare.api import rest_request
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
 
 class RESTClientTest(unittest.TestCase):
-    user_agent = 'pyuploadcare/1.2.6'
+    user_agent = 'pyuploadcare/' + __version__
 
     def tearDown(self):
         conf.api_version = '0.3'
