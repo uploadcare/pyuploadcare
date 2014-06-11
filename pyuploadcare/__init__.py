@@ -15,7 +15,7 @@ Usage example::
 
 from __future__ import unicode_literals
 
-__version__ = '1.2.5'
+__version__ = '1.2.6'
 
 from .api_resources import File, FileList, FileGroup
 from .exceptions import (
