@@ -11,7 +11,7 @@ from ..exceptions import InvalidRequestError
 from ..api_resources import File, FileGroup
 
 
-class FileField(six.with_metaclass(models.SubfieldBase), models.Field):
+class FileField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """Django model field that stores uploaded file as Uploadcare CDN url.
     """
 
@@ -108,7 +108,7 @@ class ImageField(FileField):
         return models.Field.formfield(self, **kwargs)
 
 
-class FileGroupField(six.with_metaclass(models.SubfieldBase), models.Field):
+class FileGroupField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """Django model field that stores uploaded file group as Uploadcare CDN url.
 
     It provides multiple file uploading.
