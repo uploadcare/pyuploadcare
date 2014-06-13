@@ -9,13 +9,14 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
 
-from pyuploadcare import conf
+from pyuploadcare import conf, __version__
 from pyuploadcare.api import rest_request
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
 
 class RESTClientTest(unittest.TestCase):
+    user_agent = 'pyuploadcare/' + __version__
 
     def tearDown(self):
         conf.api_version = '0.3'
@@ -43,7 +44,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.3+json')
-        self.assertTrue(headers['User-Agent'].startswith('pyuploadcare/'))
+        self.assertEqual(headers['User-Agent'], self.user_agent)
 
         conf.api_version = '0.1'
         rest_request('GET', 'files/')
@@ -51,4 +52,4 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
-        self.assertTrue(headers['User-Agent'].startswith('pyuploadcare/'))
+        self.assertEqual(headers['User-Agent'], self.user_agent)

@@ -3,11 +3,24 @@
 History
 -------
 
+
+1.2.7
+~~~~~
+
+- handle rest api throttling
+
+
 1.2.6
 ~~~~~
 
 - update widget to 1.2.3
 - fixed compatibility with six library version 1.7.0 and above
+
+
+1.2.5
+~~~~~
+
+- fixed setup script
 
 
 1.2.4

@@ -35,6 +35,16 @@ class InvalidRequestError(UploadcareException, ValueError):
     """Invalid parameters errors, e.g. status 404."""
 
 
+class ThrottledRequestError(UploadcareException):
+    """Raised when request was throttled."""
+    def __init__(self, response):
+        try:
+            self.wait = int(response.headers.get('x-throttle-wait-seconds', 15))
+        except ValueError:
+            self.wait = 15
+        self.wait += 1
+
+
 class UploadError(UploadcareException):
     """Upload errors.
 
