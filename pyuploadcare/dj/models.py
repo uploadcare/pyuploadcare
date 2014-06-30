@@ -93,7 +93,7 @@ class ImageField(FileField):
     def __init__(self, manual_crop=None, *args, **kwargs):
         is_crop_valid = (
             isinstance(manual_crop, six.string_types) and
-            pattern_of_crop.match(manual_crop)
+            all([pattern_of_crop.match(part) for part in manual_crop.split(',')])
         )
         if not (manual_crop is None or is_crop_valid):
             raise ValidationError('Invalid manual crop value')
