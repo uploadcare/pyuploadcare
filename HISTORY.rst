@@ -4,6 +4,12 @@ History
 -------
 
 
+1.2.9
+~~~~~
+
+- compatibility with Django 1.7
+
+
 1.2.8
 ~~~~~
 
