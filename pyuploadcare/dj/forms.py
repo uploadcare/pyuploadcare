@@ -19,6 +19,7 @@ class FileWidget(TextInput):
     """
 
     input_type = 'hidden'
+    is_hidden = False
 
     class Media:
         js = (dj_conf.uploadcare_js,)
