@@ -4,6 +4,13 @@ History
 -------
 
 
+1.2.10
+~~~~~
+
+- handle responses for HEAD and OPTION requests
+- update widget to 1.4.6
+
+
 1.2.9
 ~~~~~
 

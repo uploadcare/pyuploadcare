@@ -151,9 +151,13 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
         # No content.
         if response.status_code == 204:
             return {}
+        if verb.lower() == 'options':
+            return ''
 
         if 200 <= response.status_code < 300:
             if _content_type_from_response(response).endswith(('/json', '+json')):
+                if verb.lower() == 'head':
+                    return ''
                 try:
                     return response.json()
                 except ValueError as exc:
