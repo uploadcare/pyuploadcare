@@ -53,3 +53,15 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
         self.assertEqual(headers['User-Agent'], self.user_agent)
+
+    @patch('requests.sessions.Session.request', autospec=True)
+    def test_head(self, request):
+        request.return_value = MockResponse(200, b'')
+
+        rest_request('HEAD', 'files/')
+
+    @patch('requests.sessions.Session.request', autospec=True)
+    def test_options(self, request):
+        request.return_value = MockResponse(200, b'')
+
+        rest_request('OPTIONS', 'files/')

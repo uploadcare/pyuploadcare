@@ -22,7 +22,7 @@ script: nosetests tests
 notifications:
   email:
     recipients:
-      - ak@whitescape.com
+      - ak@uploadcare.com
       - dm@uploadcare.com
     on_success: change
     on_failure: change
