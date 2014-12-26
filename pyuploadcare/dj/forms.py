@@ -62,6 +62,12 @@ class FileField(Field):
                 'Invalid value for a field: {exc}'.format(exc=exc)
             )
 
+    def widget_attrs(self, widget):
+        attrs = {}
+        if not self.required:
+            attrs['data-clearable'] = ''
+        return attrs
+
 
 class ImageField(FileField):
     """Django form field that sets up ``FileWidget`` to work with images.
@@ -72,7 +78,8 @@ class ImageField(FileField):
         super(ImageField, self).__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
-        attrs = {'data-images-only': ''}
+        attrs = super(ImageField, self).widget_attrs(widget)
+        attrs['data-images-only'] = ''
         if self.manual_crop is not None:
             attrs['data-crop'] = self.manual_crop
         return attrs
@@ -97,6 +104,8 @@ class FileGroupField(Field):
 
     def widget_attrs(self, widget):
         attrs = {'data-multiple': ''}
+        if not self.required:
+            attrs['data-clearable'] = ''
         return attrs
 
 
@@ -105,5 +114,6 @@ class ImageGroupField(FileGroupField):
     """
 
     def widget_attrs(self, widget):
-        attrs = {'data-multiple': '', 'data-images-only': ''}
+        attrs = super(ImageGroupField, self).widget_attrs(widget)
+        attrs['data-images-only'] = ''
         return attrs
