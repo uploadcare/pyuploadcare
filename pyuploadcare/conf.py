@@ -24,3 +24,6 @@ verify_api_ssl = True
 verify_upload_ssl = True
 
 timeout = DEFAULT
+
+# retry throttled requests this many times
+retry_throttled = 1

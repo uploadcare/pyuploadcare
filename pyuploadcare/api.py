@@ -54,7 +54,7 @@ def _content_type_from_response(response):
 
 
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
-                 retry_throttled=1):
+                 retry_throttled=conf.retry_throttled):
     """Makes REST API request and returns response as ``dict``.
 
     It provides auth headers as well and takes settings from ``conf`` module.
