@@ -3,13 +3,15 @@ from __future__ import unicode_literals, division
 import re
 import logging
 import math
+import time
 
 import dateutil.parser
 import six
 
 from . import conf
 from .api import rest_request, uploading_request
-from .exceptions import InvalidRequestError, APIError
+from .exceptions import (InvalidRequestError, APIError, UploadError,
+                         TimeoutError)
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -272,6 +274,25 @@ class File(object):
             )
         file_from_url = cls.FileFromUrl(result['token'])
         return file_from_url
+
+    @classmethod
+    def upload_from_url_sync(cls, url, timeout=30):
+        """Uploads file from given url and returns ``File`` instance.
+        """
+        ffu = cls.upload_from_url(url)
+
+        time_started = time.time()
+        while time.time() - time_started < timeout:
+            status = ffu.update_info()['status']
+            if status == 'success':
+                return ffu.get_file()
+            if status in ('failed', 'error'):
+                raise UploadError(
+                    'could not upload file from url: {0}'.format(ffu.info())
+                )
+            time.sleep(0.1)
+        else:
+            raise TimeoutError('timed out during upload')
 
     class FileFromUrl(object):
         """Contains the logic around an upload from url.

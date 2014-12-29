@@ -4,6 +4,14 @@ History
 -------
 
 
+1.2.12
+~~~~~~
+
+- add synchronous upload from URL method to `File`
+- UploadcareExceptions are `__repr__`ed properly
+- update widget to 1.5.2
+
+
 1.2.11
 ~~~~~~
 
@@ -148,7 +156,7 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
 
 - ``ImageField`` was added. It provides uploading only image files. Moreover,
   you can activate manual crop, e.g. ``ImageField(manual_crop='2:3')``.
-- More apropriate exceptions were added.
+- More appropriate exceptions were added.
 - Tests were separated from library and were restructured.
 - Widget was updated up to *0.6.7*.
 - Issue of ``FileField``'s ``blank``, ``null`` attributes was fixed.
