@@ -156,10 +156,7 @@ class FileGroupDateMethodsTest(unittest.TestCase):
 class FileCopyTest(unittest.TestCase):
     @patch('requests.sessions.Session.request', autospec=True)
     def test_remote_copy_source(self, request):
-        request.return_value = MockResponse(
-            status=200,
-            data='{}'
-        )
+        request.return_value = MockResponse(status=200)
 
         # uuid with no effects
         f = File('a771f854-c2cb-408a-8c36-71af77811f3b')
