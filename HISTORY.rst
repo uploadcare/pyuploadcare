@@ -4,6 +4,12 @@ History
 -------
 
 
+1.2.11
+~~~~~
+
+- fix "source" composition for copy requests
+
+
 1.2.10
 ~~~~~
 

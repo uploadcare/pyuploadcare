@@ -217,8 +217,9 @@ class File(object):
         """
         effects = effects or ''
         if self.default_effects is not None:
-            effects = '{head}-/{tail}'.format(head=self.default_effects,
-                                              tail=effects)
+            fmt = '{head}-/{tail}' if effects else '{head}'
+            effects = fmt.format(head=self.default_effects,
+                                 tail=effects)
         data = {
             'source': self.cdn_path(effects)
         }
