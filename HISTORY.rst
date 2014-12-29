@@ -5,14 +5,14 @@ History
 
 
 1.2.11
-~~~~~
+~~~~~~
 
 - fix "source" composition for copy requests
 - let configure default throttle retry count via `conf.retry_throttled`
 
 
 1.2.10
-~~~~~
+~~~~~~
 
 - handle responses for HEAD and OPTION requests
 - update widget to 1.4.6
