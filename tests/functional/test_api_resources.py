@@ -154,65 +154,37 @@ class FileGroupDateMethodsTest(unittest.TestCase):
 
 
 class FileCopyTest(unittest.TestCase):
-    @patch('requests.sessions.Session.request', autospec=True)
+    @patch('pyuploadcare.api_resources.rest_request', autospec=True)
     def test_remote_copy_source(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = {}
 
         # uuid with no effects
         f = File('a771f854-c2cb-408a-8c36-71af77811f3b')
         f.copy(target='tgt')
-        request.assert_called_with(
-            ANY,
-            'POST',
-            'https://api.uploadcare.com/files/',
-            allow_redirects=True,
-            data='{"source": "a771f854-c2cb-408a-8c36-71af77811f3b/", "target": "tgt"}',
-            verify=True,
-            headers=ANY,
-            timeout=None,
-        )
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/",
+            "target": "tgt"})
 
         # uuid with effects
         f = File('a771f854-c2cb-408a-8c36-71af77811f3b')
         f.copy(target='tgt', effects='resize/1x1/')
-        request.assert_called_with(
-            ANY,
-            'POST',
-            'https://api.uploadcare.com/files/',
-            allow_redirects=True,
-            data='{"source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/1x1/", "target": "tgt"}',
-            verify=True,
-            headers=ANY,
-            timeout=None,
-        )
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/1x1/",
+            "target": "tgt"})
 
         # cdn url with no effects
         f = File('a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/2x2/')
         f.copy(target='tgt')
-        request.assert_called_with(
-            ANY,
-            'POST',
-            'https://api.uploadcare.com/files/',
-            allow_redirects=True,
-            data='{"source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/2x2/", "target": "tgt"}',
-            verify=True,
-            headers=ANY,
-            timeout=None,
-        )
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/2x2/",
+            "target": "tgt"})
 
         # cdn url with effects
         f = File('a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/')
         f.copy(target='tgt', effects='flip/')
-        request.assert_called_with(
-            ANY,
-            'POST',
-            'https://api.uploadcare.com/files/',
-            allow_redirects=True,
-            data='{"source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/-/flip/", "target": "tgt"}',
-            verify=True,
-            headers=ANY,
-            timeout=None,
-        )
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/-/flip/",
+            "target": "tgt"})
 
 
 class FileGroupAsContainerTypeTest(unittest.TestCase):
