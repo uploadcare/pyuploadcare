@@ -8,6 +8,7 @@ History
 ~~~~~
 
 - fix "source" composition for copy requests
+- let configure default throttle retry count via `conf.retry_throttled`
 
 
 1.2.10
