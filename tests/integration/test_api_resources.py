@@ -16,6 +16,10 @@ from pyuploadcare.api_resources import File, FileGroup, FileList
 from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
 
 
+# increase throttle retries for Travis CI
+conf.retry_throttled = 10
+
+
 class FileUploadTest(unittest.TestCase):
 
     def setUp(self):
