@@ -54,7 +54,7 @@ def _content_type_from_response(response):
 
 
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
-                 retry_throttled=conf.retry_throttled):
+                 retry_throttled=conf.DEFAULT):
     """Makes REST API request and returns response as ``dict``.
 
     It provides auth headers as well and takes settings from ``conf`` module.
@@ -83,6 +83,9 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
         }
 
     """
+    if retry_throttled is conf.DEFAULT:
+        retry_throttled = conf.retry_throttled
+
     path = path.lstrip('/')
     url = urljoin(conf.api_base, path)
     url_parts = urlsplit(url)
