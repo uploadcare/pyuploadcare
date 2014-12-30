@@ -9,7 +9,7 @@ History
 
 - add synchronous upload from URL method to `File`
 - UploadcareExceptions are `__repr__`ed properly
-- update widget to 1.5.2
+- update widget to 1.5.3 (see `widget changelog`_)
 
 
 1.2.11
@@ -241,3 +241,6 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
   - url()
   - filename()
 - Changed pyuploadcare.UploadCareException.__init__
+
+
+.. _widget changelog: https://github.com/uploadcare/uploadcare-widget/blob/master/HISTORY.markdown
