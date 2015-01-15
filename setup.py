@@ -15,14 +15,16 @@ requirements = [
 if PY_VERSION == (2, 6):
     requirements.append('argparse')
 
+if PY_VERSION < (3, 0):
+    long_description = open('README.rst').read() + '\n\n' + open('HISTORY.rst').read()
+else:
+    long_description = open('README.rst', encoding='utf-8').read() + '\n\n' + open('HISTORY.rst', encoding='utf-8').read()
 
 setup(
     name='pyuploadcare',
     version='1.2.12',
     description='Python library for Uploadcare.com',
-    long_description=(
-        open('README.rst').read() + '\n\n' + open('HISTORY.rst').read()
-    ),
+    long_description=(long_description),
     author='Uploadcare LLC',
     author_email='hello@uploadcare.com',
     url='https://github.com/uploadcare/pyuploadcare',
