@@ -276,23 +276,13 @@ class File(object):
         return file_from_url
 
     @classmethod
-    def upload_from_url_sync(cls, url, timeout=30):
+    def upload_from_url_sync(cls, url, timeout=30, interval=0.3,
+                             until_ready=False):
         """Uploads file from given url and returns ``File`` instance.
         """
         ffu = cls.upload_from_url(url)
-
-        time_started = time.time()
-        while time.time() - time_started < timeout:
-            status = ffu.update_info()['status']
-            if status == 'success':
-                return ffu.get_file()
-            if status in ('failed', 'error'):
-                raise UploadError(
-                    'could not upload file from url: {0}'.format(ffu.info())
-                )
-            time.sleep(0.1)
-        else:
-            raise TimeoutError('timed out during upload')
+        return ffu.wait(timeout=timeout, interval=interval,
+                        until_ready=until_ready)
 
     class FileFromUrl(object):
         """Contains the logic around an upload from url.
@@ -365,6 +355,27 @@ class File(object):
             """Returns ``File`` instance if upload is completed."""
             if self.info()['status'] == 'success':
                 return File(self.info()['uuid'])
+
+        def wait(self, timeout=30, interval=0.3, until_ready=False):
+
+            def check_file():
+                status = self.update_info()['status']
+                if status == 'success':
+                    return self.get_file()
+                if status in ('failed', 'error'):
+                    raise UploadError(
+                        'could not upload file from url: {0}'.format(self.info())
+                    )
+
+            time_started = time.time()
+            while time.time() - time_started < timeout:
+                file = check_file()
+                if file and (not until_ready or
+                             file.update_info().get('is_ready')):
+                    return file
+                time.sleep(interval)
+            else:
+                raise TimeoutError('timed out during upload')
 
 
 class FileList(object):
