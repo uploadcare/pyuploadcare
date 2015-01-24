@@ -77,6 +77,14 @@ class FileUploadFromUrlTest(unittest.TestCase):
 
         self.assertIsInstance(file_from_url.get_file(), File)
 
+    @skip_on_travis
+    def test_successful_upload_from_url_sync(self):
+        file_from_url = File.upload_from_url(
+            'https://github.com/images/error/angry_unicorn.png'
+        )
+        file = file_from_url.wait(interval=1, until_ready=False)
+        self.assertIsInstance(file, File)
+
 
 class FileInfoTest(unittest.TestCase):
     @classmethod
