@@ -1,0 +1,12 @@
+# git log --format='%aN <%aE>' | sort -u
+
+Alex Zinchenko <admloki@gmail.com>
+Dmitriy Narkevich <github@dimier.org>
+Dmitry Mukhin <dm@uploadcare.com>
+Evgeniy Kirov <evg.kirov@gmail.com>
+homm <homm86@gmail.com>
+Marsel Mavletkulov <marselester@ya.ru>
+Maxim Kamenkov <mkamenkov@gmail.com>
+Sławek Ehlert <slafs@op.pl>
+Valentin Golev <me@va1en0k.net>
+Zowie <zowielangdon@gmail.com>

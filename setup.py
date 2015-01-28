@@ -22,7 +22,7 @@ else:
 
 setup(
     name='pyuploadcare',
-    version='1.2.12',
+    version='1.2.13',
     description='Python library for Uploadcare.com',
     long_description=(long_description),
     author='Uploadcare LLC',

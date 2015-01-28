@@ -4,6 +4,15 @@ History
 -------
 
 
+1.2.13
+~~~~~~
+
+- improve synchronous upload API
+- fix encoding issues with pip3
+- update widget to 1.5.4 (see `widget changelog`_)
+- add AUTHORS.txt
+
+
 1.2.12
 ~~~~~~
 
