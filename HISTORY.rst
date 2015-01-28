@@ -4,6 +4,12 @@ History
 -------
 
 
+1.2.14
+~~~~~~
+
+- update widget to 1.5.5 (see `widget changelog`_)
+
+
 1.2.13
 ~~~~~~
 
