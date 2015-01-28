@@ -17,7 +17,7 @@ History
 ~~~~~~
 
 - add synchronous upload from URL method to `File`
-- UploadcareExceptions are `__repr__`ed properly
+- UploadcareExceptions are `__repr__`'ed properly
 - update widget to 1.5.3 (see `widget changelog`_)
 
 
