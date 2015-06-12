@@ -30,6 +30,9 @@ matrix:
   include:
     - python: 2.7
       env: DJANGO=1.8 SUITE="tests/integration"
+cache:
+  directories:
+    - $HOME/.cache/pip
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
   - pip install django~=$DJANGO.0
