@@ -4,6 +4,7 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
+import sys
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
@@ -31,8 +32,12 @@ class RESTClientTest(unittest.TestCase):
         with self.assertRaises(APIError) as cm:
             rest_request('GET', 'files/')
 
-        self.assertEqual('No JSON object could be decoded',
-                         cm.exception.data)
+        if sys.version_info >= (3, 4):
+            self.assertEqual('Expecting value: line 1 column 1 (char 0)',
+                             cm.exception.data)
+        else:
+            self.assertEqual('No JSON object could be decoded',
+                             cm.exception.data)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):

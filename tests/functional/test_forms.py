@@ -29,7 +29,7 @@ class FormFieldsAttributesTest(unittest.TestCase):
             cf = forms.CharField()
             ff = uc_forms.FileField()
 
-        f = SomeForm()
+        f = SomeForm(label_suffix='')
         self.assertRegexpMatches(
             str(f.media),
             'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
@@ -45,7 +45,7 @@ class FormFieldsAttributesTest(unittest.TestCase):
             ff = uc_forms.FileField(
                 widget=uc_forms.FileWidget(attrs={'role': 'role'}))
 
-        f = SomeForm()
+        f = SomeForm(label_suffix='')
         self.assertRegexpMatches(
             str(f.media),
             'https://ucarecdn\.com/widget/[\d\.]+/uploadcare/uploadcare-[\d\.]+\.min\.js'
