@@ -7,26 +7,26 @@ python:
   - 3.3
   - 3.4
 env:
-  - DJANGO=1.4.20
-  - DJANGO=1.5.12
-  - DJANGO=1.6.11
-  - DJANGO=1.7.8
-  - DJANGO=1.8.2
+  - DJANGO=1.4
+  - DJANGO=1.5
+  - DJANGO=1.6
+  - DJANGO=1.7
+  - DJANGO=1.8
 matrix:
   exclude:
     - python: 2.6
-      env: DJANGO=1.7.8
+      env: DJANGO=1.7
     - python: 2.6
-      env: DJANGO=1.8.2
+      env: DJANGO=1.8
     - python: 3.2
-      env: DJANGO=1.4.20
+      env: DJANGO=1.4
     - python: 3.3
-      env: DJANGO=1.4.20
+      env: DJANGO=1.4
     - python: 3.4
-      env: DJANGO=1.4.20
+      env: DJANGO=1.4
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
-  - pip install django==$DJANGO
+  - pip install django~=$DJANGO.0
   - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
   - python setup.py install
 script: py.test tests
