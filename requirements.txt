@@ -1,6 +1,6 @@
 -e .
 
-Django==1.4.5
+Django~=1.8
 
-tox==1.4.3
+tox~=2.0
 Sphinx==1.2b1
