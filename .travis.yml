@@ -7,11 +7,14 @@ python:
   - 3.3
   - 3.4
 env:
-  - DJANGO=1.4
-  - DJANGO=1.5
-  - DJANGO=1.6
-  - DJANGO=1.7
-  - DJANGO=1.8
+  global:
+    - SUITE="tests/functional tests/unit"
+  matrix:
+    - DJANGO=1.4
+    - DJANGO=1.5
+    - DJANGO=1.6
+    - DJANGO=1.7
+    - DJANGO=1.8
 matrix:
   exclude:
     - python: 2.6
@@ -24,12 +27,15 @@ matrix:
       env: DJANGO=1.4
     - python: 3.4
       env: DJANGO=1.4
+  include:
+    - python: 2.7
+      env: DJANGO=1.8 SUITE="tests/integration"
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
   - pip install django~=$DJANGO.0
   - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
   - python setup.py install
-script: py.test tests
+script: py.test $SUITE
 notifications:
   email:
     recipients:
