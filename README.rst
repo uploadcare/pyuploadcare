@@ -4,6 +4,9 @@ PyUploadcare: a Python library for Uploadcare
 
 .. image:: https://travis-ci.org/uploadcare/pyuploadcare.png?branch=master
    :target: https://travis-ci.org/uploadcare/pyuploadcare
+.. image:: https://readthedocs.org/projects/pyuploadcare/badge/?version=latest
+   :target: https://readthedocs.org/projects/pyuploadcare/?badge=latest
+   :alt: Documentation Status
 
 The most important thing for us at `Uploadcare`_ is to make file uploading on
 the web really easy. Everyone is used to the routine work, related to allowing
