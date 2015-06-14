@@ -22,7 +22,7 @@ else:
 
 setup(
     name='pyuploadcare',
-    version='1.2.14',
+    version='1.2.15',
     description='Python library for Uploadcare.com',
     long_description=(long_description),
     author='Uploadcare LLC',
@@ -31,7 +31,7 @@ setup(
     packages=['pyuploadcare', 'pyuploadcare.dj'],
     package_data={
         'pyuploadcare.dj': [
-            'static/uploadcare/assets/uploaders/*.js',
+            'static/uploadcare/*.js',
         ]
     },
     entry_points={

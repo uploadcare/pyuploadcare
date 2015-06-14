@@ -38,6 +38,8 @@ asynchornously.
 Features
 --------
 
+- Python wrapper for Uploadcare [REST](https://uploadcare.com/documentation/rest/)
+  and [Upload](https://uploadcare.com/documentation/upload/) APIs
 - Django widget with useful manual crop and multiupload;
 - *ucare* console utility;
 - hosted assets (Kudos to `Sławek Ehlert`_!).
