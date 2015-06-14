@@ -10,21 +10,22 @@ Settings
 --------
 
 Besides required ``pub_key``, ``secret`` settings there are optional settings,
-for example, ``widget_version``:
+for example, ``widget_version`` or ``widget_variant``:
 
 .. code-block:: python
 
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '0.10',
+        'widget_version': '2.3.1',
+        'widget_variant': 'min',  // without jQuery
     }
 
 PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
 
 .. code-block:: html
 
-    <script src="https://ucarecdn.com/widget/x.y.z/uploadcare/uploadcare-x.y.z.min.js"></script>
+    <script src="https://ucarecdn.com/widget/x.y.z/uploadcare/uploadcare.full.min.js"></script>
 
 If you don't want to use hosted assets you have to turn off this feature:
 
