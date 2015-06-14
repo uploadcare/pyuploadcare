@@ -29,7 +29,7 @@ hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare.{varia
 )
 
 local_url = 'uploadcare/uploadcare.{variant}.js'.format(
-    version=widget_variant)
+    variant=widget_variant)
 
 use_hosted_assets = settings.UPLOADCARE.get(
     'use_hosted_assets',
