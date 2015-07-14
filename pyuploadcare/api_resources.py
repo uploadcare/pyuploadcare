@@ -580,7 +580,7 @@ class FileGroup(object):
         return group
 
 
-def api_listener(cls, next_url, reverse, count=None):
+def api_iterator(cls, next_url, reverse, count=None):
     while next_url and count != 0:
         try:
             result = rest_request('GET', next_url)
@@ -594,8 +594,8 @@ def api_listener(cls, next_url, reverse, count=None):
             working_set = result['results']
             next_url = result['next']
 
-        for file_info in working_set:
-            yield cls(file_info)
+        for item in working_set:
+            yield cls(item)
 
             if count is not None:
                 count -= 1
@@ -633,7 +633,7 @@ class FileList(object):
         return '/files/?' + urlencode(qs)
 
     def __iter__(self):
-        return api_listener(
+        return api_iterator(
             File.construct_from, self.api_url(),
             self.until is not None, self.count,
         )
