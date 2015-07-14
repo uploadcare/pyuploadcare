@@ -8,6 +8,11 @@ import time
 import dateutil.parser
 import six
 
+if six.PY3:
+    from urllib.parse import urlencode
+else:
+    from urllib import urlencode
+
 from . import conf
 from .api import rest_request, uploading_request
 from .exceptions import (InvalidRequestError, APIError, UploadError,
@@ -575,15 +580,21 @@ class FileGroup(object):
         return group
 
 
-def api_listener(cls, next_url, count=None):
+def api_listener(cls, next_url, reverse, count=None):
     while next_url and count != 0:
         try:
             result = rest_request('GET', next_url)
         except InvalidRequestError:
             return
-        next_url = result['next']
 
-        for file_info in result['results']:
+        if reverse:
+            working_set = reversed(result['results'])
+            next_url = result['previous']
+        else:
+            working_set = result['results']
+            next_url = result['next']
+
+        for file_info in working_set:
             yield cls(file_info)
 
             if count is not None:
@@ -603,10 +614,23 @@ class FileList(object):
         self.until = kwargs.get('until')
         self.count = kwargs.get('count')
         self.stored = kwargs.get('stored')
-        self.removed = kwargs.get('removed')
+        self.removed = kwargs.get('removed', False)
         self.request_limit = kwargs.get('request_limit')
 
     def __iter__(self):
-        next_url = '/files/'
-        return api_listener(File.construct_from, next_url, self.count)
+        qs = {}
+        if self.since is not None:
+            qs['from'] = self.since.isoformat()
+        if self.until is not None:
+            qs['to'] = self.until.isoformat()
+        if self.request_limit:
+            qs['limit'] = self.request_limit
+        for f in ['stored', 'removed']:
+            v = getattr(self, f)
+            qs[f] = 'none' if v is None else str(bool(v)).lower()
+        next_url = '/files/?' + urlencode(qs)
+
+        return api_listener(
+            File.construct_from, next_url, self.until is not None, self.count,
+        )
 
