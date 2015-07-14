@@ -616,8 +616,9 @@ class FileList(object):
         self.stored = kwargs.get('stored')
         self.removed = kwargs.get('removed', False)
         self.request_limit = kwargs.get('request_limit')
+        self._length = None
 
-    def __iter__(self):
+    def api_url(self, **additional):
         qs = {}
         if self.since is not None:
             qs['from'] = self.since.isoformat()
@@ -628,9 +629,20 @@ class FileList(object):
         for f in ['stored', 'removed']:
             v = getattr(self, f)
             qs[f] = 'none' if v is None else str(bool(v)).lower()
-        next_url = '/files/?' + urlencode(qs)
+        qs.update(additional)
+        return '/files/?' + urlencode(qs)
 
+    def __iter__(self):
         return api_listener(
-            File.construct_from, next_url, self.until is not None, self.count,
+            File.construct_from, self.api_url(),
+            self.until is not None, self.count,
         )
 
+    def __len__(self):
+        if self.since is not None or self.until is not None:
+            raise ValueError("Can't count objects since or until some date.")
+
+        if self._length is None:
+            result = rest_request('GET', self.api_url(limit='1'))
+            self._length = result['total']
+        return self._length
