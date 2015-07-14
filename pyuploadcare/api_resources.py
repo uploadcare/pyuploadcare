@@ -603,7 +603,12 @@ def api_iterator(cls, next_url, reverse, count=None):
                     return
 
 
-class FileList(object):
+class BaseApiList(object):
+    # abstract
+    base_url = None
+    constructor = None
+    filters = []
+
     def __init__(self, **kwargs):
         # Only explicit kwargs are allowed.
 
@@ -613,10 +618,11 @@ class FileList(object):
         self.since = kwargs.get('since')
         self.until = kwargs.get('until')
         self.count = kwargs.get('count')
-        self.stored = kwargs.get('stored')
-        self.removed = kwargs.get('removed', False)
         self.request_limit = kwargs.get('request_limit')
         self._length = None
+
+        for f, default in self.filters:
+            setattr(self, f, kwargs.get(f, default))
 
     def api_url(self, **additional):
         qs = {}
@@ -626,15 +632,15 @@ class FileList(object):
             qs['to'] = self.until.isoformat()
         if self.request_limit:
             qs['limit'] = self.request_limit
-        for f in ['stored', 'removed']:
+        for f, _ in self.filters:
             v = getattr(self, f)
             qs[f] = 'none' if v is None else str(bool(v)).lower()
         qs.update(additional)
-        return '/files/?' + urlencode(qs)
+        return self.base_url + '?' + urlencode(qs)
 
     def __iter__(self):
         return api_iterator(
-            File.construct_from, self.api_url(),
+            self.constructor, self.api_url(),
             self.until is not None, self.count,
         )
 
@@ -646,3 +652,14 @@ class FileList(object):
             result = rest_request('GET', self.api_url(limit='1'))
             self._length = result['total']
         return self._length
+
+
+class FileList(BaseApiList):
+    base_url = '/files/'
+    constructor = File.construct_from
+    filters = [('stored', None), ('removed', False)]
+
+
+class GroupList(BaseApiList):
+    base_url = '/groups/'
+    constructor = FileGroup.construct_from
