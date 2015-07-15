@@ -8,9 +8,12 @@ from tempfile import NamedTemporaryFile
 from datetime import datetime
 import time
 
+import mock
 import requests
 from pyuploadcare import conf
-from pyuploadcare.api import InvalidRequestError
+from pyuploadcare.api import (
+    InvalidRequestError, rest_request as original_rest_request,
+)
 from pyuploadcare.api_resources import File, FileGroup, FileList
 
 from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
@@ -320,23 +323,59 @@ class FileListIterationTest(unittest.TestCase):
         conf.secret = None
 
     def test_iteration_over_all_files(self):
-        files = list(file_ for file_ in FileList(limit=10))
+        files = list(FileList(limit=10))
         self.assertTrue(len(files) >= 0)
 
     def test_iteration_over_limited_count_of_files(self):
-        create_file_group(files_qty=3)
-
-        files = list(file_ for file_ in FileList(limit=2))
+        files = list(FileList(limit=2))
         self.assertEqual(len(files), 2)
 
     def test_iteration_over_stored_files(self):
         for file_ in FileList(stored=True, limit=10):
             self.assertTrue(file_.is_stored())
 
+    def test_iteration_over_not_stored_files(self):
+        for file_ in FileList(stored=False, limit=10):
+            self.assertFalse(file_.is_stored())
+
     def test_iteration_over_removed_files(self):
         for file_ in FileList(removed=True, limit=10):
             self.assertTrue(file_.is_removed())
 
+    def test_iteration_over_not_removed_files(self):
+        for file_ in FileList(removed=False, limit=10):
+            self.assertFalse(file_.is_removed())
+
     def test_iteration_over_stored_removed_files(self):
         files = list(FileList(stored=True, removed=True, limit=10))
         self.assertEqual(len(files), 0)
+
+    @mock.patch('pyuploadcare.api_resources.rest_request',
+                side_effect=original_rest_request)
+    def test_iterate_through_all_pages(self, rest_request):
+        list(FileList(request_limit=3, limit=10))
+        for call in rest_request.call_args_list:
+            self.assertIn('/files/?', call[0][1])
+
+    @mock.patch('pyuploadcare.api_resources.rest_request',
+                side_effect=original_rest_request)
+    def test_count_files(self, rest_request):
+        self.assertNotEqual(0, FileList(stored=None, removed=None).count())
+        self.assertEqual(1, rest_request.call_count)
+        self.assertIn('limit=1', rest_request.call_args[0][1])
+        rest_request.reset_mock()
+
+        self.assertNotEqual(0, FileList(stored=True, removed=None).count())
+        self.assertEqual(1, rest_request.call_count)
+        self.assertIn('limit=1', rest_request.call_args[0][1])
+        rest_request.reset_mock()
+
+        self.assertNotEqual(0, FileList(stored=False, removed=True).count())
+        self.assertEqual(1, rest_request.call_count)
+        self.assertIn('limit=1', rest_request.call_args[0][1])
+        rest_request.reset_mock()
+
+        self.assertEqual(0, FileList(stored=True, removed=True).count())
+        self.assertEqual(1, rest_request.call_count)
+        self.assertIn('limit=1', rest_request.call_args[0][1])
+        rest_request.reset_mock()
