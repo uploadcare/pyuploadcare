@@ -2,7 +2,6 @@
 from __future__ import unicode_literals, division
 import re
 import logging
-import math
 import time
 
 import dateutil.parser
@@ -580,8 +579,8 @@ class FileGroup(object):
         return group
 
 
-def api_iterator(cls, next_url, reverse, count=None):
-    while next_url and count != 0:
+def api_iterator(cls, next_url, reverse, limit=None):
+    while next_url and limit != 0:
         try:
             result = rest_request('GET', next_url)
         except InvalidRequestError:
@@ -597,9 +596,9 @@ def api_iterator(cls, next_url, reverse, count=None):
         for item in working_set:
             yield cls(item)
 
-            if count is not None:
-                count -= 1
-                if count == 0:
+            if limit is not None:
+                limit -= 1
+                if limit == 0:
                     return
 
 
@@ -617,9 +616,9 @@ class BaseApiList(object):
 
         self.since = kwargs.get('since')
         self.until = kwargs.get('until')
-        self.count = kwargs.get('count')
+        self.limit = kwargs.get('limit')
         self.request_limit = kwargs.get('request_limit')
-        self._length = None
+        self._count = None
 
         for f, default in self.filters:
             setattr(self, f, kwargs.get(f, default))
@@ -641,17 +640,17 @@ class BaseApiList(object):
     def __iter__(self):
         return api_iterator(
             self.constructor, self.api_url(),
-            self.until is not None, self.count,
+            self.until is not None, self.limit,
         )
 
-    def __len__(self):
+    def count(self):
         if self.since is not None or self.until is not None:
             raise ValueError("Can't count objects since or until some date.")
 
-        if self._length is None:
+        if self._count is None:
             result = rest_request('GET', self.api_url(limit='1'))
-            self._length = result['total']
-        return self._length
+            self._count = result['total']
+        return self._count
 
 
 class FileList(BaseApiList):
@@ -661,7 +660,7 @@ class FileList(BaseApiList):
 
     - ``since`` -- a datetime object from which objects will be iterated;
     - ``until`` -- a datetime object to which objects will be iterated;
-    - ``count`` -- a total number of objects to be iterated.
+    - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
     - ``stored`` -- ``True`` to include only stored files,
       ``False`` to exclude, ``None`` is default, will not exclude anything;
@@ -683,7 +682,7 @@ class FileList(BaseApiList):
 
     Count objects::
 
-        >>> print('Number of stored files is', len(FileList(stored=True)))
+        >>> print('Number of stored files is', FileList(stored=True).count())
 
     """
     base_url = '/files/'
@@ -698,7 +697,7 @@ class GroupList(BaseApiList):
 
     - ``since`` -- a datetime object from which objects will be iterated;
     - ``until`` -- a datetime object to which objects will be iterated;
-    - ``count`` -- a total number of objects to be iterated.
+    - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
 
     If ``until`` is specified, the order of items will be reversed.
@@ -712,7 +711,7 @@ class GroupList(BaseApiList):
 
     Count objects::
 
-        >>> print('Number of groups is', len(GroupList()))
+        >>> print('Number of groups is', GroupList().count())
 
     """
     base_url = '/groups/'
