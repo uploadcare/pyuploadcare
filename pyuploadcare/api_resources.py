@@ -655,11 +655,65 @@ class BaseApiList(object):
 
 
 class FileList(BaseApiList):
+    """List of File resources.
+
+    This class provides iteration over all uploaded files. You can specify:
+
+    - ``since`` -- a datetime object from which objects will be iterated;
+    - ``until`` -- a datetime object to which objects will be iterated;
+    - ``count`` -- a total number of objects to be iterated.
+      If not specified, all available objects are iterated;
+    - ``stored`` -- ``True`` to include only stored files,
+      ``False`` to exclude, ``None`` is default, will not exclude anything;
+    - ``removed`` -- ``True`` to include only removed files,
+      ``False`` to exclude, ``None`` will not exclude anything.
+      The default is ``False``.
+
+    If ``until`` is specified, the order of items will be reversed.
+    It is impossible to specify ``since`` and ``until`` at the same time.
+
+    Files can't be stored and removed at the same time,
+    such query will always return an empty set.
+    But files can be not stored and not removed (just uploaded files).
+
+    Usage example::
+
+        >>> for f in FileList(removed=None):
+        >>>     print f.datetime_uploaded()
+
+    Count objects::
+
+        >>> print('Number of stored files is', len(FileList(stored=True)))
+
+    """
     base_url = '/files/'
     constructor = File.construct_from
     filters = [('stored', None), ('removed', False)]
 
 
 class GroupList(BaseApiList):
+    """List of FileGroup resources.
+
+    This class provides iteration over all groups for project. You can specify:
+
+    - ``since`` -- a datetime object from which objects will be iterated;
+    - ``until`` -- a datetime object to which objects will be iterated;
+    - ``count`` -- a total number of objects to be iterated.
+      If not specified, all available objects are iterated;
+
+    If ``until`` is specified, the order of items will be reversed.
+    It is impossible to specify ``since`` and ``until`` at the same time.
+
+    Usage example::
+
+        >>> from datetime import datetime, timedelta
+        >>> for f in GroupList(since=datetime.now() - timedelta(weeks=1)):
+        >>>     print f.datetime_created()
+
+    Count objects::
+
+        >>> print('Number of groups is', len(GroupList()))
+
+    """
     base_url = '/groups/'
     constructor = FileGroup.construct_from
