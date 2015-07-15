@@ -10,123 +10,14 @@ from mock import patch
 
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
-    ucare_argparser, list_files, get_file, store_file, delete_file, main,
+    ucare_argparser, get_file, store_file, delete_file, main,
     create_group,
 )
-from .utils import MockResponse
+from .utils import MockResponse, MockListResponse
 
 
 def arg_namespace(arguments_str):
     return ucare_argparser().parse_args(arguments_str.split())
-
-
-class UcareListTest(unittest.TestCase):
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_secret_is_none(self, request):
-        conf.secret = None
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list'))
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_no_args(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_page_2(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --page 2'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=2&limit=20')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_limit_10(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --limit 10'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=10')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_stored_all(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --stored all'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_stored_true(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --stored true'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&stored=true')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_stored_false(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --stored false'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&stored=false')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_removed_all(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --removed all'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_removed_true(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --removed true'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&removed=true')
-        )
-
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_removed_false(self, request):
-        request.return_value = MockResponse(status=200)
-
-        list_files(arg_namespace('list --removed false'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('GET', 'https://api.uploadcare.com/files/?page=1&limit=20&removed=false')
-        )
 
 
 class UcareGetTest(unittest.TestCase):
@@ -218,7 +109,7 @@ class UcareCommonArgsTest(unittest.TestCase):
         conf.pub_key = None
         conf.secret = None
 
-        conf.api_version = '0.3'
+        conf.api_version = '0.4'
         conf.api_base = 'https://api.uploadcare.com/'
         conf.upload_base = 'https://upload.uploadcare.com/'
 
@@ -230,7 +121,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_pub_key(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         main(arg_namespace('--pub_key demopublickey list'))
 
@@ -238,7 +129,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_secret(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         main(arg_namespace('--secret demosecretkey list'))
 
@@ -246,7 +137,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_api_base(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         main(arg_namespace('--api_base https://uploadcare.com/api/ list'))
 
@@ -254,7 +145,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_upload_base(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         main(arg_namespace('--upload_base https://uploadcare.com/upload/ list'))
 
@@ -262,7 +153,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_verify_api_ssl(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         main(arg_namespace('list'))
         self.assertTrue(conf.verify_api_ssl)
@@ -272,7 +163,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_verify_upload_ssl(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         main(arg_namespace('list'))
         self.assertTrue(conf.verify_upload_ssl)
@@ -282,7 +173,7 @@ class UcareCommonArgsTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_api_version(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         main(arg_namespace('--api_version 0.777 list'))
 
@@ -306,7 +197,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_use_pub_key_from_config_file(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         self.tmp_config_file.write(
             '[ucare]\n'
@@ -320,7 +211,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_redefine_pub_key_by_second_config_file(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         self.tmp_config_file.write(
             '[ucare]\n'
@@ -342,7 +233,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_use_available_pub_key_from_config_files(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         self.tmp_config_file.write(
             '[ucare]\n'
@@ -364,7 +255,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_redefine_config_pub_key_by_args(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         self.tmp_config_file.write(
             '[ucare]\n'
@@ -378,7 +269,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_load_verify_api_ssl_false_value_from_config(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         self.tmp_config_file.write(
             '[ucare]\n'
@@ -392,7 +283,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_load_verify_api_ssl_true_value_from_config(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         self.tmp_config_file.write(
             '[ucare]\n'
@@ -406,7 +297,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_redefine_config_verify_api_ssl_by_args(self, request):
-        request.return_value = MockResponse(status=200)
+        request.return_value = MockListResponse()
 
         self.tmp_config_file.write(
             '[ucare]\n'

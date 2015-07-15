@@ -631,8 +631,10 @@ class BaseApiList(object):
             qs['to'] = self.until.isoformat()
         if self.request_limit:
             qs['limit'] = self.request_limit
-        for f, _ in self.filters:
+        for f, default in self.filters:
             v = getattr(self, f)
+            if v == default:
+                continue
             qs[f] = 'none' if v is None else str(bool(v)).lower()
         qs.update(additional)
         return self.base_url + '?' + urlencode(qs)

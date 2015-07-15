@@ -307,55 +307,6 @@ class FileCopyTest(unittest.TestCase):
         self.assertEqual(200, resp.status_code)
 
 
-class FileListRetrieveTest(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
-
-    @classmethod
-    def tearDownClass(cls):
-        conf.pub_key = None
-        conf.secret = None
-
-    def test_get_only_one_file(self):
-        result = FileList.retrieve(page=1, limit=1)
-        if result['results']:
-            self.assertEqual(len(result['results']), 1)
-
-    def test_get_only_stored_file(self):
-        result = FileList.retrieve(page=1, limit=1, stored=True)
-        if result['results']:
-            file_info = result['results'][0]
-            self.assertIsNotNone(file_info['datetime_stored'])
-
-    def test_get_only_non_stored_file(self):
-        result = FileList.retrieve(page=1, limit=1, stored=False)
-        if result['results']:
-            file_info = result['results'][0]
-            self.assertIsNone(file_info['datetime_stored'])
-
-    def test_get_only_removed_file(self):
-        result = FileList.retrieve(page=1, limit=1, removed=True)
-        if result['results']:
-            file_info = result['results'][0]
-            self.assertIsNotNone(file_info['datetime_removed'])
-
-    def test_get_only_non_removed_file(self):
-        result = FileList.retrieve(page=1, limit=1, removed=False)
-        if result['results']:
-            file_info = result['results'][0]
-            self.assertIsNone(file_info['datetime_removed'])
-
-    def test_get_only_stored_removed_file(self):
-        result = FileList.retrieve(page=1, limit=1, stored=True, removed=True)
-        if result['results']:
-            file_info = result['results'][0]
-            self.assertIsNotNone(file_info['datetime_stored'])
-            self.assertIsNotNone(file_info['datetime_removed'])
-
-
 class FileListIterationTest(unittest.TestCase):
 
     @classmethod
@@ -369,24 +320,23 @@ class FileListIterationTest(unittest.TestCase):
         conf.secret = None
 
     def test_iteration_over_all_files(self):
-        files = list(file_ for file_ in FileList(count=10))
+        files = list(file_ for file_ in FileList(limit=10))
         self.assertTrue(len(files) >= 0)
 
     def test_iteration_over_limited_count_of_files(self):
         create_file_group(files_qty=3)
 
-        files = list(file_ for file_ in FileList(count=2))
+        files = list(file_ for file_ in FileList(limit=2))
         self.assertEqual(len(files), 2)
 
     def test_iteration_over_stored_files(self):
-        for file_ in FileList(stored=True, count=10):
+        for file_ in FileList(stored=True, limit=10):
             self.assertTrue(file_.is_stored())
 
     def test_iteration_over_removed_files(self):
-        for file_ in FileList(removed=True, count=10):
+        for file_ in FileList(removed=True, limit=10):
             self.assertTrue(file_.is_removed())
 
     def test_iteration_over_stored_removed_files(self):
-        for file_ in FileList(stored=True, removed=True, count=10):
-            self.assertTrue(file_.is_stored())
-            self.assertTrue(file_.is_removed())
+        files = list(FileList(stored=True, removed=True, limit=10))
+        self.assertEqual(len(files), 0)
