@@ -614,14 +614,19 @@ class BaseApiList(object):
         if kwargs.get('since') is not None and kwargs.get('until') is not None:
             raise TypeError('Only one of since and until arguments is allowed.')
 
-        self.since = kwargs.get('since')
-        self.until = kwargs.get('until')
-        self.limit = kwargs.get('limit')
-        self.request_limit = kwargs.get('request_limit')
+        self.since = kwargs.pop('since', None)
+        self.until = kwargs.pop('until', None)
+        self.limit = kwargs.pop('limit', None)
+        self.request_limit = kwargs.pop('request_limit', None)
         self._count = None
 
         for f, default in self.filters:
-            setattr(self, f, kwargs.get(f, default))
+            setattr(self, f, kwargs.pop(f, default))
+
+        if kwargs:
+            raise TypeError('Extra arguments: {}.'.format(
+                ", ".join(kwargs.keys())
+            ))
 
     def api_url(self, **additional):
         qs = {}

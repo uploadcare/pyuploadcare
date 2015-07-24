@@ -322,6 +322,16 @@ class FileListIterationTest(unittest.TestCase):
         conf.pub_key = None
         conf.secret = None
 
+    def test_bad_args(self):
+        with self.assertRaises(TypeError) as cm:
+            FileList(since=datetime.now(), until=datetime.now())
+        self.assertEqual(cm.exception.args[0],
+                         'Only one of since and until arguments is allowed.')
+
+        with self.assertRaises(TypeError) as cm:
+            FileList(extra=None)
+        self.assertEqual(cm.exception.args[0], 'Extra arguments: extra.')
+
     def test_iteration_over_all_files(self):
         files = list(FileList(limit=10))
         self.assertTrue(len(files) >= 0)
