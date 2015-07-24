@@ -22,7 +22,7 @@ from .pyuploadcare import __version__
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#needs_sphinx = '1.0'
+needs_sphinx = '1.3.1'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PyUploadcare'
-copyright = u'2013, Uploadcare Ltd'
+copyright = u'2011-2015, Uploadcare LLC'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -95,7 +95,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -188,7 +188,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'PyUploadcare.tex', u'PyUploadcare Documentation',
-   u'Uploadcare Ltd', 'manual'),
+   u'Uploadcare LLC', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -218,7 +218,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'pyuploadcare', u'PyUploadcare Documentation',
-     [u'Uploadcare Ltd'], 1)
+     [u'Uploadcare LLC'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -232,7 +232,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'PyUploadcare', u'PyUploadcare Documentation',
-   u'Uploadcare Ltd', 'PyUploadcare', 'Python library for Uploadcare.',
+   u'Uploadcare LLC', 'PyUploadcare', 'Python library for Uploadcare.',
    'Miscellaneous'),
 ]
 
