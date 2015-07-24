@@ -20,7 +20,7 @@ conf.pub_key = settings.UPLOADCARE['pub_key']
 conf.secret = settings.UPLOADCARE['secret']
 
 
-widget_version = settings.UPLOADCARE.get('widget_version', '2.3.1')
+widget_version = settings.UPLOADCARE.get('widget_version', '2.4.0')
 widget_variant = settings.UPLOADCARE.get('widget_variant', 'full.min')
 
 hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare.{variant}.js'.format(

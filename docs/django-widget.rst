@@ -17,7 +17,7 @@ for example, ``widget_version`` or ``widget_variant``:
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '2.3.1',
+        'widget_version': '2.4.0',
         'widget_variant': 'min',  // without jQuery
     }
 
