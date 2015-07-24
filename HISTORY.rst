@@ -3,6 +3,12 @@
 History
 -------
 
+1.3.0
+~~~~~
+
+- API version was updated up to *0.4*.
+- update widget to 2.4.0 (see `widget changelog`_)
+
 1.2.15
 ~~~~~~
 
