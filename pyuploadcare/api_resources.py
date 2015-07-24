@@ -2,11 +2,15 @@
 from __future__ import unicode_literals, division
 import re
 import logging
-import math
 import time
 
 import dateutil.parser
 import six
+
+if six.PY3:
+    from urllib.parse import urlencode
+else:
+    from urllib import urlencode
 
 from . import conf
 from .api import rest_request, uploading_request
@@ -378,121 +382,6 @@ class File(object):
                 raise TimeoutError('timed out during upload')
 
 
-class FileList(object):
-    """List of File resources.
-
-    This class provides iteration over all uploaded files. You can specify:
-
-    - ``offset`` -- an offset into the list of returned items;
-    - ``count`` -- a limit on the number of objects to be returned;
-    - ``stored`` -- ``True`` to include only removed files,
-      ``False`` to exclude;
-    - ``removed`` -- ``True`` to include only stored files,
-      ``False`` to exclude.
-
-    Usage example::
-
-        >>> files_from_second_to_end = FileList(offset=1)
-        >>> for file_ in files_from_second_to_end:
-        >>>     print file_
-
-    """
-
-    def __init__(self, offset=0, count=None, stored=None, removed=None):
-        if offset < 0:
-            raise InvalidRequestError(
-                'offset has to be greater than or equal to zero'
-            )
-        self.offset = offset
-
-        if count is not None and count < 0:
-            raise InvalidRequestError(
-                'count has to be greater than or equal to zero'
-            )
-        self.count = count
-
-        self.stored = stored
-        self.removed = removed
-
-    def __iter__(self):
-        return FileList.FileListIterator(self.offset, self.count,
-                                         self.stored, self.removed)
-
-    @classmethod
-    def retrieve(cls, page, limit=20, stored=None, removed=None):
-        """Returns list of files' raw information by requesting Uploadcare API.
-        """
-        if page < 1:
-            raise InvalidRequestError(
-                'page has to be greater than or equal to one'
-            )
-
-        url = 'files/?page={page}&limit={limit}'.format(page=page, limit=limit)
-        if stored is not None:
-            url += '&stored={stored}'.format(
-                stored='true' if stored else 'false')
-        if removed is not None:
-            url += '&removed={removed}'.format(
-                removed='true' if removed else 'false')
-        return rest_request('GET', url)
-
-    class FileListIterator(object):
-        """Iterator that yields ``File`` instances while API pages are found.
-
-        It caches API result for particular page between yields.
-
-        """
-
-        _count_per_request = 20
-
-        def __init__(self, offset, count=None, stored=None, removed=None):
-            # ``+1`` is a zero numbering correction.
-            self._page = int(math.ceil(
-                (offset + 1) / self._count_per_request
-            ))
-            self._position_in_page = offset % self._count_per_request
-
-            self._count = count
-            self._stored = stored
-            self._removed = removed
-
-            self._count_of_constructed_files = 0
-            self._result_cache = None
-
-        def next(self):
-            if (self._count is not None and
-                self._count == self._count_of_constructed_files):
-                raise StopIteration
-
-            if self._result_cache is None or self._result_cache['page'] != self._page:
-                try:
-                    self._result_cache = FileList.retrieve(
-                        page=self._page,
-                        limit=self._count_per_request,
-                        stored=self._stored,
-                        removed=self._removed
-                    )
-                except InvalidRequestError:
-                    raise StopIteration
-            try:
-                file_info = self._result_cache['results'][self._position_in_page]
-            except IndexError:
-                raise StopIteration
-
-            # ``-1`` is a zero numbering correction.
-            if self._position_in_page < self._count_per_request - 1:
-                self._position_in_page += 1
-            else:
-                self._page += 1
-                self._position_in_page = 0
-
-            self._count_of_constructed_files += 1
-
-            return File.construct_from(file_info)
-
-        __next__ = next
-
-
 GROUP_ID_REGEX = re.compile('''
     (?P<group_id>
         [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
@@ -688,3 +577,149 @@ class FileGroup(object):
 
         group = cls.construct_from(group_info)
         return group
+
+
+def api_iterator(cls, next_url, reverse, limit=None):
+    while next_url and limit != 0:
+        try:
+            result = rest_request('GET', next_url)
+        except InvalidRequestError:
+            return
+
+        if reverse:
+            working_set = reversed(result['results'])
+            next_url = result['previous']
+        else:
+            working_set = result['results']
+            next_url = result['next']
+
+        for item in working_set:
+            yield cls(item)
+
+            if limit is not None:
+                limit -= 1
+                if limit == 0:
+                    return
+
+
+class BaseApiList(object):
+    # abstract
+    base_url = None
+    constructor = None
+    filters = []
+
+    def __init__(self, **kwargs):
+        # Only explicit kwargs are allowed.
+
+        if kwargs.get('since') is not None and kwargs.get('until') is not None:
+            raise TypeError('Only one of since and until arguments is allowed.')
+
+        self.since = kwargs.pop('since', None)
+        self.until = kwargs.pop('until', None)
+        self.limit = kwargs.pop('limit', None)
+        self.request_limit = kwargs.pop('request_limit', None)
+        self._count = None
+
+        for f, default in self.filters:
+            setattr(self, f, kwargs.pop(f, default))
+
+        if kwargs:
+            raise TypeError('Extra arguments: {}.'.format(
+                ", ".join(kwargs.keys())
+            ))
+
+    def api_url(self, **additional):
+        qs = {}
+        if self.since is not None:
+            qs['from'] = self.since.isoformat()
+        if self.until is not None:
+            qs['to'] = self.until.isoformat()
+        if self.request_limit:
+            qs['limit'] = self.request_limit
+        for f, default in self.filters:
+            v = getattr(self, f)
+            if v == default:
+                continue
+            qs[f] = 'none' if v is None else str(bool(v)).lower()
+        qs.update(additional)
+        return self.base_url + '?' + urlencode(qs)
+
+    def __iter__(self):
+        return api_iterator(
+            self.constructor, self.api_url(),
+            self.until is not None, self.limit,
+        )
+
+    def count(self):
+        if self.since is not None or self.until is not None:
+            raise ValueError("Can't count objects since or until some date.")
+
+        if self._count is None:
+            result = rest_request('GET', self.api_url(limit='1'))
+            self._count = result['total']
+        return self._count
+
+
+class FileList(BaseApiList):
+    """List of File resources.
+
+    This class provides iteration over all uploaded files. You can specify:
+
+    - ``since`` -- a datetime object from which objects will be iterated;
+    - ``until`` -- a datetime object to which objects will be iterated;
+    - ``limit`` -- a total number of objects to be iterated.
+      If not specified, all available objects are iterated;
+    - ``stored`` -- ``True`` to include only stored files,
+      ``False`` to exclude, ``None`` is default, will not exclude anything;
+    - ``removed`` -- ``True`` to include only removed files,
+      ``False`` to exclude, ``None`` will not exclude anything.
+      The default is ``False``.
+
+    If ``until`` is specified, the order of items will be reversed.
+    It is impossible to specify ``since`` and ``until`` at the same time.
+
+    Files can't be stored and removed at the same time,
+    such query will always return an empty set.
+    But files can be not stored and not removed (just uploaded files).
+
+    Usage example::
+
+        >>> for f in FileList(removed=None):
+        >>>     print f.datetime_uploaded()
+
+    Count objects::
+
+        >>> print('Number of stored files is', FileList(stored=True).count())
+
+    """
+    base_url = '/files/'
+    constructor = File.construct_from
+    filters = [('stored', None), ('removed', False)]
+
+
+class GroupList(BaseApiList):
+    """List of FileGroup resources.
+
+    This class provides iteration over all groups for project. You can specify:
+
+    - ``since`` -- a datetime object from which objects will be iterated;
+    - ``until`` -- a datetime object to which objects will be iterated;
+    - ``limit`` -- a total number of objects to be iterated.
+      If not specified, all available objects are iterated;
+
+    If ``until`` is specified, the order of items will be reversed.
+    It is impossible to specify ``since`` and ``until`` at the same time.
+
+    Usage example::
+
+        >>> from datetime import datetime, timedelta
+        >>> for f in GroupList(since=datetime.now() - timedelta(weeks=1)):
+        >>>     print f.datetime_created()
+
+    Count objects::
+
+        >>> print('Number of groups is', GroupList().count())
+
+    """
+    base_url = '/groups/'
+    constructor = FileGroup.construct_from

@@ -7,6 +7,7 @@ import logging
 import pprint
 import os.path
 
+import dateutil.parser
 from six.moves import configparser
 
 from . import conf, __version__
@@ -33,14 +34,20 @@ def bool_or_none(value):
     return {'true': True, 'false': False}.get(value)
 
 
-def list_files(arg_namespace=None):
-    result = FileList.retrieve(
-        page=arg_namespace.page or 1,
-        limit=arg_namespace.limit or 20,
-        stored=bool_or_none(arg_namespace.stored),
-        removed=bool_or_none(arg_namespace.removed)
+def int_or_none(value):
+    return None if value.lower() == 'none' else int(value)
+
+
+def list_files(arg_namespace):
+    files = FileList(
+        since=arg_namespace.since,
+        until=arg_namespace.until,
+        limit=arg_namespace.limit,
+        stored=arg_namespace.stored,
+        removed=arg_namespace.removed,
     )
-    pp.pprint(result)
+    files.constructor = lambda x: x
+    pp.pprint(list(files))
 
 
 def get_file(arg_namespace):
@@ -148,12 +155,18 @@ def ucare_argparser():
     # list
     subparser = subparsers.add_parser('list', help='list all files')
     subparser.set_defaults(func=list_files)
-    subparser.add_argument('--page', help='page to show', type=int)
-    subparser.add_argument('--limit', help='files per page', type=int)
+    subparser.add_argument('--since', help='show files uploaded since',
+                           type=dateutil.parser.parse)
+    subparser.add_argument('--until', help='show files uploaded until',
+                           type=dateutil.parser.parse)
+    subparser.add_argument('--limit', help='files to show', default=100,
+                           type=int_or_none)
     subparser.add_argument('--stored', help='filter stored files',
-                           choices=['all', 'true', 'false'])
+                           choices=[True, False, None],
+                           type=bool_or_none, default=None)
     subparser.add_argument('--removed', help='filter removed files',
-                           choices=['all', 'true', 'false'])
+                           choices=[True, False, None],
+                           type=bool_or_none, default=False)
 
     # get
     subparser = subparsers.add_parser('get', help='get file info')

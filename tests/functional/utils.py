@@ -5,7 +5,6 @@ import json
 
 
 class MockResponse(object):
-
     def __init__(self, status, data=b'{}'):
         self.status_code = status
         self.content = data
@@ -15,6 +14,16 @@ class MockResponse(object):
     def json(self):
         """Returns the json-encoded content of a response, if any."""
         return json.loads(self.text)
+
+
+class MockListResponse(MockResponse):
+    def __init__(self):
+        super(MockListResponse, self).__init__(
+            200, b'{'
+                 b'"results": [], "next": null, "previous": null,'
+                 b'"total": 0, "per_page": 1'
+                 b'}'
+        )
 
 
 def api_response_from_file(filename):

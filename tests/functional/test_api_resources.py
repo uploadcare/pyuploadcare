@@ -8,7 +8,7 @@ import datetime
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
-from mock import patch, ANY
+from mock import patch
 from dateutil.tz import tzutc
 
 from pyuploadcare.api_resources import File, FileGroup

@@ -20,7 +20,7 @@ class RESTClientTest(unittest.TestCase):
     user_agent = 'pyuploadcare/' + __version__
 
     def tearDown(self):
-        conf.api_version = '0.3'
+        conf.api_version = '0.4'
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
@@ -48,7 +48,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
-                         'application/vnd.uploadcare-v0.3+json')
+                         'application/vnd.uploadcare-v0.4+json')
         self.assertEqual(headers['User-Agent'], self.user_agent)
 
         conf.api_version = '0.1'
