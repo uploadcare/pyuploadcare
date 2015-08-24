@@ -18,7 +18,7 @@ secret = None
 api_version = '0.4'
 api_base = 'https://api.uploadcare.com/'
 upload_base = 'https://upload.uploadcare.com/'
-cdn_base = 'http://www.ucarecdn.com/'
+cdn_base = 'https://ucarecdn.com/'
 
 verify_api_ssl = True
 verify_upload_ssl = True

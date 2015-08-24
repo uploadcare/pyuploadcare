@@ -23,18 +23,27 @@ A simple Uploadcare ``ImageField`` can be added to an existing Django project
 in just a couple of `simple steps`_. As a result, your users
 are going to be able to see the progress of the upload, choose files from
 Google Drive or Instagram, and edit form while files are uploading
-asynchornously.
+asynchronously.
 
 .. code-block:: python
 
+    from django import forms
     from django.db import models
 
     from pyuploadcare.dj import ImageField
+    from pyuploadcare.dj.forms import FileWidget
 
 
     class Candidate(models.Model):
-
         photo = ImageField(blank=True, manual_crop="")
+
+
+    # optional. provide advanced widget options: https://uploadcare.com/documentation/widget/#configuration
+    class CandidateForm(forms.Form):
+        photo = ImageField(widget=FileWidget(attrs={
+            'data-cdn-base': 'https://cdn.super-candidates.com',
+            'data-image-shrink': '1024x1024',
+        }))
 
 .. image:: http://www.ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
 
@@ -43,7 +52,7 @@ Features
 
 - Python wrapper for Uploadcare [REST](https://uploadcare.com/documentation/rest/)
   and [Upload](https://uploadcare.com/documentation/upload/) APIs
-- Django widget with useful manual crop and multiupload;
+- Django widget with useful manual crop and multi-upload;
 - *ucare* console utility;
 - hosted assets (Kudos to `Sławek Ehlert`_!).
 

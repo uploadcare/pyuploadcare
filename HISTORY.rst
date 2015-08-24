@@ -3,6 +3,13 @@
 History
 -------
 
+1.3.1
+~~~~~
+
+- Default CDN base to https://ucarecdn.com
+- Allow changing CDN base via Django settings
+- update widget to 2.5.0 (see `widget changelog`_)
+
 1.3.0
 ~~~~~
 
