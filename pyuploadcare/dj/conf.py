@@ -12,15 +12,18 @@ if not hasattr(settings, 'UPLOADCARE'):
 
 if 'pub_key' not in settings.UPLOADCARE:
     raise ImproperlyConfigured('UPLOADCARE setting must have pub_key')
-
 if 'secret' not in settings.UPLOADCARE:
     raise ImproperlyConfigured('UPLOADCARE setting must have secret')
+
 
 conf.pub_key = settings.UPLOADCARE['pub_key']
 conf.secret = settings.UPLOADCARE['secret']
 
+if 'cdn_base' in settings.UPLOADCARE:
+    conf.cdn_base = settings.UPLOADCARE['cdn_base']
 
-widget_version = settings.UPLOADCARE.get('widget_version', '2.4.0')
+
+widget_version = settings.UPLOADCARE.get('widget_version', '2.5.0')
 widget_variant = settings.UPLOADCARE.get('widget_variant', 'full.min')
 
 hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare.{variant}.js'.format(

@@ -17,8 +17,9 @@ for example, ``widget_version`` or ``widget_variant``:
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '2.4.0',
+        'widget_version': '2.5.0',
         'widget_variant': 'min',  // without jQuery
+        'cdn_base': 'https://cdn.mycompany.com',
     }
 
 PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
@@ -124,9 +125,31 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 
         photo = ImageField(blank=True, manual_crop="")
 
-.. image:: http://www.ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
+.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
 
 .. _django-widget-models-filegroupfield-ref:
+
+
+Advanced widget options
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You can pass any widget options via ``FileWidget``'s attrs argument:
+
+.. code-block:: python
+
+    from django import forms
+
+    from pyuploadcare.dj import ImageField
+    from pyuploadcare.dj.forms import FileWidget
+
+
+    # optional. provide advanced widget options: https://uploadcare.com/documentation/widget/#configuration
+    class CandidateForm(forms.Form):
+        photo = ImageField(widget=FileWidget(attrs={
+            'data-cdn-base': 'https://cdn.super-candidates.com',
+            'data-image-shrink': '1024x1024',
+        }))
+
 
 FileGroupField
 ~~~~~~~~~~~~~~
@@ -165,4 +188,4 @@ It stores uploaded images as a group:
         photos = ImageGroupField()
 
 .. _widget documentation: https://uploadcare.com/documentation/widget/#crop
-.. _TextField: https://docs.djangoproject.com/en/1.5/ref/models/fields/#django.db.models.TextField
+.. _TextField: https://docs.djangoproject.com/en/1.8/ref/models/fields/#django.db.models.TextField
