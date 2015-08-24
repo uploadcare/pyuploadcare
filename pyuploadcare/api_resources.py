@@ -41,9 +41,9 @@ class File(object):
 
         >>> file_ = File('a771f854-c2cb-408a-8c36-71af77811f3b')
         >>> file_.cdn_url
-        http://www.ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
+        https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
         >>> print File('https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/')
-        http://www.ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/
+        https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/
 
     """
 
@@ -87,13 +87,13 @@ class File(object):
 
             >>> file_ = File('a771f854-c2cb-408a-8c36-71af77811f3b')
             >>> file_.cdn_url
-            http://www.ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
+            https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
 
         You can set default effects::
 
             >>> file_.default_effects = 'effect/flip/-/effect/mirror/'
             >>> file_.cdn_url
-            http://www.ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
+            https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
 
         """
         return '{cdn_base}{path}'.format(cdn_base=conf.cdn_base,
@@ -468,7 +468,7 @@ class FileGroup(object):
 
             >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
             >>> file_group.cdn_url
-            http://www.ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/
+            https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/
 
         """
         return '{cdn_base}{group_id}/'.format(
@@ -484,7 +484,7 @@ class FileGroup(object):
 
             >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
             >>> file_group.file_cdn_urls[0]
-            'http://www.ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/0/'
+            'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/0/'
 
         """
         file_cdn_urls = []

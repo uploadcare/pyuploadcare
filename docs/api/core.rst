@@ -13,7 +13,7 @@ to do direct api calls or use api resources::
     >>> pyuploadcare.conf.secret = '<your private key>'
     >>> f = pyuploadcare.File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
     >>> f.cdn_url
-    http://www.ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/
+    https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/
 
 
 .. _core_api-file-ref:

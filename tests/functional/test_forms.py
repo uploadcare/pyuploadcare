@@ -60,14 +60,14 @@ class FileFieldURLTest(unittest.TestCase):
     def test_returns_url_if_uuid_is_given(self):
         cdn_url = uc_forms.FileField().clean(
             'cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0')
-        expected_cdn_url = 'http://www.ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/'
+        expected_cdn_url = 'https://ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/'
 
         self.assertEqual(cdn_url, expected_cdn_url)
 
     def test_returns_url_if_url_has_aleady_been_given(self):
         cdn_url = uc_forms.FileField().clean(
             'www.ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0')
-        expected_cdn_url = 'http://www.ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/'
+        expected_cdn_url = 'https://ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/'
 
         self.assertEqual(cdn_url, expected_cdn_url)
 
@@ -87,14 +87,14 @@ class FileGroupFieldURLTest(unittest.TestCase):
     def test_returns_url_if_uuid_is_given(self):
         cdn_url = uc_forms.FileGroupField().clean(
             '0513dda0-582f-447d-846f-096e5df9e2bb~2')
-        expected_cdn_url = 'http://www.ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/'
+        expected_cdn_url = 'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/'
 
         self.assertEqual(cdn_url, expected_cdn_url)
 
     def test_returns_url_if_url_has_aleady_been_given(self):
         cdn_url = uc_forms.FileGroupField().clean(
             'ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/')
-        expected_cdn_url = 'http://www.ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/'
+        expected_cdn_url = 'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/'
 
         self.assertEqual(cdn_url, expected_cdn_url)
 
