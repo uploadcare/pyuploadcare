@@ -4,6 +4,8 @@ import re
 
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext as _
+
 import six
 
 from . import forms
@@ -51,6 +53,16 @@ class FileField(six.with_metaclass(models.SubfieldBase, models.Field)):
         kwargs['form_class'] = forms.FileField
 
         return models.Field.formfield(self, **kwargs)
+
+    def validate(self, value, model_instance):
+        super(FileField, self).validate(value, model_instance)
+
+        try:
+            value.info()
+        except InvalidRequestError:
+            raise ValidationError(_('UUID to store could not be found on server: %(uuid)s'),
+                                  code='invalid_url',
+                                  params={'uuid': value.uuid})
 
     def clean(self, value, model_instance):
         cleaned_value = super(FileField, self).clean(value, model_instance)
