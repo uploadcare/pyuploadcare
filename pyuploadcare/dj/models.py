@@ -60,7 +60,7 @@ class FileField(six.with_metaclass(models.SubfieldBase, models.Field)):
         try:
             value.info()
         except InvalidRequestError:
-            raise ValidationError(_('UUID to store could not be found on server: %(uuid)s'),
+            raise ValidationError(_('The file with UUID %(uuid)s could not be found in your Uploadcare project'),
                                   code='invalid_url',
                                   params={'uuid': value.uuid})
 
