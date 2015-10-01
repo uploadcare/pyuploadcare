@@ -5,13 +5,18 @@ try:
 except ImportError:
     import unittest
 import os
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
+from mock import patch
 from django.core.exceptions import ValidationError
 from django.db import models
 
 from pyuploadcare.dj.models import ImageField, FileField, FileGroupField
 from pyuploadcare.api_resources import File, FileGroup
+from pyuploadcare.exceptions import InvalidRequestError
+
+from .utils import faked_size_validator
 
 
 class CropToolRegexTest(unittest.TestCase):
@@ -81,6 +86,18 @@ class FileFieldTest(unittest.TestCase):
             cv = FileField()
         emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
         self.assertIsInstance(emp.cv, File)
+
+    @patch('pyuploadcare.api_resources.rest_request', autospec=True)
+    def test_not_found_file_uuid(self, request):
+        request.side_effect = InvalidRequestError(404)
+
+        class Employee(models.Model):
+            cv = FileField(validators=[faked_size_validator])
+
+        emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
+
+        with self.assertRaises(ValidationError):
+            emp._meta.get_field_by_name('cv')[0].clean(emp.cv, emp)
 
 
 class FileGroupFieldTest(unittest.TestCase):

@@ -32,3 +32,10 @@ def api_response_from_file(filename):
 
     with open(path_to_file, 'rb') as fp:
         return fp.read()
+
+
+def faked_size_validator(value):
+    """ Just for calling `value.info` inside `Field.clean` method.
+    """
+    file_size = value.info()[u'size']
+    return True

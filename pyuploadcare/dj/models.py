@@ -49,12 +49,25 @@ class FileField(six.with_metaclass(models.SubfieldBase, models.Field)):
 
     def formfield(self, **kwargs):
         kwargs['form_class'] = forms.FileField
+        return super(FileField, self).formfield(**kwargs)
 
-        return models.Field.formfield(self, **kwargs)
+    def validate(self, value, model_instance):
+        super(FileField, self).validate(value, model_instance)
+
+        if value:
+            try:
+                # Hack for receiving information about file and if error
+                # happens (e.g. file not found) we catching it and
+                # re-raise as ValidationError.
+                value.info()
+            except InvalidRequestError as exc:
+                raise ValidationError(
+                    'The file could not be found in your Uploadcare project',
+                    code='invalid_url')
 
     def clean(self, value, model_instance):
         cleaned_value = super(FileField, self).clean(value, model_instance)
-        if cleaned_value:
+        if cleaned_value and not cleaned_value.is_stored():
             cleaned_value.store()
         return cleaned_value
 
