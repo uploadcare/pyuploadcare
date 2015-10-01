@@ -16,8 +16,6 @@ from pyuploadcare.dj.models import ImageField, FileField, FileGroupField
 from pyuploadcare.api_resources import File, FileGroup
 from pyuploadcare.exceptions import InvalidRequestError
 
-from .utils import faked_size_validator
-
 
 class CropToolRegexTest(unittest.TestCase):
 
@@ -90,6 +88,9 @@ class FileFieldTest(unittest.TestCase):
     @patch('pyuploadcare.api_resources.rest_request', autospec=True)
     def test_not_found_file_uuid(self, request):
         request.side_effect = InvalidRequestError(404)
+
+        # Just for calling `value.info` inside `Field.clean` method.
+        faked_size_validator = lambda value: value.info()['size']
 
         class Employee(models.Model):
             cv = FileField(validators=[faked_size_validator])
