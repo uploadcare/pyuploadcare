@@ -5,7 +5,9 @@ try:
 except ImportError:
     import unittest
 import os
+import sys
 
+sys.path.append('test_project')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
