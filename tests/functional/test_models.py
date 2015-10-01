@@ -7,8 +7,16 @@ except ImportError:
 import os
 import sys
 
+# Add project folder to PATH for avoiding troubles in Django < 1.8
+# It can't find `gallery` app
 sys.path.append('test_project')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
+
+# Load models for avoiding 'AppRegistryNotReady: Models aren't loaded yet.'
+# in Django 1.7.10
+import django
+if hasattr(django, 'setup'):
+    django.setup()
 
 from mock import patch
 from django.core.exceptions import ValidationError
