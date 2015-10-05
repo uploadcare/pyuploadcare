@@ -5,8 +5,11 @@ import time
 import argparse
 import logging
 import pprint
-import os.path
+import os
+import sys
+from math import ceil
 
+import requests
 import dateutil.parser
 from six.moves import configparser
 
@@ -145,6 +148,64 @@ def create_group(arg_namespace):
     pp.pprint(group)
 
 
+def sync_files(arg_namespace):
+    if not os.path.exists(arg_namespace.path):
+        os.makedirs(arg_namespace.path)
+
+    if arg_namespace.uuids:
+        files = (File(uuid) for uuid in arg_namespace.uuids)
+    else:
+        files = FileList()
+
+    def bar(iter_content, parts, title=''):
+        parts = float(parts)
+        cells = 10
+        progress = 0
+        step = cells / parts
+
+        draw = lambda progress: sys.stdout.write(
+            '\r[{:10}] {:.2f}% {}'.format(
+                '#'*int(progress), progress * cells, title))
+
+        for chunk in iter_content:
+            yield chunk
+
+            progress += step
+            draw(progress)
+            sys.stdout.flush()
+
+        draw(cells)
+        print('')
+
+    def _save_file(fname, response, size):
+        chunk_size = 1024
+
+        if os.path.exists(fname) and not arg_namespace.replace:
+            pp.pprint('File `{}` already exists. '
+                      'To override it use `--replace` option'.format(fname))
+            return
+
+        with open(fname, 'wb') as lf:
+            for chunk in bar(response.iter_content(chunk_size),
+                             ceil(f.size() / float(chunk_size)),
+                             os.path.basename(fname)):
+                lf.write(chunk)
+
+    for f in files:
+        url = f.info()['original_file_url']
+        response = requests.get(url, stream=True)
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            pp.pprint(('Can\'t download file: `{}`. '
+                       'Origin exception: {}').format(url, e))
+            continue
+
+        local_filename = os.path.join(arg_namespace.path, f.filename())
+        _save_file(local_filename, response, f.size())
+
+
 def ucare_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version',
@@ -278,6 +339,15 @@ def ucare_argparser():
     subparser = subparsers.add_parser('create_group', help='create file group')
     subparser.set_defaults(func=create_group)
     subparser.add_argument('paths', nargs='+', help='file paths')
+
+    # Sync files
+    subparser = subparsers.add_parser('sync', help='sync files')
+    subparser.set_defaults(func=sync_files)
+    subparser.add_argument('path', nargs='?', help='local_path', default='.')
+    subparser.add_argument('--replace', help='replace exists files',
+                           default=False, action='store_true')
+    subparser.add_argument('--uuids', nargs='+',
+                           help='list of file\'s uuids for sync',)
 
     # common arguments
     parser.add_argument(
