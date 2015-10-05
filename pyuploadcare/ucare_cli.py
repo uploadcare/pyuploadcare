@@ -157,42 +157,9 @@ def sync_files(arg_namespace):
     else:
         files = FileList()
 
-    def bar(iter_content, parts, title=''):
-        parts = float(parts)
-        cells = 10
-        progress = 0
-        step = cells / parts
-
-        draw = lambda progress: sys.stdout.write(
-            '\r[{:10}] {:.2f}% {}'.format(
-                '#'*int(progress), progress * cells, title))
-
-        for chunk in iter_content:
-            yield chunk
-
-            progress += step
-            draw(progress)
-            sys.stdout.flush()
-
-        draw(cells)
-        print('')
-
-    def _save_file(fname, response, size):
-        chunk_size = 1024
-
-        if os.path.exists(fname) and not arg_namespace.replace:
-            pp.pprint('File `{}` already exists. '
-                      'To override it use `--replace` option'.format(fname))
-            return
-
-        with open(fname, 'wb') as lf:
-            for chunk in bar(response.iter_content(chunk_size),
-                             ceil(f.size() / float(chunk_size)),
-                             os.path.basename(fname)):
-                lf.write(chunk)
-
     for f in files:
         url = f.info()['original_file_url']
+        local_filename = os.path.join(arg_namespace.path, f.filename())
         response = requests.get(url, stream=True)
 
         try:
@@ -202,8 +169,44 @@ def sync_files(arg_namespace):
                        'Origin exception: {}').format(url, e))
             continue
 
-        local_filename = os.path.join(arg_namespace.path, f.filename())
-        _save_file(local_filename, response, f.size())
+        if os.path.exists(local_filename) and not arg_namespace.replace:
+            pp.pprint(
+                'File `{}` already exists. '
+                'To override it use `--replace` option'.format(
+                    local_filename))
+            continue
+
+        save_file_locally(local_filename, response, f.size())
+
+
+def save_file_locally(fname, response, size):
+    chunk_size = 1024
+    with open(fname, 'wb') as lf:
+        for chunk in bar(response.iter_content(chunk_size),
+                         ceil(size / float(chunk_size)),
+                         os.path.basename(fname)):
+            lf.write(chunk)
+
+
+def bar(iter_content, parts, title=''):
+    parts = float(parts)
+    cells = 10
+    progress = 0
+    step = cells / parts
+
+    draw = lambda progress: sys.stdout.write(
+        '\r[{:10}] {:.2f}% {}'.format(
+            '#'*int(progress), progress * cells, title))
+
+    for chunk in iter_content:
+        yield chunk
+
+        progress += step
+        draw(progress)
+        sys.stdout.flush()
+
+    draw(cells)
+    print('')
 
 
 def ucare_argparser():

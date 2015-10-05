@@ -11,7 +11,7 @@ from mock import patch
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
     ucare_argparser, get_file, store_file, delete_file, main,
-    create_group,
+    create_group, sync_files
 )
 from .utils import MockResponse, MockListResponse
 
@@ -335,3 +335,54 @@ class CreateFileGroupTest(unittest.TestCase):
             request.mock_calls[0][1][1:],
             ('POST', 'https://upload.uploadcare.com/group/')
         )
+
+
+@patch('pyuploadcare.ucare_cli.save_file_locally', autospec=True)
+@patch('os.makedirs', autospec=True)
+@patch('os.path.exists', autospec=True)
+@patch('requests.sessions.Session.request', autospec=True)
+class UcareSyncTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(UcareSyncTestCase, cls).setUpClass()
+        cls.default_response = MockListResponse.from_file('list_files.json')
+
+    def test_created_directory_for_upload(self, request, exists, makedirs,
+                                          save_file_locally):
+        exists.return_value = False
+        request.return_value = self.default_response
+        makedirs.return_value = None
+
+        diraname = 'diraname'
+
+        sync_files(arg_namespace('sync {}'.format(diraname)))
+
+        self.assertEqual(len(makedirs.mock_calls), 1)
+        self.assertTrue(diraname in makedirs.call_args[0])
+
+    def test_file_exists_and_replace_flag(self, request, exists, makedirs,
+                                          save_file_locally):
+        exists.return_value = True
+        request.return_value = self.default_response
+
+        sync_files(arg_namespace('sync'))
+        self.assertEqual(len(save_file_locally.mock_calls), 0)
+
+        sync_files(arg_namespace('sync --replace'))
+        self.assertEqual(len(save_file_locally.mock_calls), 8)
+
+    def test_http_error(self, request, exists, makedirs, save_file_locally):
+        request.return_value = self.default_response
+        request.return_value.status_code = 400
+
+        sync_files(arg_namespace('sync'))
+        self.assertEqual(len(save_file_locally.mock_calls), 0)
+
+    def test_uuids(self, request, exists, makedirs, save_file_locally):
+        uuids = ('e16f669c-ecde-421b-8a0c-f6023d25b1e3',
+                 'e16f669c-ecde-421b-8a0c-f6023d25b133')
+        request.return_value = MockResponse.from_file('single_file.json')
+        exists.return_value = False
+
+        sync_files(arg_namespace('sync --uuids {}'.format(' '.join(uuids))))
+        self.assertEqual(len(save_file_locally.mock_calls), 2)
