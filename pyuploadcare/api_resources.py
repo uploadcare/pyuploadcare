@@ -22,6 +22,7 @@ logger = logging.getLogger("pyuploadcare")
 
 
 RE_UUID = '[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}'
+RE_UUID_REGEX = re.compile(RE_UUID, re.VERBOSE)
 RE_EFFECTS = '(?:[^/]+/)+'  # -/resize/(200x300/)*
 UUID_WITH_EFFECTS_REGEX = re.compile('''
     /?
@@ -53,7 +54,7 @@ class File(object):
         if not matches:
             raise InvalidRequestError("couldn't find UUID")
 
-        self.uuid = matches.groupdict()['uuid']
+        self._uuid = matches.groupdict()['uuid']
         self.default_effects = matches.groupdict()['effects']
 
         self._info_cache = None
@@ -63,6 +64,20 @@ class File(object):
 
     def __str__(self):
         return self.cdn_url
+
+    @property
+    def uuid(self):
+        return self._uuid
+
+    @uuid.setter
+    def uuid(self, value):
+        match = RE_UUID_REGEX.match(value)
+
+        if not match:
+            raise InvalidRequestError(
+                'Value `{0}` invalid as UUID'.format(value))
+
+        self._uuid = match.group(0)
 
     @property
     def _api_uri(self):

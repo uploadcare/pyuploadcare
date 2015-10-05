@@ -19,8 +19,15 @@ from .utils import MockResponse, api_response_from_file
 class FileRegexTest(unittest.TestCase):
 
     def test_value_error_when_uuid_is_bad(self):
-        file_serialized = 'blah'
-        self.assertRaises(InvalidRequestError, File, file_serialized)
+        file_serialized_invalid = 'blah'
+        self.assertRaises(InvalidRequestError, File, file_serialized_invalid)
+
+        file_serialized_valid = '3addab78-6368-4c55-ac08-22412b6a2a4c'
+        file_ = File(file_serialized_valid)
+
+        self.assertRaises(InvalidRequestError,
+                          setattr, file_, 'uuid', file_serialized_invalid)
+        file_.uuid = file_serialized_valid
 
     def test_only_uuid(self):
         file_serialized = '3addab78-6368-4c55-ac08-22412b6a2a4c'
