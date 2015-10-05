@@ -165,13 +165,13 @@ def sync_files(arg_namespace):
         try:
             response.raise_for_status()
         except requests.HTTPError as e:
-            pp.pprint(('Can\'t download file: `{}`. '
-                       'Origin exception: {}').format(url, e))
+            pp.pprint(('Can\'t download file: `{0}`. '
+                       'Origin error: {1}').format(url, e))
             continue
 
         if os.path.exists(local_filename) and not arg_namespace.replace:
             pp.pprint(
-                'File `{}` already exists. '
+                'File `{0}` already exists. '
                 'To override it use `--replace` option'.format(
                     local_filename))
             continue
@@ -195,7 +195,7 @@ def bar(iter_content, parts, title=''):
     step = cells / parts
 
     draw = lambda progress: sys.stdout.write(
-        '\r[{:10}] {:.2f}% {}'.format(
+        '\r[{0:10}] {1:.2f}% {2}'.format(
             '#'*int(progress), progress * cells, title))
 
     for chunk in iter_content:

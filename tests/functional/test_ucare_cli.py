@@ -342,10 +342,7 @@ class CreateFileGroupTest(unittest.TestCase):
 @patch('os.path.exists', autospec=True)
 @patch('requests.sessions.Session.request', autospec=True)
 class UcareSyncTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super(UcareSyncTestCase, cls).setUpClass()
-        cls.default_response = MockListResponse.from_file('list_files.json')
+    default_response = MockListResponse.from_file('list_files.json')
 
     def test_created_directory_for_upload(self, request, exists, makedirs,
                                           save_file_locally):
@@ -355,7 +352,7 @@ class UcareSyncTestCase(unittest.TestCase):
 
         diraname = 'diraname'
 
-        sync_files(arg_namespace('sync {}'.format(diraname)))
+        sync_files(arg_namespace('sync {0}'.format(diraname)))
 
         self.assertEqual(len(makedirs.mock_calls), 1)
         self.assertTrue(diraname in makedirs.call_args[0])
@@ -384,5 +381,5 @@ class UcareSyncTestCase(unittest.TestCase):
         request.return_value = MockResponse.from_file('single_file.json')
         exists.return_value = False
 
-        sync_files(arg_namespace('sync --uuids {}'.format(' '.join(uuids))))
+        sync_files(arg_namespace('sync --uuids {0}'.format(' '.join(uuids))))
         self.assertEqual(len(save_file_locally.mock_calls), 2)

@@ -29,10 +29,11 @@ class MockResponse(object):
 
 class MockListResponse(MockResponse):
     def __init__(self, status=200, data=None):
-        template = (b'{{'
-                    b'"results": {}, "next": null, "previous": null,'
+        template = (b'{'
+                    b'"results": ' + (data or b'[]') + b', "next": null, '
+                    b'"previous": null,'
                     b'"total": 0, "per_page": 1'
-                    b'}}').format(data or '[]')
+                    b'}')
 
         super(MockListResponse, self).__init__(status, template)
 
