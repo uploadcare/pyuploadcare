@@ -14,8 +14,8 @@ else:
 
 from . import conf
 from .api import rest_request, uploading_request
-from .exceptions import (InvalidRequestError, APIError, UploadError,
-                         TimeoutError)
+from .exceptions import (InvalidParamError, InvalidRequestError, APIError,
+                         UploadError, TimeoutError)
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -52,7 +52,7 @@ class File(object):
         matches = UUID_WITH_EFFECTS_REGEX.search(cdn_url_or_file_id)
 
         if not matches:
-            raise InvalidRequestError("couldn't find UUID")
+            raise InvalidParamError("Couldn't find UUID")
 
         self._uuid = matches.groupdict()['uuid']
         self.default_effects = matches.groupdict()['effects']
@@ -74,7 +74,7 @@ class File(object):
         match = RE_UUID_REGEX.match(value)
 
         if not match:
-            raise InvalidRequestError('Invalid UUID: {0}'.format(value))
+            raise InvalidParamError('Invalid UUID: {0}'.format(value))
 
         self._uuid = match.group(0)
 
@@ -437,11 +437,11 @@ class FileGroup(object):
         matches = GROUP_ID_REGEX.search(cdn_url_or_group_id)
 
         if not matches:
-            raise InvalidRequestError("couldn't find group id")
+            raise InvalidParamError("Couldn't find group id")
 
         files_qty = int(matches.groupdict()['files_qty'])
         if files_qty <= 0:
-            raise InvalidRequestError("couldn't find group id")
+            raise InvalidParamError("Couldn't find group id")
 
         self.id = matches.groupdict()['group_id']
 
@@ -581,11 +581,11 @@ class FileGroup(object):
                 file_index = 'files[{index}]'.format(index=index)
                 data[file_index] = six.text_type(file_)
             else:
-                raise InvalidRequestError(
+                raise InvalidParamError(
                     'all items have to be ``File`` instance'
                 )
         if not data:
-            raise InvalidRequestError('set of files is empty')
+            raise InvalidParamError('set of files is empty')
 
         group_info = uploading_request('POST', 'group/', data=data)
 
