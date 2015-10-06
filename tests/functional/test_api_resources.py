@@ -27,6 +27,10 @@ class FileRegexTest(unittest.TestCase):
 
         self.assertRaises(InvalidRequestError,
                           setattr, file_, 'uuid', file_serialized_invalid)
+        self.assertRaises(InvalidRequestError,
+                          setattr, file_, 'uuid',
+                          file_serialized_valid + file_serialized_invalid)
+
         file_.uuid = file_serialized_valid
 
     def test_only_uuid(self):

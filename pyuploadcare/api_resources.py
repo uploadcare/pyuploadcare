@@ -22,7 +22,7 @@ logger = logging.getLogger("pyuploadcare")
 
 
 RE_UUID = '[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}'
-RE_UUID_REGEX = re.compile(RE_UUID, re.VERBOSE)
+RE_UUID_REGEX = re.compile('^{0}$'.format(RE_UUID))
 RE_EFFECTS = '(?:[^/]+/)+'  # -/resize/(200x300/)*
 UUID_WITH_EFFECTS_REGEX = re.compile('''
     /?
@@ -74,8 +74,7 @@ class File(object):
         match = RE_UUID_REGEX.match(value)
 
         if not match:
-            raise InvalidRequestError(
-                'Value `{0}` invalid as UUID'.format(value))
+            raise InvalidRequestError('Invalid UUID: {0}'.format(value))
 
         self._uuid = match.group(0)
 
