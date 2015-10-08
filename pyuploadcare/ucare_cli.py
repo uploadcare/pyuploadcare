@@ -155,6 +155,8 @@ def sync_files(arg_namespace):
     else:
         files = FileList()
 
+    session = requests.Session()
+
     for f in files:
         if arg_namespace.effects:
             f.default_effects = arg_namespace.effects
@@ -173,7 +175,7 @@ def sync_files(arg_namespace):
             continue
 
         url = f.cdn_url
-        response = requests.get(url, stream=True, verify=conf.verify_api_ssl)
+        response = session.get(url, stream=True, verify=conf.verify_api_ssl)
 
         try:
             response.raise_for_status()
