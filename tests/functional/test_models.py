@@ -5,13 +5,26 @@ try:
 except ImportError:
     import unittest
 import os
+import sys
+
+# Add project folder to PATH for avoiding troubles in Django < 1.8
+# It can't find `gallery` app
+sys.path.append('test_project')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
+# Load models for avoiding 'AppRegistryNotReady: Models aren't loaded yet.'
+# in Django 1.7.10
+import django
+if hasattr(django, 'setup'):
+    django.setup()
+
+from mock import patch
 from django.core.exceptions import ValidationError
 from django.db import models
 
 from pyuploadcare.dj.models import ImageField, FileField, FileGroupField
 from pyuploadcare.api_resources import File, FileGroup
+from pyuploadcare.exceptions import InvalidRequestError
 
 
 class CropToolRegexTest(unittest.TestCase):
@@ -81,6 +94,21 @@ class FileFieldTest(unittest.TestCase):
             cv = FileField()
         emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
         self.assertIsInstance(emp.cv, File)
+
+    @patch('pyuploadcare.api_resources.rest_request', autospec=True)
+    def test_not_found_file_uuid(self, request):
+        request.side_effect = InvalidRequestError(404)
+
+        # Just for calling `value.info` inside `Field.clean` method.
+        faked_size_validator = lambda value: value.info()['size']
+
+        class Employee(models.Model):
+            cv = FileField(validators=[faked_size_validator])
+
+        emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
+
+        with self.assertRaises(ValidationError):
+            emp._meta.get_field_by_name('cv')[0].clean(emp.cv, emp)
 
 
 class FileGroupFieldTest(unittest.TestCase):
