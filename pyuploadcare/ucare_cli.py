@@ -5,8 +5,12 @@ import time
 import argparse
 import logging
 import pprint
-import os.path
+import os
+import sys
+import re
+from math import ceil
 
+import requests
 import dateutil.parser
 from six.moves import configparser
 
@@ -145,6 +149,98 @@ def create_group(arg_namespace):
     pp.pprint(group)
 
 
+def sync_files(arg_namespace):
+    if arg_namespace.uuids:
+        files = (File(uuid) for uuid in arg_namespace.uuids)
+    else:
+        files = FileList()
+
+    session = requests.Session()
+
+    for f in files:
+        if arg_namespace.effects:
+            f.default_effects = arg_namespace.effects
+
+        local_filepath = build_filepath(arg_namespace.path, f)
+        dirname = os.path.dirname(local_filepath)
+
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
+        if os.path.exists(local_filepath) and not arg_namespace.replace:
+            pp.pprint(
+                'File `{0}` already exists. '
+                'To override it use `--replace` option'.format(
+                    local_filepath))
+            continue
+
+        url = f.cdn_url
+        response = session.get(url, stream=True, verify=conf.verify_api_ssl)
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            pp.pprint(('Can\'t download file: `{0}`. '
+                       'Origin error: {1}').format(url, e))
+            continue
+
+        save_file_locally(local_filepath, response, f.size())
+
+
+PATTERNS_REGEX = re.compile(r'(\${\w+})')
+PATTERNS_MAPPING = {
+    '${uuid}': lambda f: f.uuid,
+    '${filename}': lambda f: f.filename(),
+    '${effects}': lambda f: f.default_effects,
+    '${ext}': lambda f: '.{0}'.format(f.info()["image_info"]["format"]).lower()
+}
+DEFAULT_PATTERN_FILENAME = '${uuid}${ext}'
+
+
+def build_filepath(path, file_):
+    if not PATTERNS_REGEX.findall(path):
+        path = os.path.join(path, DEFAULT_PATTERN_FILENAME)
+
+    def _replace(mobj):
+        pattern_name = mobj.group(0)
+        if pattern_name in PATTERNS_MAPPING:
+            pattern = PATTERNS_MAPPING[pattern_name]
+            return pattern(file_)
+        return pattern_name
+
+    return os.path.normpath(PATTERNS_REGEX.sub(_replace, path))
+
+
+def save_file_locally(fname, response, size):
+    chunk_size = 1024
+    with open(fname, 'wb') as lf:
+        for chunk in bar(response.iter_content(chunk_size),
+                         ceil(size / float(chunk_size)),
+                         fname):
+            lf.write(chunk)
+
+
+def bar(iter_content, parts, title=''):
+    parts = float(parts)
+    cells = 10
+    progress = 0
+    step = cells / parts
+
+    draw = lambda progress: sys.stdout.write(
+        '\r[{0:10}] {1:.2f}% {2}'.format(
+            '#'*int(progress), progress * cells, title))
+
+    for chunk in iter_content:
+        yield chunk
+
+        progress += step
+        draw(progress)
+        sys.stdout.flush()
+
+    draw(cells)
+    print('')
+
+
 def ucare_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version',
@@ -278,6 +374,24 @@ def ucare_argparser():
     subparser = subparsers.add_parser('create_group', help='create file group')
     subparser.set_defaults(func=create_group)
     subparser.add_argument('paths', nargs='+', help='file paths')
+
+    # Sync files
+    subparser = subparsers.add_parser('sync', help='sync files')
+    subparser.set_defaults(func=sync_files)
+    subparser.add_argument('path', nargs='?', help=(
+        'Local path. It can contains special patterns like: {0} '
+        'Default is {1}'.format(
+            ' '.join(PATTERNS_MAPPING.keys()),
+            DEFAULT_PATTERN_FILENAME)
+    ), default='.')
+    subparser.add_argument('--replace', help='replace exists files',
+                           default=False, action='store_true')
+    subparser.add_argument('--uuids', nargs='+',
+                           help='list of file\'s uuids for sync',)
+    subparser.add_argument('--effects', help=(
+        'apply effects for synced images. For more information look at: '
+        'https://uploadcare.com/documentation/cdn/'
+    ))
 
     # common arguments
     parser.add_argument(

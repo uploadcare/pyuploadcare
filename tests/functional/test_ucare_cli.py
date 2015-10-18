@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
+import os
 try:
     import unittest2 as unittest
 except ImportError:
@@ -11,7 +12,7 @@ from mock import patch
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
     ucare_argparser, get_file, store_file, delete_file, main,
-    create_group,
+    create_group, sync_files
 )
 from .utils import MockResponse, MockListResponse
 
@@ -335,3 +336,86 @@ class CreateFileGroupTest(unittest.TestCase):
             request.mock_calls[0][1][1:],
             ('POST', 'https://upload.uploadcare.com/group/')
         )
+
+
+@patch('pyuploadcare.ucare_cli.save_file_locally', autospec=True)
+@patch('os.makedirs', autospec=True)
+@patch('os.path.exists', autospec=True)
+@patch('requests.sessions.Session.request', autospec=True)
+class UcareSyncTestCase(unittest.TestCase):
+    @property
+    def default_response(self):
+        return MockListResponse.from_file('list_files.json')
+
+    def test_created_directory_for_upload(self, request, exists, makedirs,
+                                          save_file_locally):
+        exists.return_value = False
+        request.return_value = self.default_response
+        makedirs.return_value = None
+
+        diraname = 'diraname'
+
+        sync_files(arg_namespace('sync {0}'.format(diraname)))
+
+        self.assertEqual(len(makedirs.mock_calls), 8)
+        self.assertTrue(diraname in makedirs.call_args[0])
+
+    def test_file_exists_and_replace_flag(self, request, exists, makedirs,
+                                          save_file_locally):
+        exists.return_value = True
+        request.return_value = self.default_response
+
+        sync_files(arg_namespace('sync'))
+        self.assertEqual(len(save_file_locally.mock_calls), 0)
+
+        sync_files(arg_namespace('sync --replace'))
+        self.assertEqual(len(save_file_locally.mock_calls), 8)
+
+    def test_http_error(self, request, exists, makedirs, save_file_locally):
+        request.return_value = self.default_response
+        request.return_value.status_code = 400
+
+        sync_files(arg_namespace('sync'))
+        self.assertEqual(len(save_file_locally.mock_calls), 0)
+
+    def test_uuids(self, request, exists, makedirs, save_file_locally):
+        uuids = ('e16f669c-ecde-421b-8a0c-f6023d25b1e3',
+                 'e16f669c-ecde-421b-8a0c-f6023d25b133')
+        request.return_value = MockResponse.from_file('single_file.json')
+        exists.return_value = False
+
+        sync_files(arg_namespace('sync --uuids {0}'.format(' '.join(uuids))))
+        self.assertEqual(len(save_file_locally.mock_calls), 2)
+
+    def test_patterns_works(self, request, exists, makedirs,
+                            save_file_locally):
+        exists.return_value = False
+        response = request.return_value = self.default_response
+
+        sync_files(arg_namespace("sync ${uuid}${ext}"))
+
+        self.assertEqual(len(save_file_locally.mock_calls), 8)
+
+        expected_filenames = sorted('{0}.{1}'.format(
+            a['uuid'], a['image_info']['format'].lower()
+        ) for a in response.json()['results'])
+
+        filenames = sorted(b[1][0] for b in save_file_locally.mock_calls)
+
+        self.assertListEqual(expected_filenames, filenames)
+
+    @patch('requests.get', autospec=True)
+    def test_effects_works(self, get, request, exists, makedirs,
+                           save_file_locally):
+        exists.return_value = False
+        response = request.return_value = self.default_response
+        effects = '/resize/200x200/'
+
+        sync_files(arg_namespace("sync --effects {0}".format(effects)))
+
+        self.assertEqual(len(save_file_locally.mock_calls), 8)
+
+        # Skip `.raise_for_status` calls which odd
+        for call in get.mock_calls[::2]:
+            url = call[1][0]
+            self.assertIn(effects, url)
