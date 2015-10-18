@@ -32,7 +32,11 @@ class APIError(UploadcareException):
 
 
 class InvalidRequestError(UploadcareException, ValueError):
-    """Invalid parameters errors, e.g. status 404."""
+    """Invalid service parameters errors, e.g status 404"""
+
+
+class InvalidParamError(InvalidRequestError):
+    """Invalid parameters errors, e.g. invalid UUID"""
 
 
 class ThrottledRequestError(UploadcareException):

@@ -12,15 +12,26 @@ from mock import patch
 from dateutil.tz import tzutc
 
 from pyuploadcare.api_resources import File, FileGroup
-from pyuploadcare.exceptions import InvalidRequestError
+from pyuploadcare.exceptions import InvalidRequestError, InvalidParamError
 from .utils import MockResponse, api_response_from_file
 
 
 class FileRegexTest(unittest.TestCase):
 
     def test_value_error_when_uuid_is_bad(self):
-        file_serialized = 'blah'
-        self.assertRaises(InvalidRequestError, File, file_serialized)
+        file_serialized_invalid = 'blah'
+        self.assertRaises(InvalidParamError, File, file_serialized_invalid)
+
+        file_serialized_valid = '3addab78-6368-4c55-ac08-22412b6a2a4c'
+        file_ = File(file_serialized_valid)
+
+        self.assertRaises(InvalidParamError,
+                          setattr, file_, 'uuid', file_serialized_invalid)
+        self.assertRaises(InvalidParamError,
+                          setattr, file_, 'uuid',
+                          file_serialized_valid + file_serialized_invalid)
+
+        file_.uuid = file_serialized_valid
 
     def test_only_uuid(self):
         file_serialized = '3addab78-6368-4c55-ac08-22412b6a2a4c'
@@ -94,19 +105,19 @@ class FileGroupRegexTest(unittest.TestCase):
 
     def test_value_error_when_uuid_is_bad(self):
         group_id = 'blah'
-        self.assertRaises(InvalidRequestError, FileGroup, group_id)
+        self.assertRaises(InvalidParamError, FileGroup, group_id)
 
     def test_value_error_when_group_id_has_not_files_qty(self):
         group_id = 'd5f45851-3a58-41a4-b76c-356e22837a2f'
-        self.assertRaises(InvalidRequestError, FileGroup, group_id)
+        self.assertRaises(InvalidParamError, FileGroup, group_id)
 
     def test_value_error_when_group_id_has_chars_instead_of_files_qty(self):
         group_id = 'd5f45851-3a58-41a4-b76c-356e22837a2f~blah'
-        self.assertRaises(InvalidRequestError, FileGroup, group_id)
+        self.assertRaises(InvalidParamError, FileGroup, group_id)
 
     def test_value_error_when_group_id_has_zero_files(self):
         group_id = 'd5f45851-3a58-41a4-b76c-356e22837a2f~0'
-        self.assertRaises(InvalidRequestError, FileGroup, group_id)
+        self.assertRaises(InvalidParamError, FileGroup, group_id)
 
     def test_valid_group_id(self):
         group_id = 'd5f45851-3a58-41a4-b76c-356e22837a2f~12'
@@ -287,7 +298,7 @@ class FileCDNUrlsTest(unittest.TestCase):
 class FileGroupCreateTest(unittest.TestCase):
 
     def test_invalid_request_error_if_iterable_is_empty(self):
-        self.assertRaises(InvalidRequestError, FileGroup.create, [])
+        self.assertRaises(InvalidParamError, FileGroup.create, [])
 
     def test_type_error_if_non_iterable(self):
         self.assertRaises(TypeError, FileGroup.create, None)
@@ -297,14 +308,14 @@ class FileGroupCreateTest(unittest.TestCase):
             File('6c5e9526-b0fe-4739-8975-72e8d5ee6342'),
             None,
         )
-        self.assertRaises(InvalidRequestError, FileGroup.create, files)
+        self.assertRaises(InvalidParamError, FileGroup.create, files)
 
     def test_invalid_request_error_if_iterable_is_dict(self):
         files = {
             'file_1': File('6c5e9526-b0fe-4739-8975-72e8d5ee6342'),
             'file_2': File('a771f854-c2cb-408a-8c36-71af77811f3b'),
         }
-        self.assertRaises(InvalidRequestError, FileGroup.create, files)
+        self.assertRaises(InvalidParamError, FileGroup.create, files)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_group_successfully_created(self, request):
