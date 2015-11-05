@@ -11,14 +11,12 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch
 
 from pyuploadcare import conf, __version__
-from pyuploadcare.api import rest_request
+from pyuploadcare.api import rest_request, _make_user_agent
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
 
 class RESTClientTest(unittest.TestCase):
-    user_agent = 'pyuploadcare/' + __version__
-
     def tearDown(self):
         conf.api_version = '0.4'
 
@@ -41,6 +39,8 @@ class RESTClientTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
+        user_agent = _make_user_agent()
+
         request.return_value = MockResponse(200, b'[]')
 
         rest_request('GET', 'files/')
@@ -49,15 +49,16 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
                          'application/vnd.uploadcare-v0.4+json')
-        self.assertEqual(headers['User-Agent'], self.user_agent)
+        self.assertEqual(headers['User-Agent'], user_agent)
 
         conf.api_version = '0.1'
         rest_request('GET', 'files/')
         headers = request.call_args[1]['headers']
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
-        self.assertEqual(headers['Accept'], 'application/vnd.uploadcare-v0.1+json')
-        self.assertEqual(headers['User-Agent'], self.user_agent)
+        self.assertEqual(headers['Accept'],
+                         'application/vnd.uploadcare-v0.1+json')
+        self.assertEqual(headers['User-Agent'], user_agent)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_head(self, request):

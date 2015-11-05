@@ -18,6 +18,7 @@ if 'secret' not in settings.UPLOADCARE:
 
 conf.pub_key = settings.UPLOADCARE['pub_key']
 conf.secret = settings.UPLOADCARE['secret']
+conf.user_agent_name = 'pyuploadcare-django'
 
 if 'cdn_base' in settings.UPLOADCARE:
     conf.cdn_base = settings.UPLOADCARE['cdn_base']
