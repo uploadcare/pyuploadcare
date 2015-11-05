@@ -4,8 +4,7 @@
 Command Line Tool
 =================
 
-In order to show help message:
-
-.. code-block:: console
-
-    $ ucare -h
+.. argparse::
+   :module: pyuploadcare.ucare_cli
+   :func: ucare_argparser
+   :prog: ucare
