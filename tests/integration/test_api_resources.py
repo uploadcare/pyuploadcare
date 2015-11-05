@@ -287,13 +287,6 @@ class FileCopyTest(unittest.TestCase):
         conf.pub_key = None
         conf.secret = None
 
-    def test_errors(self):
-        with self.assertRaises(InvalidRequestError) as cm:
-            self.f.copy(target='nonexistent')
-
-        self.assertIn('Project has no storage with provided name',
-                      cm.exception.data)
-
     def test_local_copy(self):
         response = self.f.copy()
         self.assertEqual('file', response['type'])
@@ -301,13 +294,15 @@ class FileCopyTest(unittest.TestCase):
         response = self.f.copy(effects='resize/50x/')
         self.assertEqual('file', response['type'])
 
-    def test_remote_copy(self):
+    @mock.patch('pyuploadcare.api_resources.rest_request')
+    def test_remote_copy(self, rest_request):
+        rest_request.return_value = result = {
+            'type': 'url',
+            'result': 's3://random_string'
+        }
         response = self.f.copy(target='default', effects='resize/50x/')
         self.assertEqual('url', response['type'])
-
-        url = response['result'].replace('s3://', 'http://s3.amazonaws.com/')
-        resp = requests.head(url)
-        self.assertEqual(200, resp.status_code)
+        self.assertTrue('s3://' in response['result'])
 
 
 class FileListIterationTest(unittest.TestCase):
