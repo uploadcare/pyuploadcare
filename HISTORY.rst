@@ -3,6 +3,11 @@
 History
 -------
 
+1.3.3
+~~~~~
+
+- Expanded User-Agent
+
 1.3.2
 ~~~~~
 
