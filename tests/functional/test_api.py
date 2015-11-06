@@ -11,7 +11,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch
 
 from pyuploadcare import conf, __version__
-from pyuploadcare.api import rest_request, _make_user_agent
+from pyuploadcare.api import rest_request, _build_user_agent
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
@@ -39,7 +39,7 @@ class RESTClientTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
-        user_agent = _make_user_agent()
+        user_agent = _build_user_agent()
 
         request.return_value = MockResponse(200, b'[]')
 
