@@ -53,6 +53,11 @@ def _content_type_from_response(response):
     return content_type
 
 
+def _build_user_agent():
+    return '{0}/{1}/{2}'.format(conf.user_agent_name, __version__,
+                                conf.pub_key)
+
+
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
                  retry_throttled=conf.DEFAULT):
     """Makes REST API request and returns response as ``dict``.
@@ -124,8 +129,9 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
             'Date': date,
             'Content-Type': content_type,
-            'Accept': 'application/vnd.uploadcare-v{0}+json'.format(conf.api_version),
-            'User-Agent': 'pyuploadcare/{0}'.format(__version__),
+            'Accept': 'application/vnd.uploadcare-v{0}+json'.format(
+                conf.api_version),
+            'User-Agent': _build_user_agent(),
         }
         logger.debug('''sent:
             verb: {0}
