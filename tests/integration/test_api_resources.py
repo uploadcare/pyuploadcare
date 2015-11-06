@@ -294,16 +294,6 @@ class FileCopyTest(unittest.TestCase):
         response = self.f.copy(effects='resize/50x/')
         self.assertEqual('file', response['type'])
 
-    @mock.patch('pyuploadcare.api_resources.rest_request')
-    def test_remote_copy(self, rest_request):
-        rest_request.return_value = result = {
-            'type': 'url',
-            'result': 's3://random_string'
-        }
-        response = self.f.copy(target='default', effects='resize/50x/')
-        self.assertEqual('url', response['type'])
-        self.assertTrue('s3://' in response['result'])
-
 
 class FileListIterationTest(unittest.TestCase):
 
