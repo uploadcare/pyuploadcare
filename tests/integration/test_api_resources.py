@@ -287,27 +287,12 @@ class FileCopyTest(unittest.TestCase):
         conf.pub_key = None
         conf.secret = None
 
-    def test_errors(self):
-        with self.assertRaises(InvalidRequestError) as cm:
-            self.f.copy(target='nonexistent')
-
-        self.assertIn('Project has no storage with provided name',
-                      cm.exception.data)
-
     def test_local_copy(self):
         response = self.f.copy()
         self.assertEqual('file', response['type'])
 
         response = self.f.copy(effects='resize/50x/')
         self.assertEqual('file', response['type'])
-
-    def test_remote_copy(self):
-        response = self.f.copy(target='default', effects='resize/50x/')
-        self.assertEqual('url', response['type'])
-
-        url = response['result'].replace('s3://', 'http://s3.amazonaws.com/')
-        resp = requests.head(url)
-        self.assertEqual(200, resp.status_code)
 
 
 class FileListIterationTest(unittest.TestCase):
