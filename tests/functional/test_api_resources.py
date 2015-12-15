@@ -357,6 +357,18 @@ class FileListTestCase(unittest.TestCase):
             FileList(sort='invalid_sort')
         self.assertIn('Unknown method of sorting', cm.exception.args[0])
 
+    def test_called_without_dups(self, api_iterator, rest_request):
+        file_list = FileList()
+        file_list.store(self.UUIDS[0], self.UUIDS[0])
+
+        rest_request.assert_called_once_with(
+            'PUT', FileList.storage_url, [self.UUIDS[0]])
+
+        rest_request.reset_mock()
+        file_list.delete(self.UUIDS[0], self.UUIDS[0])
+        rest_request.assert_called_once_with(
+            'DELETE', FileList.storage_url, [self.UUIDS[0]])
+
     def test_correct_qs_generated(self, *args, **kwargs):
         sort = FileList.sorting[-1]
 

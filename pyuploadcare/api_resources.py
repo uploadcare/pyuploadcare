@@ -752,7 +752,7 @@ class FileList(BaseApiList):
         if needed.
         """
         if uuids:
-            uuids = iter(uuids)
+            uuids = iter(set(uuids))
         else:
             uuids = (f.uuid for f in self)
 
