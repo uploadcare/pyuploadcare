@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division
 import re
 import logging
 import time
+from itertools import islice
 
 import dateutil.parser
 import six
@@ -712,6 +713,7 @@ class FileList(BaseApiList):
     filters = [('stored', None), ('removed', False)]
     sorting = ['uploaded-time', '-uploaded-time', '-size', 'size']
     storage_url = '/files/storage/'
+    uuids_per_storage_request = 100
 
     def __init__(self, **kwargs):
         self.sort = kwargs.pop('sort', None)
@@ -742,20 +744,20 @@ class FileList(BaseApiList):
     def _base_storage_operation(self, method, *uuids):
         """ Base method for storage operations (store, delete).
         """
-        for uuids_batch in self._gather_uuids_for_mass_operation(uuids):
+        for uuids_batch in self._gather_uuids_for_storage_operation(uuids):
             rest_request(method, self.storage_url, uuids_batch)
 
-    def _gather_uuids_for_mass_operation(self, uuids):
-        uuids_per_request = 100
-
-        if not uuids:
-            uuids = [f.uuids for f in self]
-
-        start = 0 - uuids_per_request
+    def _gather_uuids_for_storage_operation(self, uuids):
+        """ Gather uuids for storage operations and split those to chunks
+        if needed.
+        """
+        if uuids:
+            uuids = iter(uuids)
+        else:
+            uuids = (f.uuid for f in self)
 
         while True:
-            start += uuids_per_request
-            chunk = uuids[start:uuids_per_request]
+            chunk = list(islice(uuids, 0, self.uuids_per_storage_request))
 
             if not chunk:
                 return

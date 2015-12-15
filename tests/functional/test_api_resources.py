@@ -8,7 +8,7 @@ import datetime
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
-from mock import patch
+from mock import patch, MagicMock
 from dateutil.tz import tzutc
 
 from pyuploadcare.api_resources import File, FileGroup, FileList
@@ -339,14 +339,67 @@ class FileGroupCreateTest(unittest.TestCase):
         self.assertEqual(group[0].uuid, '0cea5a61-f976-47d9-815a-e787f52aeba1')
 
 
+@patch('pyuploadcare.api_resources.rest_request')
+@patch('pyuploadcare.api_resources.api_iterator')
 class FileListTestCase(unittest.TestCase):
-    def test_invalid_sorting_param(self):
+    UUIDS = ['6c5e9526-b0fe-4739-8975-72e8d5ee6342',
+             'a771f854-c2cb-408a-8c36-71af77811f3b',
+             '0cea5a61-f976-47d9-815a-e787f52aeba1']
+
+    @classmethod
+    def setUpClass(cls):
+        super(FileListTestCase, cls).setUpClass()
+        cls.api_iterator_side_effect = lambda *args, **kwargs: (
+            MagicMock(uuid=uuid) for uuid in cls.UUIDS)
+
+    def test_invalid_sorting_param(self, *args, **kwargs):
         with self.assertRaises(ValueError) as cm:
             FileList(sort='invalid_sort')
         self.assertIn('Unknown method of sorting', cm.exception.args[0])
 
-    def test_correct_qs_generated(self):
+    def test_correct_qs_generated(self, *args, **kwargs):
         sort = FileList.sorting[-1]
 
         file_list = FileList(sort=sort)
         self.assertIn('sort={0}'.format(sort), file_list.api_url())
+
+    def test_storage_methods_without_args(self, api_iterator, rest_request):
+        api_iterator.side_effect = self.api_iterator_side_effect
+
+        file_list = FileList()
+        file_list.store()
+
+        rest_request.assert_called_with('PUT', FileList.storage_url,
+                                        self.UUIDS)
+
+        rest_request.reset_mock()
+        file_list.delete()
+        rest_request.assert_called_with('DELETE', FileList.storage_url,
+                                        self.UUIDS)
+
+    def test_storage_methods_with_args(self, api_iterator, rest_request):
+        api_iterator.side_effect = self.api_iterator_side_effect
+
+        file_list = FileList()
+        file_list.store(*self.UUIDS[:1])
+
+        rest_request.assert_called_once_with('PUT', FileList.storage_url,
+                                             self.UUIDS[:1])
+
+        rest_request.reset_mock()
+        file_list.delete(*self.UUIDS[:1])
+        rest_request.assert_called_once_with('DELETE', FileList.storage_url,
+                                             self.UUIDS[:1])
+
+    def test_storage_methods_chunked(self, api_iterator, rest_request):
+        api_iterator.side_effect = self.api_iterator_side_effect
+
+        file_list = FileList()
+        file_list.uuids_per_storage_request = 1
+        file_list.store()
+        file_list.delete()
+
+        for uuid in self.UUIDS:
+            rest_request.assert_any_call('PUT', FileList.storage_url, [uuid])
+            rest_request.assert_any_call('DELETE', FileList.storage_url,
+                                         [uuid])
