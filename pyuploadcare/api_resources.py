@@ -688,6 +688,7 @@ class FileList(BaseApiList):
     - ``removed`` -- ``True`` to include only removed files,
       ``False`` to exclude, ``None`` will not exclude anything.
       The default is ``False``.
+    - ``sort`` - a string that specify how files must be sorted.
 
     If ``until`` is specified, the order of items will be reversed.
     It is impossible to specify ``since`` and ``until`` at the same time.
@@ -710,6 +711,7 @@ class FileList(BaseApiList):
     constructor = File.construct_from
     filters = [('stored', None), ('removed', False)]
     sorting = ['uploaded-time', '-uploaded-time', '-size', 'size']
+    storage_url = '/files/storage/'
 
     def __init__(self, **kwargs):
         self.sort = kwargs.pop('sort', None)
@@ -730,10 +732,35 @@ class FileList(BaseApiList):
         store all of these. Otherwise store all files according by current
         filters.
         """
+        return self._base_storage_operation('PUT', *uuids)
 
-    def delete(self, **uuids):
+    def delete(self, *uuids):
         """ Same as ``.store`` but delete files.
         """
+        return self._base_storage_operation('DELETE', *uuids)
+
+    def _base_storage_operation(self, method, *uuids):
+        """ Base method for storage operations (store, delete).
+        """
+        for uuids_batch in self._gather_uuids_for_mass_operation(uuids):
+            rest_request(method, self.storage_url, uuids_batch)
+
+    def _gather_uuids_for_mass_operation(self, uuids):
+        uuids_per_request = 100
+
+        if not uuids:
+            uuids = [f.uuids for f in self]
+
+        start = 0 - uuids_per_request
+
+        while True:
+            start += uuids_per_request
+            chunk = uuids[start:uuids_per_request]
+
+            if not chunk:
+                return
+
+            yield chunk
 
 
 class GroupList(BaseApiList):
