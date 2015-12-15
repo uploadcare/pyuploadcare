@@ -11,7 +11,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch
 from dateutil.tz import tzutc
 
-from pyuploadcare.api_resources import File, FileGroup
+from pyuploadcare.api_resources import File, FileGroup, FileList
 from pyuploadcare.exceptions import InvalidRequestError, InvalidParamError
 from .utils import MockResponse, api_response_from_file
 
@@ -337,3 +337,16 @@ class FileGroupCreateTest(unittest.TestCase):
         self.assertIsInstance(group, FileGroup)
         self.assertEqual(len(group), 1)
         self.assertEqual(group[0].uuid, '0cea5a61-f976-47d9-815a-e787f52aeba1')
+
+
+class FileListTestCase(unittest.TestCase):
+    def test_invalid_sorting_param(self):
+        with self.assertRaises(ValueError) as cm:
+            FileList(sort='invalid_sort')
+        self.assertIn('Unknown method of sorting', cm.exception.args[0])
+
+    def test_correct_qs_generated(self):
+        sort = FileList.sorting[-1]
+
+        file_list = FileList(sort=sort)
+        self.assertIn('sort={0}'.format(sort), file_list.api_url())

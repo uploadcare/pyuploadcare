@@ -709,6 +709,31 @@ class FileList(BaseApiList):
     base_url = '/files/'
     constructor = File.construct_from
     filters = [('stored', None), ('removed', False)]
+    sorting = ['uploaded-time', '-uploaded-time', '-size', 'size']
+
+    def __init__(self, **kwargs):
+        self.sort = kwargs.pop('sort', None)
+
+        if self.sort and self.sort not in self.sorting:
+            raise ValueError(
+                "Unknown method of sorting: {0}".format(self.sort))
+
+        super(FileList, self).__init__(**kwargs)
+
+    def api_url(self, **additional):
+        if self.sort:
+            additional.setdefault('sort', self.sort)
+        return super(FileList, self).api_url(**additional)
+
+    def store(self, *uuids):
+        """ Mass operations for storing files. If ``uuids`` specified - then
+        store all of these. Otherwise store all files according by current
+        filters.
+        """
+
+    def delete(self, **uuids):
+        """ Same as ``.store`` but delete files.
+        """
 
 
 class GroupList(BaseApiList):
