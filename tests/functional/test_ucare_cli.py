@@ -11,7 +11,7 @@ from mock import patch
 
 from pyuploadcare import conf
 from pyuploadcare.ucare_cli import (
-    ucare_argparser, get_file, store_file, delete_file, main,
+    ucare_argparser, get_file, store_files, delete_files, main,
     create_group, sync_files
 )
 from .utils import MockResponse, MockListResponse
@@ -46,62 +46,66 @@ class UcareGetTest(unittest.TestCase):
         )
 
 
-class UcareStoreTest(unittest.TestCase):
+class UcareStorageOperationsMixin(object):
+    method_name = None  # e.g store or delete
 
     def test_parse_wait_arg(self):
-        args = arg_namespace('store --wait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        args = arg_namespace(
+            '{0} --wait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'.format(
+                self.method_name))
         self.assertTrue(args.wait)
 
     def test_wait_is_true_by_default(self):
-        args = arg_namespace('store 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        args = arg_namespace(
+            '{0} 6c5e9526-b0fe-4739-8975-72e8d5ee6342'.format(
+                self.method_name))
         self.assertTrue(args.wait)
 
     def test_parse_no_wait_arg(self):
-        args = arg_namespace('store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+        args = arg_namespace(
+            '{0} --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'.format(
+                self.method_name))
         self.assertFalse(args.wait)
 
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_no_wait(self, request):
-        request.return_value = MockResponse(
-            status=200,
-            data=b'{"on_s3": true, "last_keep_claim": "now"}'
-        )
+    def test_one_file(self):
+        path = \
+            'pyuploadcare.api_resources.FileList.{0}'.format(self.method_name)
 
-        store_file(arg_namespace('store --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
+        with patch(path) as patched:
+            self.func(arg_namespace(
+                '{0} --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'.format(
+                    self.method_name)))
 
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('PUT', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/storage/')
-        )
+            patched.assert_called_with('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+
+    def test_several_files(self):
+        path = \
+            'pyuploadcare.api_resources.FileList.{0}'.format(self.method_name)
+
+        with patch(path) as patched:
+            self.func(arg_namespace(
+                '{0} --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342 '
+                '6c5e9526-b0fe-4739-8975-72e8d5ee6341'.format(
+                    self.method_name)))
+
+            patched.assert_called_with('6c5e9526-b0fe-4739-8975-72e8d5ee6342',
+                                       '6c5e9526-b0fe-4739-8975-72e8d5ee6341')
 
 
-class UcareDeleteTest(unittest.TestCase):
+class UcareStoreTest(UcareStorageOperationsMixin, unittest.TestCase):
+    method_name = 'store'
 
-    def test_parse_wait_arg(self):
-        args = arg_namespace('delete --wait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-        self.assertTrue(args.wait)
+    @property
+    def func(self):
+        return store_files
 
-    def test_wait_is_true_by_default(self):
-        args = arg_namespace('delete 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-        self.assertTrue(args.wait)
 
-    def test_parse_no_wait_arg(self):
-        args = arg_namespace('delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-        self.assertFalse(args.wait)
+class UcareDeleteTest(UcareStorageOperationsMixin, unittest.TestCase):
+    method_name = 'delete'
 
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_no_wait(self, request):
-        request.return_value = MockResponse(
-            status=200,
-            data=b'{"on_s3": true, "last_keep_claim": "now"}'
-        )
-
-        delete_file(arg_namespace('delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342'))
-
-        self.assertEqual(
-            request.mock_calls[0][1][1:],
-            ('DELETE', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
-        )
+    @property
+    def func(self):
+        return delete_files
 
 
 class UcareCommonArgsTest(unittest.TestCase):
