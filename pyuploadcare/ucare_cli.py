@@ -66,8 +66,6 @@ def store_files(arg_namespace):
 
 def delete_files(arg_namespace):
     FilesStorage(arg_namespace.paths).delete()
-    _wait_if_needed(arg_namespace, File.is_removed,
-                    'timed out trying to delete')
 
 
 def _wait_if_needed(arg_namespace, check_func, error_msg):
