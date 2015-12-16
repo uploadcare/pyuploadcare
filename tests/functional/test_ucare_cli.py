@@ -10,6 +10,7 @@ from tempfile import NamedTemporaryFile
 from mock import patch
 
 from pyuploadcare import conf
+from pyuploadcare.api_resources import FileList
 from pyuploadcare.ucare_cli import (
     ucare_argparser, get_file, store_files, delete_files, main,
     create_group, sync_files
@@ -106,6 +107,35 @@ class UcareDeleteTest(UcareStorageOperationsMixin, unittest.TestCase):
     @property
     def func(self):
         return delete_files
+
+
+@patch('pyuploadcare.ucare_cli.FileList', sorting=FileList.sorting)
+class UcareListTestCase(unittest.TestCase):
+    def test_options_defaults(self, FileList_):
+        args = arg_namespace('list')
+        main(args)
+        self.assertCalledWith(FileList_, args)
+
+    def test_invalid_sort_option(self, FileList_):
+        self.assertRaises(SystemExit, arg_namespace, 'list --sort=invalid')
+
+    def test_sort_option(self, FileList_):
+        sort = FileList.sorting[-1]
+        args = arg_namespace('list --sort={0}'.format(sort))
+        main(args)
+
+        self.assertEqual(args.sort, sort)
+        self.assertCalledWith(FileList_, args)
+
+    def assertCalledWith(self, mock_obj, args_obj):
+        mock_obj.assert_called_with(
+            since=args_obj.since,
+            until=args_obj.until,
+            limit=args_obj.limit,
+            stored=args_obj.stored,
+            removed=args_obj.removed,
+            sort=args_obj.sort,
+        )
 
 
 class UcareCommonArgsTest(unittest.TestCase):

@@ -49,6 +49,7 @@ def list_files(arg_namespace):
         limit=arg_namespace.limit,
         stored=arg_namespace.stored,
         removed=arg_namespace.removed,
+        sort=arg_namespace.sort,
     )
     files.constructor = lambda x: x
     pp.pprint(list(files))
@@ -262,6 +263,9 @@ def ucare_argparser():
     subparser.add_argument('--removed', help='filter removed files',
                            choices=[True, False, None],
                            type=bool_or_none, default=False)
+    subparser.add_argument('--sort', help='sorting of files',
+                           choices=FileList.sorting,
+                           default=None)
 
     # get
     subparser = subparsers.add_parser('get', help='get file info')
@@ -481,7 +485,6 @@ def main(arg_namespace=None,
         try:
             arg_namespace.func(arg_namespace)
         except UploadcareException as exc:
-            print(exc)
             pp.pprint('ERROR: {0}'.format(exc))
 
 
