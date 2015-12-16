@@ -690,6 +690,7 @@ class FileList(BaseApiList):
     - ``removed`` -- ``True`` to include only removed files,
       ``False`` to exclude, ``None`` will not exclude anything.
       The default is ``False``.
+    - ``sort`` - a string that specify how files must be sorted.
 
     If ``until`` is specified, the order of items will be reversed.
     It is impossible to specify ``since`` and ``until`` at the same time.
@@ -711,6 +712,21 @@ class FileList(BaseApiList):
     base_url = '/files/'
     constructor = File.construct_from
     filters = [('stored', None), ('removed', False)]
+    sorting = ['uploaded-time', '-uploaded-time', '-size', 'size']
+
+    def __init__(self, **kwargs):
+        self.sort = kwargs.pop('sort', None)
+
+        if self.sort and self.sort not in self.sorting:
+            raise ValueError(
+                "Unsupported sorting method: {0}".format(self.sort))
+
+        super(FileList, self).__init__(**kwargs)
+
+    def api_url(self, **additional):
+        if self.sort:
+            additional.setdefault('sort', self.sort)
+        return super(FileList, self).api_url(**additional)
 
 
 class FilesStorage(object):

@@ -400,3 +400,22 @@ class FilesStorageTestCase(unittest.TestCase):
             rest_request.assert_any_call('PUT', storage.storage_url, [uuid])
             rest_request.assert_any_call('DELETE', storage.storage_url,
                                          [uuid])
+
+
+class FileListTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(FileListTestCase, cls).setUpClass()
+        cls.api_iterator_side_effect = lambda *args, **kwargs: (
+            MagicMock(uuid=uuid) for uuid in cls.UUIDS)
+
+    def test_invalid_sorting_param(self, *args, **kwargs):
+        with self.assertRaises(ValueError) as cm:
+            FileList(sort='invalid_sort')
+        self.assertIn('Unsupported sorting method', cm.exception.args[0])
+
+    def test_correct_qs_generated(self, *args, **kwargs):
+        sort = FileList.sorting[-1]
+
+        file_list = FileList(sort=sort)
+        self.assertIn('sort={0}'.format(sort), file_list.api_url())
