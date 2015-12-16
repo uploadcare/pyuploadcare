@@ -3,6 +3,8 @@ from __future__ import unicode_literals, division
 import re
 import logging
 import time
+from itertools import islice
+from collections import Iterable
 
 import dateutil.parser
 import six
@@ -709,6 +711,60 @@ class FileList(BaseApiList):
     base_url = '/files/'
     constructor = File.construct_from
     filters = [('stored', None), ('removed', False)]
+
+
+class FilesStorage(object):
+    """ Object for doing storage-related operations like ``store``, ``delete``
+    for several files.
+    """
+    storage_url = '/files/storage/'
+    uuids_per_storage_request = 100
+
+    def __init__(self, seq):
+        """ Seq can be:
+        * UUIDs
+        * File's instances
+        * instance of FileList
+        """
+        if not isinstance(seq, Iterable):
+            raise TypeError('``seq`` must be an iterable')
+
+        self._seq = seq
+
+    def store(self):
+        """ Store all specified files.
+        """
+        return self._base_opration('PUT')
+
+    def delete(self):
+        """ Delete all specified files.
+        """
+        return self._base_opration('DELETE')
+
+    def _base_opration(self, method):
+        """ Base method for storage operations.
+        """
+        uuids = self.uuids()
+
+        while True:
+            chunk = list(islice(uuids, 0, self.uuids_per_storage_request))
+
+            if not chunk:
+                return
+
+            rest_request(method, self.storage_url, chunk)
+
+    def uuids(self):
+        """ Extract uuid from each item of specified ``seq``.
+        """
+        for f in self._seq:
+            if isinstance(f, File):
+                yield f.uuid
+            elif isinstance(f, six.string_types):
+                yield f
+            else:
+                raise ValueError(
+                    'Invalid type for sequence item: {0}'.format(type(f)))
 
 
 class GroupList(BaseApiList):

@@ -8,10 +8,10 @@ import datetime
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
-from mock import patch
+from mock import patch, MagicMock
 from dateutil.tz import tzutc
 
-from pyuploadcare.api_resources import File, FileGroup
+from pyuploadcare.api_resources import File, FileGroup, FileList, FilesStorage
 from pyuploadcare.exceptions import InvalidRequestError, InvalidParamError
 from .utils import MockResponse, api_response_from_file
 
@@ -337,3 +337,66 @@ class FileGroupCreateTest(unittest.TestCase):
         self.assertIsInstance(group, FileGroup)
         self.assertEqual(len(group), 1)
         self.assertEqual(group[0].uuid, '0cea5a61-f976-47d9-815a-e787f52aeba1')
+
+
+@patch('pyuploadcare.api_resources.rest_request')
+@patch('pyuploadcare.api_resources.api_iterator')
+class FilesStorageTestCase(unittest.TestCase):
+    UUIDS = ['6c5e9526-b0fe-4739-8975-72e8d5ee6342',
+             'a771f854-c2cb-408a-8c36-71af77811f3b',
+             '0cea5a61-f976-47d9-815a-e787f52aeba1']
+
+    @classmethod
+    def setUpClass(cls):
+        super(FilesStorageTestCase, cls).setUpClass()
+        cls.api_iterator_side_effect = lambda *args, **kwargs: (
+            MagicMock(uuid=uuid, spec=File) for uuid in cls.UUIDS)
+
+    def test_error_with_wrong_seq_type(self, *args):
+        self.assertRaises(TypeError, FilesStorage, 1)
+
+    def test_called_with_uuids(self, *args):
+        storage = FilesStorage(self.UUIDS)
+
+        for a, b in zip(storage.uuids(), self.UUIDS):
+            self.assertEqual(a, b)
+
+    def test_called_with_file_instances(self, *args):
+        storage = FilesStorage(File(u) for u in self.UUIDS)
+
+        for a, b in zip(storage.uuids(), self.UUIDS):
+            self.assertEqual(a, b)
+
+    def test_called_with_file_list_instance(self, api_iterator, *args):
+        api_iterator.side_effect = self.api_iterator_side_effect
+        storage = FilesStorage(FileList())
+
+        for a, b in zip(storage.uuids(), self.UUIDS):
+            self.assertEqual(a, b)
+
+    def test_operations(self, api_iterator, rest_request):
+        api_iterator.side_effect = self.api_iterator_side_effect
+        storage = FilesStorage(self.UUIDS)
+
+        storage.store()
+        rest_request.assert_called_with('PUT', storage.storage_url,
+                                        self.UUIDS)
+
+        rest_request.reset_mock()
+
+        storage.delete()
+        rest_request.assert_called_with('DELETE', storage.storage_url,
+                                        self.UUIDS)
+
+    def test_chunked_operations(self, api_iterator, rest_request):
+        api_iterator.side_effect = self.api_iterator_side_effect
+        storage = FilesStorage(self.UUIDS)
+        storage.uuids_per_storage_request = 1
+
+        storage.store()
+        storage.delete()
+
+        for uuid in self.UUIDS:
+            rest_request.assert_any_call('PUT', storage.storage_url, [uuid])
+            rest_request.assert_any_call('DELETE', storage.storage_url,
+                                         [uuid])
