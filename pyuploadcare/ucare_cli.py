@@ -49,6 +49,7 @@ def list_files(arg_namespace):
         limit=arg_namespace.limit,
         stored=arg_namespace.stored,
         removed=arg_namespace.removed,
+        sort=arg_namespace.sort,
     )
     files.constructor = lambda x: x
     pp.pprint(list(files))
@@ -58,30 +59,29 @@ def get_file(arg_namespace):
     pp.pprint(File(arg_namespace.path).info())
 
 
-def store_file(arg_namespace):
-    file_ = File(arg_namespace.path)
-    file_.store()
+def store_files(arg_namespace):
+    FileList().store(*arg_namespace.paths)
+    _wait_if_needed(arg_namespace, File.is_stored,
+                    'timed out trying to store')
 
-    if arg_namespace.wait:
+
+def delete_files(arg_namespace):
+    FileList().delete(*arg_namespace.paths)
+    _wait_if_needed(arg_namespace, File.is_removed,
+                    'timed out trying to delete')
+
+
+def _wait_if_needed(arg_namespace, check_func, error_msg):
+    if not arg_namespace.wait:
+        return
+
+    for path in arg_namespace.paths:
+        file_ = File(path)
         timeout = arg_namespace.timeout
         time_started = time.time()
-        while not file_.is_stored():
+        while not check_func(file_):
             if time.time() - time_started > timeout:
-                raise TimeoutError('timed out trying to store')
-            file_.update_info()
-            time.sleep(0.1)
-
-
-def delete_file(arg_namespace):
-    file_ = File(arg_namespace.path)
-    file_.delete()
-
-    if arg_namespace.wait:
-        timeout = arg_namespace.timeout
-        time_started = time.time()
-        while not file_.is_removed():
-            if time.time() - time_started > timeout:
-                raise TimeoutError('timed out trying to delete')
+                raise TimeoutError(error_msg)
             file_.update_info()
             time.sleep(0.1)
 
@@ -263,6 +263,9 @@ def ucare_argparser():
     subparser.add_argument('--removed', help='filter removed files',
                            choices=[True, False, None],
                            type=bool_or_none, default=False)
+    subparser.add_argument('--sort', help='sorting of files',
+                           choices=FileList.sorting,
+                           default=None)
 
     # get
     subparser = subparsers.add_parser('get', help='get file info')
@@ -297,15 +300,15 @@ def ucare_argparser():
     subparser = subparsers.add_parser('store',
                                       parents=[waiting_parent],
                                       help='store file')
-    subparser.set_defaults(func=store_file)
-    subparser.add_argument('path', help='file path')
+    subparser.set_defaults(func=store_files)
+    subparser.add_argument('paths', nargs='+', help='file(s) path')
 
     # delete
     subparser = subparsers.add_parser('delete',
                                       parents=[waiting_parent],
                                       help='request delete')
-    subparser.set_defaults(func=delete_file)
-    subparser.add_argument('path', help='file path')
+    subparser.set_defaults(func=delete_files)
+    subparser.add_argument('paths', nargs='+', help='file(s) path')
 
     # common upload args
     upload_parent = argparse.ArgumentParser(add_help=False)

@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division
 import re
 import logging
 import time
+from itertools import islice
 
 import dateutil.parser
 import six
@@ -688,6 +689,7 @@ class FileList(BaseApiList):
     - ``removed`` -- ``True`` to include only removed files,
       ``False`` to exclude, ``None`` will not exclude anything.
       The default is ``False``.
+    - ``sort`` - a string that specify how files must be sorted.
 
     If ``until`` is specified, the order of items will be reversed.
     It is impossible to specify ``since`` and ``until`` at the same time.
@@ -709,6 +711,58 @@ class FileList(BaseApiList):
     base_url = '/files/'
     constructor = File.construct_from
     filters = [('stored', None), ('removed', False)]
+    sorting = ['uploaded-time', '-uploaded-time', '-size', 'size']
+    storage_url = '/files/storage/'
+    uuids_per_storage_request = 100
+
+    def __init__(self, **kwargs):
+        self.sort = kwargs.pop('sort', None)
+
+        if self.sort and self.sort not in self.sorting:
+            raise ValueError(
+                "Unknown method of sorting: {0}".format(self.sort))
+
+        super(FileList, self).__init__(**kwargs)
+
+    def api_url(self, **additional):
+        if self.sort:
+            additional.setdefault('sort', self.sort)
+        return super(FileList, self).api_url(**additional)
+
+    def store(self, *uuids):
+        """ Mass operations for storing files. If ``uuids`` specified - then
+        store all of these. Otherwise store all files according by current
+        filters.
+        """
+        return self._base_storage_operation('PUT', *uuids)
+
+    def delete(self, *uuids):
+        """ Same as ``.store`` but delete files.
+        """
+        return self._base_storage_operation('DELETE', *uuids)
+
+    def _base_storage_operation(self, method, *uuids):
+        """ Base method for storage operations (store, delete).
+        """
+        for uuids_batch in self._gather_uuids_for_storage_operation(uuids):
+            rest_request(method, self.storage_url, uuids_batch)
+
+    def _gather_uuids_for_storage_operation(self, uuids):
+        """ Gather uuids for storage operations and split those to chunks
+        if needed.
+        """
+        if uuids:
+            uuids = iter(set(uuids))
+        else:
+            uuids = (f.uuid for f in self)
+
+        while True:
+            chunk = list(islice(uuids, 0, self.uuids_per_storage_request))
+
+            if not chunk:
+                return
+
+            yield chunk
 
 
 class GroupList(BaseApiList):
