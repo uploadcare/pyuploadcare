@@ -714,16 +714,16 @@ class FileList(BaseApiList):
 
 
 class FilesStorage(object):
-    """ Object for doing storage-related operations like ``store``, ``delete``
-    for several files.
+    """ Batch storage operations for the list of files.
+    ``store`` and ``delete`` are supported.
     """
     storage_url = '/files/storage/'
-    uuids_per_storage_request = 100
+    chunk_size = 100
 
     def __init__(self, seq):
         """ Seq can be:
-        * UUIDs
-        * File's instances
+        * list of UUIDs
+        * list of File's instances
         * instance of FileList
         """
         if not isinstance(seq, Iterable):
@@ -747,7 +747,7 @@ class FilesStorage(object):
         uuids = self.uuids()
 
         while True:
-            chunk = list(islice(uuids, 0, self.uuids_per_storage_request))
+            chunk = list(islice(uuids, 0, self.chunk_size))
 
             if not chunk:
                 return

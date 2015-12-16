@@ -391,7 +391,7 @@ class FilesStorageTestCase(unittest.TestCase):
     def test_chunked_operations(self, api_iterator, rest_request):
         api_iterator.side_effect = self.api_iterator_side_effect
         storage = FilesStorage(self.UUIDS)
-        storage.uuids_per_storage_request = 1
+        storage.chunk_size = 1
 
         storage.store()
         storage.delete()
