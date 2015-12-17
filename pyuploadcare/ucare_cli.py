@@ -49,6 +49,7 @@ def list_files(arg_namespace):
         limit=arg_namespace.limit,
         stored=arg_namespace.stored,
         removed=arg_namespace.removed,
+        request_limit=arg_namespace.request_limit,
     )
     files.constructor = lambda x: x
     pp.pprint(list(files))
@@ -254,6 +255,8 @@ def ucare_argparser():
                            type=dateutil.parser.parse)
     subparser.add_argument('--limit', help='files to show', default=100,
                            type=int_or_none)
+    subparser.add_argument('--request_limit', help='files per request',
+                           default=100, type=int_or_none)
     subparser.add_argument('--stored', help='filter stored files',
                            choices=[True, False, None],
                            type=bool_or_none, default=None)
