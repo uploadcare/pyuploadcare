@@ -596,6 +596,8 @@ class FileGroup(object):
 
 
 def api_iterator(cls, next_url, reverse, limit=None):
+    reverse_stack = []
+
     while next_url and limit != 0:
         try:
             result = rest_request('GET', next_url)
@@ -610,12 +612,19 @@ def api_iterator(cls, next_url, reverse, limit=None):
             next_url = result['next']
 
         for item in working_set:
-            yield cls(item)
+
+            if reverse:
+                reverse_stack.append(cls(item))
+            else:
+                yield cls(item)
 
             if limit is not None:
                 limit -= 1
                 if limit == 0:
-                    return
+                    break
+
+    for item in reverse_stack[::-1]:
+        yield item
 
 
 class BaseApiList(object):

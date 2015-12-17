@@ -1,0 +1,30 @@
+{
+  "previous": "http://localhost:8000/api/files/?sort=-uploaded-time&limit=1&to=2015-11-16T11%3A45%3A55.005371%2B00%3A00&offset=0", 
+  "per_page": 1, 
+  "total": 26, 
+  "results": [
+    {
+      "uuid": "2d1a59de-55db-4729-af1c-75f3caf0ffc1", 
+      "is_image": true, 
+      "datetime_uploaded": "2015-11-16T11:45:55.005371Z", 
+      "url": "http://localhost:8000/api/files/2d1a59de-55db-4729-af1c-75f3caf0ffc1/", 
+      "source": null, 
+      "is_ready": true, 
+      "original_file_url": "http://localhost:8000/2d1a59de-55db-4729-af1c-75f3caf0ffc1/IMG_20151110105108.jpg", 
+      "original_filename": "IMG_2015-11-10 10:51:08.jpg", 
+      "image_info": {
+        "orientation": null, 
+        "format": "JPEG", 
+        "height": 393, 
+        "width": 526, 
+        "geo_location": null, 
+        "datetime_original": null
+      }, 
+      "datetime_stored": "2015-11-16T11:45:56.173206Z", 
+      "datetime_removed": null, 
+      "mime_type": "image/jpeg", 
+      "size": 20109
+    }
+  ], 
+  "next": "http://localhost:8000/api/files/?sort=-uploaded-time&from=2015-11-16T11%3A45%3A55.005371%2B00%3A00&limit=1&offset=0"
+}
