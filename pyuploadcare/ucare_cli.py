@@ -42,6 +42,16 @@ def int_or_none(value):
     return None if value.lower() == 'none' else int(value)
 
 
+def int_or_datetime(value):
+    """ Used for parsing ``until`` and ``since`` values which can be as
+    ``datetime`` (sorted by ``uploaded-datetime``) or ``int``
+    (sorted by ``size``).
+    """
+    if value.isdigit():
+        return int(value)
+    return dateutil.parser.parse(value)
+
+
 def list_files(arg_namespace):
     files = FileList(
         since=arg_namespace.since,
@@ -251,9 +261,9 @@ def ucare_argparser():
     subparser = subparsers.add_parser('list', help='list all files')
     subparser.set_defaults(func=list_files)
     subparser.add_argument('--since', help='show files uploaded since',
-                           type=dateutil.parser.parse)
+                           type=int_or_datetime)
     subparser.add_argument('--until', help='show files uploaded until',
-                           type=dateutil.parser.parse)
+                           type=int_or_datetime)
     subparser.add_argument('--limit', help='files to show', default=100,
                            type=int_or_none)
     subparser.add_argument('--request_limit', help='files per request',

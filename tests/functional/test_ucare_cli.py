@@ -8,6 +8,7 @@ except ImportError:
 from tempfile import NamedTemporaryFile
 
 from mock import patch, MagicMock
+from dateutil import parser
 
 from pyuploadcare import conf
 from pyuploadcare.api_resources import FileList, FilesStorage
@@ -136,6 +137,19 @@ class UcareListTestCase(unittest.TestCase):
 
         self.assertEqual(args.sort, sort)
         self.assertCalledWith(FileList_, args)
+
+    def test_since_and_until_options(self, FileList_):
+        values = ('1', '2015-11-16T09:24:13')
+        parsed_values = (int(values[0]), parser.parse(values[1]))
+
+        for option in ('since', 'until'):
+            for cli_value, parsed_value in zip(values, parsed_values):
+                args = arg_namespace('list --{0}={1}'.format(option,
+                                                             cli_value))
+                main(args)
+
+                self.assertEqual(getattr(args, option), parsed_value)
+                self.assertCalledWith(FileList_, args)
 
     def assertCalledWith(self, mock_obj, args_obj):
         mock_obj.assert_called_with(

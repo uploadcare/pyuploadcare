@@ -4,6 +4,7 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
+from urllib import quote
 import json
 import datetime
 import os
@@ -423,16 +424,53 @@ class FileListTestCase(unittest.TestCase):
     def tearDownClass(cls):
         cls.patcher.stop()
 
-    def test_invalid_sorting_param(self, *args, **kwargs):
-        with self.assertRaises(ValueError) as cm:
+    def test_invalid_sorting_param(self):
+        with self.assertRaises(ValueError) as e:
             FileList(sort='invalid_sort')
-        self.assertIn('Unsupported sorting method', cm.exception.args[0])
+        self.assertIn('Unsupported sorting method', e.exception.args[0])
 
-    def test_correct_qs_generated(self, *args, **kwargs):
+    def test_correct_qs_generated(self):
         sort = FileList.sorting[-1]
 
         file_list = FileList(sort=sort)
         self.assertIn('sort={0}'.format(sort), file_list.api_url())
+
+    def test_cant_provied_since_and_until_in_same_time(self):
+        with self.assertRaises(TypeError) as e:
+            FileList(since='since', until='until')
+        self.assertIn('Only one of since and until', e.exception.args[0])
+
+    def test_since_and_until_for_uploaded_time_sorting(self):
+        file_list = FileList(sort='uploaded-time', since=1)
+        self.assertRaises(ValueError, file_list.api_url)
+
+        file_list = FileList(sort='-uploaded-time', until=1)
+        self.assertRaises(ValueError, file_list.api_url)
+
+        now = datetime.datetime.now()
+
+        file_list = FileList(sort='uploaded-time', until=now)
+        self.assertIn('to={0}'.format(quote(now.isoformat())),
+                      file_list.api_url())
+
+        file_list = FileList(sort='-uploaded-time', since=now)
+        self.assertIn('from={0}'.format(quote(now.isoformat())),
+                      file_list.api_url())
+
+    def test_since_and_until_for_size_sorting(self):
+        file_list = FileList(sort='size', since=1)
+        self.assertIn('from={0}'.format(file_list.since), file_list.api_url())
+
+        file_list = FileList(sort='-size', until=1)
+        self.assertIn('to={0}'.format(file_list.until), file_list.api_url())
+
+        now = datetime.datetime.now()
+
+        file_list = FileList(sort='size', until=now)
+        self.assertRaises(ValueError, file_list.api_url)
+
+        file_list = FileList(sort='-size', since=now)
+        self.assertRaises(ValueError, file_list.api_url)
 
     def test_uploaded_time_and_since_with_pagination(self):
         """ In this test we except a next result:
