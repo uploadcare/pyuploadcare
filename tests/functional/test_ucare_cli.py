@@ -158,6 +158,7 @@ class UcareListTestCase(unittest.TestCase):
             limit=args_obj.limit,
             stored=args_obj.stored,
             removed=args_obj.removed,
+            request_limit=args_obj.request_limit,
             sort=args_obj.sort,
         )
 

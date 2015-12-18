@@ -4,7 +4,12 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
-from urllib import quote
+
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
+
 import json
 import datetime
 import os
@@ -414,9 +419,9 @@ class FileListTestCase(unittest.TestCase):
         cls.rest_request = cls.patcher.start()
 
         def _rest_request_result(method, next_url):
-            filename = next_url.split('?')[-1]
+            filename = '&'.join(sorted(next_url.split('?')[-1].split('&')))
             raw_data = api_response_from_file(filename)
-            return json.loads(raw_data)
+            return json.loads(raw_data.decode('utf-8'))
 
         cls.rest_request.side_effect = _rest_request_result
 
@@ -484,11 +489,11 @@ class FileListTestCase(unittest.TestCase):
 
         >> sort=uploaded-time and since=2015-11-16T09:24:13
 
-        2015-11-16T09:24:13
         2015-11-16T09:35:16
         2015-11-16T09:36:57
+        2015-11-16T09:38:50
         """
-        since = parse('2015-11-16T09:35:16')
+        since = parse('2015-11-16T09:24:13')
 
         file_list = FileList(sort='uploaded-time',
                              since=since,
@@ -496,9 +501,9 @@ class FileListTestCase(unittest.TestCase):
                              limit=3)
 
         expected_dates = [parse(d) for d in (
+            '2015-11-16T09:24:13.061627Z',
             '2015-11-16T09:35:16.770971Z',
             '2015-11-16T09:36:57.474736Z',
-            '2015-11-16T09:38:50.330673Z',
         )]
 
         for f, d in zip(file_list, expected_dates):
@@ -516,10 +521,11 @@ class FileListTestCase(unittest.TestCase):
         2015-11-16T11:48:30
         2015-11-16T11:46:56
 
-        >> sort=-uploaded-time and until=2015-11-16T11:49:08
+        >> sort=-uploaded-time and since=2015-11-16T11:49:08
 
         2015-11-16T11:48:30
         2015-11-16T11:46:56
+        2015-11-16T11:45:55
 
         """
         since = parse('2015-11-16T11:49:08')

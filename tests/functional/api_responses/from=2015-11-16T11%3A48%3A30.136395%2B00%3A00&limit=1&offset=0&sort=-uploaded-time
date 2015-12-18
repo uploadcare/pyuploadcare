@@ -1,7 +1,7 @@
 {
-  "previous": "http://localhost:8000/api/files/?sort=-uploaded-time&limit=1&to=2015-11-16T11%3A46%3A56.836193%2B00%3A00&offset=0", 
   "per_page": 1, 
   "total": 26, 
+  "next": "http://localhost:8000/api/files/?sort=-uploaded-time&limit=1&from=2015-11-16T11%3A46%3A56.836193%2B00%3A00&offset=0", 
   "results": [
     {
       "uuid": "8623b95b-32de-4c04-be8d-9cfd52240e74", 
@@ -21,10 +21,10 @@
         "datetime_original": null
       }, 
       "datetime_stored": "2015-11-16T11:46:57.502000Z", 
-      "datetime_removed": null, 
       "mime_type": "image/jpeg", 
+      "datetime_removed": null, 
       "size": 20109
     }
   ], 
-  "next": "http://localhost:8000/api/files/?sort=-uploaded-time&limit=1&from=2015-11-16T11%3A46%3A56.836193%2B00%3A00&offset=0"
+  "previous": "http://localhost:8000/api/files/?sort=-uploaded-time&limit=1&to=2015-11-16T11%3A46%3A56.836193%2B00%3A00&offset=0"
 }
