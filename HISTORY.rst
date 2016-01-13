@@ -3,6 +3,12 @@
 History
 -------
 
+1.3.4
+~~~~~
+
+- Added storage operations
+- Added request_limit to ucare_cli
+
 1.3.3
 ~~~~~
 
