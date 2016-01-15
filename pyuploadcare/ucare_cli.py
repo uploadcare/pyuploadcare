@@ -148,7 +148,7 @@ def upload(arg_namespace):
 def create_group(arg_namespace):
     files = [File(uuid) for uuid in arg_namespace.paths]
     group = FileGroup.create(files)
-    pprint(group)
+    pprint(group.info())
 
 
 def sync_files(arg_namespace):
