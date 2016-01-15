@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 import time
 import argparse
 import logging
-import pprint
 import os
 import sys
 import re
+import json
 from math import ceil
 
 import requests
@@ -19,7 +19,10 @@ from .api_resources import File, FileGroup, FileList, FilesStorage
 from .exceptions import UploadcareException, TimeoutError, UploadError
 
 
-pp = pprint.PrettyPrinter(indent=2)
+def pprint(value):
+    print(json.dumps(value, indent=2))
+
+
 logger = logging.getLogger('pyuploadcare')
 str_settings = (
     'pub_key',
@@ -52,11 +55,11 @@ def list_files(arg_namespace):
         request_limit=arg_namespace.request_limit,
     )
     files.constructor = lambda x: x
-    pp.pprint(list(files))
+    pprint(list(files))
 
 
 def get_file(arg_namespace):
-    pp.pprint(File(arg_namespace.path).info())
+    pprint(File(arg_namespace.path).info())
 
 
 def store_files(arg_namespace):
@@ -86,7 +89,7 @@ def _wait_if_needed(arg_namespace, check_func, error_msg):
 
 def _check_upload_args(arg_namespace):
     if not conf.secret and (arg_namespace.store or arg_namespace.info):
-        pp.pprint('Cannot store or get info without "--secret" key')
+        pprint('Cannot store or get info without "--secret" key')
         return False
     return True
 
@@ -94,20 +97,20 @@ def _check_upload_args(arg_namespace):
 def _handle_uploaded_file(file_, arg_namespace):
     if arg_namespace.store:
         file_.store()
-        pp.pprint('File stored successfully.')
+        pprint('File stored successfully.')
 
     if arg_namespace.info:
-        pp.pprint(file_.info())
+        pprint(file_.info())
 
     if arg_namespace.cdnurl:
-        pp.pprint('CDN url: {0}'.format(file_.cdn_url))
+        pprint('CDN url: {0}'.format(file_.cdn_url))
 
 
 def upload_from_url(arg_namespace):
     if not _check_upload_args(arg_namespace):
         return
     file_from_url = File.upload_from_url(arg_namespace.url)
-    pp.pprint(file_from_url)
+    pprint(file_from_url)
 
     if arg_namespace.wait or arg_namespace.store:
         timeout = arg_namespace.timeout
@@ -118,7 +121,8 @@ def upload_from_url(arg_namespace):
                 break
             if status in ('failed', 'error'):
                 raise UploadError(
-                    'could not upload file from url: {0}'.format(file_from_url.info())
+                    'could not upload file from url: {0}'.format(
+                        file_from_url.info())
                 )
             time.sleep(1)
         else:
@@ -127,7 +131,7 @@ def upload_from_url(arg_namespace):
     if arg_namespace.store or arg_namespace.info:
         file_ = file_from_url.get_file()
         if file_ is None:
-            pp.pprint('Cannot store or get info.')
+            pprint('Cannot store or get info.')
             return
 
         _handle_uploaded_file(file_, arg_namespace)
@@ -144,7 +148,7 @@ def upload(arg_namespace):
 def create_group(arg_namespace):
     files = [File(uuid) for uuid in arg_namespace.paths]
     group = FileGroup.create(files)
-    pp.pprint(group)
+    pprint(group.info())
 
 
 def sync_files(arg_namespace):
@@ -166,7 +170,7 @@ def sync_files(arg_namespace):
             os.makedirs(dirname)
 
         if os.path.exists(local_filepath) and not arg_namespace.replace:
-            pp.pprint(
+            pprint(
                 'File `{0}` already exists. '
                 'To override it use `--replace` option'.format(
                     local_filepath))
@@ -178,8 +182,8 @@ def sync_files(arg_namespace):
         try:
             response.raise_for_status()
         except requests.HTTPError as e:
-            pp.pprint(('Can\'t download file: `{0}`. '
-                       'Origin error: {1}').format(url, e))
+            pprint(('Can\'t download file: `{0}`. '
+                    'Origin error: {1}').format(url, e))
             continue
 
         save_file_locally(local_filepath, response, f.size())
@@ -482,7 +486,7 @@ def main(arg_namespace=None,
         try:
             arg_namespace.func(arg_namespace)
         except UploadcareException as exc:
-            pp.pprint('ERROR: {0}'.format(exc))
+            pprint('ERROR: {0}'.format(exc))
 
 
 if __name__ == '__main__':
