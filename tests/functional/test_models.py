@@ -67,30 +67,40 @@ class FileFieldTest(unittest.TestCase):
 
     def test_empty_str_is_allowed(self):
         class Employee(models.Model):
+            class Meta:
+                app_label = 'tests'
             cv = FileField(blank=True)
         emp = Employee()
         self.assertEqual(emp.cv, '')
 
     def test_null_is_allowed(self):
         class Employee(models.Model):
+            class Meta:
+                app_label = 'tests'
             cv = FileField(null=True)
         emp = Employee(cv=None)
         self.assertEqual(emp.cv, None)
 
     def test_validation_error_if_value_is_int(self):
         class Employee(models.Model):
+            class Meta:
+                app_label = 'tests'
             cv = FileField()
         with self.assertRaises(ValidationError):
             Employee(cv=123)
 
     def test_validation_error_if_uuid_is_invalid_str(self):
         class Employee(models.Model):
+            class Meta:
+                app_label = 'tests'
             cv = FileField()
         with self.assertRaises(ValidationError):
             Employee(cv='123')
 
     def test_file_instance_if_uuid_is_valid(self):
         class Employee(models.Model):
+            class Meta:
+                app_label = 'tests'
             cv = FileField()
         emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
         self.assertIsInstance(emp.cv, File)
@@ -103,6 +113,8 @@ class FileFieldTest(unittest.TestCase):
         faked_size_validator = lambda value: value.info()['size']
 
         class Employee(models.Model):
+            class Meta:
+                app_label = 'tests'
             cv = FileField(validators=[faked_size_validator])
 
         emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
@@ -115,30 +127,40 @@ class FileGroupFieldTest(unittest.TestCase):
 
     def test_empty_str_is_allowed(self):
         class Book(models.Model):
+            class Meta:
+                app_label = 'tests'
             pages = FileGroupField(blank=True)
         book = Book()
         self.assertEqual(book.pages, '')
 
     def test_null_is_allowed(self):
         class Book(models.Model):
+            class Meta:
+                app_label = 'tests'
             pages = FileGroupField(null=True)
         book = Book(pages=None)
         self.assertEqual(book.pages, None)
 
     def test_validation_error_if_value_is_int(self):
         class Book(models.Model):
+            class Meta:
+                app_label = 'tests'
             pages = FileGroupField()
         with self.assertRaises(ValidationError):
             Book(pages=123)
 
     def test_validation_error_if_group_id_is_invalid_str(self):
         class Book(models.Model):
+            class Meta:
+                app_label = 'tests'
             pages = FileGroupField()
         with self.assertRaises(ValidationError):
             Book(pages='123')
 
     def test_file_group_instance_if_group_id_is_valid(self):
         class Book(models.Model):
+            class Meta:
+                app_label = 'tests'
             pages = FileGroupField()
         book = Book(pages='0513dda0-582f-447d-846f-096e5df9e2bb~2')
         self.assertIsInstance(book.pages, FileGroup)
