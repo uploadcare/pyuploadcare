@@ -139,8 +139,7 @@ You can pass any widget options via ``FileWidget``'s attrs argument:
 
     from django import forms
 
-    from pyuploadcare.dj import ImageField
-    from pyuploadcare.dj.forms import FileWidget
+    from pyuploadcare.dj.forms import FileWidget, ImageField
 
 
     # optional. provide advanced widget options: https://uploadcare.com/documentation/widget/#configuration
