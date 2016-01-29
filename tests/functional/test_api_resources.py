@@ -4,12 +4,20 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
+
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
+
+import json
 import datetime
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch, MagicMock
 from dateutil.tz import tzutc
+from dateutil.parser import parse
 
 from pyuploadcare.api_resources import File, FileGroup, FileList, FilesStorage
 from pyuploadcare.exceptions import InvalidRequestError, InvalidParamError
@@ -400,3 +408,207 @@ class FilesStorageTestCase(unittest.TestCase):
             rest_request.assert_any_call('PUT', storage.storage_url, [uuid])
             rest_request.assert_any_call('DELETE', storage.storage_url,
                                          [uuid])
+
+
+class FileListTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(FileListTestCase, cls).setUpClass()
+
+        cls.patcher = patch('pyuploadcare.api_resources.rest_request')
+        cls.rest_request = cls.patcher.start()
+
+        def _rest_request_result(method, next_url):
+            filename = '&'.join(sorted(next_url.split('?')[-1].split('&')))
+            raw_data = api_response_from_file(filename)
+            return json.loads(raw_data.decode('utf-8'))
+
+        cls.rest_request.side_effect = _rest_request_result
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.patcher.stop()
+
+    def test_invalid_sorting_param(self):
+        with self.assertRaises(ValueError) as e:
+            FileList(sort='invalid_sort')
+        self.assertIn('Unsupported sorting method', e.exception.args[0])
+
+    def test_correct_qs_generated(self):
+        sort = FileList.sorting[-1]
+
+        file_list = FileList(sort=sort)
+        self.assertIn('sort={0}'.format(sort), file_list.api_url())
+
+    def test_cant_provied_since_and_until_in_same_time(self):
+        with self.assertRaises(TypeError) as e:
+            FileList(since='since', until='until')
+        self.assertIn('Only one of since and until', e.exception.args[0])
+
+    def test_since_and_until_for_uploaded_time_sorting(self):
+        file_list = FileList(sort='uploaded-time', since=1)
+        self.assertRaises(ValueError, file_list.api_url)
+
+        file_list = FileList(sort='-uploaded-time', until=1)
+        self.assertRaises(ValueError, file_list.api_url)
+
+        now = datetime.datetime.now()
+
+        file_list = FileList(sort='uploaded-time', until=now)
+        self.assertIn('to={0}'.format(quote(now.isoformat())),
+                      file_list.api_url())
+
+        file_list = FileList(sort='-uploaded-time', since=now)
+        self.assertIn('from={0}'.format(quote(now.isoformat())),
+                      file_list.api_url())
+
+    def test_since_and_until_for_size_sorting(self):
+        file_list = FileList(sort='size', since=1)
+        self.assertIn('from={0}'.format(file_list.since), file_list.api_url())
+
+        file_list = FileList(sort='-size', until=1)
+        self.assertIn('to={0}'.format(file_list.until), file_list.api_url())
+
+        now = datetime.datetime.now()
+
+        file_list = FileList(sort='size', until=now)
+        self.assertRaises(ValueError, file_list.api_url)
+
+        file_list = FileList(sort='-size', since=now)
+        self.assertRaises(ValueError, file_list.api_url)
+
+    def test_uploaded_time_and_since_with_pagination(self):
+        """ In this test we except a next result:
+
+        >> sort=uploaded-time
+
+        2015-11-16T09:20:57
+        2015-11-16T09:24:13
+        2015-11-16T09:35:16
+        2015-11-16T09:36:57
+
+        >> sort=uploaded-time and since=2015-11-16T09:24:13
+
+        2015-11-16T09:35:16
+        2015-11-16T09:36:57
+        2015-11-16T09:38:50
+        """
+        since = parse('2015-11-16T09:24:13')
+
+        file_list = FileList(sort='uploaded-time',
+                             since=since,
+                             request_limit=1,
+                             limit=3)
+
+        expected_dates = [parse(d) for d in (
+            '2015-11-16T09:24:13.061627Z',
+            '2015-11-16T09:35:16.770971Z',
+            '2015-11-16T09:36:57.474736Z',
+        )]
+
+        for f, d in zip(file_list, expected_dates):
+            self.assertEqual(f.datetime_uploaded(), d)
+
+        self.assertTrue(self.rest_request.call_count, 3)
+
+    def test_desc_upload_time_and_since_with_pagination(self):
+        """ In this test we expect a next result:
+
+        >> sort=-uploaded-time
+
+        2015-11-16T11:50:31
+        2015-11-16T11:49:08
+        2015-11-16T11:48:30
+        2015-11-16T11:46:56
+
+        >> sort=-uploaded-time and since=2015-11-16T11:49:08
+
+        2015-11-16T11:48:30
+        2015-11-16T11:46:56
+        2015-11-16T11:45:55
+
+        """
+        since = parse('2015-11-16T11:49:08')
+
+        file_list = FileList(sort='-uploaded-time',
+                             since=since,
+                             request_limit=1,
+                             limit=3)
+
+        expected_dates = [parse(d) for d in (
+            '2015-11-16T11:48:30.136395Z',
+            '2015-11-16T11:46:56.836193Z',
+            '2015-11-16T11:45:55.005371Z',
+        )]
+
+        for f, d in zip(file_list, expected_dates):
+            self.assertEqual(f.datetime_uploaded(), d)
+
+        self.assertTrue(self.rest_request.call_count, 3)
+
+    def test_uploaded_time_and_until_with_pagination(self):
+        """ In this test we expect a next result:
+
+        >> sort=uploaded-time
+
+        2015-11-16T09:20:57
+        2015-11-16T09:24:13
+        2015-11-16T09:35:16
+        2015-11-16T09:36:57
+
+        >> sort=uploaded-time and until=2015-11-16T09:35:16
+
+        2015-11-16T09:20:57
+        2015-11-16T09:24:13
+
+        """
+        until = parse('2015-11-16T09:35:16')
+
+        file_list = FileList(sort='uploaded-time',
+                             until=until,
+                             request_limit=1,
+                             limit=3)
+        expected_dates = [parse(d) for d in (
+            '2015-11-16T09:20:57.244649Z',
+            '2015-11-16T09:24:13.061627Z',
+        )]
+
+        for f, d in zip(file_list, expected_dates):
+            self.assertEqual(f.datetime_uploaded(), d)
+
+        self.assertTrue(self.rest_request.call_count, 2)
+
+    def test_desc_uploaded_time_and_until_with_pagination(self):
+        """ In this query we expect a next result:
+
+        >> sort=-uploaded-time
+
+        2015-11-16T11:50:31
+        2015-11-16T11:49:08
+        2015-11-16T11:48:30
+        2015-11-16T11:46:56
+
+        >> sort=-uploaded-time and until=2015-11-16T11:48:30
+
+        2015-11-16T11:50:31
+        2015-11-16T11:49:08
+        2015-11-16T11:48:30
+
+        """
+        until = parse('2015-11-16T11:48:30')
+
+        file_list = FileList(sort='-uploaded-time',
+                             until=until,
+                             request_limit=1,
+                             limit=3)
+
+        expected_dates = [parse(d) for d in (
+            '2015-11-16T11:50:31.180434Z',
+            '2015-11-16T11:49:08.285716Z',
+            '2015-11-16T11:48:30.136395Z',
+        )]
+
+        for f, d in zip(file_list, expected_dates):
+            self.assertEqual(f.datetime_uploaded(), d)
+
+        self.assertTrue(self.rest_request.call_count, 3)

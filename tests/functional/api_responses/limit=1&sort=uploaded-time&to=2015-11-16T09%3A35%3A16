@@ -1,0 +1,23 @@
+{
+  "previous": "http://localhost:8000/api/files/?sort=uploaded-time&to=2015-11-16T09%3A24%3A13.061627%2B00%3A00&limit=1&offset=0", 
+  "per_page": 1, 
+  "total": 26, 
+  "results": [
+    {
+      "uuid": "43e578a0-a9b4-449d-91f2-76dba0ac5614", 
+      "is_image": false, 
+      "datetime_uploaded": "2015-11-16T09:24:13.061627Z", 
+      "url": "http://localhost:8000/api/files/43e578a0-a9b4-449d-91f2-76dba0ac5614/", 
+      "source": null, 
+      "is_ready": true, 
+      "original_file_url": "http://localhost:8000/43e578a0-a9b4-449d-91f2-76dba0ac5614/fields.json", 
+      "original_filename": "fields.json", 
+      "image_info": null, 
+      "datetime_stored": "2015-11-16T09:24:13.078293Z", 
+      "datetime_removed": null, 
+      "mime_type": "application/json", 
+      "size": 589
+    }
+  ], 
+  "next": "http://localhost:8000/api/files/?sort=uploaded-time&offset=0&limit=1&from=2015-11-16T09%3A24%3A13.061627%2B00%3A00"
+}

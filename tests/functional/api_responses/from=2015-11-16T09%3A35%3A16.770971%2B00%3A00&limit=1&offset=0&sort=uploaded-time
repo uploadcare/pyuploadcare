@@ -1,0 +1,23 @@
+{
+  "per_page": 1, 
+  "total": 26, 
+  "next": "http://localhost:8000/api/files/?sort=uploaded-time&from=2015-11-16T09%3A36%3A57.474736%2B00%3A00&limit=1&offset=0", 
+  "results": [
+    {
+      "uuid": "3598c424-dcda-4044-8cae-d3cbef1bd4cd", 
+      "is_image": null, 
+      "datetime_uploaded": "2015-11-16T09:36:57.474736Z", 
+      "url": "http://localhost:8000/api/files/3598c424-dcda-4044-8cae-d3cbef1bd4cd/", 
+      "source": null, 
+      "is_ready": false, 
+      "original_file_url": null, 
+      "original_filename": "fields.json", 
+      "image_info": null, 
+      "datetime_stored": null, 
+      "mime_type": "application/json", 
+      "datetime_removed": null, 
+      "size": 589
+    }
+  ], 
+  "previous": "http://localhost:8000/api/files/?sort=uploaded-time&limit=1&to=2015-11-16T09%3A36%3A57.474736%2B00%3A00&offset=0"
+}

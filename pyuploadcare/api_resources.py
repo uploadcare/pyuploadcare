@@ -5,6 +5,7 @@ import logging
 import time
 from itertools import islice
 from collections import Iterable
+from datetime import datetime
 
 import dateutil.parser
 import six
@@ -596,6 +597,8 @@ class FileGroup(object):
 
 
 def api_iterator(cls, next_url, reverse, limit=None):
+    reverse_stack = []
+
     while next_url and limit != 0:
         try:
             result = rest_request('GET', next_url)
@@ -610,12 +613,19 @@ def api_iterator(cls, next_url, reverse, limit=None):
             next_url = result['next']
 
         for item in working_set:
-            yield cls(item)
+
+            if reverse:
+                reverse_stack.append(cls(item))
+            else:
+                yield cls(item)
 
             if limit is not None:
                 limit -= 1
                 if limit == 0:
-                    return
+                    break
+
+    for item in reverse_stack[::-1]:
+        yield item
 
 
 class BaseApiList(object):
@@ -628,7 +638,8 @@ class BaseApiList(object):
         # Only explicit kwargs are allowed.
 
         if kwargs.get('since') is not None and kwargs.get('until') is not None:
-            raise TypeError('Only one of since and until arguments is allowed.')
+            raise TypeError('Only one of since and until '
+                            'arguments is allowed.')
 
         self.since = kwargs.pop('since', None)
         self.until = kwargs.pop('until', None)
@@ -647,9 +658,9 @@ class BaseApiList(object):
     def api_url(self, **additional):
         qs = {}
         if self.since is not None:
-            qs['from'] = self.since.isoformat()
+            qs['from'] = self.get_formatted_since_or_until(self.since)
         if self.until is not None:
-            qs['to'] = self.until.isoformat()
+            qs['to'] = self.get_formatted_since_or_until(self.until)
         if self.request_limit:
             qs['limit'] = self.request_limit
         for f, default in self.filters:
@@ -665,6 +676,9 @@ class BaseApiList(object):
             self.constructor, self.api_url(),
             self.until is not None, self.limit,
         )
+
+    def get_formatted_since_or_until(self, value):
+        return value.isoformat()
 
     def count(self):
         if self.since is not None or self.until is not None:
@@ -690,6 +704,7 @@ class FileList(BaseApiList):
     - ``removed`` -- ``True`` to include only removed files,
       ``False`` to exclude, ``None`` will not exclude anything.
       The default is ``False``.
+    - ``sort`` - a string that specify how files must be sorted.
 
     If ``until`` is specified, the order of items will be reversed.
     It is impossible to specify ``since`` and ``until`` at the same time.
@@ -711,6 +726,39 @@ class FileList(BaseApiList):
     base_url = '/files/'
     constructor = File.construct_from
     filters = [('stored', None), ('removed', False)]
+    sorting = ['uploaded-time', '-uploaded-time', '-size', 'size']
+
+    def __init__(self, **kwargs):
+        self.sort = kwargs.pop('sort', None)
+
+        if self.sort and self.sort not in self.sorting:
+            raise ValueError(
+                "Unsupported sorting method: {0}".format(self.sort))
+
+        super(FileList, self).__init__(**kwargs)
+
+    def api_url(self, **additional):
+        if self.sort:
+            additional.setdefault('sort', self.sort)
+        return super(FileList, self).api_url(**additional)
+
+    def get_formatted_since_or_until(self, value):
+        if self.sort and 'uploaded-time' in self.sort:
+            try:
+                return value.isoformat()
+            except AttributeError:
+                raise ValueError('For sorting by "{0}" only '
+                                 '"datetime" object is correct value '
+                                 'for "since" or "until"'.format(self.sort))
+        if self.sort and 'size' in self.sort:
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                raise ValueError(
+                    'For sorting by "{0}" only "int" is correct type of value '
+                    'for "since" or "until"')
+
+        return value
 
 
 class FilesStorage(object):
