@@ -3,6 +3,11 @@
 History
 -------
 
+1.3.6
+~~~~~
+
+- Fixed ZeroDivision error when trying to sync files with no size
+
 1.3.5
 ~~~~~
 
