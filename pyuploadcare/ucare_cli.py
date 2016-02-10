@@ -160,8 +160,8 @@ def sync_files(arg_namespace):
     session = requests.Session()
 
     for f in files:
-        if arg_namespace.effects:
-            f.default_effects = arg_namespace.effects
+        if f.is_image() and arg_namespace.effects:
+            f.default_effects = arg_namespace.effects.lstrip('-/')
 
         local_filepath = build_filepath(arg_namespace.path, f)
         dirname = os.path.dirname(local_filepath)
@@ -194,7 +194,7 @@ PATTERNS_MAPPING = {
     '${uuid}': lambda f: f.uuid,
     '${filename}': lambda f: f.filename(),
     '${effects}': lambda f: f.default_effects,
-    '${ext}': lambda f: '.{0}'.format(f.info()["image_info"]["format"]).lower()
+    '${ext}': lambda f: os.path.splitext(f.filename() or '')[-1],
 }
 DEFAULT_PATTERN_FILENAME = '${uuid}${ext}'
 
@@ -393,8 +393,11 @@ def ucare_argparser():
     subparser.add_argument('--uuids', nargs='+',
                            help='list of file\'s uuids for sync',)
     subparser.add_argument('--effects', help=(
-        'apply effects for synced images. For more information look at: '
-        'https://uploadcare.com/documentation/cdn/'
+        'apply effects for synced images.'
+        'Note that effects will apply to images only.'
+        'For more information look at: '
+        'https://uploadcare.com/documentation/cdn/  '
+        'Example: --effects=resize/200x/-/rotate/90/'
     ))
 
     # common arguments
