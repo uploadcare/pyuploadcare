@@ -7,13 +7,13 @@ except ImportError:
     import unittest
 from tempfile import NamedTemporaryFile
 
-from mock import patch, MagicMock
+from mock import patch, MagicMock, Mock
 
 from pyuploadcare import conf
 from pyuploadcare.api_resources import FilesStorage
 from pyuploadcare.ucare_cli import (
     ucare_argparser, get_file, store_files, delete_files, main,
-    create_group, sync_files
+    create_group, sync_files, save_file_locally
 )
 from .utils import MockResponse, MockListResponse
 
@@ -443,3 +443,19 @@ class UcareSyncTestCase(unittest.TestCase):
             else:
                 self.assertTrue(url.endswith(effects))
                 self.assertTrue('/-/-/' not in url)
+
+
+class SaveFileLocallyTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tmp_file = NamedTemporaryFile(mode='wb', delete=False)
+
+    def tearDown(self):
+        os.remove(self.tmp_file.name)
+
+    def test_zero_filesize(self):
+        response = Mock()
+        response.iter_content.return_value = ('1', '2', '3')
+
+        save_file_locally(self.tmp_file.name, response, 0)
+        with open(self.tmp_file.name, 'r') as f:
+            self.assertEqual(f.read(), '123')
