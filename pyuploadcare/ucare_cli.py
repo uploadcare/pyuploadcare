@@ -223,7 +223,7 @@ def save_file_locally(fname, response, size):
 
 
 def bar(iter_content, parts, title=''):
-    parts = float(parts)
+    parts = max(float(parts), 1.0)
     cells = 10
     progress = 0
     step = cells / parts
