@@ -454,7 +454,7 @@ class SaveFileLocallyTestCase(unittest.TestCase):
 
     def test_zero_filesize(self):
         response = Mock()
-        response.iter_content.return_value = ('1', '2', '3')
+        response.iter_content.return_value = '1 2 3'.encode('utf-8').split()
 
         save_file_locally(self.tmp_file.name, response, 0)
         with open(self.tmp_file.name, 'r') as f:
