@@ -44,5 +44,6 @@ notifications:
     recipients:
       - ak@uploadcare.com
       - dm@uploadcare.com
+      - vs@uploadcare.com
     on_success: change
     on_failure: change
