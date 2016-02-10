@@ -3,6 +3,14 @@
 History
 -------
 
+1.3.5
+~~~~~
+
+- Added support of Django 1.9
+- Removed indication of Unicode strings from output of `ucare`
+- Fixed a group representation for `ucare create_group` command
+- Fixed error with `ucare sync` when trying to processing of not image files
+
 1.3.4
 ~~~~~
 
