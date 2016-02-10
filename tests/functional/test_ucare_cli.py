@@ -372,7 +372,7 @@ class UcareSyncTestCase(unittest.TestCase):
 
         sync_files(arg_namespace('sync {0}'.format(diraname)))
 
-        self.assertEqual(len(makedirs.mock_calls), 8)
+        self.assertEqual(len(makedirs.mock_calls), 9)
         self.assertTrue(diraname in makedirs.call_args[0])
 
     def test_file_exists_and_replace_flag(self, request, exists, makedirs,
@@ -384,7 +384,7 @@ class UcareSyncTestCase(unittest.TestCase):
         self.assertEqual(len(save_file_locally.mock_calls), 0)
 
         sync_files(arg_namespace('sync --replace'))
-        self.assertEqual(len(save_file_locally.mock_calls), 8)
+        self.assertEqual(len(save_file_locally.mock_calls), 9)
 
     def test_http_error(self, request, exists, makedirs, save_file_locally):
         request.return_value = self.default_response
@@ -409,28 +409,37 @@ class UcareSyncTestCase(unittest.TestCase):
 
         sync_files(arg_namespace("sync ${uuid}${ext}"))
 
-        self.assertEqual(len(save_file_locally.mock_calls), 8)
+        self.assertEqual(len(save_file_locally.mock_calls), 9)
 
-        expected_filenames = sorted('{0}.{1}'.format(
-            a['uuid'], a['image_info']['format'].lower()
+        expected_filenames = sorted('{0}{1}'.format(
+            a['uuid'], os.path.splitext(a['original_filename'])[-1].lower()
         ) for a in response.json()['results'])
 
         filenames = sorted(b[1][0] for b in save_file_locally.mock_calls)
 
         self.assertListEqual(expected_filenames, filenames)
 
-    @patch('requests.get', autospec=True)
+    @patch('requests.sessions.Session.get', autospec=True)
     def test_effects_works(self, get, request, exists, makedirs,
                            save_file_locally):
         exists.return_value = False
         response = request.return_value = self.default_response
-        effects = '/resize/200x200/'
+        effects = "-/resize/200x200/"
+        not_image_uuid = 'a4a79b35-01ed-4e83-ad5c-6bf155a31ed5'
 
-        sync_files(arg_namespace("sync --effects {0}".format(effects)))
+        sync_files(arg_namespace("sync --effects={0}".format(effects)))
 
-        self.assertEqual(len(save_file_locally.mock_calls), 8)
+        self.assertEqual(save_file_locally.call_count, 9)
+        self.assertEqual(get.call_count, 9)
 
-        # Skip `.raise_for_status` calls which odd
-        for call in get.mock_calls[::2]:
-            url = call[1][0]
-            self.assertIn(effects, url)
+        for call in get.call_args_list:
+            url = call[0][1]
+
+            # Check that effects don't applied on non-image
+            if not_image_uuid in url:
+                self.assertFalse(url.endswith(effects))
+
+            # And applied on images
+            else:
+                self.assertTrue(url.endswith(effects))
+                self.assertTrue('/-/-/' not in url)
