@@ -393,8 +393,11 @@ def ucare_argparser():
     subparser.add_argument('--uuids', nargs='+',
                            help='list of file\'s uuids for sync',)
     subparser.add_argument('--effects', help=(
-        'apply effects for synced images. For more information look at: '
-        'https://uploadcare.com/documentation/cdn/'
+        'apply effects for synced images.'
+        'Note that effects will apply to images only.'
+        'For more information look at: '
+        'https://uploadcare.com/documentation/cdn/  '
+        'Example: --effects=resize/200x/-/rotate/90/'
     ))
 
     # common arguments
