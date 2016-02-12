@@ -15,6 +15,7 @@ from six.moves import configparser
 from dateutil import parser
 
 from . import conf, __version__
+from .api import _build_user_agent
 from .api_resources import File, FileGroup, FileList, FilesStorage
 from .exceptions import UploadcareException, TimeoutError, UploadError
 
@@ -168,6 +169,36 @@ def sync_files(arg_namespace):
         files = FileList()
 
     session = requests.Session()
+    session.headers.update({'User-Agent': _build_user_agent()})
+
+    def _get(url, max_retry=3):
+        response = None
+
+        for i in range(max_retry):
+            try:
+                response = session.get(url, stream=True,
+                                       verify=conf.verify_api_ssl)
+            except requests.exceptions.ConnectionError as e:
+                pprint('Connection Error: {0}'.format(e))
+                pprint('Retry..')
+                time.sleep(i ** 2)
+                continue
+            else:
+                break
+
+        if response is None:
+            pprint('Can\'t fetch URL: {0}'.format(url))
+            pprint('Skip it.')
+            return
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            pprint(('Can\'t download file: `{0}`. '
+                    'Origin error: {1}').format(url, e))
+            return
+
+        return response
 
     for f in files:
         if f.is_image() and arg_namespace.effects:
@@ -176,7 +207,7 @@ def sync_files(arg_namespace):
         local_filepath = build_filepath(arg_namespace.path, f)
         dirname = os.path.dirname(local_filepath)
 
-        if not os.path.exists(dirname):
+        if dirname and not os.path.exists(dirname):
             os.makedirs(dirname)
 
         if os.path.exists(local_filepath) and not arg_namespace.replace:
@@ -187,16 +218,10 @@ def sync_files(arg_namespace):
             continue
 
         url = f.cdn_url
-        response = session.get(url, stream=True, verify=conf.verify_api_ssl)
+        response = _get(url)
 
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as e:
-            pprint(('Can\'t download file: `{0}`. '
-                    'Origin error: {1}').format(url, e))
-            continue
-
-        save_file_locally(local_filepath, response, f.size())
+        if response:
+            save_file_locally(local_filepath, response, f.size())
 
 
 PATTERNS_REGEX = re.compile(r'(\${\w+})')
