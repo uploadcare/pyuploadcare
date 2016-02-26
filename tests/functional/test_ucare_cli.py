@@ -10,7 +10,7 @@ from tempfile import NamedTemporaryFile
 from mock import patch, MagicMock, Mock
 
 from pyuploadcare import conf
-from pyuploadcare.api_resources import FilesStorage
+from pyuploadcare.exceptions import InvalidRequestError
 from pyuploadcare.ucare_cli import (
     ucare_argparser, get_file, store_files, delete_files, main,
     create_group, sync_files, save_file_locally
@@ -390,7 +390,8 @@ class UcareSyncTestCase(unittest.TestCase):
         request.return_value = self.default_response
         request.return_value.status_code = 400
 
-        sync_files(arg_namespace('sync'))
+        with self.assertRaises(InvalidRequestError):
+            sync_files(arg_namespace('sync'))
         self.assertEqual(len(save_file_locally.mock_calls), 0)
 
     def test_uuids(self, request, exists, makedirs, save_file_locally):

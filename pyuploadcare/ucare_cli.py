@@ -12,6 +12,7 @@ from math import ceil
 
 import requests
 from six.moves import configparser
+from dateutil import parser
 
 from . import conf, __version__
 from .api_resources import File, FileGroup, FileList, FilesStorage
@@ -45,6 +46,12 @@ def int_or_none(value):
 
 
 def list_files(arg_namespace):
+    if arg_namespace.starting_point:
+        ordering_field = (arg_namespace.ordering or '').lstrip('-')
+        if ordering_field in ('', 'datetime_uploaded'):
+            arg_namespace.starting_point = parser.parse(
+                arg_namespace.starting_point)
+
     files = FileList(
         starting_point=arg_namespace.starting_point,
         ordering=arg_namespace.ordering,

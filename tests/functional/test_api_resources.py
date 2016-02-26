@@ -421,13 +421,13 @@ class FileListTestCase(unittest.TestCase):
         now = datetime.datetime.now()
 
         for ordering in (None, 'datetime_uploaded', '-datetime_uploaded'):
-            f = FileList(starting_point=six.text_type(now), ordering=ordering)
-            print(f.api_url())
+            f = FileList(starting_point=now, ordering=ordering)
             self.assertTrue('from={0}'.format(quote(now.isoformat()))
                             in f.api_url())
 
     def test_starting_point_invalid_datetime_uploaded(self):
-        with self.assertRaisesRegexp(ValueError, 'Unknown string format'):
+        with self.assertRaisesRegexp(
+                ValueError, 'The starting_point must be a datetime'):
             FileList(starting_point='string', ordering='datetime_uploaded')
 
     def test_api_url(self):

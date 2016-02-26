@@ -5,6 +5,7 @@ import logging
 import time
 from itertools import islice
 from collections import Iterable
+from datetime import date, datetime
 
 import dateutil.parser
 import six
@@ -629,8 +630,9 @@ class BaseApiList(object):
         # Makes sure that the value of starting_point a correctly formatted
         ordering_field = (ordering or '').lstrip('-')
         if ordering_field in ('', 'datetime_uploaded') and starting_point:
-            self.starting_point = dateutil.parser.parse(
-                six.text_type(starting_point)).isoformat()
+            if not isinstance(starting_point, (datetime, date)):
+                raise ValueError('The starting_point must be a datetime')
+            self.starting_point = starting_point.isoformat()
 
     def api_url(self, **additional):
         qs = {}
