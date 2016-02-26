@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# encoding: utf-8
+# coding: utf-8
 from __future__ import unicode_literals
 import time
 import argparse
@@ -11,7 +11,6 @@ import json
 from math import ceil
 
 import requests
-import dateutil.parser
 from six.moves import configparser
 
 from . import conf, __version__
@@ -47,15 +46,19 @@ def int_or_none(value):
 
 def list_files(arg_namespace):
     files = FileList(
-        since=arg_namespace.since,
-        until=arg_namespace.until,
+        starting_point=arg_namespace.starting_point,
+        ordering=arg_namespace.ordering,
         limit=arg_namespace.limit,
         stored=arg_namespace.stored,
         removed=arg_namespace.removed,
         request_limit=arg_namespace.request_limit,
     )
     files.constructor = lambda x: x
-    pprint(list(files))
+
+    try:
+        pprint(list(files))
+    except ValueError as e:
+        print(e)
 
 
 def get_file(arg_namespace):
@@ -253,10 +256,14 @@ def ucare_argparser():
     # list
     subparser = subparsers.add_parser('list', help='list all files')
     subparser.set_defaults(func=list_files)
-    subparser.add_argument('--since', help='show files uploaded since',
-                           type=dateutil.parser.parse)
-    subparser.add_argument('--until', help='show files uploaded until',
-                           type=dateutil.parser.parse)
+    subparser.add_argument(
+        '--starting_point',
+        help='a starting point for filtering files',
+        action='store')
+    subparser.add_argument(
+        '--ordering',
+        help='specify the way the files should be sorted',
+        action='store')
     subparser.add_argument('--limit', help='files to show', default=100,
                            type=int_or_none)
     subparser.add_argument('--request_limit', help='files per request',

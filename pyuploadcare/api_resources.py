@@ -595,19 +595,15 @@ class FileGroup(object):
         return group
 
 
-def api_iterator(cls, next_url, reverse, limit=None):
+def api_iterator(cls, next_url, limit=None):
     while next_url and limit != 0:
         try:
             result = rest_request('GET', next_url)
         except InvalidRequestError:
             return
 
-        if reverse:
-            working_set = reversed(result['results'])
-            next_url = result['previous']
-        else:
-            working_set = result['results']
-            next_url = result['next']
+        working_set = result['results']
+        next_url = result['next']
 
         for item in working_set:
             yield cls(item)
@@ -625,13 +621,8 @@ class BaseApiList(object):
     filters = []
 
     def __init__(self, **kwargs):
-        # Only explicit kwargs are allowed.
-
-        if kwargs.get('since') is not None and kwargs.get('until') is not None:
-            raise TypeError('Only one of since and until arguments is allowed.')
-
-        self.since = kwargs.pop('since', None)
-        self.until = kwargs.pop('until', None)
+        self.starting_point = kwargs.pop('starting_point', None)
+        self.ordering = kwargs.pop('ordering', None)
         self.limit = kwargs.pop('limit', None)
         self.request_limit = kwargs.pop('request_limit', None)
         self._count = None
@@ -646,30 +637,60 @@ class BaseApiList(object):
 
     def api_url(self, **additional):
         qs = {}
-        if self.since is not None:
-            qs['from'] = self.since.isoformat()
-        if self.until is not None:
-            qs['to'] = self.until.isoformat()
+
+        if self.starting_point is not None:
+            qs['from'] = self.starting_point
+
+        if self.ordering is not None:
+            qs['ordering'] = self.ordering
+
         if self.request_limit:
             qs['limit'] = self.request_limit
+
         for f, default in self.filters:
             v = getattr(self, f)
             if v == default:
                 continue
             qs[f] = 'none' if v is None else str(bool(v)).lower()
+
         qs.update(additional)
+
         return self.base_url + '?' + urlencode(qs)
 
+    @property
+    def starting_point(self):
+        """ Prepare value of the starting_point depending on the
+        current ordering.
+        """
+        if not self.__starting_point:
+            return None
+
+        ordering_field = (self.ordering or '').lstrip('-')
+        error_message = ('Incorrect value of the starting_point when '
+                         'ordering == {}'.format(self.ordering))
+
+        if not ordering_field or ordering_field == 'datetime_uploaded':
+            try:
+                return dateutil.parser.parse(self.__starting_point).isoformat()
+            except ValueError:
+                raise ValueError(error_message)
+
+        if ordering_field == 'size':
+            try:
+                return int(self.__starting_point)
+            except (ValueError, TypeError):
+                raise ValueError(error_message)
+
+        raise ValueError('{} is unknown ordering field'.format(self.ordering))
+
+    @starting_point.setter
+    def starting_point(self, value):
+        self.__starting_point = value
+
     def __iter__(self):
-        return api_iterator(
-            self.constructor, self.api_url(),
-            self.until is not None, self.limit,
-        )
+        return api_iterator(self.constructor, self.api_url(), self.limit)
 
     def count(self):
-        if self.since is not None or self.until is not None:
-            raise ValueError("Can't count objects since or until some date.")
-
         if self._count is None:
             result = rest_request('GET', self.api_url(limit='1'))
             self._count = result['total']
@@ -677,12 +698,15 @@ class BaseApiList(object):
 
 
 class FileList(BaseApiList):
-    """List of File resources.
+    """ List of File resources.
 
-    This class provides iteration over all uploaded files. You can specify:
+    This class provides iteration over all uploaded files.
 
-    - ``since`` -- a datetime object from which objects will be iterated;
-    - ``until`` -- a datetime object to which objects will be iterated;
+    You can specify:
+
+    - ``starting_point`` -- a starting point for filtering files.
+      It is reflects a ``from`` parameter from REST API.
+    - ``ordering`` -- specify the way the files should be sorted.
     - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
     - ``stored`` -- ``True`` to include only stored files,
@@ -691,12 +715,14 @@ class FileList(BaseApiList):
       ``False`` to exclude, ``None`` will not exclude anything.
       The default is ``False``.
 
-    If ``until`` is specified, the order of items will be reversed.
-    It is impossible to specify ``since`` and ``until`` at the same time.
+    Files can't be stored and removed at the same time, such query will
+    always return an empty set.
 
-    Files can't be stored and removed at the same time,
-    such query will always return an empty set.
     But files can be not stored and not removed (just uploaded files).
+
+    More about this REST resource:
+
+        http://uploadcare.com/documentation/rest/#file-files
 
     Usage example::
 
