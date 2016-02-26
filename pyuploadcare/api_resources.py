@@ -597,11 +597,7 @@ class FileGroup(object):
 
 def api_iterator(cls, next_url, limit=None):
     while next_url and limit != 0:
-        try:
-            result = rest_request('GET', next_url)
-        except InvalidRequestError:
-            return
-
+        result = rest_request('GET', next_url)
         working_set = result['results']
         next_url = result['next']
 
@@ -620,20 +616,21 @@ class BaseApiList(object):
     constructor = None
     filters = []
 
-    def __init__(self, **kwargs):
-        self.starting_point = kwargs.pop('starting_point', None)
-        self.ordering = kwargs.pop('ordering', None)
-        self.limit = kwargs.pop('limit', None)
-        self.request_limit = kwargs.pop('request_limit', None)
+    def __init__(self, starting_point=None, ordering=None, limit=None,
+                 request_limit=None, stored=None, removed=None):
+        self.starting_point = starting_point
+        self.ordering = ordering
+        self.limit = limit
+        self.request_limit = request_limit
+        self.stored = stored
+        self.removed = removed
         self._count = None
 
-        for f, default in self.filters:
-            setattr(self, f, kwargs.pop(f, default))
-
-        if kwargs:
-            raise TypeError('Extra arguments: {0}.'.format(
-                ", ".join(kwargs.keys())
-            ))
+        # Makes sure that the value of starting_point a correctly formatted
+        ordering_field = (ordering or '').lstrip('-')
+        if ordering_field in ('', 'datetime_uploaded') and starting_point:
+            self.starting_point = dateutil.parser.parse(
+                six.text_type(starting_point)).isoformat()
 
     def api_url(self, **additional):
         qs = {}
@@ -647,50 +644,23 @@ class BaseApiList(object):
         if self.request_limit:
             qs['limit'] = self.request_limit
 
-        for f, default in self.filters:
-            v = getattr(self, f)
-            if v == default:
-                continue
-            qs[f] = 'none' if v is None else str(bool(v)).lower()
+        if self.stored is not None:
+            qs['stored'] = str(self.stored).lower()
+
+        if self.removed is not None:
+            qs['removed'] = str(self.removed).lower()
 
         qs.update(additional)
 
         return self.base_url + '?' + urlencode(qs)
 
-    @property
-    def starting_point(self):
-        """ Prepare value of the starting_point depending on the
-        current ordering.
-        """
-        if not self.__starting_point:
-            return None
-
-        ordering_field = (self.ordering or '').lstrip('-')
-        error_message = ('Incorrect value of the starting_point when '
-                         'ordering == {0}'.format(self.ordering))
-
-        if not ordering_field or ordering_field == 'datetime_uploaded':
-            try:
-                return dateutil.parser.parse(self.__starting_point).isoformat()
-            except ValueError:
-                raise ValueError(error_message)
-
-        if ordering_field == 'size':
-            try:
-                return int(self.__starting_point)
-            except (ValueError, TypeError):
-                raise ValueError(error_message)
-
-        raise ValueError('{0} is unknown ordering field'.format(self.ordering))
-
-    @starting_point.setter
-    def starting_point(self, value):
-        self.__starting_point = value
-
     def __iter__(self):
         return api_iterator(self.constructor, self.api_url(), self.limit)
 
     def count(self):
+        if self.starting_point:
+            raise ValueError(
+                'Can\'t count objects if the `starting_point` present')
         if self._count is None:
             result = rest_request('GET', self.api_url(limit='1'))
             self._count = result['total']
@@ -706,7 +676,9 @@ class FileList(BaseApiList):
 
     - ``starting_point`` -- a starting point for filtering files.
       It is reflects a ``from`` parameter from REST API.
-    - ``ordering`` -- specify the way the files should be sorted.
+    - ``ordering`` -- a string with name of the field what must be used
+      for sorting files. The actual list of supported fields you can find in
+      documentation: http://uploadcare.com/documentation/rest/#file-files
     - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
     - ``stored`` -- ``True`` to include only stored files,
@@ -719,10 +691,6 @@ class FileList(BaseApiList):
     always return an empty set.
 
     But files can be not stored and not removed (just uploaded files).
-
-    More about this REST resource:
-
-        http://uploadcare.com/documentation/rest/#file-files
 
     Usage example::
 
