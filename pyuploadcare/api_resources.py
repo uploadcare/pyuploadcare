@@ -631,7 +631,7 @@ class BaseApiList(object):
             setattr(self, f, kwargs.pop(f, default))
 
         if kwargs:
-            raise TypeError('Extra arguments: {}.'.format(
+            raise TypeError('Extra arguments: {0}.'.format(
                 ", ".join(kwargs.keys())
             ))
 
@@ -667,7 +667,7 @@ class BaseApiList(object):
 
         ordering_field = (self.ordering or '').lstrip('-')
         error_message = ('Incorrect value of the starting_point when '
-                         'ordering == {}'.format(self.ordering))
+                         'ordering == {0}'.format(self.ordering))
 
         if not ordering_field or ordering_field == 'datetime_uploaded':
             try:
@@ -681,7 +681,7 @@ class BaseApiList(object):
             except (ValueError, TypeError):
                 raise ValueError(error_message)
 
-        raise ValueError('{} is unknown ordering field'.format(self.ordering))
+        raise ValueError('{0} is unknown ordering field'.format(self.ordering))
 
     @starting_point.setter
     def starting_point(self, value):

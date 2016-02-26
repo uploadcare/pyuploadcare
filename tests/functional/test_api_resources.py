@@ -440,7 +440,7 @@ class FileListTestCase(unittest.TestCase):
         for ordering in (None, 'datetime_uploaded', '-datetime_uploaded'):
             f = FileList(starting_point=str(now), ordering=ordering)
             self.assertEqual(f.starting_point, now.isoformat())
-            self.assertTrue('from={}'.format(quote(now.isoformat()))
+            self.assertTrue('from={0}'.format(quote(now.isoformat()))
                             in f.api_url())
 
     def test_starting_point_invalid_datetime_uploaded(self):
