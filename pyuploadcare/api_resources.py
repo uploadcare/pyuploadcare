@@ -631,19 +631,15 @@ class BaseApiList(object):
                 raise ValueError('The starting_point must be a datetime')
             self.starting_point = starting_point.isoformat()
 
-    def api_url(self, **additional):
-        qs = {}
-
+    def api_url(self, **qs):
         if self.starting_point is not None:
-            qs['from'] = self.starting_point
+            qs.setdefault('from', self.starting_point)
 
         if self.ordering is not None:
-            qs['ordering'] = self.ordering
+            qs.setdefault('ordering', self.ordering)
 
         if self.request_limit:
-            qs['limit'] = self.request_limit
-
-        qs.update(additional)
+            qs.setdefault('limit', self.request_limit)
 
         return self.base_url + '?' + urlencode(qs)
 
@@ -703,14 +699,14 @@ class FileList(BaseApiList):
         self.removed = kwargs.pop('removed', None)
         super(FileList, self).__init__(*args, **kwargs)
 
-    def api_url(self, **additional):
+    def api_url(self, **qs):
         if self.stored is not None:
-            additional['stored'] = str(bool(self.stored)).lower()
+            qs.setdefault('stored', str(bool(self.stored)).lower())
 
         if self.removed is not None:
-            additional['removed'] = str(bool(self.removed)).lower()
+            qs.setdefault('removed', str(bool(self.removed)).lower())
 
-        return super(FileList, self).api_url(**additional)
+        return super(FileList, self).api_url(**qs)
 
 
 class FilesStorage(object):
