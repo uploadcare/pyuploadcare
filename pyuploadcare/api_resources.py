@@ -617,13 +617,11 @@ class BaseApiList(object):
     constructor = None
 
     def __init__(self, starting_point=None, ordering=None, limit=None,
-                 request_limit=None, stored=None, removed=None):
+                 request_limit=None):
         self.starting_point = starting_point
         self.ordering = ordering
         self.limit = limit
         self.request_limit = request_limit
-        self.stored = stored
-        self.removed = removed
         self._count = None
 
         # Makes sure that the value of starting_point a correctly formatted
@@ -644,12 +642,6 @@ class BaseApiList(object):
 
         if self.request_limit:
             qs['limit'] = self.request_limit
-
-        if self.stored is not None:
-            qs['stored'] = str(bool(self.stored)).lower()
-
-        if self.removed is not None:
-            qs['removed'] = str(bool(self.removed)).lower()
 
         qs.update(additional)
 
@@ -705,6 +697,20 @@ class FileList(BaseApiList):
     """
     base_url = '/files/'
     constructor = File.construct_from
+
+    def __init__(self, *args, **kwargs):
+        self.stored = kwargs.pop('stored', None)
+        self.removed = kwargs.pop('removed', None)
+        super(FileList, self).__init__(*args, **kwargs)
+
+    def api_url(self, **additional):
+        if self.stored is not None:
+            additional['stored'] = str(bool(self.stored)).lower()
+
+        if self.removed is not None:
+            additional['removed'] = str(bool(self.removed)).lower()
+
+        return super(FileList, self).api_url(**additional)
 
 
 class FilesStorage(object):
