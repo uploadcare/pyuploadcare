@@ -11,8 +11,15 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch, MagicMock
 from dateutil.tz import tzutc
 
+import six
+
+if six.PY3:
+    from urllib.parse import quote
+else:
+    from urllib import quote
+
 from pyuploadcare.api_resources import File, FileGroup, FileList, FilesStorage
-from pyuploadcare.exceptions import InvalidRequestError, InvalidParamError
+from pyuploadcare.exceptions import InvalidParamError
 from .utils import MockResponse, api_response_from_file
 
 
@@ -400,3 +407,63 @@ class FilesStorageTestCase(unittest.TestCase):
             rest_request.assert_any_call('PUT', storage.storage_url, [uuid])
             rest_request.assert_any_call('DELETE', storage.storage_url,
                                          [uuid])
+
+
+class FileListTestCase(unittest.TestCase):
+    def test_starting_point_valid_size(self):
+        f = FileList(starting_point='123', ordering='size')
+        self.assertTrue('from=123' in f.api_url())
+
+        f = FileList(starting_point='123', ordering='-size')
+        self.assertTrue('from=123' in f.api_url())
+
+    def test_starting_point_valid_datetime_uploaded(self):
+        now = datetime.datetime.now()
+
+        for ordering in (None, 'datetime_uploaded', '-datetime_uploaded'):
+            f = FileList(starting_point=now, ordering=ordering)
+            self.assertTrue('from={0}'.format(quote(now.isoformat()))
+                            in f.api_url())
+
+    def test_starting_point_invalid_datetime_uploaded(self):
+        with self.assertRaisesRegexp(
+                ValueError, 'The starting_point must be a datetime'):
+            FileList(starting_point='string', ordering='datetime_uploaded')
+
+    def test_api_url(self):
+        f = FileList(
+            starting_point='123',
+            ordering='size',
+            request_limit=10,
+            stored=True
+        )
+        url = f.api_url()
+        self.assertTrue('from=123' in url)
+        self.assertTrue('ordering=size' in url)
+        self.assertTrue('limit=10' in url)
+        self.assertTrue('stored=true' in url)
+
+    @patch('pyuploadcare.api_resources.rest_request')
+    def test_count(self, rest_request):
+        rest_request.return_value = dict(total=10)
+
+        f = FileList(
+            ordering='size',
+            request_limit=10,
+            stored=True
+        )
+        self.assertEqual(f.count(), 10)
+        self.assertEqual(rest_request.called, 1)
+        self.assertEqual(rest_request.mock_calls[0][1][0], 'GET')
+
+        url = rest_request.mock_calls[0][1][1]
+        self.assertTrue('ordering=size' in url)
+        self.assertTrue('limit=1' in url)
+        self.assertTrue('stored=true' in url)
+
+    def test_count_invalid(self):
+        f = FileList(ordering='size', starting_point='123')
+        with self.assertRaisesRegexp(
+                ValueError,
+                'Can\'t count objects if the `starting_point` present'):
+            f.count()

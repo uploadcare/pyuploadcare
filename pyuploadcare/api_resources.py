@@ -5,6 +5,7 @@ import logging
 import time
 from itertools import islice
 from collections import Iterable
+from datetime import date, datetime
 
 import dateutil.parser
 import six
@@ -595,19 +596,11 @@ class FileGroup(object):
         return group
 
 
-def api_iterator(cls, next_url, reverse, limit=None):
+def api_iterator(cls, next_url, limit=None):
     while next_url and limit != 0:
-        try:
-            result = rest_request('GET', next_url)
-        except InvalidRequestError:
-            return
-
-        if reverse:
-            working_set = reversed(result['results'])
-            next_url = result['previous']
-        else:
-            working_set = result['results']
-            next_url = result['next']
+        result = rest_request('GET', next_url)
+        working_set = result['results']
+        next_url = result['next']
 
         for item in working_set:
             yield cls(item)
@@ -622,54 +615,41 @@ class BaseApiList(object):
     # abstract
     base_url = None
     constructor = None
-    filters = []
 
-    def __init__(self, **kwargs):
-        # Only explicit kwargs are allowed.
-
-        if kwargs.get('since') is not None and kwargs.get('until') is not None:
-            raise TypeError('Only one of since and until arguments is allowed.')
-
-        self.since = kwargs.pop('since', None)
-        self.until = kwargs.pop('until', None)
-        self.limit = kwargs.pop('limit', None)
-        self.request_limit = kwargs.pop('request_limit', None)
+    def __init__(self, starting_point=None, ordering=None, limit=None,
+                 request_limit=None):
+        self.starting_point = starting_point
+        self.ordering = ordering
+        self.limit = limit
+        self.request_limit = request_limit
         self._count = None
 
-        for f, default in self.filters:
-            setattr(self, f, kwargs.pop(f, default))
+        # Makes sure that the value of starting_point a correctly formatted
+        ordering_field = (ordering or '').lstrip('-')
+        if ordering_field in ('', 'datetime_uploaded') and starting_point:
+            if not isinstance(starting_point, (datetime, date)):
+                raise ValueError('The starting_point must be a datetime')
+            self.starting_point = starting_point.isoformat()
 
-        if kwargs:
-            raise TypeError('Extra arguments: {}.'.format(
-                ", ".join(kwargs.keys())
-            ))
+    def api_url(self, **qs):
+        if self.starting_point is not None:
+            qs.setdefault('from', self.starting_point)
 
-    def api_url(self, **additional):
-        qs = {}
-        if self.since is not None:
-            qs['from'] = self.since.isoformat()
-        if self.until is not None:
-            qs['to'] = self.until.isoformat()
+        if self.ordering is not None:
+            qs.setdefault('ordering', self.ordering)
+
         if self.request_limit:
-            qs['limit'] = self.request_limit
-        for f, default in self.filters:
-            v = getattr(self, f)
-            if v == default:
-                continue
-            qs[f] = 'none' if v is None else str(bool(v)).lower()
-        qs.update(additional)
+            qs.setdefault('limit', self.request_limit)
+
         return self.base_url + '?' + urlencode(qs)
 
     def __iter__(self):
-        return api_iterator(
-            self.constructor, self.api_url(),
-            self.until is not None, self.limit,
-        )
+        return api_iterator(self.constructor, self.api_url(), self.limit)
 
     def count(self):
-        if self.since is not None or self.until is not None:
-            raise ValueError("Can't count objects since or until some date.")
-
+        if self.starting_point:
+            raise ValueError(
+                'Can\'t count objects if the `starting_point` present')
         if self._count is None:
             result = rest_request('GET', self.api_url(limit='1'))
             self._count = result['total']
@@ -677,12 +657,17 @@ class BaseApiList(object):
 
 
 class FileList(BaseApiList):
-    """List of File resources.
+    """ List of File resources.
 
-    This class provides iteration over all uploaded files. You can specify:
+    This class provides iteration over all uploaded files.
 
-    - ``since`` -- a datetime object from which objects will be iterated;
-    - ``until`` -- a datetime object to which objects will be iterated;
+    You can specify:
+
+    - ``starting_point`` -- a starting point for filtering files.
+      It is reflects a ``from`` parameter from REST API.
+    - ``ordering`` -- a string with name of the field what must be used
+      for sorting files. The actual list of supported fields you can find in
+      documentation: http://uploadcare.com/documentation/rest/#file-files
     - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
     - ``stored`` -- ``True`` to include only stored files,
@@ -691,11 +676,9 @@ class FileList(BaseApiList):
       ``False`` to exclude, ``None`` will not exclude anything.
       The default is ``False``.
 
-    If ``until`` is specified, the order of items will be reversed.
-    It is impossible to specify ``since`` and ``until`` at the same time.
+    Files can't be stored and removed at the same time, such query will
+    always return an empty set.
 
-    Files can't be stored and removed at the same time,
-    such query will always return an empty set.
     But files can be not stored and not removed (just uploaded files).
 
     Usage example::
@@ -710,7 +693,20 @@ class FileList(BaseApiList):
     """
     base_url = '/files/'
     constructor = File.construct_from
-    filters = [('stored', None), ('removed', False)]
+
+    def __init__(self, *args, **kwargs):
+        self.stored = kwargs.pop('stored', None)
+        self.removed = kwargs.pop('removed', None)
+        super(FileList, self).__init__(*args, **kwargs)
+
+    def api_url(self, **qs):
+        if self.stored is not None:
+            qs.setdefault('stored', str(bool(self.stored)).lower())
+
+        if self.removed is not None:
+            qs.setdefault('removed', str(bool(self.removed)).lower())
+
+        return super(FileList, self).api_url(**qs)
 
 
 class FilesStorage(object):
