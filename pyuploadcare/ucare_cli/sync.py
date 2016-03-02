@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 import os
 import re
-import sys
 import time
 import hashlib
 from math import ceil
@@ -16,7 +15,7 @@ from pyuploadcare import conf
 from pyuploadcare.api import _build_user_agent, rest_request
 from pyuploadcare.api_resources import FileList, File
 from pyuploadcare.ucare_cli.utils import (
-    pprint, promt, int_or_none, bool_or_none
+    pprint, promt, int_or_none, bool_or_none, bar
 )
 
 
@@ -127,55 +126,37 @@ def save_file_locally(fname, response, size):
             lf.write(chunk)
 
 
-def bar(iter_content, parts, title=''):
-    parts = max(float(parts), 1.0)
-    cells = 10
-    progress = 0
-    step = cells / parts
-
-    draw = lambda progress: sys.stdout.write(
-        '\r[{0:10}] {1:.2f}% {2}'.format(
-            '#'*int(progress), progress * cells, title))
-
-    for chunk in iter_content:
-        yield chunk
-
-        progress += step
-        draw(progress)
-        sys.stdout.flush()
-
-    draw(cells)
-    print('')
-
-
 class SessionFileList(FileList):
-    """ A class for saving session of synced files.
-    It gives ability to continue syncing from last savepoint.
+    """ Provides an ability to save current state of iteration if any errors
+    happened during iteration. After that is possible to restore this state
+    and continue from that point.
+
+    Also, this class can transparently iterate over provided list of UUIDs and
+    all list of files of the user.
     """
+    session_restored = False
+
     def __new__(cls, *args, **kwargs):
         parts = text_type(args) + text_type(kwargs)
         cls.signature = hashlib.md5(parts).hexdigest()
         cls._session_filepath = os.path.join(os.path.expanduser('~'),
                                              '.{}.sync'.format(cls.signature))
-        cls.restored = False
 
         if os.path.exists(cls._session_filepath):
             if promt('Continue last sync?'):
                 with open(cls._session_filepath, 'rb') as f:
-                    cls.restored = True
+                    cls.session_restored = True
                     return pickle.load(f)
 
         return FileList.__new__(cls, *args, **kwargs)
 
     def __init__(self, *args, **kwargs):
-        # Session restored. No need a real initialization.
-        if self.restored:
-            return
-
-        self.uuids = kwargs.pop('uuids')
-        self.handled_uuids = []
-        self.last_page_url = None
-        super(SessionFileList, self).__init__(*args, **kwargs)
+        # A session is not restored. So we need to initialize a new object.
+        if not self.session_restored:
+            self.uuids = kwargs.pop('uuids')
+            self.handled_uuids = []
+            self.last_page_url = None
+            super(SessionFileList, self).__init__(*args, **kwargs)
 
     def __enter__(self):
         return self
@@ -185,11 +166,21 @@ class SessionFileList(FileList):
             with open(self._session_filepath, 'wb') as f:
                 pickle.dump(self, f)
             return False
+
+        # Iteration is complete without errors.
+        # Let's delete serialized session if exists.
+        if os.path.exists(self._session_filepath):
+            try:
+                os.remove(self._session_filepath)
+            except OSError:
+                pass
+
         return True
 
     def __iter__(self):
         if self.uuids:
             return self.iter_uuids()
+
         return self.iter_urls(
             self.last_page_url or self.api_url(), self.limit)
 
@@ -197,8 +188,8 @@ class SessionFileList(FileList):
         for uuid in self.uuids:
             if uuid in self.handled_uuids:
                 continue
-            self.handled_uuids.append(uuid)
             yield File(uuid)
+            self.handled_uuids.append(uuid)
 
     def iter_urls(self, next_url, limit=None):
         while next_url and limit != 0:
