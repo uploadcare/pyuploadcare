@@ -136,7 +136,7 @@ class SessionFileList(FileList):
     """
     def __new__(cls, *args, **kwargs):
         parts = text_type(args) + text_type(kwargs)
-        cls.signature = hashlib.md5(parts).hexdigest()
+        cls.signature = hashlib.md5(parts.encode('utf-8')).hexdigest()
         cls._session_filepath = os.path.join(os.path.expanduser('~'),
                                              '.{}.sync'.format(cls.signature))
         cls.session_restored = False
@@ -149,11 +149,10 @@ class SessionFileList(FileList):
 
         return FileList.__new__(cls, *args, **kwargs)
 
-    def __init__(self, uuids=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         # A session is not restored. So we need to initialize a new object.
         if not self.session_restored:
-            # self.uuids = kwargs.pop('uuids', None)
-            self.uuids = uuids
+            self.uuids = kwargs.pop('uuids', None)
             self.handled_uuids = []
             self.last_page_url = None
             super(SessionFileList, self).__init__(*args, **kwargs)

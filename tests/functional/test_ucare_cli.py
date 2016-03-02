@@ -539,7 +539,8 @@ class SessionFileListTestCase(unittest.TestCase):
         """ Fake API response. In total 3 pages: page=0, page=1, page=2
         3 files per page.
         """
-        files = json.loads(api_response_from_file('list_files.json'))
+        files = json.loads(
+            api_response_from_file('list_files.json').decode('utf-8'))
 
         # First iteration
         if not url.startswith('/page='):
