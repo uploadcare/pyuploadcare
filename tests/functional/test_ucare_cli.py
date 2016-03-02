@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 import os
+import json
 try:
     import unittest2 as unittest
 except ImportError:
@@ -15,8 +16,11 @@ from pyuploadcare.ucare_cli import (
     ucare_argparser, get_file, store_files, delete_files, main,
     create_group
 )
-from pyuploadcare.ucare_cli.sync import sync_files, save_file_locally
-from .utils import MockResponse, MockListResponse
+from pyuploadcare.api_resources import File
+from pyuploadcare.ucare_cli.sync import (
+    sync_files, save_file_locally, SessionFileList
+)
+from .utils import MockResponse, MockListResponse, api_response_from_file
 
 
 def arg_namespace(arguments_str):
@@ -474,3 +478,150 @@ class SaveFileLocallyTestCase(unittest.TestCase):
         save_file_locally(self.tmp_file.name, response, 0)
         with open(self.tmp_file.name, 'r') as f:
             self.assertEqual(f.read(), '123')
+
+
+@patch('pyuploadcare.ucare_cli.sync.promt', autospec=True)
+class SessionFileListTestCase(unittest.TestCase):
+    def test_iteration_over_uuids(self, promt):
+        promt.return_value = False
+
+        uuids = ['e16f669c-ecde-421b-8a0c-f6023d25b1e3',
+                 'e16f669c-ecde-421b-8a0c-f6023d25b133']
+
+        files = SessionFileList(uuids=uuids)
+        self.assertEqual(files.session_restored, False)
+
+        for uuid, file_obj in zip(uuids, list(files)):
+            self.assertIsInstance(file_obj, File)
+            self.assertEqual(file_obj.uuid, uuid)
+
+        # Tracking of handled files works
+        self.assertListEqual(files.handled_uuids, uuids)
+
+    def test_uuid_error(self, promt):
+        """ Session saved if error happened.
+        """
+        promt.return_value = False
+
+        uuids = ['e16f669c-ecde-421b-8a0c-f6023d25b1e3',
+                 'e16f669c-ecde-421b-8a0c-f6023d25b133']
+
+        file_list = SessionFileList(uuids=uuids)
+        self.assertEqual(file_list.session_restored, False)
+
+        with self.assertRaises(ValueError):
+            with file_list as files:
+                for i, file in enumerate(files):
+                    if i > 0:
+                        raise ValueError
+                    self.assertEqual(file.uuid, uuids[0])
+
+        # Restore the session
+        promt.return_value = True
+        restored_file_list = SessionFileList(uuids=uuids)
+
+        self.assertEqual(restored_file_list.session_restored, True)
+
+        # Old and restored sessions has an equal state
+        self.assertListEqual(file_list.handled_uuids,
+                             restored_file_list.handled_uuids)
+
+        # Iteration continued
+        with restored_file_list as files:
+            for file in files:
+                self.assertEqual(file.uuid, uuids[1])
+
+        # After successful iteration the serialized session is deleted
+        self.assertFalse(os.path.exists(restored_file_list._session_filepath))
+
+    @staticmethod
+    def _rest_request_side_effect(method, url):
+        """ Fake API response. In total 3 pages: page=0, page=1, page=2
+        3 files per page.
+        """
+        files = json.loads(api_response_from_file('list_files.json'))
+
+        # First iteration
+        if not url.startswith('/page='):
+            return dict(results=files[:3], next='/page=1')
+
+        page = int(url.strip('/page='))
+
+        if page == 1:
+            return dict(results=files[3:6], next='/page=2')
+
+        return dict(results=files[6:9], next=None)
+
+    # UUIDs from the list_files.json
+    list_files_uuids = [
+        # page=0
+        "e16f669c-ecde-421b-8a0c-f6023d25b1e3",
+        "ff77605d-ac18-4140-9912-cf58d9d8da98",
+        "11e3f3de-ee6e-4f19-b924-988da86951a4",
+        # page=1
+        "683ba092-639a-4b66-b98b-33f77c34b030",
+        "da5f7610-213a-42b1-944a-922a2e5510ee",
+        "bbd35834-5a6f-4fb2-a628-7ddc1c444f2b",
+        # page=2
+        "dd536a15-a6a2-43a3-8eae-04513e66118d",
+        "a4a79b35-01ed-4e83-ad5c-6bf155a31ed5",
+        "1a73ee75-56fa-4143-8ff0-f9f44f3cacd8",
+    ]
+
+    @patch('pyuploadcare.ucare_cli.sync.rest_request', autospec=True)
+    def test_iteration_over_files(self, rest_request, promt):
+        promt.return_value = False
+        rest_request.side_effect = self._rest_request_side_effect
+
+        file_list = SessionFileList()
+        self.assertEqual(file_list.session_restored, False)
+
+        for uuid, file_obj in zip(self.list_files_uuids, list(file_list)):
+            self.assertIsInstance(file_obj, File)
+            self.assertEqual(file_obj.uuid, uuid)
+
+        # The last page saved
+        self.assertEqual(file_list.last_page_url, '/page=2')
+
+    @patch('pyuploadcare.ucare_cli.sync.rest_request', autospec=True)
+    def test_iteration_over_files_error(self, rest_request, promt):
+        promt.return_value = False
+        rest_request.side_effect = self._rest_request_side_effect
+
+        file_list = SessionFileList()
+        self.assertEqual(file_list.session_restored, False)
+
+        with self.assertRaises(ValueError):
+            # Raise an error on the page=1
+            with file_list as files:
+                for i, file in enumerate(files):
+                    if i > 4:
+                        raise ValueError
+                    self.assertEqual(file.uuid, self.list_files_uuids[i])
+
+        # Saved correct page
+        self.assertEqual(file_list.last_page_url, '/page=1')
+
+        # Several files from the page=1 already handled
+        self.assertListEqual(file_list.handled_uuids,
+                             self.list_files_uuids[3:i])
+
+        # Restore the session
+        promt.return_value = True
+        restored_file_list = SessionFileList()
+
+        self.assertEqual(restored_file_list.session_restored, True)
+
+        # Old and restored sessions has equal state
+        self.assertEqual(file_list.last_page_url,
+                         restored_file_list.last_page_url)
+        self.assertListEqual(file_list.handled_uuids,
+                             restored_file_list.handled_uuids)
+
+        # Iteration continued
+        with restored_file_list as files:
+            for i, file in enumerate(files):
+                self.assertEqual(file.uuid, self.list_files_uuids[3:][i])
+
+        # After successful iteration the serialized session is deleted
+        self.assertFalse(os.path.exists(restored_file_list._session_filepath))

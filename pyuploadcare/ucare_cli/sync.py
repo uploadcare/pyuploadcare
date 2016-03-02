@@ -134,13 +134,12 @@ class SessionFileList(FileList):
     Also, this class can transparently iterate over provided list of UUIDs and
     all list of files of the user.
     """
-    session_restored = False
-
     def __new__(cls, *args, **kwargs):
         parts = text_type(args) + text_type(kwargs)
         cls.signature = hashlib.md5(parts).hexdigest()
         cls._session_filepath = os.path.join(os.path.expanduser('~'),
                                              '.{}.sync'.format(cls.signature))
+        cls.session_restored = False
 
         if os.path.exists(cls._session_filepath):
             if promt('Continue last sync?'):
@@ -150,10 +149,11 @@ class SessionFileList(FileList):
 
         return FileList.__new__(cls, *args, **kwargs)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, uuids=None, *args, **kwargs):
         # A session is not restored. So we need to initialize a new object.
         if not self.session_restored:
-            self.uuids = kwargs.pop('uuids')
+            # self.uuids = kwargs.pop('uuids', None)
+            self.uuids = uuids
             self.handled_uuids = []
             self.last_page_url = None
             super(SessionFileList, self).__init__(*args, **kwargs)
@@ -194,13 +194,18 @@ class SessionFileList(FileList):
     def iter_urls(self, next_url, limit=None):
         while next_url and limit != 0:
             self.last_page_url = next_url
+            self.handled_uuids = []
 
             result = rest_request('GET', next_url)
             working_set = result['results']
             next_url = result['next']
 
             for item in working_set:
-                yield self.constructor(item)
+                obj = self.constructor(item)
+
+                if obj.uuid not in self.handled_uuids:
+                    yield obj
+                    self.handled_uuids.append(obj.uuid)
 
                 if limit is not None:
                     limit -= 1
