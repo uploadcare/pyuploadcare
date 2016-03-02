@@ -359,6 +359,19 @@ class CreateFileGroupTest(unittest.TestCase):
 @patch('os.path.exists', autospec=True)
 @patch('requests.sessions.Session.request', autospec=True)
 class UcareSyncTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(UcareSyncTestCase, cls).setUpClass()
+        # Disable session restore
+        cls.promt_patch = patch('pyuploadcare.ucare_cli.sync.promt')
+        cls.promt = cls.promt_patch.start()
+        cls.promt.return_value = False
+
+    @classmethod
+    def tearDownClass(cls):
+        super(UcareSyncTestCase, cls).tearDownClass()
+        cls.promt_patch.stop()
+
     @property
     def default_response(self):
         return MockListResponse.from_file('list_files.json')
