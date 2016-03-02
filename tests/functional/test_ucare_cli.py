@@ -13,8 +13,9 @@ from pyuploadcare import conf
 from pyuploadcare.exceptions import InvalidRequestError
 from pyuploadcare.ucare_cli import (
     ucare_argparser, get_file, store_files, delete_files, main,
-    create_group, sync_files, save_file_locally
+    create_group
 )
+from pyuploadcare.ucare_cli.sync import sync_files, save_file_locally
 from .utils import MockResponse, MockListResponse
 
 
@@ -353,7 +354,7 @@ class CreateFileGroupTest(unittest.TestCase):
         )
 
 
-@patch('pyuploadcare.ucare_cli.save_file_locally', autospec=True)
+@patch('pyuploadcare.ucare_cli.sync.save_file_locally', autospec=True)
 @patch('os.makedirs', autospec=True)
 @patch('os.path.exists', autospec=True)
 @patch('requests.sessions.Session.request', autospec=True)
