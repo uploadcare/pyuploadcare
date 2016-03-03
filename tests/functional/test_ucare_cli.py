@@ -18,7 +18,7 @@ from pyuploadcare.ucare_cli import (
 )
 from pyuploadcare.api_resources import File
 from pyuploadcare.ucare_cli.sync import (
-    sync_files, save_file_locally, SessionFileList
+    sync_files, save_file_locally, TrackedFileList, SyncSession
 )
 from .utils import MockResponse, MockListResponse, api_response_from_file
 
@@ -481,22 +481,22 @@ class SaveFileLocallyTestCase(unittest.TestCase):
 
 
 @patch('pyuploadcare.ucare_cli.sync.promt', autospec=True)
-class SessionFileListTestCase(unittest.TestCase):
+class TrackedFileListTestCase(unittest.TestCase):
     def test_iteration_over_uuids(self, promt):
         promt.return_value = False
 
         uuids = ['e16f669c-ecde-421b-8a0c-f6023d25b1e3',
                  'e16f669c-ecde-421b-8a0c-f6023d25b133']
 
-        files = SessionFileList(uuids=uuids)
-        self.assertEqual(files.session_restored, False)
+        file_list = TrackedFileList(uuids=uuids)
 
-        for uuid, file_obj in zip(uuids, list(files)):
-            self.assertIsInstance(file_obj, File)
-            self.assertEqual(file_obj.uuid, uuid)
+        with SyncSession(file_list) as files:
+            for uuid, file_obj in zip(uuids, list(files)):
+                self.assertIsInstance(file_obj, File)
+                self.assertEqual(file_obj.uuid, uuid)
 
-        # Tracking of handled files works
-        self.assertListEqual(files.handled_uuids, uuids)
+            # Tracking of handled files works
+            self.assertListEqual(files.handled_uuids, uuids)
 
     def test_uuid_error(self, promt):
         """ Session saved if error happened.
@@ -506,11 +506,11 @@ class SessionFileListTestCase(unittest.TestCase):
         uuids = ['e16f669c-ecde-421b-8a0c-f6023d25b1e3',
                  'e16f669c-ecde-421b-8a0c-f6023d25b133']
 
-        file_list = SessionFileList(uuids=uuids)
-        self.assertEqual(file_list.session_restored, False)
+        file_list = TrackedFileList(uuids=uuids)
+        session1 = SyncSession(file_list)
 
-        with self.assertRaises(ValueError):
-            with file_list as files:
+        with session1 as files:
+            with self.assertRaises(ValueError):
                 for i, file in enumerate(files):
                     if i > 0:
                         raise ValueError
@@ -518,21 +518,18 @@ class SessionFileListTestCase(unittest.TestCase):
 
         # Restore the session
         promt.return_value = True
-        restored_file_list = SessionFileList(uuids=uuids)
+        session2 = SyncSession(file_list)
+        with session2 as restored_files:
+            # Old and restored sessions has an equal state
+            self.assertListEqual(file_list.handled_uuids,
+                                 restored_files.handled_uuids)
 
-        self.assertEqual(restored_file_list.session_restored, True)
-
-        # Old and restored sessions has an equal state
-        self.assertListEqual(file_list.handled_uuids,
-                             restored_file_list.handled_uuids)
-
-        # Iteration continued
-        with restored_file_list as files:
+            # Iteration continued
             for file in files:
                 self.assertEqual(file.uuid, uuids[1])
 
         # After successful iteration the serialized session is deleted
-        self.assertFalse(os.path.exists(restored_file_list._session_filepath))
+        self.assertFalse(os.path.exists(session2.session_filepath))
 
     @staticmethod
     def _rest_request_side_effect(method, url):
@@ -574,55 +571,49 @@ class SessionFileListTestCase(unittest.TestCase):
         promt.return_value = False
         rest_request.side_effect = self._rest_request_side_effect
 
-        file_list = SessionFileList()
-        self.assertEqual(file_list.session_restored, False)
+        with SyncSession(TrackedFileList()) as files:
+            for uuid, file_obj in zip(self.list_files_uuids, files):
+                self.assertIsInstance(file_obj, File)
+                self.assertEqual(file_obj.uuid, uuid)
 
-        for uuid, file_obj in zip(self.list_files_uuids, list(file_list)):
-            self.assertIsInstance(file_obj, File)
-            self.assertEqual(file_obj.uuid, uuid)
-
-        # The last page saved
-        self.assertEqual(file_list.last_page_url, '/page=2')
+            # The last page saved
+            self.assertEqual(files.last_page_url, '/page=2')
 
     @patch('pyuploadcare.ucare_cli.sync.rest_request', autospec=True)
     def test_iteration_over_files_error(self, rest_request, promt):
         promt.return_value = False
         rest_request.side_effect = self._rest_request_side_effect
 
-        file_list = SessionFileList()
-        self.assertEqual(file_list.session_restored, False)
+        file_list = TrackedFileList()
 
-        with self.assertRaises(ValueError):
-            # Raise an error on the page=1
-            with file_list as files:
+        session1 = SyncSession(file_list)
+        with session1 as files:
+            with self.assertRaises(ValueError):
+                # Raise an error on the page=1
                 for i, file in enumerate(files):
                     if i > 4:
                         raise ValueError
                     self.assertEqual(file.uuid, self.list_files_uuids[i])
 
-        # Saved correct page
-        self.assertEqual(file_list.last_page_url, '/page=1')
+            # Saved correct page
+            self.assertEqual(files.last_page_url, '/page=1')
 
-        # Several files from the page=1 already handled
-        self.assertListEqual(file_list.handled_uuids,
-                             self.list_files_uuids[3:i])
+            # Several files from the page=1 already handled
+            self.assertListEqual(files.handled_uuids,
+                                 self.list_files_uuids[3:i])
 
         # Restore the session
         promt.return_value = True
-        restored_file_list = SessionFileList()
+        session2 = SyncSession(file_list)
+        files_left = self.list_files_uuids[i:]
 
-        self.assertEqual(restored_file_list.session_restored, True)
+        with session2 as files:
+            # Old and restored sessions has equal state
+            self.assertEqual(file_list.last_page_url, files.last_page_url)
+            self.assertListEqual(file_list.handled_uuids, files.handled_uuids)
 
-        # Old and restored sessions has equal state
-        self.assertEqual(file_list.last_page_url,
-                         restored_file_list.last_page_url)
-        self.assertListEqual(file_list.handled_uuids,
-                             restored_file_list.handled_uuids)
-
-        # Iteration continued
-        with restored_file_list as files:
             for i, file in enumerate(files):
-                self.assertEqual(file.uuid, self.list_files_uuids[3:][i])
+                self.assertEqual(file.uuid, files_left[i])
 
         # After successful iteration the serialized session is deleted
-        self.assertFalse(os.path.exists(restored_file_list._session_filepath))
+        self.assertFalse(os.path.exists(session2.session_filepath))

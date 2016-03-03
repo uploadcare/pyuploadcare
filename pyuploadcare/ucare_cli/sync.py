@@ -69,7 +69,7 @@ def sync_files(arg_namespace):
             request_limit=arg_namespace.request_limit,
         ))
 
-    with SessionFileList(**kwargs) as files:
+    with SyncSession(TrackedFileList(**kwargs)) as files:
         for f in files:
             if f.is_image() and arg_namespace.effects:
                 f.default_effects = arg_namespace.effects.lstrip('-/')
@@ -126,55 +126,55 @@ def save_file_locally(fname, response, size):
             lf.write(chunk)
 
 
-class SessionFileList(FileList):
+class SyncSession(object):
     """ Provides an ability to save current state of iteration if any errors
     happened during iteration. After that is possible to restore this state
     and continue from that point.
-
-    Also, this class can transparently iterate over provided list of UUIDs and
-    all list of files of the user.
     """
-    def __new__(cls, *args, **kwargs):
-        parts = text_type(args) + text_type(kwargs)
-        cls.signature = hashlib.md5(parts.encode('utf-8')).hexdigest()
-        cls._session_filepath = os.path.join(os.path.expanduser('~'),
-                                             '.{}.sync'.format(cls.signature))
-        cls.session_restored = False
+    def __init__(self, file_list):
+        parts = text_type(file_list.__dict__)
+        self.session = file_list
+        self.signature = hashlib.md5(parts.encode('utf-8')).hexdigest()
+        self.session_filepath = os.path.join(
+            os.path.expanduser('~'),
+            '.{0}.sync'.format(self.signature))
 
-        if os.path.exists(cls._session_filepath):
+        # If the serialized session is exists load it and set as current
+        if os.path.exists(self.session_filepath):
             if promt('Continue last sync?'):
-                with open(cls._session_filepath, 'rb') as f:
-                    cls.session_restored = True
-                    return pickle.load(f)
-
-        return FileList.__new__(cls, *args, **kwargs)
-
-    def __init__(self, *args, **kwargs):
-        # A session is not restored. So we need to initialize a new object.
-        if not self.session_restored:
-            self.uuids = kwargs.pop('uuids', None)
-            self.handled_uuids = []
-            self.last_page_url = None
-            super(SessionFileList, self).__init__(*args, **kwargs)
+                with open(self.session_filepath, 'rb') as f:
+                    self.session = pickle.load(f)
+                    return
 
     def __enter__(self):
-        return self
+        return self.session
 
     def __exit__(self, *args):
         if all(args):
-            with open(self._session_filepath, 'wb') as f:
-                pickle.dump(self, f)
+            with open(self.session_filepath, 'wb') as f:
+                pickle.dump(self.session, f)
             return False
 
         # Iteration is complete without errors.
         # Let's delete serialized session if exists.
-        if os.path.exists(self._session_filepath):
+        if os.path.exists(self.session_filepath):
             try:
-                os.remove(self._session_filepath)
+                os.remove(self.session_filepath)
             except OSError:
                 pass
 
         return True
+
+
+class TrackedFileList(FileList):
+    """ Transparently iterate over provided list of UUIDs and all list
+    of files of the user. Saves current state of iteration.
+    """
+    def __init__(self, *args, **kwargs):
+        self.uuids = kwargs.pop('uuids', None)
+        self.handled_uuids = []
+        self.last_page_url = None
+        super(TrackedFileList, self).__init__(*args, **kwargs)
 
     def __iter__(self):
         if self.uuids:
@@ -193,7 +193,6 @@ class SessionFileList(FileList):
     def iter_urls(self, next_url, limit=None):
         while next_url and limit != 0:
             self.last_page_url = next_url
-            self.handled_uuids = []
 
             result = rest_request('GET', next_url)
             working_set = result['results']
@@ -210,6 +209,8 @@ class SessionFileList(FileList):
                     limit -= 1
                     if limit == 0:
                         return
+
+            self.handled_uuids = []
 
 
 def add_sync_files_parser(subparsers):
