@@ -1,6 +1,6 @@
 from django.db import models
 
-from pyuploadcare.dj import FileField, ImageField, ImageGroupField
+from pyuploadcare.dj.models import FileField, ImageField, ImageGroupField
 
 
 class Gallery(models.Model):
