@@ -689,7 +689,7 @@ class FileList(BaseApiList):
     Usage example::
 
         >>> for f in FileList(removed=None):
-        >>>     print f.datetime_uploaded()
+        >>>     print(f.datetime_uploaded())
 
     Count objects::
 
@@ -789,7 +789,7 @@ class GroupList(BaseApiList):
         >>> from datetime import datetime, timedelta
         >>> last_week = datetime.now() - timedelta(weeks=1)
         >>> for f in GroupList(starting_point=last_week):
-        >>>     print f.datetime_created()
+        >>>     print(f.datetime_created())
 
     Count objects::
 

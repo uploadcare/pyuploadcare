@@ -36,7 +36,7 @@ bool_settings = (
 
 
 def _list(api_list_class, arg_namespace, **extra):
-    """ A common function for building methods of the `list showing`.
+    """ A common function for building methods of the "list showing".
     """
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or '').lstrip('-')
