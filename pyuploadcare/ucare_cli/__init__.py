@@ -40,7 +40,7 @@ def _list(api_list_class, arg_namespace, **extra):
     """
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or '').lstrip('-')
-        if ordering_field in ('', 'datetime_uploaded'):
+        if ordering_field in ('', 'datetime_uploaded', 'datetime_created'):
             arg_namespace.starting_point = parser.parse(
                 arg_namespace.starting_point)
 
