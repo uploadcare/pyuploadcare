@@ -621,12 +621,12 @@ class BaseApiList(object):
     def __init__(self, starting_point=None, ordering=None, limit=None,
                  request_limit=None):
         self.starting_point = starting_point
-        self.ordering = ordering or ''
+        self.ordering = ordering
         self.limit = limit
         self.request_limit = request_limit
         self._count = None
 
-        ordering_field = self.ordering.lstrip('-')
+        ordering_field = (self.ordering or '').lstrip('-')
         datetime_fields = self.datetime_ordering_fields or ()
 
         if self.starting_point and ordering_field in datetime_fields:
