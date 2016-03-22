@@ -9,6 +9,7 @@ except ImportError:
 from tempfile import NamedTemporaryFile
 
 from mock import patch, MagicMock, Mock
+from dateutil import parser
 
 from pyuploadcare import conf
 from pyuploadcare.exceptions import InvalidRequestError
@@ -27,9 +28,8 @@ def arg_namespace(arguments_str):
     return ucare_argparser().parse_args(arguments_str.split())
 
 
+@patch('requests.sessions.Session.request', autospec=True)
 class UcareGetTest(unittest.TestCase):
-
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_get_by_uuid(self, request):
         request.return_value = MockResponse(status=200)
 
@@ -40,7 +40,6 @@ class UcareGetTest(unittest.TestCase):
             ('GET', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
         )
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_get_by_cdn_url(self, request):
         request.return_value = MockResponse(status=200)
 
@@ -620,3 +619,50 @@ class TrackedFileListTestCase(unittest.TestCase):
 
         # After successful iteration the serialized session is deleted
         self.assertFalse(os.path.exists(session2.session_filepath))
+
+
+@patch('pyuploadcare.ucare_cli.pprint')
+@patch('pyuploadcare.ucare_cli.GroupList')
+class ListGroupsTestCase(unittest.TestCase):
+    def test_calling_without_params(self, GroupList, pprint):
+        instance = self.make_group_list(GroupList)
+        main(arg_namespace('list_groups'))
+
+        GroupList.assert_called_once_with(
+            starting_point=None,
+            ordering=None,
+            limit=100,
+            request_limit=100
+        )
+        pprint.assert_called_once_with(list(instance))
+
+    def test_calling_with_params(self, GroupList, pprint):
+        instance = self.make_group_list(GroupList)
+        main(arg_namespace('list_groups '
+                           '--starting_point=2015-10-21 '
+                           '--ordering=-datetime_created '
+                           '--limit 10 '
+                           '--request_limit 5'))
+
+        GroupList.assert_called_once_with(
+            starting_point=parser.parse('2015-10-21'),
+            ordering='-datetime_created',
+            limit=10,
+            request_limit=5
+        )
+        pprint.assert_called_once_with(list(instance))
+
+    def test_empty_result(self, GroupList, pprint):
+        instance = self.make_group_list(GroupList, list_groups=[])
+        main(arg_namespace('list_groups'))
+        self.assertTrue(GroupList.called)
+        pprint.assert_called_once_with(list(instance))
+
+    def make_group_list(self, GroupList, list_groups=None):
+        if list_groups is None:
+            list_groups = json.loads(
+                api_response_from_file('list_groups.json').decode('utf-8'))
+
+        instance = GroupList.return_value
+        instance.__iter__.side_effect = lambda *args: iter(list_groups)
+        return instance
