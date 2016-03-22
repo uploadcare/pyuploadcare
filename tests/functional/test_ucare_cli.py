@@ -144,7 +144,7 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_pub_key(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--pub_key demopublickey list'))
+        main(arg_namespace('--pub_key demopublickey list_files'))
 
         self.assertEqual(conf.pub_key, 'demopublickey')
 
@@ -152,7 +152,7 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_secret(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--secret demosecretkey list'))
+        main(arg_namespace('--secret demosecretkey list_files'))
 
         self.assertEqual(conf.secret, 'demosecretkey')
 
@@ -160,7 +160,8 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_api_base(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--api_base https://uploadcare.com/api/ list'))
+        main(arg_namespace(
+            '--api_base https://uploadcare.com/api/ list_files'))
 
         self.assertEqual(conf.api_base, 'https://uploadcare.com/api/')
 
@@ -168,7 +169,8 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_upload_base(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--upload_base https://uploadcare.com/upload/ list'))
+        main(arg_namespace(
+            '--upload_base https://uploadcare.com/upload/ list_files'))
 
         self.assertEqual(conf.upload_base, 'https://uploadcare.com/upload/')
 
@@ -176,27 +178,27 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_verify_api_ssl(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('list'))
+        main(arg_namespace('list_files'))
         self.assertTrue(conf.verify_api_ssl)
 
-        main(arg_namespace('--no_check_api_certificate list'))
+        main(arg_namespace('--no_check_api_certificate list_files'))
         self.assertFalse(conf.verify_api_ssl)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_verify_upload_ssl(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('list'))
+        main(arg_namespace('list_files'))
         self.assertTrue(conf.verify_upload_ssl)
 
-        main(arg_namespace('--no_check_upload_certificate list'))
+        main(arg_namespace('--no_check_upload_certificate list_files'))
         self.assertFalse(conf.verify_upload_ssl)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_api_version(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--api_version 0.777 list'))
+        main(arg_namespace('--api_version 0.777 list_files'))
 
         self.assertEqual(conf.api_version, '0.777')
 
@@ -226,7 +228,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('list'), [self.tmp_config_file.name])
+        main(arg_namespace('list_files'), [self.tmp_config_file.name])
 
         self.assertEqual(conf.pub_key, 'demopublickey')
 
@@ -247,7 +249,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         second_tmp_conf_file.close()
 
-        main(arg_namespace('list'),
+        main(arg_namespace('list_files'),
              [self.tmp_config_file.name, second_tmp_conf_file.name])
 
         self.assertEqual(conf.pub_key, 'demopublickey_modified')
@@ -269,7 +271,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         second_tmp_conf_file.close()
 
-        main(arg_namespace('list'),
+        main(arg_namespace('list_files'),
              [self.tmp_config_file.name, second_tmp_conf_file.name])
 
         self.assertEqual(conf.pub_key, 'demopublickey')
@@ -284,7 +286,8 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('--pub_key pub list'), [self.tmp_config_file.name])
+        main(arg_namespace('--pub_key pub list_files'),
+             [self.tmp_config_file.name])
 
         self.assertEqual(conf.pub_key, 'pub')
 
@@ -298,7 +301,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('list'), [self.tmp_config_file.name])
+        main(arg_namespace('list_files'), [self.tmp_config_file.name])
 
         self.assertFalse(conf.verify_api_ssl)
 
@@ -312,7 +315,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('list'), [self.tmp_config_file.name])
+        main(arg_namespace('list_files'), [self.tmp_config_file.name])
 
         self.assertTrue(conf.verify_api_ssl)
 
@@ -326,7 +329,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('--no_check_api_certificate list'),
+        main(arg_namespace('--no_check_api_certificate list_files'),
              [self.tmp_config_file.name])
 
         self.assertFalse(conf.verify_api_ssl)

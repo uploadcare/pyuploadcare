@@ -10,7 +10,9 @@ from six.moves import configparser
 from dateutil import parser
 
 from pyuploadcare import conf, __version__
-from pyuploadcare.api_resources import File, FileGroup, FileList, FilesStorage
+from pyuploadcare.api_resources import (
+    File, FileGroup, FileList, FilesStorage, GroupList
+)
 from pyuploadcare.exceptions import (
     UploadcareException, TimeoutError, UploadError
 )
@@ -33,27 +35,37 @@ bool_settings = (
 )
 
 
-def list_files(arg_namespace):
+def _list(api_list_class, arg_namespace, **extra):
+    """ A common function for building methods of the `list showing`.
+    """
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or '').lstrip('-')
         if ordering_field in ('', 'datetime_uploaded'):
             arg_namespace.starting_point = parser.parse(
                 arg_namespace.starting_point)
 
-    files = FileList(
+    items = api_list_class(
         starting_point=arg_namespace.starting_point,
         ordering=arg_namespace.ordering,
         limit=arg_namespace.limit,
-        stored=arg_namespace.stored,
-        removed=arg_namespace.removed,
         request_limit=arg_namespace.request_limit,
+        **extra
     )
-    files.constructor = lambda x: x
+    items.constructor = lambda x: x
 
     try:
-        pprint(list(files))
+        pprint(list(items))
     except ValueError as e:
         print(e)
+
+
+def list_files(arg_namespace):
+    return _list(FileList, arg_namespace,
+                 stored=arg_namespace.stored, removed=arg_namespace.removed)
+
+
+def list_groups(arg_namespace):
+    return _list(GroupList, arg_namespace)
 
 
 def get_file(arg_namespace):
@@ -156,8 +168,8 @@ def ucare_argparser():
 
     subparsers = parser.add_subparsers()
 
-    # list
-    subparser = subparsers.add_parser('list', help='list all files')
+    # files list
+    subparser = subparsers.add_parser('list_files', help='list all files')
     subparser.set_defaults(func=list_files)
     subparser.add_argument(
         '--starting_point',
@@ -177,6 +189,22 @@ def ucare_argparser():
     subparser.add_argument('--removed', help='filter removed files',
                            choices=[True, False, None],
                            type=bool_or_none, default=False)
+
+    # groups list
+    subparser = subparsers.add_parser('list_groups', help='list all groups')
+    subparser.set_defaults(func=list_groups)
+    subparser.add_argument(
+        '--starting_point',
+        help='a starting point for filtering groups',
+        action='store')
+    subparser.add_argument(
+        '--ordering',
+        help='specify the way the groups should be sorted',
+        action='store')
+    subparser.add_argument('--limit', help='group to show', default=100,
+                           type=int_or_none)
+    subparser.add_argument('--request_limit', help='groups per request',
+                           default=100, type=int_or_none)
 
     # get
     subparser = subparsers.add_parser('get', help='get file info')
