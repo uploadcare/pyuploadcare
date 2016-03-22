@@ -57,17 +57,6 @@ File List API Resource
    :members:
    :undoc-members:
 
-   .. attribute:: since
-
-   .. attribute:: until
-
-   .. attribute:: count
-
-   .. attribute:: stored
-
-   .. attribute:: removed
-
-
 .. _core_api-grouplist-ref:
 
 Group List API Resource
@@ -76,13 +65,6 @@ Group List API Resource
 .. autoclass:: pyuploadcare.api_resources.GroupList
    :members:
    :undoc-members:
-
-   .. attribute:: since
-
-   .. attribute:: until
-
-   .. attribute:: count
-
 
 .. _core_api-api-ref:
 
