@@ -698,7 +698,7 @@ class FileList(BaseApiList):
     """
     base_url = '/files/'
     constructor = File.construct_from
-    datetime_ordering_fields = ('', 'datetime_uploaded')
+    datetime_ordering_fields = ['', 'datetime_uploaded']
 
     def __init__(self, *args, **kwargs):
         self.stored = kwargs.pop('stored', None)
@@ -798,4 +798,4 @@ class GroupList(BaseApiList):
     """
     base_url = '/groups/'
     constructor = FileGroup.construct_from
-    datetime_ordering_fields = ('', 'datetime_created')
+    datetime_ordering_fields = ['', 'datetime_created']
