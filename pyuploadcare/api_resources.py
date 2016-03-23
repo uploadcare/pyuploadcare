@@ -620,19 +620,27 @@ class BaseApiList(object):
 
     def __init__(self, starting_point=None, ordering=None, limit=None,
                  request_limit=None):
-        self.starting_point = starting_point
         self.ordering = ordering
         self.limit = limit
         self.request_limit = request_limit
+        self.starting_point = starting_point
         self._count = None
 
-        ordering_field = (self.ordering or '').lstrip('-')
-        datetime_fields = self.datetime_ordering_fields or ()
+    @property
+    def starting_point(self):
+        return self._starting_point
 
-        if self.starting_point and ordering_field in datetime_fields:
-            if not isinstance(starting_point, (datetime, date)):
+    @starting_point.setter
+    def starting_point(self, value):
+        ordering_field = (self.ordering or '').lstrip('-')
+        datetime_fields = self.datetime_ordering_fields or []
+
+        if value and ordering_field in datetime_fields:
+            if not isinstance(value, (datetime, date)):
                 raise ValueError('The starting_point must be a datetime')
-            self.starting_point = starting_point.isoformat()
+            value = value.isoformat()
+
+        self._starting_point = value
 
     def api_url(self, **qs):
         if self.starting_point is not None:
