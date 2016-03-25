@@ -10,7 +10,7 @@ Settings
 --------
 
 Besides required ``pub_key``, ``secret`` settings there are optional settings,
-for example, ``widget_version`` or ``widget_variant``:
+for example, ``widget_version`` or ``widget_build``:
 
 .. code-block:: python
 
@@ -18,7 +18,7 @@ for example, ``widget_version`` or ``widget_variant``:
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
         'widget_version': '2.5.0',
-        'widget_variant': 'min',  // without jQuery
+        'widget_build': 'min',  // without jQuery
         'cdn_base': 'https://cdn.mycompany.com',
     }
 
