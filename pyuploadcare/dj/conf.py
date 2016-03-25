@@ -24,7 +24,7 @@ if 'cdn_base' in settings.UPLOADCARE:
     conf.cdn_base = settings.UPLOADCARE['cdn_base']
 
 
-widget_version = settings.UPLOADCARE.get('widget_version', '2.8.1')
+widget_version = settings.UPLOADCARE.get('widget_version', '2.8.x')
 widget_build = settings.UPLOADCARE.get(
     'widget_build',
     settings.UPLOADCARE.get('widget_variant', 'full.min'))
