@@ -24,8 +24,8 @@ if 'cdn_base' in settings.UPLOADCARE:
     conf.cdn_base = settings.UPLOADCARE['cdn_base']
 
 
-widget_version = settings.UPLOADCARE.get('widget_version', '2.5.5')
 widget_build = settings.UPLOADCARE.get('widget_build', 'full.min')
+widget_version = settings.UPLOADCARE.get('widget_version', '2.8.1')
 widget_filename = 'uploadcare.{0}.js'.format(widget_build).replace('..', '.')
 
 hosted_url = (
