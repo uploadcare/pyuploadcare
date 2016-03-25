@@ -616,7 +616,7 @@ class BaseApiList(object):
     base_url = None
     constructor = None
     # ordering fields names which must be handled as datetime
-    datetime_ordering_fields = None
+    datetime_ordering_fields = ()
 
     def __init__(self, starting_point=None, ordering=None, limit=None,
                  request_limit=None):
@@ -633,7 +633,7 @@ class BaseApiList(object):
     @starting_point.setter
     def starting_point(self, value):
         ordering_field = (self.ordering or '').lstrip('-')
-        datetime_fields = self.datetime_ordering_fields or []
+        datetime_fields = self.datetime_ordering_fields
 
         if value and ordering_field in datetime_fields:
             if not isinstance(value, (datetime, date)):
@@ -706,7 +706,7 @@ class FileList(BaseApiList):
     """
     base_url = '/files/'
     constructor = File.construct_from
-    datetime_ordering_fields = ['', 'datetime_uploaded']
+    datetime_ordering_fields = ('', 'datetime_uploaded')
 
     def __init__(self, *args, **kwargs):
         self.stored = kwargs.pop('stored', None)
@@ -806,4 +806,4 @@ class GroupList(BaseApiList):
     """
     base_url = '/groups/'
     constructor = FileGroup.construct_from
-    datetime_ordering_fields = ['', 'datetime_created']
+    datetime_ordering_fields = ('', 'datetime_created')
