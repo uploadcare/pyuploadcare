@@ -27,10 +27,9 @@ if 'cdn_base' in settings.UPLOADCARE:
 widget_version = settings.UPLOADCARE.get('widget_version', '2.5.5')
 widget_variant = settings.UPLOADCARE.get('widget_variant', 'full.min')
 
-hosted_url = 'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare.{variant}.js'.format(
-    version=widget_version,
-    variant=widget_variant,
-)
+hosted_url = (
+    'https://ucarecdn.com/widget/{version}/uploadcare/uploadcare.{variant}.js'
+    .format(version=widget_version, variant=widget_variant))
 
 local_url = 'uploadcare/uploadcare.{variant}.js'.format(
     variant=widget_variant)
