@@ -9,6 +9,7 @@ except ImportError:
 from tempfile import NamedTemporaryFile
 
 from mock import patch, MagicMock, Mock
+from dateutil import parser
 
 from pyuploadcare import conf
 from pyuploadcare.exceptions import InvalidRequestError
@@ -27,9 +28,8 @@ def arg_namespace(arguments_str):
     return ucare_argparser().parse_args(arguments_str.split())
 
 
+@patch('requests.sessions.Session.request', autospec=True)
 class UcareGetTest(unittest.TestCase):
-
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_get_by_uuid(self, request):
         request.return_value = MockResponse(status=200)
 
@@ -40,7 +40,6 @@ class UcareGetTest(unittest.TestCase):
             ('GET', 'https://api.uploadcare.com/files/6c5e9526-b0fe-4739-8975-72e8d5ee6342/')
         )
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_get_by_cdn_url(self, request):
         request.return_value = MockResponse(status=200)
 
@@ -144,7 +143,7 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_pub_key(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--pub_key demopublickey list'))
+        main(arg_namespace('--pub_key demopublickey list_files'))
 
         self.assertEqual(conf.pub_key, 'demopublickey')
 
@@ -152,7 +151,7 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_secret(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--secret demosecretkey list'))
+        main(arg_namespace('--secret demosecretkey list_files'))
 
         self.assertEqual(conf.secret, 'demosecretkey')
 
@@ -160,7 +159,8 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_api_base(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--api_base https://uploadcare.com/api/ list'))
+        main(arg_namespace(
+            '--api_base https://uploadcare.com/api/ list_files'))
 
         self.assertEqual(conf.api_base, 'https://uploadcare.com/api/')
 
@@ -168,7 +168,8 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_upload_base(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--upload_base https://uploadcare.com/upload/ list'))
+        main(arg_namespace(
+            '--upload_base https://uploadcare.com/upload/ list_files'))
 
         self.assertEqual(conf.upload_base, 'https://uploadcare.com/upload/')
 
@@ -176,27 +177,27 @@ class UcareCommonArgsTest(unittest.TestCase):
     def test_change_verify_api_ssl(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('list'))
+        main(arg_namespace('list_files'))
         self.assertTrue(conf.verify_api_ssl)
 
-        main(arg_namespace('--no_check_api_certificate list'))
+        main(arg_namespace('--no_check_api_certificate list_files'))
         self.assertFalse(conf.verify_api_ssl)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_verify_upload_ssl(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('list'))
+        main(arg_namespace('list_files'))
         self.assertTrue(conf.verify_upload_ssl)
 
-        main(arg_namespace('--no_check_upload_certificate list'))
+        main(arg_namespace('--no_check_upload_certificate list_files'))
         self.assertFalse(conf.verify_upload_ssl)
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_change_api_version(self, request):
         request.return_value = MockListResponse()
 
-        main(arg_namespace('--api_version 0.777 list'))
+        main(arg_namespace('--api_version 0.777 list_files'))
 
         self.assertEqual(conf.api_version, '0.777')
 
@@ -226,7 +227,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('list'), [self.tmp_config_file.name])
+        main(arg_namespace('list_files'), [self.tmp_config_file.name])
 
         self.assertEqual(conf.pub_key, 'demopublickey')
 
@@ -247,7 +248,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         second_tmp_conf_file.close()
 
-        main(arg_namespace('list'),
+        main(arg_namespace('list_files'),
              [self.tmp_config_file.name, second_tmp_conf_file.name])
 
         self.assertEqual(conf.pub_key, 'demopublickey_modified')
@@ -269,7 +270,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         second_tmp_conf_file.close()
 
-        main(arg_namespace('list'),
+        main(arg_namespace('list_files'),
              [self.tmp_config_file.name, second_tmp_conf_file.name])
 
         self.assertEqual(conf.pub_key, 'demopublickey')
@@ -284,7 +285,8 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('--pub_key pub list'), [self.tmp_config_file.name])
+        main(arg_namespace('--pub_key pub list_files'),
+             [self.tmp_config_file.name])
 
         self.assertEqual(conf.pub_key, 'pub')
 
@@ -298,7 +300,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('list'), [self.tmp_config_file.name])
+        main(arg_namespace('list_files'), [self.tmp_config_file.name])
 
         self.assertFalse(conf.verify_api_ssl)
 
@@ -312,7 +314,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('list'), [self.tmp_config_file.name])
+        main(arg_namespace('list_files'), [self.tmp_config_file.name])
 
         self.assertTrue(conf.verify_api_ssl)
 
@@ -326,7 +328,7 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         )
         self.tmp_config_file.close()
 
-        main(arg_namespace('--no_check_api_certificate list'),
+        main(arg_namespace('--no_check_api_certificate list_files'),
              [self.tmp_config_file.name])
 
         self.assertFalse(conf.verify_api_ssl)
@@ -617,3 +619,50 @@ class TrackedFileListTestCase(unittest.TestCase):
 
         # After successful iteration the serialized session is deleted
         self.assertFalse(os.path.exists(session2.session_filepath))
+
+
+@patch('pyuploadcare.ucare_cli.pprint')
+@patch('pyuploadcare.ucare_cli.GroupList')
+class ListGroupsTestCase(unittest.TestCase):
+    def test_calling_without_params(self, GroupList, pprint):
+        instance = self.make_group_list(GroupList)
+        main(arg_namespace('list_groups'))
+
+        GroupList.assert_called_once_with(
+            starting_point=None,
+            ordering=None,
+            limit=100,
+            request_limit=100
+        )
+        pprint.assert_called_once_with(list(instance))
+
+    def test_calling_with_params(self, GroupList, pprint):
+        instance = self.make_group_list(GroupList)
+        main(arg_namespace('list_groups '
+                           '--starting_point=2015-10-21 '
+                           '--ordering=-datetime_created '
+                           '--limit 10 '
+                           '--request_limit 5'))
+
+        GroupList.assert_called_once_with(
+            starting_point=parser.parse('2015-10-21'),
+            ordering='-datetime_created',
+            limit=10,
+            request_limit=5
+        )
+        pprint.assert_called_once_with(list(instance))
+
+    def test_empty_result(self, GroupList, pprint):
+        instance = self.make_group_list(GroupList, list_groups=[])
+        main(arg_namespace('list_groups'))
+        self.assertTrue(GroupList.called)
+        pprint.assert_called_once_with(list(instance))
+
+    def make_group_list(self, GroupList, list_groups=None):
+        if list_groups is None:
+            list_groups = json.loads(
+                api_response_from_file('list_groups.json').decode('utf-8'))
+
+        instance = GroupList.return_value
+        instance.__iter__.side_effect = lambda *args: iter(list_groups)
+        return instance

@@ -430,6 +430,13 @@ class FileListTestCase(unittest.TestCase):
                 ValueError, 'The starting_point must be a datetime'):
             FileList(starting_point='string', ordering='datetime_uploaded')
 
+    def test_starting_point_cant_set_invalid_value_later(self):
+        f = FileList(ordering='datetime_uploaded')
+
+        with self.assertRaisesRegexp(
+                ValueError, 'The starting_point must be a datetime'):
+            f.starting_point = 'string'
+
     def test_api_url(self):
         f = FileList(
             starting_point='123',

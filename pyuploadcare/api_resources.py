@@ -615,21 +615,32 @@ class BaseApiList(object):
     # abstract
     base_url = None
     constructor = None
+    # ordering fields names which must be handled as datetime
+    datetime_ordering_fields = ()
 
     def __init__(self, starting_point=None, ordering=None, limit=None,
                  request_limit=None):
-        self.starting_point = starting_point
         self.ordering = ordering
         self.limit = limit
         self.request_limit = request_limit
+        self.starting_point = starting_point
         self._count = None
 
-        # Makes sure that the value of starting_point a correctly formatted
-        ordering_field = (ordering or '').lstrip('-')
-        if ordering_field in ('', 'datetime_uploaded') and starting_point:
-            if not isinstance(starting_point, (datetime, date)):
+    @property
+    def starting_point(self):
+        return self._starting_point
+
+    @starting_point.setter
+    def starting_point(self, value):
+        ordering_field = (self.ordering or '').lstrip('-')
+        datetime_fields = self.datetime_ordering_fields
+
+        if value and ordering_field in datetime_fields:
+            if not isinstance(value, (datetime, date)):
                 raise ValueError('The starting_point must be a datetime')
-            self.starting_point = starting_point.isoformat()
+            value = value.isoformat()
+
+        self._starting_point = value
 
     def api_url(self, **qs):
         if self.starting_point is not None:
@@ -670,6 +681,8 @@ class FileList(BaseApiList):
       documentation: http://uploadcare.com/documentation/rest/#file-files
     - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
+    - ``request_limit`` -- a number of objects retrieved per request (page).
+      Usually, you don't need worry about this parameter.
     - ``stored`` -- ``True`` to include only stored files,
       ``False`` to exclude, ``None`` is default, will not exclude anything;
     - ``removed`` -- ``True`` to include only removed files,
@@ -684,7 +697,7 @@ class FileList(BaseApiList):
     Usage example::
 
         >>> for f in FileList(removed=None):
-        >>>     print f.datetime_uploaded()
+        >>>     print(f.datetime_uploaded())
 
     Count objects::
 
@@ -693,6 +706,7 @@ class FileList(BaseApiList):
     """
     base_url = '/files/'
     constructor = File.construct_from
+    datetime_ordering_fields = ('', 'datetime_uploaded')
 
     def __init__(self, *args, **kwargs):
         self.stored = kwargs.pop('stored', None)
@@ -768,19 +782,22 @@ class GroupList(BaseApiList):
 
     This class provides iteration over all groups for project. You can specify:
 
-    - ``since`` -- a datetime object from which objects will be iterated;
-    - ``until`` -- a datetime object to which objects will be iterated;
+    - ``starting_point`` -- a starting point for filtering groups.
+      It is reflects a ``from`` parameter from the REST API.
+    - ``ordering`` -- a string with name of the field what must be used
+      for sorting files. The actual list of supported fields you can find in
+      documentation: https://uploadcare.com/documentation/rest/#group-groups
     - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
-
-    If ``until`` is specified, the order of items will be reversed.
-    It is impossible to specify ``since`` and ``until`` at the same time.
+    - ``request_limit`` -- a number of objects retrieved per request (page).
+      Usually, you don't need worry about this parameter.
 
     Usage example::
 
         >>> from datetime import datetime, timedelta
-        >>> for f in GroupList(since=datetime.now() - timedelta(weeks=1)):
-        >>>     print f.datetime_created()
+        >>> last_week = datetime.now() - timedelta(weeks=1)
+        >>> for f in GroupList(starting_point=last_week):
+        >>>     print(f.datetime_created())
 
     Count objects::
 
@@ -789,3 +806,4 @@ class GroupList(BaseApiList):
     """
     base_url = '/groups/'
     constructor = FileGroup.construct_from
+    datetime_ordering_fields = ('', 'datetime_created')
