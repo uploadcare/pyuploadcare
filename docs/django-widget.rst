@@ -17,7 +17,7 @@ for example, ``widget_version`` or ``widget_build``:
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '2.5.0',
+        'widget_version': '2.8.1',
         'widget_build': 'min',  // without jQuery
         'cdn_base': 'https://cdn.mycompany.com',
     }
