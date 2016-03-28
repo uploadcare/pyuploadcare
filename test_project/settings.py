@@ -69,13 +69,12 @@ LOGGING = {
 
 
 # upload care stuff starts here
-# NB: files uploaded by demo account are removed daily, use it to fool around or
-#     signup on https://uploadcare.com to get your own keys.
+# NB: files uploaded by demo account are removed daily, use it to fool around
+# or signup on https://uploadcare.com to get your own keys.
 UPLOADCARE = {
     'pub_key': 'demopublickey',
     'secret': 'demoprivatekey',
+    # 'use_hosted_assets': False,
+    # 'widget_url': 'http://static.example.com/widget.js',
+    # 'upload_base_url': 'http://other.upload.handler/',
 }
-
-#PYUPLOADCARE_USE_HOSTED_ASSETS = False
-#PYUPLOADCARE_WIDGET_URL = 'http://static.example.com/widget.js'
-#PYUPLOADCARE_UPLOAD_BASE_URL = 'http://other.upload.handler/'

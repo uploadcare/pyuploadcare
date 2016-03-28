@@ -10,15 +10,15 @@ Settings
 --------
 
 Besides required ``pub_key``, ``secret`` settings there are optional settings,
-for example, ``widget_version`` or ``widget_variant``:
+for example, ``widget_version`` or ``widget_build``:
 
 .. code-block:: python
 
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '2.5.0',
-        'widget_variant': 'min',  // without jQuery
+        'widget_version': '2.8.1',
+        'widget_build': 'min',  // without jQuery
         'cdn_base': 'https://cdn.mycompany.com',
     }
 
