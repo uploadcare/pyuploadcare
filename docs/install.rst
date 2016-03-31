@@ -57,5 +57,5 @@ So that means you can’t use these classes correctly with versions prior 0.5
 (but that should not be an issue :)
 
 Also, note that Django configuration option ``UPLOADCARE['widget_variant']``
-now is deprecated and it’s will be removed in next major release. Use
+now is deprecated and it will be removed in next major release. Use
 ``UPLOADCARE['widget_build']`` instead.
