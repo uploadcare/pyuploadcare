@@ -50,8 +50,7 @@ asynchronously.
 Features
 --------
 
-- Python wrapper for Uploadcare [REST](https://uploadcare.com/documentation/rest/)
-  and [Upload](https://uploadcare.com/documentation/upload/) APIs
+- Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs
 - Django widget with useful manual crop and multi-upload;
 - *ucare* console utility;
 - hosted assets (Kudos to `Sławek Ehlert`_!).
@@ -85,3 +84,5 @@ Besides the `Travis CI`_ we use tox. In order to run tests just:
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
 .. _Sławek Ehlert: https://github.com/slafs
 .. _Travis CI: https://travis-ci.org/uploadcare/pyuploadcare
+.. _REST: https://uploadcare.com/documentation/rest/
+.. _Upload: https://uploadcare.com/documentation/upload/
