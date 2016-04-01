@@ -59,7 +59,7 @@ Like that:
 
     from django.db import models
 
-    from pyuploadcare.dj import ImageField
+    from pyuploadcare.dj.models import ImageField
 
 
     class Photo(models.Model):

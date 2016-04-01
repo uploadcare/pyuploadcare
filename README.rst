@@ -30,7 +30,7 @@ asynchronously.
     from django import forms
     from django.db import models
 
-    from pyuploadcare.dj import ImageField
+    from pyuploadcare.dj.models import ImageField
     from pyuploadcare.dj.forms import FileWidget
 
 
