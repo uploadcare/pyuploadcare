@@ -48,11 +48,13 @@ Some caveats about migration process from version 1.x to 2.x.
 
 A version 2.0 contains the next breaking changes:
 
+* Now, you should import Django models' fields (e.g ``ImageField``) directly from the ``pyuploadcare.dj.models`` module.
+
 * Changed initializing for the ``FileList`` and ``GroupList`` classes. The ``since`` and ``until`` parameters have been removed. Use combination of ``starting_point`` and ``ordering`` instead.
 
 * The ``ucare list`` CLI command has been renamed to ``ucare list_files``. And, according to the previous change, the ``since`` and ``until`` parameters have been removed. The ``starting_point`` and ordering parameters added.
 
-These changes are necessary for working with version 0.5 of REST API.
+These last two changes are necessary for working with version 0.5 of REST API.
 So that means you can’t use these classes correctly with versions prior 0.5
 (but that should not be an issue :)
 

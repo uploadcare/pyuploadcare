@@ -95,7 +95,7 @@ FileField
 
     from django.db import models
 
-    from pyuploadcare.dj import FileField
+    from pyuploadcare.dj.models import FileField
 
 
     class Candidate(models.Model):
@@ -118,7 +118,7 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 
     from django.db import models
 
-    from pyuploadcare.dj import ImageField
+    from pyuploadcare.dj.models import ImageField
 
 
     class Candidate(models.Model):
@@ -160,7 +160,7 @@ uploaded files as a group:
 
     from django.db import models
 
-    from pyuploadcare.dj import FileGroupField
+    from pyuploadcare.dj.models import FileGroupField
 
 
     class Book(models.Model):
@@ -179,7 +179,7 @@ It stores uploaded images as a group:
 
     from django.db import models
 
-    from pyuploadcare.dj import ImageGroupField
+    from pyuploadcare.dj.models import ImageGroupField
 
 
     class Gallery(models.Model):
