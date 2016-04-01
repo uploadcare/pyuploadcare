@@ -3,6 +3,15 @@
 History
 -------
 
+2.0
+~~~
+
+- Added support for version 0.5 ours REST API.
+- Updated widget to version 2.8.1 (see `widget changelog`_).
+- Added the ``ucare list_groups`` command.
+- Deprecated things were deleted.
+- This version is not backward compatible. For detailed information about the migration process see `update to version 2.0`_.
+
 1.3.6
 ~~~~~
 
@@ -308,3 +317,4 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
 
 
 .. _widget changelog: https://github.com/uploadcare/uploadcare-widget/blob/master/HISTORY.markdown
+.. _update to version 2.0: http://pyuploadcare.readthedocs.org/en/v2.0/install.html#update-to-version-2-0
