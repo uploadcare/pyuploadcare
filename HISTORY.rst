@@ -6,11 +6,12 @@ History
 2.0
 ~~~
 
-- Added support for version 0.5 ours REST API.
+- Added support for version 0.5 of REST API.
 - Updated widget to version 2.8.1 (see `widget changelog`_).
 - Added the ``ucare list_groups`` command.
-- Deprecated things were deleted.
-- This version is not backward compatible. For detailed information about the migration process see `update to version 2.0`_.
+- Removed deprecated entities.
+
+**NB**: There are backward incompatible changes. For detailed information about the upgrade process see `update to version 2.0`_.
 
 1.3.6
 ~~~~~
