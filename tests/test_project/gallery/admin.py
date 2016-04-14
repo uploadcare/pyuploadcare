@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from gallery.models import Gallery, Photo, GalleryMultiupload
+from .models import Gallery, Photo, GalleryMultiupload
 
 
 class PhotoInline(admin.StackedInline):
