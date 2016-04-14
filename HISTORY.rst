@@ -3,6 +3,11 @@
 History
 -------
 
+2.0.1
+~~~
+
+- Fixed issue with missing ``ucare_cli`` package.
+
 2.0
 ~~~
 
