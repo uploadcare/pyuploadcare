@@ -40,7 +40,7 @@ INSTALLED_APPS = (
 
     'pyuploadcare.dj',
 
-    'gallery',
+    'test_project.gallery',
 )
 
 LOGGING = {
