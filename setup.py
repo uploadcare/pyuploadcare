@@ -29,7 +29,7 @@ setup(
     author='Uploadcare LLC',
     author_email='hello@uploadcare.com',
     url='https://github.com/uploadcare/pyuploadcare',
-    packages=['pyuploadcare', 'pyuploadcare.dj'],
+    packages=['pyuploadcare', 'pyuploadcare.dj', 'pyuploadcare.ucare_cli'],
     package_data={
         'pyuploadcare.dj': [
             'static/uploadcare/*.js',
