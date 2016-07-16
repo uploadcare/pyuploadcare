@@ -3,12 +3,20 @@ from __future__ import unicode_literals
 
 import sys
 import json
+from datetime import datetime, date
 
 from six.moves import input
 
 
+class Encoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return str(obj)
+        return super(Encoder, self).default(obj)
+
+
 def pprint(value):
-    print(json.dumps(value, indent=2))
+    print(json.dumps(value, indent=2, cls=Encoder))
 
 
 def bool_or_none(value):

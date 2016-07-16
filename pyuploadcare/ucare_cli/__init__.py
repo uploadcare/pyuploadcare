@@ -11,7 +11,7 @@ from dateutil import parser
 
 from pyuploadcare import conf, __version__
 from pyuploadcare.api_resources import (
-    File, FileGroup, FileList, FilesStorage, GroupList
+    File, FileGroup, FileList, FilesStorage, GroupList, Stats
 )
 from pyuploadcare.exceptions import (
     UploadcareException, TimeoutError, UploadError
@@ -159,6 +159,16 @@ def create_group(arg_namespace):
     files = [File(uuid) for uuid in arg_namespace.paths]
     group = FileGroup.create(files)
     pprint(group.info())
+
+
+def get_stats(arg_namespace):
+    stats = Stats()
+    object_stats = arg_namespace.stats_for
+
+    try:
+        pprint(getattr(stats, object_stats)())
+    except AttributeError:
+        pprint('Invalid object: {}'.format(object_stats))
 
 
 def ucare_argparser():
@@ -319,6 +329,11 @@ def ucare_argparser():
 
     # Sync files
     add_sync_files_parser(subparsers)
+
+    # Stats
+    stats_parser = subparsers.add_parser('stats', help='show stats')
+    stats_parser.add_argument('stats_for', help='object for getting stats for')
+    stats_parser.set_defaults(func=get_stats)
 
     # common arguments
     parser.add_argument(

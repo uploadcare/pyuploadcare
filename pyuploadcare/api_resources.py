@@ -807,3 +807,36 @@ class GroupList(BaseApiList):
     base_url = '/groups/'
     constructor = FileGroup.construct_from
     datetime_ordering_fields = ('', 'datetime_created')
+
+
+class Stats(object):
+    """ Resource for getting stats for the project or account.
+    """
+    base_url = '/stats/'
+
+    def account(self):
+        return self._post_process(self._request('account'))
+
+    def project(self):
+        return self._post_process(self._request('project'))
+
+    def _request(self, for_):
+        url = '{}{}/'.format(self.base_url, for_)
+        return rest_request('GET', url)
+
+    def _post_process(self, data):
+        def _handle_dates(row):
+            start, end = row['period_start'], row['period_end']
+            if start:
+                row['period_start'] = dateutil.parser.parse(start)
+            if end:
+                row['period_end'] = dateutil.parser.parse(end)
+
+        if 'current' in data:
+            _handle_dates(data['current'])
+
+        if 'history' in data:
+            for row in data['history']:
+                _handle_dates(row)
+
+        return data
