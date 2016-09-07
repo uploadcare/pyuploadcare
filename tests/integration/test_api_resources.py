@@ -11,7 +11,7 @@ import time
 import mock
 from pyuploadcare import conf
 from pyuploadcare.api import (
-    rest_request as original_rest_request,
+    rest_request as original_rest_request
 )
 from pyuploadcare.api_resources import File, FileGroup, FileList
 
