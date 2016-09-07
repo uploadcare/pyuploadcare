@@ -277,9 +277,34 @@ class File(object):
         return file_
 
     @classmethod
-    def upload(cls, file_obj):
-        """Uploads a file and returns ``File`` instance."""
-        files = uploading_request('POST', 'base/', files={'file': file_obj})
+    def upload(cls, file_obj, store=None):
+        """Uploads a file and returns ``File`` instance.
+
+        Args:
+            file_obj: file object to upload to
+            store (Optional[bool]): Should the file be automatically stored
+                upon upload. Defaults to None.
+                - False - do not store file
+                - True - store file (can result in error if autostore
+                               is disabled for project)
+                - None - use project settings
+
+        Returns:
+            ``File`` instance
+        """
+        if store is None:
+            store = 'auto'
+        elif store:
+            store = '1'
+        else:
+            store = '0'
+
+        data = {
+            'UPLOADCARE_STORE': store,
+        }
+
+        files = uploading_request('POST', 'base/', data=data,
+                                  files={'file': file_obj})
         file_ = cls(files['file'])
         return file_
 
