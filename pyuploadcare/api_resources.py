@@ -284,11 +284,41 @@ class File(object):
         return file_
 
     @classmethod
-    def upload_from_url(cls, url):
+    def upload_from_url(cls, url, store=None, filename=None):
         """Uploads file from given url and returns ``FileFromUrl`` instance.
+
+        Args:
+            url (str): URL of file to upload to
+            store (Optional[bool]): Should the file be automatically stored
+                upon upload. Defaults to None.
+                - False - do not store file
+                - True - store file (can result in error if autostore
+                               is disabled for project)
+                - None - use project settings
+            filename (Optional[str]): Name of the uploaded file. If this not
+                specified the filename will be obtained from response headers
+                or source URL. Defaults to None.
+
+        Returns:
+            ``FileFromUrl`` instance
         """
+
+        if store is None:
+            store = 'auto'
+        elif store:
+            store = '1'
+        else:
+            store = '0'
+
+        data = {
+            'source_url': url,
+            'store': store,
+        }
+        if filename:
+            data['filename'] = filename
+
         result = uploading_request('POST', 'from_url/',
-                                   data={'source_url': url})
+                                   data=data)
         if 'token' not in result:
             raise APIError(
                 'could not find token in result: {0}'.format(result)
@@ -297,9 +327,34 @@ class File(object):
         return file_from_url
 
     @classmethod
-    def upload_from_url_sync(cls, url, timeout=30, interval=0.3,
-                             until_ready=False):
+    def upload_from_url_sync(cls, url, store=None, filename=None, timeout=30,
+                             interval=0.3, until_ready=False):
         """Uploads file from given url and returns ``File`` instance.
+
+        Args:
+            url (str): URL of file to upload to
+            store (Optional[bool]): Should the file be automatically stored
+                upon upload. Defaults to None.
+                - False - do not store file
+                - True - store file (can result in error if autostore
+                               is disabled for project)
+                - None - use project settings
+            filename (Optional[str]): Name of the uploaded file. If this not
+                specified the filename will be obtained from response headers
+                or source URL. Defaults to None.
+            timeout (Optional[int]): seconds to wait for successful upload.
+                Defaults to 30.
+            interval (Optional[float]): interval between upload status checks.
+                Defaults to 0.3.
+            until_ready (Optional[bool]): should we wait until file is
+                available via CDN. Defaults to False.
+
+        Returns:
+            ``File`` instance
+
+        Raises:
+            ``TimeoutError`` if file wasn't uploaded in time
+
         """
         ffu = cls.upload_from_url(url)
         return ffu.wait(timeout=timeout, interval=interval,
