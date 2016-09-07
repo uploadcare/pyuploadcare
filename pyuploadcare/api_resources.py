@@ -356,7 +356,7 @@ class File(object):
             ``TimeoutError`` if file wasn't uploaded in time
 
         """
-        ffu = cls.upload_from_url(url)
+        ffu = cls.upload_from_url(url, store, filename)
         return ffu.wait(timeout=timeout, interval=interval,
                         until_ready=until_ready)
 

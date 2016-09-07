@@ -9,10 +9,9 @@ from datetime import datetime
 import time
 
 import mock
-import requests
 from pyuploadcare import conf
 from pyuploadcare.api import (
-    InvalidRequestError, rest_request as original_rest_request,
+    rest_request as original_rest_request,
 )
 from pyuploadcare.api_resources import File, FileGroup, FileList
 
@@ -53,9 +52,11 @@ class FileUploadFromUrlTest(unittest.TestCase):
 
     def setUp(self):
         conf.pub_key = 'demopublickey'
+        conf.secret = 'demoprivatekey'
 
     def tearDown(self):
         conf.pub_key = None
+        conf.secret = None
 
     def test_get_some_token(self):
         file_from_url = File.upload_from_url(
@@ -81,12 +82,45 @@ class FileUploadFromUrlTest(unittest.TestCase):
         self.assertIsInstance(file_from_url.get_file(), File)
 
     @skip_on_travis
-    def test_successful_upload_from_url_sync(self):
-        file_from_url = File.upload_from_url(
-            'https://github.com/images/error/angry_unicorn.png'
+    def test_successful_upload_from_url_sync_autostore(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            interval=1
         )
-        file = file_from_url.wait(interval=1, until_ready=False)
         self.assertIsInstance(file, File)
+        self.assertEqual(file.filename(), 'angry_unicorn.png')
+        self.assertIsNone(file.datetime_stored())
+
+    @skip_on_travis
+    def test_successful_upload_from_url_sync_dont_store(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            store=False,
+            interval=1
+        )
+        self.assertIsInstance(file, File)
+        self.assertEqual(file.filename(), 'angry_unicorn.png')
+        self.assertIsNone(file.datetime_stored())
+
+    @skip_on_travis
+    def test_successful_upload_from_url_sync_store(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            store=True,
+            interval=1
+        )
+        self.assertIsInstance(file, File)
+        self.assertIsNotNone(file.datetime_stored())
+
+    @skip_on_travis
+    def test_successful_upload_from_url_sync_with_filename(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            filename='meh.png',
+            interval=1
+        )
+        self.assertIsInstance(file, File)
+        self.assertEqual(file.filename(), 'meh.png')
 
 
 class FileInfoTest(unittest.TestCase):
