@@ -33,8 +33,6 @@ matrix:
   include:
     - python: 2.7
       env: DJANGO=1.8 SUITE="tests/integration"
-  allow_failures:
-    - env: DJANGO=1.10
 cache:
   directories:
     - $HOME/.cache/pip
