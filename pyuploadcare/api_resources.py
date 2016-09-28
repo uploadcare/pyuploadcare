@@ -352,8 +352,8 @@ class File(object):
         return file_from_url
 
     @classmethod
-    def upload_from_url_sync(cls, url, store=None, filename=None, timeout=30,
-                             interval=0.3, until_ready=False):
+    def upload_from_url_sync(cls, url, timeout=30, interval=0.3,
+                             until_ready=False, store=None, filename=None):
         """Uploads file from given url and returns ``File`` instance.
 
         Args:
