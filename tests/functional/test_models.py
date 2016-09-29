@@ -120,7 +120,7 @@ class FileFieldTest(unittest.TestCase):
         emp = Employee(cv='3addab78-6368-4c55-ac08-22412b6a2a4c')
 
         with self.assertRaises(ValidationError):
-            emp._meta.get_field_by_name('cv')[0].clean(emp.cv, emp)
+            emp._meta.get_field('cv').clean(emp.cv, emp)
 
 
 class FileGroupFieldTest(unittest.TestCase):

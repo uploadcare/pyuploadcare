@@ -9,10 +9,9 @@ from datetime import datetime
 import time
 
 import mock
-import requests
 from pyuploadcare import conf
 from pyuploadcare.api import (
-    InvalidRequestError, rest_request as original_rest_request,
+    rest_request as original_rest_request
 )
 from pyuploadcare.api_resources import File, FileGroup, FileList
 
@@ -23,18 +22,24 @@ from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
 conf.retry_throttled = 10
 
 
-class FileUploadTest(unittest.TestCase):
+class RestAPITestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        conf.pub_key = 'demopublickey'
+        conf.secret = 'demoprivatekey'
+
+    @classmethod
+    def tearDownClass(cls):
+        conf.pub_key = None
+        conf.secret = None
+
+
+class FileUploadTest(RestAPITestCase):
 
     def setUp(self):
-        conf.pub_key = 'demopublickey'
-
         self.tmp_txt_file = NamedTemporaryFile(mode='wb', delete=False)
-        content = 'привет'
-        self.tmp_txt_file.write(content.encode('utf-8'))
+        self.tmp_txt_file.write('привет'.encode('utf-8'))
         self.tmp_txt_file.close()
-
-    def tearDown(self):
-        conf.pub_key = None
 
     def test_successful_upload_when_file_is_opened_in_txt_mode(self):
         with open(self.tmp_txt_file.name, 'rt') as fh:
@@ -49,14 +54,7 @@ class FileUploadTest(unittest.TestCase):
         self.assertIsInstance(file_, File)
 
 
-class FileUploadFromUrlTest(unittest.TestCase):
-
-    def setUp(self):
-        conf.pub_key = 'demopublickey'
-
-    def tearDown(self):
-        conf.pub_key = None
-
+class FileUploadFromUrlTest(RestAPITestCase):
     def test_get_some_token(self):
         file_from_url = File.upload_from_url(
             'https://github.com/images/error/angry_unicorn.png'
@@ -81,25 +79,52 @@ class FileUploadFromUrlTest(unittest.TestCase):
         self.assertIsInstance(file_from_url.get_file(), File)
 
     @skip_on_travis
-    def test_successful_upload_from_url_sync(self):
-        file_from_url = File.upload_from_url(
-            'https://github.com/images/error/angry_unicorn.png'
+    def test_successful_upload_from_url_sync_autostore(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            interval=1
         )
-        file = file_from_url.wait(interval=1, until_ready=False)
         self.assertIsInstance(file, File)
+        self.assertEqual(file.filename(), 'angry_unicorn.png')
+        self.assertIsNotNone(file.datetime_stored())
+
+    @skip_on_travis
+    def test_successful_upload_from_url_sync_dont_store(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            store=False,
+            interval=1
+        )
+        self.assertIsInstance(file, File)
+        self.assertEqual(file.filename(), 'angry_unicorn.png')
+        self.assertIsNone(file.datetime_stored())
+
+    @skip_on_travis
+    def test_successful_upload_from_url_sync_store(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            store=True,
+            interval=1
+        )
+        self.assertIsInstance(file, File)
+        self.assertIsNotNone(file.datetime_stored())
+
+    @skip_on_travis
+    def test_successful_upload_from_url_sync_with_filename(self):
+        file = File.upload_from_url_sync(
+            'https://github.com/images/error/angry_unicorn.png',
+            filename='meh.png',
+            interval=1
+        )
+        self.assertIsInstance(file, File)
+        self.assertEqual(file.filename(), 'meh.png')
 
 
-class FileInfoTest(unittest.TestCase):
+class FileInfoTest(RestAPITestCase):
     @classmethod
     def setUpClass(cls):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
+        super(FileInfoTest, cls).setUpClass()
         cls.file_ = upload_tmp_txt_file(content='hello')
-
-    @classmethod
-    def tearDownClass(cls):
-        conf.pub_key = None
-        conf.secret = None
 
     def test_info_is_non_empty_dict(self):
         self.assertIsInstance(self.file_.info(), dict)
@@ -147,18 +172,13 @@ class FileInfoTest(unittest.TestCase):
         self.assertEqual(self.file_.mime_type(), 'application/octet-stream')
 
 
-class FileStoreTest(unittest.TestCase):
+class FileStoreTest(RestAPITestCase):
 
     def setUp(self):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
-
         self.file_ = upload_tmp_txt_file(content='пока')
 
     def tearDown(self):
         self.file_.delete()
-        conf.pub_key = None
-        conf.secret = None
 
     def test_successful_store(self):
         self.assertFalse(self.file_.is_stored())
@@ -168,17 +188,10 @@ class FileStoreTest(unittest.TestCase):
         self.assertTrue(self.file_.is_stored())
 
 
-class FileDeleteTest(unittest.TestCase):
+class FileDeleteTest(RestAPITestCase):
 
     def setUp(self):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
-
         self.file_ = upload_tmp_txt_file(content='привет')
-
-    def tearDown(self):
-        conf.pub_key = None
-        conf.secret = None
 
     def test_successful_delete(self):
         self.assertFalse(self.file_.is_removed())
@@ -188,15 +201,7 @@ class FileDeleteTest(unittest.TestCase):
         self.assertTrue(self.file_.is_removed())
 
 
-class FileGroupCreateTest(unittest.TestCase):
-
-    def setUp(self):
-        conf.pub_key = 'demopublickey'
-
-    def tearDown(self):
-        conf.pub_key = None
-        conf.secret = None
-
+class FileGroupCreateTest(RestAPITestCase):
     def test_successful_create(self):
         files = [
             upload_tmp_txt_file(content='пока'),
@@ -205,18 +210,12 @@ class FileGroupCreateTest(unittest.TestCase):
         self.assertIsInstance(group, FileGroup)
 
 
-class FileGroupInfoTest(unittest.TestCase):
+class FileGroupInfoTest(RestAPITestCase):
 
     @classmethod
     def setUpClass(cls):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
+        super(FileGroupInfoTest, cls).setUpClass()
         cls.group = create_file_group(files_qty=1)
-
-    @classmethod
-    def tearDownClass(cls):
-        conf.pub_key = None
-        conf.secret = None
 
     def test_info_is_non_empty_dict(self):
         self.assertIsInstance(self.group.info(), dict)
@@ -232,17 +231,10 @@ class FileGroupInfoTest(unittest.TestCase):
         self.assertFalse(self.group.is_stored())
 
 
-class FileGroupStoreTest(unittest.TestCase):
+class FileGroupStoreTest(RestAPITestCase):
 
     def setUp(self):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
-
         self.group = create_file_group(files_qty=1)
-
-    def tearDown(self):
-        conf.pub_key = None
-        conf.secret = None
 
     def test_successful_store(self):
         self.assertFalse(self.group.is_stored())
@@ -252,12 +244,11 @@ class FileGroupStoreTest(unittest.TestCase):
         self.assertTrue(self.group.is_stored())
 
 
-class FileCopyTest(unittest.TestCase):
+class FileCopyTest(RestAPITestCase):
 
     @classmethod
     def setUpClass(cls):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
+        super(FileCopyTest, cls).setUpClass()
 
         # create file to copy from
         file_from_url = File.upload_from_url(
@@ -284,8 +275,8 @@ class FileCopyTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.f.delete()
-        conf.pub_key = None
-        conf.secret = None
+        super(FileCopyTest, cls).tearDownClass()
+
 
     def test_local_copy(self):
         response = self.f.copy()
@@ -295,18 +286,7 @@ class FileCopyTest(unittest.TestCase):
         self.assertEqual('file', response['type'])
 
 
-class FileListIterationTest(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
-
-    @classmethod
-    def tearDownClass(cls):
-        conf.pub_key = None
-        conf.secret = None
-
+class FileListIterationTest(RestAPITestCase):
     def test_iteration_over_all_files(self):
         files = list(FileList(limit=10))
         self.assertTrue(len(files) >= 0)

@@ -19,7 +19,7 @@ def upload_tmp_txt_file(content=''):
     tmp_txt_file.close()
 
     with open(tmp_txt_file.name, 'rb') as fh:
-        file_ = File.upload(fh)
+        file_ = File.upload(fh, store=False)
     return file_
 
 

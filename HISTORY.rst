@@ -3,8 +3,15 @@
 History
 -------
 
+2.1.0
+~~~~~
+
+- Support auto storing in upload requests
+- Updated widget to version 2.10.0 (see `widget changelog`_).
+- Drop support for Python 3.2
+
 2.0.1
-~~~
+~~~~~
 
 - Fixed issue with missing ``ucare_cli`` package.
 
