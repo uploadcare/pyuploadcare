@@ -1,3 +1,5 @@
+# https://www.djangoproject.com/download/#supported-versions
+
 sudo: false
 language: python
 python:
