@@ -45,7 +45,7 @@ asynchronously.
             'data-image-shrink': '1024x1024',
         }))
 
-.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
+.. image:: https://ucarecdn.com/dbb4021e-b20e-40fa-907b-3da0a4f8ed70/-/resize/800/manual_crop.png
 
 Features
 --------
@@ -58,7 +58,8 @@ Features
 Requirements
 ------------
 
-``pyuploadcare`` requires Python 2.6, 2.7, 3.3, 3.4 or 3.5
+``pyuploadcare`` requires Python 2.6, 2.7, 3.3, 3.4 or 3.5.
+
 If you're using ``pyuploadcare`` with Django, check ``.travis.yml`` for supported
 Python-Django combinations.
 
