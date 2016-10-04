@@ -9,6 +9,7 @@ History
 - Support auto storing in upload requests
 - Updated widget to version 2.10.0 (see `widget changelog`_).
 - Drop support for Python 3.2
+- Simplify and reduce test matrix in ``.travis.yml``
 
 2.0.1
 ~~~~~

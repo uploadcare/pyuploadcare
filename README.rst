@@ -10,7 +10,7 @@ PyUploadcare: a Python library for Uploadcare
 
 The most important thing for us at `Uploadcare`_ is to make file uploading on
 the web really easy. Everyone is used to the routine work, related to allowing
-users upload their userpics or attach resumes: from installing image processing
+users upload their user pics or attach resumes: from installing image processing
 libraries to creating folder with right permissions to ensuring the server
 never goes down or out of space to enabling CDN. Feature like ability to simply
 use a picture from Facebook or manual cropping are much more burdensome,
@@ -45,7 +45,7 @@ asynchronously.
             'data-image-shrink': '1024x1024',
         }))
 
-.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
+.. image:: https://ucarecdn.com/dbb4021e-b20e-40fa-907b-3da0a4f8ed70/-/resize/800/manual_crop.png
 
 Features
 --------
@@ -54,6 +54,15 @@ Features
 - Django widget with useful manual crop and multi-upload;
 - *ucare* console utility;
 - hosted assets (Kudos to `Sławek Ehlert`_!).
+
+Requirements
+------------
+
+``pyuploadcare`` requires Python 2.6, 2.7, 3.3, 3.4 or 3.5.
+
+If you're using ``pyuploadcare`` with Django, check ``.travis.yml`` for supported
+Python-Django combinations.
+
 
 Installation
 ------------
