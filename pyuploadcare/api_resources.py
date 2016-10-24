@@ -231,12 +231,30 @@ class File(object):
         """
         self._info_cache = rest_request('PUT', self._api_storage_uri)
 
-    def copy(self, effects=None, target=None):
+    def copy(self, effects=None, target=None, make_public=None, store=None, pattern=None):
         """Creates File copy
 
-        If ``target`` is ``None``, copy file to Uploadcare storage otherwise
-        copy to target associated with project.
-        Add ``effects`` to ``self.default_effects`` if any.
+      - If ``target`` is ``None``, copy file to Uploadcare storage otherwise
+        copy to target associated with project;
+      -  Add ``effects`` to ``self.default_effects`` if any;
+      -  To grant a file public access on the target storage set
+        ``make_public`` option to be ``true``,
+        relevant when ``target`` has a value set.
+      -  On the contrary, ``store`` option is actual only when ``target`` is ``None``.
+        Stores file permanently in your Uploadcare storage.
+        To avoid confusion, please make sure your account auto store settings
+        do not overlap with this option.
+      - Specify  ``target`` option to set the file name
+      Following example copies a file to ``samplefs`` S3 storage with an owner only access,
+      with file name consisting of uuid,original filename and file extension placed
+      in the root of the storage.
+      - >>>file.copy(target='samplefs',
+                    make_public='false',
+                    pattern='${uuid}${filename}${ext}');
+      In this example, a file is copied to 'samplefs' storage with public access and placed
+      under the directory named after file uuid. A new file has the same file name as its original.
+      - >>>file.copy(None,'samplefs','true');
+
         """
         effects = effects or ''
         if self.default_effects is not None:
@@ -248,6 +266,12 @@ class File(object):
         }
         if target is not None:
             data['target'] = target
+        if make_public is not None:
+            data['make_public'] = make_public
+        if store is not None:
+            data['store'] = store
+        if pattern is not None:
+            data['pattern'] = pattern
 
         return rest_request('POST', 'files/', data=data)
 
