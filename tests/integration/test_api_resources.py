@@ -285,6 +285,15 @@ class FileCopyTest(RestAPITestCase):
         response = self.f.copy(effects='resize/50x/')
         self.assertEqual('file', response['type'])
 
+        response = self.f.copy(store=True)
+        self.assertNotEqual(None, response['result']['datetime_stored'])
+
+        response = self.f.copy(store=False)
+        self.assertEqual(None, response['result']['datetime_stored'])
+
+        response = self.f.copy(pattern='${uuid}')
+        self.assertEqual(response['uuid'], response['original_filename'])
+
 
 class FileListIterationTest(RestAPITestCase):
     def test_iteration_over_all_files(self):

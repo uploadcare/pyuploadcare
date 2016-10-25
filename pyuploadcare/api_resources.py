@@ -237,23 +237,21 @@ class File(object):
       - If ``target`` is ``None``, copy file to Uploadcare storage otherwise
         copy to target associated with project;
       -  Add ``effects`` to ``self.default_effects`` if any;
-      -  To grant a file public access on the target storage set
-        ``make_public`` option to be ``true``,
+      -  To forbid a public from accessing your files on the target storage set
+        ``make_public`` option to be ``false``,
         relevant when ``target`` has a value set.
-      -  On the contrary, ``store`` option is actual only when ``target`` is ``None``.
-        Stores file permanently in your Uploadcare storage.
-        To avoid confusion, please make sure your account auto store settings
-        do not overlap with this option.
-      - Specify  ``target`` option to set the file name
-      Following example copies a file to ``samplefs`` S3 storage with an owner only access,
+      - Specify  ``pattern`` option to set the file name
+
+      - Following example copies a file to ``samplefs`` S3 storage with an owner only access,
       with file name consisting of uuid,original filename and file extension placed
-      in the root of the storage.
-      - >>>file.copy(target='samplefs',
-                    make_public='false',
-                    pattern='${uuid}${filename}${ext}');
-      In this example, a file is copied to 'samplefs' storage with public access and placed
+      in the root of the storage:
+            - >>>file.copy(target='samplefs',
+                            make_public='false',
+                            pattern='${uuid}${filename}${ext}');
+
+      - In this example, a file is copied to 'samplefs' storage with public access and placed
       under the directory named after file uuid. A new file has the same file name as its original.
-      - >>>file.copy(None,'samplefs','true');
+                >>>file.copy(None,'samplefs','true');
 
         """
         effects = effects or ''
