@@ -286,13 +286,16 @@ class FileCopyTest(RestAPITestCase):
         self.assertEqual('file', response['type'])
 
         response = self.f.copy(store=True)
-        self.assertNotEqual(None, response['result']['datetime_stored'])
+        time.sleep(1)
+        copied_file = File(response['result']['uuid'])
+        time.sleep(1)
+        self.assertTrue(copied_file.is_stored())
 
         response = self.f.copy(store=False)
-        self.assertEqual(None, response['result']['datetime_stored'])
-
-        response = self.f.copy(pattern='${uuid}')
-        self.assertEqual(response['uuid'], response['original_filename'])
+        time.sleep(1)
+        copied_file = File(response['result']['uuid'])
+        time.sleep(1)
+        self.assertFalse(copied_file.is_stored())
 
 
 class FileListIterationTest(RestAPITestCase):

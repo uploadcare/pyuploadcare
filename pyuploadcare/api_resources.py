@@ -231,47 +231,45 @@ class File(object):
         """
         self._info_cache = rest_request('PUT', self._api_storage_uri)
 
-    def copy(self, effects=None, target=None, make_public=None, store=None, pattern=None):
+    def copy(self, **kwargs):
         """Creates File copy
+        Keyword Args:
+          - target:  
+                If ``target`` is ``None``, copy file to Uploadcare storage otherwise
+                copy to target associated with project;
+          - effects: 
+                Add ``effects`` to ``self.default_effects`` if any;
+          - make_public: 
+                To forbid a public from accessing your files on the target storage set
+                ``make_public`` option to be False, relevant when ``target`` has a value set.
+          - store: 
+                If ``store`` option is set to False the copy of your file will be deleted
+                in 24 hour period after the upload.
+          - pattern: 
+                Specify  ``pattern`` option to set S3 object key name.
 
-      - If ``target`` is ``None``, copy file to Uploadcare storage otherwise
-        copy to target associated with project;
-      -  Add ``effects`` to ``self.default_effects`` if any;
-      -  To forbid a public from accessing your files on the target storage set
-        ``make_public`` option to be ``false``,
-        relevant when ``target`` has a value set.
-      - Specify  ``pattern`` option to set the file name
+        Following example copies a file to ``samplefs`` S3 storage with  owner only access, 
+        and file name consisting of uuid concatenated to original filename  placed
+        in the root of the bucket:
+             >>>file.copy(target='samplefs',
+                                make_public=False,
+                                pattern='${uuid}${filename}${ext}');
 
-      - Following example copies a file to ``samplefs`` S3 storage with an owner only access,
-      with file name consisting of uuid,original filename and file extension placed
-      in the root of the storage:
-            - >>>file.copy(target='samplefs',
-                            make_public='false',
-                            pattern='${uuid}${filename}${ext}');
-
-      - In this example, a file is copied to 'samplefs' storage with public access and placed
-      under the directory named after file uuid. A new file has the same file name as its original.
-                >>>file.copy(None,'samplefs','true');
+        In this example, a file is copied to ``samplefs`` storage with public access and placed
+        under the directory named after file uuid. A new file has the same file name as its original.
+                >>>file.copy(None,'samplefs');
 
         """
-        effects = effects or ''
+        effects = kwargs.get('effects','')
         if self.default_effects is not None:
             fmt = '{head}-/{tail}' if effects else '{head}'
             effects = fmt.format(head=self.default_effects,
                                  tail=effects)
-        data = {
-            'source': self.cdn_path(effects)
-        }
-        if target is not None:
-            data['target'] = target
-        if make_public is not None:
-            data['make_public'] = make_public
-        if store is not None:
-            data['store'] = store
-        if pattern is not None:
-            data['pattern'] = pattern
 
-        return rest_request('POST', 'files/', data=data)
+        kwargs.update({'source':self.cdn_path(effects)})
+        if 'effects' in kwargs:
+            del kwargs['effects']
+        return rest_request('POST', 'files/', data=kwargs)
 
     def delete(self):
         """Deletes file by requesting Uploadcare API."""
