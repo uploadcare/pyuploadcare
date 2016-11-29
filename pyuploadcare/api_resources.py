@@ -233,40 +233,48 @@ class File(object):
 
     def copy(self, **kwargs):
         """Creates File copy
+
         Keyword Args:
           - target:  
                 If ``target`` is ``None``, copy file to Uploadcare storage otherwise
                 copy to target associated with project;
           - effects: 
-                Add ``effects`` to ``self.default_effects`` if any;
+                Adds CDN image effects to ``self.default_effects`` if any;
           - make_public: 
-                To forbid a public from accessing your files on the target storage set
+                To forbid a public access for your files on the target storage set
                 ``make_public`` option to be False, relevant when ``target`` has a value set.
-          - store: 
+                Default value is True.
+          - store:
                 If ``store`` option is set to False the copy of your file will be deleted
-                in 24 hour period after the upload.
+                in 24 hour period after the upload. Relevant to Uploadcare storage only.
           - pattern: 
-                Specify  ``pattern`` option to set S3 object key name.
+                Specify  ``pattern`` option to set S3 object key name. Takes precedence over
+                pattern set in the settings. If neither is specified defaults to ${uuid}/${auto_filename}.
+                Relevant to custom storage only.
 
-        Following example copies a file to ``samplefs`` S3 storage with  owner only access, 
-        and file name consisting of uuid concatenated to original filename  placed
-        in the root of the bucket:
+        For more information on each of the options above please refer to
+        our docs https://uploadcare.com/documentation/rest/#file.
+
+        Following example copies a file to the bucket named ``samplefs`` with  owner only access,
+        and file name consisting of UUID concatenated to original filename. The file is placed
+        in the root of the storage:
              >>>file.copy(target='samplefs',
                                 make_public=False,
                                 pattern='${uuid}${filename}${ext}');
 
-        In this example, a file is copied to ``samplefs`` storage with public access and placed
-        under the directory named after file uuid. A new file has the same file name as its original.
+        In this example, a file is copied to ``samplefs`` storage. Options ``make_public`` and ``pattern``
+        are not set, so default settings  will kick in: the file has public access rights and it is placed
+        in the root of the directory named after file UUID. A new file has the same file name as its original.
                 >>>file.copy(None,'samplefs');
 
         """
-        effects = kwargs.get('effects','')
+        effects = kwargs.get('effects', '')
         if self.default_effects is not None:
             fmt = '{head}-/{tail}' if effects else '{head}'
             effects = fmt.format(head=self.default_effects,
                                  tail=effects)
 
-        kwargs.update({'source':self.cdn_path(effects)})
+        kwargs.update({'source': self.cdn_path(effects)})
         if 'effects' in kwargs:
             del kwargs['effects']
         return rest_request('POST', 'files/', data=kwargs)
