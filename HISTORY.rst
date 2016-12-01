@@ -3,6 +3,11 @@
 History
 -------
 
+x.x.x
+~~~~~
+
+- Updated widget to version 2.10.2 (see `widget changelog`_).
+
 2.1.0
 ~~~~~
 
