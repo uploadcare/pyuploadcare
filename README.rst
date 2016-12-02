@@ -93,11 +93,11 @@ Besides the `Travis CI`_ we use tox. In order to run tests just:
 Contributors
 ------------
 
-- @marselester_
-- @dmitry-mukhin_
-- @zerc_
-- @homm_
-- @va1en0k_
+- `@marselester`_
+- `@dmitry-mukhin`_
+- `@zerc`_
+- `@homm`_
+- `@va1en0k`_
 
 Current maintainer — @dmitry-mukhin_.
 
