@@ -8,22 +8,23 @@ PyUploadcare: a Python library for Uploadcare
    :target: https://readthedocs.org/projects/pyuploadcare/?badge=latest
    :alt: Documentation Status
 
-The most important thing for us at `Uploadcare`_ is to make file uploading on
-the web really easy. Everyone is used to the routine work, related to allowing
-users upload their user pics or attach resumes: from installing image processing
-libraries to creating folder with right permissions to ensuring the server
-never goes down or out of space to enabling CDN. Feature like ability to simply
-use a picture from Facebook or manual cropping are much more burdensome,
-hence rare. Uploadcare's goal is to change the status quo.
+Simple file uploads for the web are of most importance
+for us at `Uploadcare`_. Today, everyone is used to the routine of
+allowing users to upload their pics or attach resumes. The routine
+covers it all: installing image processing libraries, adjusting permissions,
+ensuring servers never go down, and enabling CDN.
+Features like uploading from Facebook or manual crop are weighty,
+hence rare.
+Our goal is to change the status quo.
 
-This library consists of an API interface for `Uploadcare`_ and a couple
+This library consists of the `Uploadcare`_ API interface and a couple
 of Django goodies.
 
-A simple Uploadcare ``ImageField`` can be added to an existing Django project
-in just a couple of `simple steps`_. As a result, your users
-are going to be able to see the progress of the upload, choose files from
-Google Drive or Instagram, and edit form while files are uploading
-asynchronously.
+Simple as that, Uploadcare ``ImageField`` can be added to an
+existing Django project in just a couple of `simple steps`_.
+This will enable your users to see the upload progress, pick files
+from Google Drive or Instagram, and edit a form while files are
+being uploaded asynchronously.
 
 .. code-block:: python
 
@@ -50,9 +51,9 @@ asynchronously.
 Features
 --------
 
-- Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs
-- Django widget with useful manual crop and multi-upload;
-- *ucare* console utility;
+- Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
+- Django widget with useful manual crop and multi-upload.
+- *ucare* console utility.
 - hosted assets (Kudos to `Sławek Ehlert`_!).
 
 Requirements
@@ -67,13 +68,13 @@ Python-Django combinations.
 Installation
 ------------
 
-To install it, just run:
+In order to install ``pyuploadcare``, simply run:
 
 .. code-block:: console
 
     $ pip install pyuploadcare
 
-or, if you're into vintage:
+or, if you prefer it the old way:
 
 .. code-block:: console
 
@@ -89,9 +90,25 @@ Besides the `Travis CI`_ we use tox. In order to run tests just:
     $ pip install tox
     $ tox
 
+Contributors
+------------
+
+- `@marselester`_
+- `@dmitry-mukhin`_
+- `@zerc`_
+- `@homm`_
+- `@va1en0k`_
+
+Current maintainer — `@dmitry-mukhin`_.
+
 .. _Uploadcare: https://uploadcare.com/
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
 .. _Sławek Ehlert: https://github.com/slafs
 .. _Travis CI: https://travis-ci.org/uploadcare/pyuploadcare
 .. _REST: https://uploadcare.com/documentation/rest/
 .. _Upload: https://uploadcare.com/documentation/upload/
+.. _@marselester: https://github.com/marselester
+.. _@dmitry-mukhin: https://github.com/dmitry-mukhin
+.. _@zerc: https://github.com/zerc
+.. _@homm: https://github.com/homm
+.. _@va1en0k: https://github.com/va1en0k
