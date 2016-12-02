@@ -99,7 +99,7 @@ Contributors
 - `@homm`_
 - `@va1en0k`_
 
-Current maintainer — @dmitry-mukhin_.
+Current maintainer — `@dmitry-mukhin`_.
 
 .. _Uploadcare: https://uploadcare.com/
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
