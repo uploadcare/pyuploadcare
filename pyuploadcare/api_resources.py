@@ -231,53 +231,82 @@ class File(object):
         """
         self._info_cache = rest_request('PUT', self._api_storage_uri)
 
-    def copy(self, **kwargs):
-        """Creates File copy
+    def copy(self, effects=None, target=None, make_public=None, store=None, pattern=None):
+        """Creates a File Copy on Uploadcare or Custom Storage. Will be deprecated in version 4.0.0"""
 
-        Keyword Args:
-          - target:  
-                If ``target`` is ``None``, copy file to Uploadcare storage otherwise
-                copy to target associated with project;
-          - effects: 
-                Adds CDN image effects to ``self.default_effects`` if any;
-          - make_public: 
-                To forbid a public access for your files on the target storage set
-                ``make_public`` option to be False, relevant when ``target`` has a value set.
-                Default value is True.
-          - store:
-                If ``store`` option is set to False the copy of your file will be deleted
-                in 24 hour period after the upload. Relevant to Uploadcare storage only.
-          - pattern: 
-                Specify  ``pattern`` option to set S3 object key name. Takes precedence over
-                pattern set in the settings. If neither is specified defaults to ${uuid}/${auto_filename}.
-                Relevant to custom storage only.
+        if target is not None:
+             return self.copy_to_remote(target, effects, make_public, pattern)
+        else:
+             return self.copy_to_local(effects, store)
 
-        For more information on each of the options above please refer to
-        our docs https://uploadcare.com/documentation/rest/#file.
+    def copy_to_local(self, effects=None, store=None):
+        """Creates a Local File Copy on Uploadcare Storage
 
-        Following example copies a file to the bucket named ``samplefs`` with  owner only access,
-        and file name consisting of UUID concatenated to original filename. The file is placed
-        in the root of the storage:
-             >>>file.copy(target='samplefs',
-                                make_public=False,
-                                pattern='${uuid}${filename}${ext}');
-
-        In this example, a file is copied to ``samplefs`` storage. Options ``make_public`` and ``pattern``
-        are not set, so default settings  will kick in: the file has public access rights and it is placed
-        in the root of the directory named after file UUID. A new file has the same file name as its original.
-                >>>file.copy(None,'samplefs');
-
+        - effects:
+            Adds CDN image effects. If ``self.default_effects`` property is set
+            effects will be combined with default effects.
+        - store:
+            If ``store`` option is set to False the copy of your file will be deleted
+            in 24 hour period after the upload.
         """
-        effects = kwargs.get('effects', '')
+        effects = effects or ''
+        store = store or ''
         if self.default_effects is not None:
             fmt = '{head}-/{tail}' if effects else '{head}'
             effects = fmt.format(head=self.default_effects,
                                  tail=effects)
+        data = {
+            'source': self.cdn_path(effects)
+        }
+        if store is not None:
+            data['store'] = store
+        return rest_request('POST', 'files/', data=data)
 
-        kwargs.update({'source': self.cdn_path(effects)})
-        if 'effects' in kwargs:
-            del kwargs['effects']
-        return rest_request('POST', 'files/', data=kwargs)
+    def copy_to_remote(self, target, effects=None, make_public=None, pattern=None):
+        """Creates File Copy On Remote Storage
+
+        - target:
+            Target name associated with the project;
+        - effects:
+            Adds CDN image effects to ``self.default_effects`` if any;
+        - make_public:
+            To forbid public from accessing your files on the storage set
+            ``make_public`` option to be False.
+            Default value is True.
+        - pattern:
+            Specify  ``pattern`` option to set S3 object key name. Takes precedence over
+            pattern set in the settings. If neither is specified defaults to
+            ${uuid}/${filename} ${effects} ${ext}
+
+        For more information on each of the options above please refer to
+        our docs https://uploadcare.com/documentation/rest/#file.
+
+        Following example copies a file to custom storage named ``samplefs``:
+             >>>file = File('e8ebfe20-8c11-4a94-9b40-52ecad7d8d1a');
+             >>>file.remote_copy(target='samplefs',
+                                 make_public=True,
+                                 pattern='${uuid}/${filename}${ext}');
+        Now custom storage ``samplefs`` contains publicly available file
+        with original filename billmurray.jpg in
+        in the directory named ``e8ebfe20-8c11-4a94-9b40-52ecad7d8d1a``.
+
+
+        """
+        effects = effects or ''
+        if self.default_effects is not None:
+            fmt = '{head}-/{tail}' if effects else '{head}'
+            effects = fmt.format(head=self.default_effects,
+                                 tail=effects)
+        data = {
+            'source': self.cdn_path(effects),
+            'target': target
+        }
+
+        if make_public is not None:
+            data['make_public'] = make_public
+        if pattern is not None:
+            data['pattern'] = pattern
+        return rest_request('POST', 'files/', data=data)
 
     def delete(self):
         """Deletes file by requesting Uploadcare API."""

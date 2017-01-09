@@ -277,25 +277,36 @@ class FileCopyTest(RestAPITestCase):
         cls.f.delete()
         super(FileCopyTest, cls).tearDownClass()
 
-
     def test_local_copy(self):
-        response = self.f.copy()
-        self.assertEqual('file', response['type'])
-
         response = self.f.copy(effects='resize/50x/')
         self.assertEqual('file', response['type'])
 
         response = self.f.copy(store=True)
-        time.sleep(1)
-        copied_file = File(response['result']['uuid'])
-        time.sleep(1)
-        self.assertTrue(copied_file.is_stored())
+        file = File(response['result']['uuid'])
+        time.sleep(2)
+        self.assertEqual(file.is_stored(), True)
 
         response = self.f.copy(store=False)
-        time.sleep(1)
-        copied_file = File(response['result']['uuid'])
-        time.sleep(1)
-        self.assertFalse(copied_file.is_stored())
+        file = File(response['result']['uuid'])
+        time.sleep(2)
+        self.assertEqual(file.is_stored(), False)
+
+    def test_copy_to_local(self):
+        response = self.f.copy_to_local()
+        self.assertEqual('file', response['type'])
+
+        response = self.f.copy_to_local(effects='resize/50x/')
+        self.assertEqual('file', response['type'])
+
+        response = self.f.copy_to_local(effects='resize/50x/', store=True)
+        file = File(response['result']['uuid'])
+        time.sleep(2)
+        self.assertEqual(file.is_stored(), True)
+
+        response = self.f.copy_to_local(store=False)
+        file = File(response['result']['uuid'])
+        time.sleep(2)
+        self.assertEqual(file.is_stored(), False)
 
 
 class FileListIterationTest(RestAPITestCase):
