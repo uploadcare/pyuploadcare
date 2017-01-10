@@ -110,3 +110,8 @@ Contributors
 .. _@zerc: https://github.com/zerc
 .. _@homm: https://github.com/homm
 .. _@va1en0k: https://github.com/va1en0k
+
+
+.. image:: https://api.codacy.com/project/badge/Grade/d4b98a73551347ec8ab18541e69d45ed
+   :alt: Codacy Badge
+   :target: https://www.codacy.com/app/khazamov/pyuploadcare?utm_source=github.com&utm_medium=referral&utm_content=uploadcare/pyuploadcare&utm_campaign=badger
