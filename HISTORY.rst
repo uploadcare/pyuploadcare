@@ -6,7 +6,7 @@ History
 x.x.x
 ~~~~~
 
-- Updated widget to version 2.10.2 (see `widget changelog`_).
+- Update CDN link to the widget and set wildcard version
 
 2.1.0
 ~~~~~
