@@ -6,7 +6,8 @@ History
 x.x.x
 ~~~~~
 
-- Update CDN link to the widget and set wildcard version
+- Update CDN link to the widget
+- Use wildcard for get latest `2.x.x` version of widget
 
 2.1.0
 ~~~~~
