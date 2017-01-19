@@ -32,7 +32,7 @@ class FormFieldsAttributesTest(unittest.TestCase):
         f = SomeForm(label_suffix='')
         self.assertRegexpMatches(
             str(f.media),
-            'https://ucarecdn\.com/widget/[\d\.x]+/uploadcare/uploadcare\.full.min\.js'
+            'https://ucarecdn\.com/libs/widget/[\d\.x]+/uploadcare\.full.min\.js'
         )
         self.assertIn('role="uploadcare-uploader"', str(f['ff']))
         self.assertIn('data-public-key="asdf"', str(f['ff']))
@@ -48,7 +48,7 @@ class FormFieldsAttributesTest(unittest.TestCase):
         f = SomeForm(label_suffix='')
         self.assertRegexpMatches(
             str(f.media),
-            'https://ucarecdn\.com/widget/[\d\.x]+/uploadcare/uploadcare\.full\.min\.js'
+            'https://ucarecdn\.com/libs/widget/[\d\.x]+/uploadcare\.full\.min\.js'
         )
         self.assertIn('role="role"', str(f['ff']))
         self.assertIn('data-public-key="asdf"', str(f['ff']))

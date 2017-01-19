@@ -6,7 +6,10 @@ History
 x.x.x
 ~~~~~
 
-- Updated widget to version 2.10.2 (see `widget changelog`_).
+- Update CDN link to the widget
+- Use wildcard ``2.x`` to always get the latest
+  patch or minor version of the ``2`` major version of the widget,
+  see `widget changelog`_  now and then :)
 
 2.1.0
 ~~~~~
