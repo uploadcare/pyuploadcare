@@ -4,9 +4,13 @@ PyUploadcare: a Python library for Uploadcare
 
 .. image:: https://travis-ci.org/uploadcare/pyuploadcare.png?branch=master
    :target: https://travis-ci.org/uploadcare/pyuploadcare
+   :alt: Build Status
 .. image:: https://readthedocs.org/projects/pyuploadcare/badge/?version=latest
    :target: https://readthedocs.org/projects/pyuploadcare/?badge=latest
    :alt: Documentation Status
+.. image:: https://coveralls.io/repos/github/uploadcare/pyuploadcare/badge.svg?branch=master
+   :target: https://coveralls.io/github/uploadcare/pyuploadcare?branch=master
+   :alt: Coverage
 .. image:: https://landscape.io/github/uploadcare/pyuploadcare/master/landscape.svg?style=flat
    :target: https://landscape.io/github/uploadcare/pyuploadcare/master
    :alt: Code Health
