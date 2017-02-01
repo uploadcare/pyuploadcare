@@ -44,7 +44,7 @@ install:
   - pip install django~=$DJANGO.0
   - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
   - pip install pytest-cov python-coveralls
-  - python setup.py install
+  - pip install -e .
 script: py.test $SUITE --cov=pyuploadcare
 notifications:
   email:
