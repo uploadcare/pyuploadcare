@@ -17,7 +17,6 @@ import json
 import socket
 import cgi
 import time
-
 import requests
 import six
 
@@ -196,6 +195,11 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             else:
                 raise
 
+def generate_secure_signature(secret, expire):
+    """Generates secure signature for upload requests"""
+
+    to_sign = str(secret) + str(int(expire))
+    return hashlib.md5(to_sign).digest().encode('hex')
 
 def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     """Makes Uploading API request and returns response as ``dict``.
@@ -204,7 +208,7 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
 
     Make sure that given ``path`` does not contain leading slash.
 
-    Usage example::
+    Usage example:: 
 
         >>> file_obj = open('photo.jpg', 'rb')
         >>> uploading_request('POST', 'base/', files={'file': file_obj})
@@ -221,7 +225,11 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
         data = {}
     data['pub_key'] = conf.pub_key
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
-
+    signed_uploads = conf.signed_uploads
+    if(conf.signed_uploads) = 'True':
+        secret = conf.private_key
+        data['expire'] = int(time.time()) * 60 * int(conf.expire)
+        data['signature'] = generate_secure_signature(secret, expire)
     try:
         response = session.request(
             str(verb), url, allow_redirects=True,

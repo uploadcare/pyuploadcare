@@ -17,6 +17,7 @@ from __future__ import unicode_literals
 
 __version__ = '2.1.0'
 
+from .api import generate_secure_signature
 from .api_resources import File, FileList, FileGroup
 from .exceptions import (
     UploadcareException, APIConnectionError, AuthenticationError, APIError,
