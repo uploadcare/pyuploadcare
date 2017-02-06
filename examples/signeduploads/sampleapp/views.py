@@ -1,12 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.shortcuts import render
 import json
 import time
-import hashlib
-import hmac
 from .forms import ImgForm
-from pyuploadcare import FileGroup, generate_secure_signature
+from pyuploadcare import generate_secure_signature
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 

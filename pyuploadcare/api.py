@@ -225,11 +225,7 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
         data = {}
     data['pub_key'] = conf.pub_key
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
-    signed_uploads = conf.signed_uploads
-    if(conf.signed_uploads) = 'True':
-        secret = conf.private_key
-        data['expire'] = int(time.time()) * 60 * int(conf.expire)
-        data['signature'] = generate_secure_signature(secret, expire)
+
     try:
         response = session.request(
             str(verb), url, allow_redirects=True,
