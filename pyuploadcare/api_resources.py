@@ -231,15 +231,20 @@ class File(object):
         """
         self._info_cache = rest_request('PUT', self._api_storage_uri)
 
-    def copy(self, effects=None, target=None, make_public=None, store=None, pattern=None):
+    def copy(self, effects=None, target=None):
         """Creates a File Copy on Uploadcare or Custom Storage. Will be deprecated in version 4.0.0"""
 
-        if target is not None:
-             return self.copy_to_remote(target, effects, make_public, pattern)
-        else:
-             return self.copy_to_local(effects, store)
+        warning = """ File.copy method will be deprecated in version 4.0.0.
+                      Please use create_local_copy and
+                      create_remote_copy instead. """
+        logger.warn('API Warning: {0}'.format(warning))
 
-    def copy_to_local(self, effects=None, store=None):
+        if target is not None:
+             return self.create_remote_copy(target, effects)
+        else:
+             return self.create_local_copy(effects)
+
+    def create_local_copy(self, effects=None, store=None):
         """Creates a Local File Copy on Uploadcare Storage
 
         - effects:
@@ -262,7 +267,7 @@ class File(object):
             data['store'] = store
         return rest_request('POST', 'files/', data=data)
 
-    def copy_to_remote(self, target, effects=None, make_public=None, pattern=None):
+    def create_remote_copy(self, target, effects=None, make_public=None, pattern=None):
         """Creates File Copy On Remote Storage
 
         - target:
@@ -272,10 +277,10 @@ class File(object):
         - make_public:
             To forbid public from accessing your files on the storage set
             ``make_public`` option to be False.
-            Default value is True.
+            Default value is None. Files have public access by default.
         - pattern:
-            Specify  ``pattern`` option to set S3 object key name. Takes precedence over
-            pattern set in the settings. If neither is specified defaults to
+            Specify ``pattern`` option to set S3 object key name. Takes precedence over
+            pattern set in project settings. If neither is specified defaults to
             ${uuid}/${filename} ${effects} ${ext}
 
         For more information on each of the options above please refer to

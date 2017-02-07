@@ -3,12 +3,12 @@
 History
 -------
 
-3.0.0
+x.x.x
 ~~~~~
 
-- Split file.copy method into file.copy_to_remote and file.copy_to_local.
-- Add new ``make_public`` and ``pattern`` parameters to file.copy_to_remote method.
-- Add new ``store`` parameter to file.copy_to_local methods.
+- Add file.create_local_copy and file.create_remote_copy methods.
+- Add new ``make_public`` and ``pattern`` parameters to file.create_remote_copy method.
+- Add new ``store`` parameter to file.create_local_copy methods.
 - Update CDN link to the widget.
 - Use wildcard ``2.x`` to always get the latest
   patch or minor version of widget version ``2``. 

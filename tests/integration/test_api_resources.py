@@ -281,29 +281,19 @@ class FileCopyTest(RestAPITestCase):
         response = self.f.copy(effects='resize/50x/')
         self.assertEqual('file', response['type'])
 
-        response = self.f.copy(store=True)
+    def test_create_local_copy(self):
+        response = self.f.create_local_copy()
+        self.assertEqual('file', response['type'])
+
+        response = self.f.create_local_copy(effects='resize/50x/')
+        self.assertEqual('file', response['type'])
+
+        response = self.f.create_local_copy(effects='resize/50x/', store=True)
         file = File(response['result']['uuid'])
         time.sleep(2)
         self.assertEqual(file.is_stored(), True)
 
-        response = self.f.copy(store=False)
-        file = File(response['result']['uuid'])
-        time.sleep(2)
-        self.assertEqual(file.is_stored(), False)
-
-    def test_copy_to_local(self):
-        response = self.f.copy_to_local()
-        self.assertEqual('file', response['type'])
-
-        response = self.f.copy_to_local(effects='resize/50x/')
-        self.assertEqual('file', response['type'])
-
-        response = self.f.copy_to_local(effects='resize/50x/', store=True)
-        file = File(response['result']['uuid'])
-        time.sleep(2)
-        self.assertEqual(file.is_stored(), True)
-
-        response = self.f.copy_to_local(store=False)
+        response = self.f.create_local_copy(store=False)
         file = File(response['result']['uuid'])
         time.sleep(2)
         self.assertEqual(file.is_stored(), False)
