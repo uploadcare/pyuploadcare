@@ -277,7 +277,7 @@ class File(object):
         return file_
 
     @classmethod
-    def upload(cls, file_obj, store=None, signature=None, expire=None):
+    def upload(cls, file_obj, store=None):
         """Uploads a file and returns ``File`` instance.
 
         Args:
@@ -288,10 +288,6 @@ class File(object):
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
-            signature (Optional[str]): Signature for the upload request.
-                Relevant only if signed uploads are enabled.
-            expire (Optional[int]): Expire time for the upload request.
-                Relevant only if signed uploads are enabled.
 
         Returns:
             ``File`` instance
@@ -307,9 +303,9 @@ class File(object):
             'UPLOADCARE_STORE': store,
         }
 
-        if conf.signed_uploads == True:
-            data['expire'] = expire
-            data['signature'] = signature
+        if conf.signed_uploads:
+            data['expire'] = conf.expire
+            data['signature'] = conf.signature
 
         files = uploading_request('POST', 'base/', data=data,
                                   files={'file': file_obj})
@@ -317,7 +313,7 @@ class File(object):
         return file_
 
     @classmethod
-    def upload_from_url(cls, url, store=None, filename=None, signature=None, expire=None):
+    def upload_from_url(cls, url, store=None, filename=None):
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
         Args:
@@ -331,10 +327,6 @@ class File(object):
             filename (Optional[str]): Name of the uploaded file. If this not
                 specified the filename will be obtained from response headers
                 or source URL. Defaults to None.
-            signature (Optional[str]): Signature for the upload request.
-                Relevant only if signed uploads are enabled.
-            expire (Optional[int]): Expire time for the upload request.
-                Relevant only if signed uploads are enabled.
 
         Returns:
             ``FileFromUrl`` instance
@@ -354,9 +346,9 @@ class File(object):
         if filename:
             data['filename'] = filename
 
-        if conf.signed_uploads == True:
-            data['expire'] = expire
-            data['signature'] = signature
+        if conf.signed_uploads:
+            data['expire'] = conf.expire
+            data['signature'] = conf.signature
 
         result = uploading_request('POST', 'from_url/',
                                    data=data)
@@ -663,7 +655,7 @@ class FileGroup(object):
         return group
 
     @classmethod
-    def create(cls, files, signature=None, expire=None):
+    def create(cls, files):
         """Creates file group and returns ``FileGroup`` instance.
 
         It expects iterable object that contains ``File`` instances, e.g.::
@@ -672,16 +664,6 @@ class FileGroup(object):
             >>> file_2 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
             >>> FileGroup.create((file_1, file_2))
             <uploadcare.FileGroup 0513dda0-6666-447d-846f-096e5df9e2bb~2>
-
-        If signed uploads are enabled then function expects signature and expire time:
-
-            >>> expire = int(time.time()) + 60 * 30
-            >>> signature = generate_secure_signature(conf.secret, expire)
-            >>> file_1 = File('1ba14c39-8f89-4a51-becb-9539318820e2')
-            >>> file_2 = File('c0d9d1dc-98a4-41c2-942f-3f70a3be168d')
-            >>> fgroup = FileGroup.create((file_1, file_2),signature=signature, expire=expire)
-            >>> print fgroup.cdn_url
-            https://ucarecdn.com/e8fb2840-cd03-41e2-a7d4-b9d02c6fa625~2/
 
         """
         data = {}
@@ -696,9 +678,9 @@ class FileGroup(object):
         if not data:
             raise InvalidParamError('set of files is empty')
 
-        if conf.signed_uploads == True:
-            data['expire'] = expire
-            data['signature'] = signature
+        if conf.signed_uploads:
+            data['expire'] = conf.expire
+            data['signature'] = conf.signature
 
         group_info = uploading_request('POST', 'group/', data=data)
 

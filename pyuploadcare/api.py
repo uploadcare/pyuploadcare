@@ -163,7 +163,8 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             return ''
 
         if 200 <= response.status_code < 300:
-            if _content_type_from_response(response).endswith(('/json', '+json')):
+            if _content_type_from_response(response).endswith(('/json',
+                                                               '+json')):
                 if verb.lower() == 'head':
                     return ''
                 try:
@@ -195,11 +196,6 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             else:
                 raise
 
-def generate_secure_signature(secret, expire):
-    """Generates secure signature for upload requests"""
-
-    to_sign = str(secret) + str(int(expire))
-    return hashlib.md5(to_sign).digest().encode('hex')
 
 def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     """Makes Uploading API request and returns response as ``dict``.
@@ -208,7 +204,7 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
 
     Make sure that given ``path`` does not contain leading slash.
 
-    Usage example:: 
+    Usage example::
 
         >>> file_obj = open('photo.jpg', 'rb')
         >>> uploading_request('POST', 'base/', files={'file': file_obj})

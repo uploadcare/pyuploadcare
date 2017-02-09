@@ -8,11 +8,9 @@ div.formy {
     padding-bottom: 10px;
     padding-left: 10px;
 
-
 }
 
 </style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script charset="utf-8" src="//ucarecdn.com/widget/2.x/uploadcare/uploadcare.full.min.js"></script>
 
 <script>
@@ -29,7 +27,7 @@ div.formy {
                      signature = response['signature'];
                      expire = response['expire'];
                      uploadcare.start({
-                         publicKey: 'dddc66243e5fad63afba',
+                         publicKey: 'YOUR_PUBLIC_KEY',
                          secureSignature:signature, 
                          secureExpire: expire});
                         }
@@ -48,7 +46,7 @@ div.formy {
  
 <form action="index" method="post" id="stumpyform">
   {% csrf_token %}
- {{ form }}
+  {{ form }}
 
 </form>
 
