@@ -253,7 +253,6 @@ class FileCopyTest(unittest.TestCase):
             "pattern": "${uuid}"})
 
 
-
 class FileGroupAsContainerTypeTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
