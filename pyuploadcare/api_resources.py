@@ -250,9 +250,11 @@ class File(object):
                 Uploadcare storage is used if target is absent.
 
         """
-        warning = """ File.copy method will be deprecated in version 4.0.0.
-                      Please use create_local_copy and
-                      create_remote_copy instead. """
+        warning = """File.copy method is deprecated and will be
+            removed in 4.0.0.
+            Please use `create_local_copy`
+            and `create_remote_copy` instead.
+        """
         logger.warn('API Warning: {0}'.format(warning))
 
         if target is not None:
@@ -270,6 +272,7 @@ class File(object):
             - store:
                 If ``store`` option is set to False the copy of your file will
                 be deleted in 24 hour period after the upload.
+                Works only if `autostore` is enabled in the project.
 
         """
         effects = self._build_effects(effects)
@@ -277,17 +280,17 @@ class File(object):
         data = {
             'source': self.cdn_path(effects)
         }
-        if store is not None:
+        if store:
             data['store'] = store
         return rest_request('POST', 'files/', data=data)
 
     def create_remote_copy(self, target, effects=None, make_public=None,
                            pattern=None):
-        """Creates file copy on remote storage.
+        """Creates file copy in remote storage.
 
         Args:
             - target:
-                Name of a custom storage connected to your project.
+                Name of a custom storage connected to the project.
             - effects:
                 Adds CDN image effects to ``self.default_effects`` if any.
             - make_public:
@@ -298,17 +301,17 @@ class File(object):
                 Specify ``pattern`` option to set S3 object key name.
                 Takes precedence over pattern set in project settings.
                 If neither is specified defaults to
-                ${uuid}/${filename} ${effects} ${ext}.
+                ${uuid}/${filename} ${effects} ${ext} .
 
         For more information on each of the options above please refer to
-        our docs https://uploadcare.com/documentation/rest/#file.
+        REST API docs https://uploadcare.com/documentation/rest/#file.
 
         Following example copies a file to custom storage named ``samplefs``:
 
              >>> file = File('e8ebfe20-8c11-4a94-9b40-52ecad7d8d1a')
-             >>> file.remote_copy(target='samplefs',
-             >>>                  make_public=True,
-             >>>                  pattern='${uuid}/${filename}${ext}')
+             >>> file.create_remote_copy(target='samplefs',
+             >>>                         make_public=True,
+             >>>                         pattern='${uuid}/${filename}${ext}')
 
         Now custom storage ``samplefs`` contains publicly available file
         with original filename billmurray.jpg in
