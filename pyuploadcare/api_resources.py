@@ -239,7 +239,9 @@ class File(object):
 
     def copy(self, effects=None, target=None):
         """Creates a File Copy on Uploadcare or Custom Storage.
-        This method Will be deprecated in version 4.0.0.
+        
+        File.copy method is deprecated and will be removed in 4.0.0.
+        Please use `create_local_copy` and `create_remote_copy` instead.
 
         Args:
             - effects:
@@ -301,7 +303,7 @@ class File(object):
                 Specify ``pattern`` option to set S3 object key name.
                 Takes precedence over pattern set in project settings.
                 If neither is specified defaults to
-                ${uuid}/${filename} ${effects} ${ext} .
+                ${uuid}/${filename}${effects}${ext} .
 
         For more information on each of the options above please refer to
         REST API docs https://uploadcare.com/documentation/rest/#file.
