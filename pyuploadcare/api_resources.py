@@ -303,7 +303,7 @@ class File(object):
                 Specify ``pattern`` option to set S3 object key name.
                 Takes precedence over pattern set in project settings.
                 If neither is specified defaults to
-                ${uuid}/${filename}${effects}${ext} .
+                `${uuid}/${filename}${effects}${ext}`.
 
         For more information on each of the options above please refer to
         REST API docs https://uploadcare.com/documentation/rest/#file.
