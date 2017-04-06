@@ -277,13 +277,26 @@ class FileCopyTest(RestAPITestCase):
         cls.f.delete()
         super(FileCopyTest, cls).tearDownClass()
 
-
     def test_local_copy(self):
-        response = self.f.copy()
-        self.assertEqual('file', response['type'])
-
         response = self.f.copy(effects='resize/50x/')
         self.assertEqual('file', response['type'])
+
+    def test_create_local_copy(self):
+        response = self.f.create_local_copy()
+        self.assertEqual('file', response['type'])
+
+        response = self.f.create_local_copy(effects='resize/50x/')
+        self.assertEqual('file', response['type'])
+
+        response = self.f.create_local_copy(effects='resize/50x/', store=True)
+        file = File(response['result']['uuid'])
+        time.sleep(2)
+        self.assertEqual(file.is_stored(), True)
+
+        response = self.f.create_local_copy(store=False)
+        file = File(response['result']['uuid'])
+        time.sleep(2)
+        self.assertEqual(file.is_stored(), False)
 
 
 class FileListIterationTest(RestAPITestCase):

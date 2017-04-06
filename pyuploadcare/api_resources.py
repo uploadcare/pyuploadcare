@@ -17,8 +17,7 @@ else:
 
 from . import conf
 from .api import rest_request, uploading_request
-from .exceptions import (InvalidParamError, InvalidRequestError, APIError,
-                         UploadError, TimeoutError)
+from .exceptions import InvalidParamError, APIError, UploadError, TimeoutError
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -67,6 +66,13 @@ class File(object):
 
     def __str__(self):
         return self.cdn_url
+
+    def _build_effects(self, effects=''):
+        if self.default_effects is not None:
+            fmt = '{head}-/{tail}' if effects else '{head}'
+            effects = fmt.format(head=self.default_effects,
+                                 tail=effects)
+        return effects
 
     @property
     def uuid(self):
@@ -232,23 +238,98 @@ class File(object):
         self._info_cache = rest_request('PUT', self._api_storage_uri)
 
     def copy(self, effects=None, target=None):
-        """Creates File copy
+        """Creates a File Copy on Uploadcare or Custom Storage.
+        
+        File.copy method is deprecated and will be removed in 4.0.0.
+        Please use `create_local_copy` and `create_remote_copy` instead.
 
-        If ``target`` is ``None``, copy file to Uploadcare storage otherwise
-        copy to target associated with project.
-        Add ``effects`` to ``self.default_effects`` if any.
+        Args:
+            - effects:
+                Adds CDN image effects. If ``self.default_effects`` property
+                is set effects will be combined with default effects.
+            - target:
+                Name of a custom storage connected to your project.
+                Uploadcare storage is used if target is absent.
+
         """
-        effects = effects or ''
-        if self.default_effects is not None:
-            fmt = '{head}-/{tail}' if effects else '{head}'
-            effects = fmt.format(head=self.default_effects,
-                                 tail=effects)
+        warning = """File.copy method is deprecated and will be
+            removed in 4.0.0.
+            Please use `create_local_copy`
+            and `create_remote_copy` instead.
+        """
+        logger.warn('API Warning: {0}'.format(warning))
+
+        if target is not None:
+            return self.create_remote_copy(target, effects)
+        else:
+            return self.create_local_copy(effects)
+
+    def create_local_copy(self, effects=None, store=None):
+        """Creates a Local File Copy on Uploadcare Storage.
+
+        Args:
+            - effects:
+                Adds CDN image effects. If ``self.default_effects`` property
+                is set effects will be combined with default effects.
+            - store:
+                If ``store`` option is set to False the copy of your file will
+                be deleted in 24 hour period after the upload.
+                Works only if `autostore` is enabled in the project.
+
+        """
+        effects = self._build_effects(effects)
+        store = store or ''
         data = {
             'source': self.cdn_path(effects)
         }
-        if target is not None:
-            data['target'] = target
+        if store:
+            data['store'] = store
+        return rest_request('POST', 'files/', data=data)
 
+    def create_remote_copy(self, target, effects=None, make_public=None,
+                           pattern=None):
+        """Creates file copy in remote storage.
+
+        Args:
+            - target:
+                Name of a custom storage connected to the project.
+            - effects:
+                Adds CDN image effects to ``self.default_effects`` if any.
+            - make_public:
+                To forbid public from accessing your files on the storage set
+                ``make_public`` option to be False.
+                Default value is None. Files have public access by default.
+            - pattern:
+                Specify ``pattern`` option to set S3 object key name.
+                Takes precedence over pattern set in project settings.
+                If neither is specified defaults to
+                `${uuid}/${filename}${effects}${ext}`.
+
+        For more information on each of the options above please refer to
+        REST API docs https://uploadcare.com/documentation/rest/#file.
+
+        Following example copies a file to custom storage named ``samplefs``:
+
+             >>> file = File('e8ebfe20-8c11-4a94-9b40-52ecad7d8d1a')
+             >>> file.create_remote_copy(target='samplefs',
+             >>>                         make_public=True,
+             >>>                         pattern='${uuid}/${filename}${ext}')
+
+        Now custom storage ``samplefs`` contains publicly available file
+        with original filename billmurray.jpg in
+        in the directory named ``e8ebfe20-8c11-4a94-9b40-52ecad7d8d1a``.
+
+        """
+        effects = self._build_effects(effects)
+        data = {
+            'source': self.cdn_path(effects),
+            'target': target
+        }
+
+        if make_public is not None:
+            data['make_public'] = make_public
+        if pattern is not None:
+            data['pattern'] = pattern
         return rest_request('POST', 'files/', data=data)
 
     def delete(self):
@@ -281,8 +362,8 @@ class File(object):
         """Uploads a file and returns ``File`` instance.
 
         Args:
-            file_obj: file object to upload to
-            store (Optional[bool]): Should the file be automatically stored
+            - file_obj: file object to upload to
+            - store (Optional[bool]): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
@@ -291,6 +372,7 @@ class File(object):
 
         Returns:
             ``File`` instance
+
         """
         if store is None:
             store = 'auto'
@@ -313,21 +395,21 @@ class File(object):
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
         Args:
-            url (str): URL of file to upload to
-            store (Optional[bool]): Should the file be automatically stored
+            - url (str): URL of file to upload to
+            - store (Optional[bool]): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
-            filename (Optional[str]): Name of the uploaded file. If this not
+            - filename (Optional[str]): Name of the uploaded file. If this not
                 specified the filename will be obtained from response headers
                 or source URL. Defaults to None.
 
         Returns:
             ``FileFromUrl`` instance
-        """
 
+        """
         if store is None:
             store = 'auto'
         elif store:
@@ -357,21 +439,21 @@ class File(object):
         """Uploads file from given url and returns ``File`` instance.
 
         Args:
-            url (str): URL of file to upload to
-            store (Optional[bool]): Should the file be automatically stored
+            - url (str): URL of file to upload to
+            - store (Optional[bool]): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
-            filename (Optional[str]): Name of the uploaded file. If this not
+            - filename (Optional[str]): Name of the uploaded file. If this not
                 specified the filename will be obtained from response headers
                 or source URL. Defaults to None.
-            timeout (Optional[int]): seconds to wait for successful upload.
+            - timeout (Optional[int]): seconds to wait for successful upload.
                 Defaults to 30.
-            interval (Optional[float]): interval between upload status checks.
+            - interval (Optional[float]): interval between upload status checks.
                 Defaults to 0.3.
-            until_ready (Optional[bool]): should we wait until file is
+            - until_ready (Optional[bool]): should we wait until file is
                 available via CDN. Defaults to False.
 
         Returns:

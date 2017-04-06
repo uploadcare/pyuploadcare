@@ -204,6 +204,54 @@ class FileCopyTest(unittest.TestCase):
             "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/-/flip/",
             "target": "tgt"})
 
+    @patch('pyuploadcare.api_resources.rest_request', autospec=True)
+    def test_create_remote_copy(self, request):
+        request.return_value = {}
+
+        # uuid with no effects
+        f = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+        f.create_remote_copy(target='tgt')
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/",
+            "target": "tgt"})
+
+        # uuid with effects
+        f = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+        f.create_remote_copy(target='tgt', effects='resize/1x1/')
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/1x1/",
+            "target": "tgt"})
+
+        # cdn url with no effects
+        f = File('a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/2x2/')
+        f.create_remote_copy(target='tgt')
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/2x2/",
+            "target": "tgt"})
+
+        # cdn url with effects
+        f = File('a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/')
+        f.create_remote_copy(target='tgt', effects='flip/')
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/-/flip/",
+            "target": "tgt"})
+
+        #cdn url with effects, set permissions to public
+        f = File('a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/')
+        f.create_remote_copy(target='tgt', effects='flip/', make_public=True)
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/-/flip/",
+            "target": "tgt",
+            "make_public": True})
+
+        #cdn url with effects, naming pattern
+        f = File('a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/')
+        f.create_remote_copy(target='tgt', effects='flip/', pattern='${uuid}')
+        request.assert_called_with('POST', 'files/', data={
+            "source": "a771f854-c2cb-408a-8c36-71af77811f3b/-/resize/3x3/-/flip/",
+            "target": "tgt",
+            "pattern": "${uuid}"})
+
 
 class FileGroupAsContainerTypeTest(unittest.TestCase):
 
