@@ -2,6 +2,7 @@
 
 Alex Zinchenko <admloki@gmail.com>
 Alexander Karpinsky <ak@uploadcare.com>
+Andrey Baryshnikov <ab@uploadcare.com>
 Dmitriy Narkevich <github@dimier.org>
 Dmitry Mukhin <dm@uploadcare.com>
 Elijah <ilya@uploadcare.com>

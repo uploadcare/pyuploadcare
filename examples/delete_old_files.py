@@ -1,7 +1,7 @@
 #!/bin/python
 
 # installation:
-# pip install pytz pyuploadcare==2.1.0
+# pip install pytz pyuploadcare~=2.1.0
 
 import pytz
 from datetime import timedelta, datetime
