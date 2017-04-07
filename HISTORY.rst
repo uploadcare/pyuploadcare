@@ -3,7 +3,7 @@
 History
 -------
 
-2.2.0
+2.2.1
 ~~~~~
 
 - Add file.create_local_copy and file.create_remote_copy methods.
