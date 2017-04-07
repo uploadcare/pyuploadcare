@@ -11,10 +11,8 @@ History
 - Add new ``store`` parameter to file.create_local_copy methods.
 - Update CDN link to the widget.
 - Use wildcard ``2.x`` to always get the latest
-  patch or minor version of widget version ``2``. 
-  See `widget changelog` (see `widget changelog`_).
-- Update bundled widget to version ``2.10.3``.
-  See `widget changelog` (see `widget changelog`_).
+  patch or minor version of widget version ``2``. See `widget changelog`_.
+- Update bundled widget to version ``2.10.3``. See `widget changelog`_.
 
 2.1.0
 ~~~~~
