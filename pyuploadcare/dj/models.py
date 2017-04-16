@@ -104,7 +104,7 @@ class ImageField(FileField):
 
     """
 
-    def __init__(self, manual_crop=None, *args, **kwargs):
+    def __init__(self, manual_crop=None, clearable=None, *args, **kwargs):
         is_crop_valid = (
             isinstance(manual_crop, six.string_types) and
             all([pattern_of_crop.match(part) for part in manual_crop.split(',')])
@@ -113,10 +113,12 @@ class ImageField(FileField):
             raise ValidationError('Invalid manual crop value')
 
         self.manual_crop = manual_crop
+        self.clearable = clearable
         super(ImageField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         kwargs['manual_crop'] = self.manual_crop
+        kwargs['clearable'] = self.clearable
         kwargs['form_class'] = forms.ImageField
 
         return models.Field.formfield(self, **kwargs)

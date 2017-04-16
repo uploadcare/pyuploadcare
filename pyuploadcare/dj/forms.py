@@ -73,8 +73,9 @@ class ImageField(FileField):
     """Django form field that sets up ``FileWidget`` to work with images.
     """
 
-    def __init__(self, manual_crop=None, *args, **kwargs):
+    def __init__(self, manual_crop=None, clearable=None, *args, **kwargs):
         self.manual_crop = manual_crop
+        self.clearable = clearable
         super(ImageField, self).__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
@@ -82,6 +83,8 @@ class ImageField(FileField):
         attrs['data-images-only'] = ''
         if self.manual_crop is not None:
             attrs['data-crop'] = self.manual_crop
+        if self.clearable is not None:
+            attrs['data-clearable'] = self.clearable
         return attrs
 
 
