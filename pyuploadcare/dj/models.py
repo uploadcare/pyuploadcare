@@ -4,6 +4,8 @@ import re
 
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext as _
+
 import six
 
 from . import forms
@@ -65,6 +67,16 @@ class FileField(six.with_metaclass(SubfieldBase, models.Field)):
                 raise ValidationError(
                     'The file could not be found in your Uploadcare project',
                     code='invalid_url')
+
+    def validate(self, value, model_instance):
+        super(FileField, self).validate(value, model_instance)
+
+        try:
+            value.info()
+        except InvalidRequestError:
+            raise ValidationError(_('The file with UUID %(uuid)s could not be found in your Uploadcare project'),
+                                  code='invalid_url',
+                                  params={'uuid': value.uuid})
 
     def clean(self, value, model_instance):
         cleaned_value = super(FileField, self).clean(value, model_instance)
