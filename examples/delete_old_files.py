@@ -22,6 +22,7 @@ if __name__ == '__main__':
 
     print 'Selecting files to be deleted...'
     uuid_list = [f.uuid for f in FileList(starting_point=dt_cutoff,
+                                          ordering='-datetime_uploaded',
                                           stored=True,
                                           request_limit=500)]
     print 'Batch delete of selected files'
