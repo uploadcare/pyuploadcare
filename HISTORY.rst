@@ -6,7 +6,7 @@ History
 2.2.1
 ~~~~~
 
-- Add file.create_local_copy and file.create_remote_copy methods.
+- Add ``file.create_local_copy`` and ``file.create_remote_copy`` methods.
 - Add new ``make_public`` and ``pattern`` parameters to file.create_remote_copy method.
 - Add new ``store`` parameter to file.create_local_copy methods.
 - Update CDN link to the widget.
