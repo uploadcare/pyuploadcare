@@ -31,9 +31,11 @@ matrix:
       env: DJANGO=1.8
 
     # integration tests
-    - python: 2.7
+    - stage: integration tests
+      python: 2.7
       env: DJANGO=1.10 SUITE="tests/integration"
-    - python: 3.5
+    - stage: integration tests
+      python: 3.5
       env: DJANGO=1.10 SUITE="tests/integration"
 
 cache:
