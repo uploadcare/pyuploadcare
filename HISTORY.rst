@@ -7,7 +7,7 @@ History
 ~~~~~
 
 - Add support for django versions 1.11 and ~2.0
-- Miscellaneous updates(version, year in a licence file, tox configuration and etc.)
+- Miscellaneous updates(version, year in a license file, tox configuration and etc.)
 
 2.2.1
 ~~~~~
