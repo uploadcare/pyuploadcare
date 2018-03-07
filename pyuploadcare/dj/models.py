@@ -45,7 +45,7 @@ class FileField(six.with_metaclass(SubfieldBase, models.Field)):
             return value.cdn_url
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = self.value_from_object(obj)
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
@@ -158,7 +158,7 @@ class FileGroupField(six.with_metaclass(SubfieldBase, models.Field)):
             return value.cdn_url
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = self.value_from_object(obj)
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
