@@ -6,6 +6,12 @@ History
 2.2.1
 ~~~~~
 
+- Add support for django versions 1.11 and ~2.0
+- Miscellaneous updates(version, year in a licence file, tox configuration and etc.)
+
+2.2.1
+~~~~~
+
 - Add ``file.create_local_copy`` and ``file.create_remote_copy`` methods.
 - Add new ``make_public`` and ``pattern`` parameters to file.create_remote_copy method.
 - Add new ``store`` parameter to file.create_local_copy methods.
