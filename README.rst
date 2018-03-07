@@ -66,7 +66,7 @@ Features
 Requirements
 ------------
 
-``pyuploadcare`` requires Python 2.6, 2.7, 3.3, 3.4 or 3.5.
+``pyuploadcare`` requires Python 2.6, 2.7, 3.3, 3.4, 3.5 or 3.6
 
 If you're using ``pyuploadcare`` with Django, check ``.travis.yml`` for supported
 Python-Django combinations.
@@ -105,6 +105,7 @@ Contributors
 - `@zerc`_
 - `@homm`_
 - `@va1en0k`_
+- `@andreshkovskii`_
 
 .. _Uploadcare: https://uploadcare.com/
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
@@ -117,3 +118,4 @@ Contributors
 .. _@zerc: https://github.com/zerc
 .. _@homm: https://github.com/homm
 .. _@va1en0k: https://github.com/va1en0k
+.. _@andreshkovskii: https://github.com/andrewshkovskii/
