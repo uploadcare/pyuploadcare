@@ -3,7 +3,7 @@
 History
 -------
 
-2.2.1
+2.3.0
 ~~~~~
 
 - Add support for django versions 1.11 and ~2.0
