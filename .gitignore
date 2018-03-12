@@ -6,3 +6,5 @@ docs/_build
 *.pyc
 .idea
 .tox/
+.cache/
+.pytest_cache/

@@ -1,9 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
+import unittest
 from tempfile import NamedTemporaryFile
 from datetime import datetime
 import time
