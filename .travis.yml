@@ -74,7 +74,7 @@ cache:
   directories:
     - $HOME/.cache/pip
 install:
-  - if [[ $$DJANGO != '' ]]; then pip install django~=$DJANGO.0; fi
+  - if [[ $DJANGO != '' ]]; then pip install django~=$DJANGO.0; fi
   - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
   - pip install pytest-cov python-coveralls
   - pip install -e .
