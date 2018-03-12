@@ -8,6 +8,7 @@ History
 
 - Add support for django versions 1.11 and ~2.0
 - Miscellaneous updates(version, year in a license file, tox configuration and etc.)
+- Drop obsolete Python and Django versions from test suites
 
 2.2.1
 ~~~~~
