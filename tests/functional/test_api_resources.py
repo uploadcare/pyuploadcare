@@ -1,9 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
+import unittest
 import datetime
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'

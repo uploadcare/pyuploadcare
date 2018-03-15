@@ -2,10 +2,7 @@
 from __future__ import unicode_literals
 import os
 import json
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
+import unittest
 from tempfile import NamedTemporaryFile
 
 from mock import patch, MagicMock, Mock

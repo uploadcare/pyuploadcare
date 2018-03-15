@@ -13,13 +13,12 @@ requirements = [
     'six>=1.2.0',
 ]
 
-if PY_VERSION == (2, 6):
-    requirements.append('argparse')
-
 if PY_VERSION < (3, 0):
-    long_description = open('README.rst').read() + '\n\n' + open('HISTORY.rst').read()
+    long_description = (open('README.rst').read() + '\n\n' +
+                        open('HISTORY.rst').read())
 else:
-    long_description = open('README.rst', encoding='utf-8').read() + '\n\n' + open('HISTORY.rst', encoding='utf-8').read()
+    long_description = (open('README.rst', encoding='utf-8').read() + '\n\n' +
+                        open('HISTORY.rst', encoding='utf-8').read())
 
 setup(
     name='pyuploadcare',
@@ -45,16 +44,11 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Framework :: Django',
-        'Framework :: Django :: 1.4',
-        'Framework :: Django :: 1.5',
-        'Framework :: Django :: 1.6',
-        'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
         'Framework :: Django :: 1.9',
         'Framework :: Django :: 1.10',
