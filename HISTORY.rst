@@ -3,6 +3,12 @@
 History
 -------
 
+2.3.1
+~~~~~
+
+- Update default widget version to ``3.x``
+- Update bundled widget to version ``3.2.3``. See `widget changelog`_.
+
 2.3.0
 ~~~~~
 
@@ -351,4 +357,4 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
 
 
 .. _widget changelog: https://github.com/uploadcare/uploadcare-widget/blob/master/HISTORY.markdown
-.. _update to version 2.0: http://pyuploadcare.readthedocs.org/en/v2.0/install.html#update-to-version-2-0
+.. _update to version 2.0: https://pyuploadcare.readthedocs.io/en/stable/install.html#update-to-version-2-0
