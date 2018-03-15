@@ -14,11 +14,11 @@ requirements = [
 ]
 
 if PY_VERSION < (3, 0):
-    long_description = open('README.rst').read() + '\n\n' + \
-                       open('HISTORY.rst').read()
+    long_description = (open('README.rst').read() + '\n\n' +
+                        open('HISTORY.rst').read())
 else:
-    long_description = open('README.rst', encoding='utf-8').read() + '\n\n' + \
-                       open('HISTORY.rst', encoding='utf-8').read()
+    long_description = (open('README.rst', encoding='utf-8').read() + '\n\n' +
+                        open('HISTORY.rst', encoding='utf-8').read())
 
 setup(
     name='pyuploadcare',

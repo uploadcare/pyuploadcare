@@ -66,11 +66,14 @@ Features
 Requirements
 ------------
 
-``pyuploadcare`` requires Python 2.7, 3.4, 3.5 or 3.6
+``pyuploadcare`` requires Python 2.7, 3.4, 3.5 or 3.6.
 
 If you're using ``pyuploadcare`` with Django, check ``.travis.yml`` for supported
 Python-Django combinations.
 
+Obsolete versions of Python and Django are officially not supported, but chances
+are everything still works. If you have to use those, modify tox.ini, test and
+run at your own risk ;) Or, you may use older versions of the library.
 
 Installation
 ------------
