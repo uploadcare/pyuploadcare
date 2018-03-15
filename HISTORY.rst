@@ -6,8 +6,8 @@ History
 2.3.0
 ~~~~~
 
-- Add support for django versions 1.11 and ~2.0
-- Miscellaneous updates(version, year in a license file, tox configuration and etc.)
+- Add support for Django versions 1.11 and ~2.0
+- Miscellaneous updates (version, year in a license file, tox configuration and etc.)
 - Drop official support for obsolete Python and Django versions.
   Chances are that everything still works. If you have to use those, modify `tox.ini`,
   run tests and use at your own risk ;) Or, you may use older versions of the library.
