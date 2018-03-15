@@ -385,6 +385,10 @@ class File(object):
             'UPLOADCARE_STORE': store,
         }
 
+        if conf.signed_uploads:
+            data['expire'] = conf.expire
+            data['signature'] = conf.signature
+
         files = uploading_request('POST', 'base/', data=data,
                                   files={'file': file_obj})
         file_ = cls(files['file'])
@@ -423,6 +427,10 @@ class File(object):
         }
         if filename:
             data['filename'] = filename
+
+        if conf.signed_uploads:
+            data['expire'] = conf.expire
+            data['signature'] = conf.signature
 
         result = uploading_request('POST', 'from_url/',
                                    data=data)
@@ -751,6 +759,10 @@ class FileGroup(object):
                 )
         if not data:
             raise InvalidParamError('set of files is empty')
+
+        if conf.signed_uploads:
+            data['expire'] = conf.expire
+            data['signature'] = conf.signature
 
         group_info = uploading_request('POST', 'group/', data=data)
 

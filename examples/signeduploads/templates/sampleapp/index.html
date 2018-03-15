@@ -1,0 +1,58 @@
+<html>
+<head>
+<style>
+div.formy {
+	
+    padding-top: 20px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+
+}
+
+</style>
+<script charset="utf-8" src="//ucarecdn.com/widget/2.x/uploadcare/uploadcare.full.min.js"></script>
+
+<script>
+  UPLOADCARE_LIVE = false;
+  UPLOADCARE_MANUAL_START = true;
+  
+ // Get signature and expire time. Signatures and their expire time are assigned on server side based on user authorization.
+ // For simplicity we are giving signatures to all guests.
+
+ $.ajax({
+     url: 'release_signature',
+     type: 'POST',
+     success: function(response) {
+                     signature = response['signature'];
+                     expire = response['expire'];
+                     uploadcare.start({
+                         publicKey: 'YOUR_PUBLIC_KEY',
+                         secureSignature:signature, 
+                         secureExpire: expire});
+                        }
+
+     });
+  </script>
+  
+
+
+
+</head>
+
+<body>
+
+<div class="formy" >
+ 
+<form action="index" method="post" id="stumpyform">
+  {% csrf_token %}
+  {{ form }}
+
+</form>
+
+</div>
+
+
+</body>
+
+</html>

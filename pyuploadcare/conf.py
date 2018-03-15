@@ -14,6 +14,8 @@ DEFAULT = object()
 
 pub_key = None
 secret = None
+expire = None
+signed_uploads = None
 
 api_version = '0.5'
 api_base = 'https://api.uploadcare.com/'

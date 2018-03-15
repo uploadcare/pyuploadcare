@@ -17,7 +17,6 @@ import json
 import socket
 import cgi
 import time
-
 import requests
 import six
 
@@ -164,7 +163,8 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             return ''
 
         if 200 <= response.status_code < 300:
-            if _content_type_from_response(response).endswith(('/json', '+json')):
+            if _content_type_from_response(response).endswith(('/json',
+                                                               '+json')):
                 if verb.lower() == 'head':
                     return ''
                 try:

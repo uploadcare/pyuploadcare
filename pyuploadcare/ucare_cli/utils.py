@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import sys
 import json
-
 from six.moves import input
 
 
