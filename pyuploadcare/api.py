@@ -222,11 +222,15 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     data['pub_key'] = conf.pub_key
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
+    headers = {
+        'User-Agent': _build_user_agent(),
+    }
+
     try:
         response = session.request(
             str(verb), url, allow_redirects=True,
             verify=conf.verify_upload_ssl, data=data, files=files,
-            timeout=_get_timeout(timeout),
+            headers=headers, timeout=_get_timeout(timeout),
         )
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
