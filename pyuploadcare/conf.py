@@ -28,4 +28,4 @@ timeout = DEFAULT
 # retry throttled requests this many times
 retry_throttled = 1
 
-user_agent_name = 'pyuploadcare'
+user_agent_extension = None
