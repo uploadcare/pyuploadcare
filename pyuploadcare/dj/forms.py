@@ -30,6 +30,9 @@ class FileWidget(TextInput):
             'data-public-key': conf.pub_key,
         }
 
+        if conf.user_agent_extension is not None:
+            default_attrs['data-integration'] = conf.user_agent_extension
+
         if dj_conf.upload_base_url is not None:
             default_attrs['data-upload-base-url'] = dj_conf.upload_base_url
 
