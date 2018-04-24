@@ -3,6 +3,11 @@
 History
 -------
 
+2.4.0
+~~~~~
+
+- Change data format in 'User-Agent' request header.
+
 2.3.1
 ~~~~~
 
