@@ -8,7 +8,7 @@ It is JSON REST request abstraction layer that is used by the
 """
 
 from __future__ import unicode_literals
-from platform import python_version
+from platform import python_implementation, python_version
 import email.utils
 import hashlib
 import hmac
@@ -58,9 +58,10 @@ def _build_user_agent():
     extension_info = ''
     if conf.user_agent_extension:
         extension_info = '; {0}'.format(conf.user_agent_extension)
-    return 'PyUploadcare/{0} (Python/{1}{2})'.format(__version__,
-                                                     python_version(),
-                                                     extension_info)
+    return 'PyUploadcare/{0} ({1}/{2}{3})'.format(__version__,
+                                                  python_implementation(),
+                                                  python_version(),
+                                                  extension_info)
 
 
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
