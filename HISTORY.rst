@@ -3,6 +3,11 @@
 History
 -------
 
+Unreleased
+~~~~~
+
+- Update links to the Uploadcare site
+
 2.4.0
 ~~~~~
 
