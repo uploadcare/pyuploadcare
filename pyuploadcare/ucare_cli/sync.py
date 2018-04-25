@@ -248,7 +248,7 @@ def add_sync_files_parser(subparsers):
         'apply effects for synced images.'
         'Note that effects will apply to images only.'
         'For more information look at: '
-        'https://uploadcare.com/documentation/cdn/  '
+        'https://uploadcare.com/docs/processing/image/  '
         'Example: --effects=resize/200x/-/rotate/90/'
     ))
     return subparser

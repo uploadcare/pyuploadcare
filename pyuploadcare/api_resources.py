@@ -306,7 +306,7 @@ class File(object):
                 `${uuid}/${filename}${effects}${ext}`.
 
         For more information on each of the options above please refer to
-        REST API docs https://uploadcare.com/documentation/rest/#file.
+        REST API docs https://uploadcare.com/docs/api_reference/rest/accessing_files/.
 
         Following example copies a file to custom storage named ``samplefs``:
 
@@ -948,7 +948,7 @@ class GroupList(BaseApiList):
       It is reflects a ``from`` parameter from the REST API.
     - ``ordering`` -- a string with name of the field what must be used
       for sorting files. The actual list of supported fields you can find in
-      documentation: https://uploadcare.com/documentation/rest/#group-groups
+      documentation: https://uploadcare.com/docs/api_reference/rest/accessing_groups/#properties
     - ``limit`` -- a total number of objects to be iterated.
       If not specified, all available objects are iterated;
     - ``request_limit`` -- a number of objects retrieved per request (page).

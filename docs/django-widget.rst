@@ -64,7 +64,7 @@ widget url:
 Model Fields
 ------------
 
-.. _Uploadcare widget: https://uploadcare.com/documentation/widget/
+.. _Uploadcare widget: https://uploadcare.com/docs/uploads/widget/
 
 As you will see, with Uploadcare, adding and working with a file field is
 just as simple as with a `TextField`_. To attach Uploadcare files to a model,
@@ -142,7 +142,7 @@ You can pass any widget options via ``FileWidget``'s attrs argument:
     from pyuploadcare.dj.forms import FileWidget, ImageField
 
 
-    # optional. provide advanced widget options: https://uploadcare.com/documentation/widget/#configuration
+    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
             'data-cdn-base': 'https://cdn.super-candidates.com',
@@ -186,5 +186,5 @@ It stores uploaded images as a group:
 
         photos = ImageGroupField()
 
-.. _widget documentation: https://uploadcare.com/documentation/widget/#crop
+.. _widget documentation: https://uploadcare.com/docs/uploads/widget/crop_options/
 .. _TextField: https://docs.djangoproject.com/en/1.8/ref/models/fields/#django.db.models.TextField

@@ -46,7 +46,7 @@ being uploaded asynchronously.
         photo = ImageField(blank=True, manual_crop="")
 
 
-    # optional. provide advanced widget options: https://uploadcare.com/documentation/widget/#configuration
+    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
             'data-cdn-base': 'https://cdn.super-candidates.com',
@@ -114,8 +114,8 @@ Contributors
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
 .. _Sławek Ehlert: https://github.com/slafs
 .. _Travis CI: https://travis-ci.org/uploadcare/pyuploadcare
-.. _REST: https://uploadcare.com/documentation/rest/
-.. _Upload: https://uploadcare.com/documentation/upload/
+.. _REST: https://uploadcare.com/docs/api_reference/rest/
+.. _Upload: https://uploadcare.com/docs/api_reference/upload/
 .. _@marselester: https://github.com/marselester
 .. _@dmitry-mukhin: https://github.com/dmitry-mukhin
 .. _@zerc: https://github.com/zerc
