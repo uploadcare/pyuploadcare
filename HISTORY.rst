@@ -3,6 +3,11 @@
 History
 -------
 
+Unreleased
+~~~~~
+
+- Update bundled widget to version ``3.3.0``. See `widget changelog`_.
+
 2.4.0
 ~~~~~
 
