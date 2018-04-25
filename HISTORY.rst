@@ -7,6 +7,7 @@ Unreleased
 ~~~~~
 
 - Update bundled widget to version ``3.3.0``. See `widget changelog`_.
+- Update links to the Uploadcare site
 
 2.4.0
 ~~~~~

@@ -114,4 +114,4 @@ How to use it in command line?
     $ ucare -h
 
 .. _Uploadcare: https://uploadcare.com
-.. _CDN docs: https://uploadcare.com/documentation/cdn/
+.. _CDN docs: https://uploadcare.com/docs/delivery/
