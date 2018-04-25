@@ -8,6 +8,7 @@ It is JSON REST request abstraction layer that is used by the
 """
 
 from __future__ import unicode_literals
+from platform import python_implementation, python_version
 import email.utils
 import hashlib
 import hmac
@@ -54,8 +55,13 @@ def _content_type_from_response(response):
 
 
 def _build_user_agent():
-    return '{0}/{1}/{2}'.format(conf.user_agent_name, __version__,
-                                conf.pub_key)
+    extension_info = ''
+    if conf.user_agent_extension:
+        extension_info = '; {0}'.format(conf.user_agent_extension)
+    return 'PyUploadcare/{0} ({1}/{2}{3})'.format(__version__,
+                                                  python_implementation(),
+                                                  python_version(),
+                                                  extension_info)
 
 
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
@@ -222,11 +228,15 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     data['pub_key'] = conf.pub_key
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
+    headers = {
+        'User-Agent': _build_user_agent(),
+    }
+
     try:
         response = session.request(
             str(verb), url, allow_redirects=True,
             verify=conf.verify_upload_ssl, data=data, files=files,
-            timeout=_get_timeout(timeout),
+            headers=headers, timeout=_get_timeout(timeout),
         )
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
