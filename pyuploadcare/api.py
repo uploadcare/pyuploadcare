@@ -58,10 +58,11 @@ def _build_user_agent():
     extension_info = ''
     if conf.user_agent_extension:
         extension_info = '; {0}'.format(conf.user_agent_extension)
-    return 'PyUploadcare/{0} ({1}/{2}{3})'.format(__version__,
-                                                  python_implementation(),
-                                                  python_version(),
-                                                  extension_info)
+    return 'PyUploadcare/{0}/{1} ({2}/{3}{4})'.format(__version__,
+                                                      conf.pub_key,
+                                                      python_implementation(),
+                                                      python_version(),
+                                                      extension_info)
 
 
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
