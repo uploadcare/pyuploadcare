@@ -29,7 +29,10 @@ else:
 
 from . import conf, __version__
 from .exceptions import (
-    APIConnectionError, AuthenticationError, APIError, InvalidRequestError,
+    APIConnectionError,
+    AuthenticationError,
+    APIError,
+    InvalidRequestError,
     ThrottledRequestError,
 )
 
@@ -49,24 +52,27 @@ def _get_timeout(timeout):
 
 
 def _content_type_from_response(response):
-    content_type = response.headers.get('Content-Type', '')
+    content_type = response.headers.get("Content-Type", "")
     content_type, _ = cgi.parse_header(content_type)
     return content_type
 
 
 def _build_user_agent():
-    extension_info = ''
+    extension_info = ""
     if conf.user_agent_extension:
-        extension_info = '; {0}'.format(conf.user_agent_extension)
-    return 'PyUploadcare/{0}/{1} ({2}/{3}{4})'.format(__version__,
-                                                      conf.pub_key,
-                                                      python_implementation(),
-                                                      python_version(),
-                                                      extension_info)
+        extension_info = "; {0}".format(conf.user_agent_extension)
+    return "PyUploadcare/{0}/{1} ({2}/{3}{4})".format(
+        __version__,
+        conf.pub_key,
+        python_implementation(),
+        python_version(),
+        extension_info,
+    )
 
 
-def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
-                 retry_throttled=conf.DEFAULT):
+def rest_request(
+    verb, path, data=None, timeout=conf.DEFAULT, retry_throttled=conf.DEFAULT
+):
     """Makes REST API request and returns response as ``dict``.
 
     It provides auth headers as well and takes settings from ``conf`` module.
@@ -98,82 +104,81 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
     if retry_throttled is conf.DEFAULT:
         retry_throttled = conf.retry_throttled
 
-    path = path.lstrip('/')
+    path = path.lstrip("/")
     url = urljoin(conf.api_base, path)
     url_parts = urlsplit(url)
 
     if url_parts.query:
-        path = url_parts.path + '?' + url_parts.query
+        path = url_parts.path + "?" + url_parts.query
     else:
         path = url_parts.path
 
-    content = ''
+    content = ""
     if data is not None:
         content = json.dumps(data)
 
-    content_type = 'application/json'
-    content_md5 = hashlib.md5(content.encode('utf-8')).hexdigest()
+    content_type = "application/json"
+    content_md5 = hashlib.md5(content.encode("utf-8")).hexdigest()
 
     def _request():
         date = email.utils.formatdate(usegmt=True)
-        sign_string = '\n'.join([
-            verb,
-            content_md5,
-            content_type,
-            date,
-            path,
-        ])
-        sign_string_as_bytes = sign_string.encode('utf-8')
+        sign_string = "\n".join([verb, content_md5, content_type, date, path])
+        sign_string_as_bytes = sign_string.encode("utf-8")
 
         try:
-            secret_as_bytes = conf.secret.encode('utf-8')
+            secret_as_bytes = conf.secret.encode("utf-8")
         except AttributeError:
             secret_as_bytes = bytes()
-        sign = hmac.new(secret_as_bytes, sign_string_as_bytes, hashlib.sha1) \
-            .hexdigest()
+        sign = hmac.new(secret_as_bytes, sign_string_as_bytes, hashlib.sha1).hexdigest()
 
         headers = {
-            'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
-            'Date': date,
-            'Content-Type': content_type,
-            'Accept': 'application/vnd.uploadcare-v{0}+json'.format(
-                conf.api_version),
-            'User-Agent': _build_user_agent(),
+            "Authorization": "Uploadcare {0}:{1}".format(conf.pub_key, sign),
+            "Date": date,
+            "Content-Type": content_type,
+            "Accept": "application/vnd.uploadcare-v{0}+json".format(conf.api_version),
+            "User-Agent": _build_user_agent(),
         }
-        logger.debug('''sent:
+        logger.debug(
+            """sent:
             verb: {0}
             path: {1}
             headers: {2}
-            data: {3}'''.format(verb, path, headers, content))
+            data: {3}""".format(
+                verb, path, headers, content
+            )
+        )
 
         try:
-            response = session.request(verb, url, allow_redirects=True,
-                                       verify=conf.verify_api_ssl,
-                                       headers=headers, data=content,
-                                       timeout=_get_timeout(timeout))
+            response = session.request(
+                verb,
+                url,
+                allow_redirects=True,
+                verify=conf.verify_api_ssl,
+                headers=headers,
+                data=content,
+                timeout=_get_timeout(timeout),
+            )
         except requests.RequestException as exc:
             raise APIConnectionError(exc.args[0])
 
-        logger.debug(
-            'got: {0} {1}'.format(response.status_code, response.text)
-        )
+        logger.debug("got: {0} {1}".format(response.status_code, response.text))
 
-        if 'warning' in response.headers:
-            match = re.search('"(.+)"', response.headers['warning'])
+        if "warning" in response.headers:
+            match = re.search('"(.+)"', response.headers["warning"])
             if match:
-                for warning in match.group(1).split('; '):
-                    logger.warn('API Warning: {0}'.format(warning))
+                for warning in match.group(1).split("; "):
+                    logger.warn("API Warning: {0}".format(warning))
 
         # No content.
         if response.status_code == 204:
             return {}
-        if verb.lower() == 'options':
-            return ''
+        if verb.lower() == "options":
+            return ""
 
         if 200 <= response.status_code < 300:
-            if _content_type_from_response(response).endswith(('/json', '+json')):
-                if verb.lower() == 'head':
-                    return ''
+            if _content_type_from_response(response).endswith(("/json", "+json")):
+                if verb.lower() == "head":
+                    return ""
                 try:
                     return response.json()
                 except ValueError as exc:
@@ -196,7 +201,7 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             return _request()
         except ThrottledRequestError as e:
             if retry_throttled:
-                logger.debug('Throttled, retry in {0} seconds'.format(e.wait))
+                logger.debug("Throttled, retry in {0} seconds".format(e.wait))
                 time.sleep(e.wait)
                 retry_throttled -= 1
                 continue
@@ -221,23 +226,26 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
         >>> File('9b9f4483-77b8-40ae-a198-272ba6280004')
 
     """
-    path = path.lstrip('/')
+    path = path.lstrip("/")
     url = urljoin(conf.upload_base, path)
 
     if data is None:
         data = {}
-    data['pub_key'] = conf.pub_key
-    data['UPLOADCARE_PUB_KEY'] = conf.pub_key
+    data["pub_key"] = conf.pub_key
+    data["UPLOADCARE_PUB_KEY"] = conf.pub_key
 
-    headers = {
-        'User-Agent': _build_user_agent(),
-    }
+    headers = {"User-Agent": _build_user_agent()}
 
     try:
         response = session.request(
-            str(verb), url, allow_redirects=True,
-            verify=conf.verify_upload_ssl, data=data, files=files,
-            headers=headers, timeout=_get_timeout(timeout),
+            str(verb),
+            url,
+            allow_redirects=True,
+            verify=conf.verify_upload_ssl,
+            data=data,
+            files=files,
+            headers=headers,
+            timeout=_get_timeout(timeout),
         )
     except requests.RequestException as exc:
         raise APIConnectionError(exc.args[0])
@@ -247,7 +255,7 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
         return {}
 
     if 200 <= response.status_code < 300:
-        if _content_type_from_response(response).endswith(('/json', '+json')):
+        if _content_type_from_response(response).endswith(("/json", "+json")):
             try:
                 return response.json()
             except ValueError as exc:

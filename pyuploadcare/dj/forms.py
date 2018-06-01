@@ -18,23 +18,20 @@ class FileWidget(TextInput):
 
     """
 
-    input_type = 'hidden'
+    input_type = "hidden"
     is_hidden = False
 
     class Media:
         js = (dj_conf.uploadcare_js,)
 
     def __init__(self, attrs=None):
-        default_attrs = {
-            'role': 'uploadcare-uploader',
-            'data-public-key': conf.pub_key,
-        }
+        default_attrs = {"role": "uploadcare-uploader", "data-public-key": conf.pub_key}
 
         if conf.user_agent_extension is not None:
-            default_attrs['data-integration'] = conf.user_agent_extension
+            default_attrs["data-integration"] = conf.user_agent_extension
 
         if dj_conf.upload_base_url is not None:
-            default_attrs['data-upload-base-url'] = dj_conf.upload_base_url
+            default_attrs["data-upload-base-url"] = dj_conf.upload_base_url
 
         if attrs is not None:
             default_attrs.update(attrs)
@@ -55,20 +52,18 @@ class FileField(Field):
     widget = FileWidget
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
 
         try:
             return File(value).cdn_url
         except InvalidRequestError as exc:
-            raise ValidationError(
-                'Invalid value for a field: {exc}'.format(exc=exc)
-            )
+            raise ValidationError("Invalid value for a field: {exc}".format(exc=exc))
 
     def widget_attrs(self, widget):
         attrs = {}
         if not self.required:
-            attrs['data-clearable'] = ''
+            attrs["data-clearable"] = ""
         return attrs
 
 
@@ -82,9 +77,9 @@ class ImageField(FileField):
 
     def widget_attrs(self, widget):
         attrs = super(ImageField, self).widget_attrs(widget)
-        attrs['data-images-only'] = ''
+        attrs["data-images-only"] = ""
         if self.manual_crop is not None:
-            attrs['data-crop'] = self.manual_crop
+            attrs["data-crop"] = self.manual_crop
         return attrs
 
 
@@ -95,20 +90,18 @@ class FileGroupField(Field):
     widget = FileWidget
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
 
         try:
             return FileGroup(value).cdn_url
         except InvalidRequestError as exc:
-            raise ValidationError(
-                'Invalid value for a field: {exc}'.format(exc=exc)
-            )
+            raise ValidationError("Invalid value for a field: {exc}".format(exc=exc))
 
     def widget_attrs(self, widget):
-        attrs = {'data-multiple': ''}
+        attrs = {"data-multiple": ""}
         if not self.required:
-            attrs['data-clearable'] = ''
+            attrs["data-clearable"] = ""
         return attrs
 
 
@@ -118,5 +111,5 @@ class ImageGroupField(FileGroupField):
 
     def widget_attrs(self, widget):
         attrs = super(ImageGroupField, self).widget_attrs(widget)
-        attrs['data-images-only'] = ''
+        attrs["data-images-only"] = ""
         return attrs

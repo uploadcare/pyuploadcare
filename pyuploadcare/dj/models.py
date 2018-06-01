@@ -20,26 +20,22 @@ class FileField(six.with_metaclass(SubfieldBase, models.Field)):
         return "TextField"
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
 
         if isinstance(value, File):
             return value
 
         if not isinstance(value, six.string_types):
-            raise ValidationError(
-                'Invalid value for a field: string was expected'
-            )
+            raise ValidationError("Invalid value for a field: string was expected")
 
         try:
             return File(value)
         except InvalidRequestError as exc:
-            raise ValidationError(
-                'Invalid value for a field: {exc}'.format(exc=exc)
-            )
+            raise ValidationError("Invalid value for a field: {exc}".format(exc=exc))
 
     def get_prep_value(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
         else:
             return value.cdn_url
@@ -49,7 +45,7 @@ class FileField(six.with_metaclass(SubfieldBase, models.Field)):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        kwargs['form_class'] = forms.FileField
+        kwargs["form_class"] = forms.FileField
         return super(FileField, self).formfield(**kwargs)
 
     def validate(self, value, model_instance):
@@ -63,8 +59,9 @@ class FileField(six.with_metaclass(SubfieldBase, models.Field)):
                 value.info()
             except InvalidRequestError as exc:
                 raise ValidationError(
-                    'The file could not be found in your Uploadcare project',
-                    code='invalid_url')
+                    "The file could not be found in your Uploadcare project",
+                    code="invalid_url",
+                )
 
     def clean(self, value, model_instance):
         cleaned_value = super(FileField, self).clean(value, model_instance)
@@ -73,7 +70,8 @@ class FileField(six.with_metaclass(SubfieldBase, models.Field)):
         return cleaned_value
 
 
-pattern_of_crop = re.compile('''
+pattern_of_crop = re.compile(
+    """
     ^
     (
         disabled| # "disabled"
@@ -84,7 +82,9 @@ pattern_of_crop = re.compile('''
         \d+x\d+\ minimum  # "200x300 minimum"
     )
     $
-''', re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 
 
 class ImageField(FileField):
@@ -105,19 +105,18 @@ class ImageField(FileField):
     """
 
     def __init__(self, manual_crop=None, *args, **kwargs):
-        is_crop_valid = (
-            isinstance(manual_crop, six.string_types) and
-            all([pattern_of_crop.match(part) for part in manual_crop.split(',')])
+        is_crop_valid = isinstance(manual_crop, six.string_types) and all(
+            [pattern_of_crop.match(part) for part in manual_crop.split(",")]
         )
         if not (manual_crop is None or is_crop_valid):
-            raise ValidationError('Invalid manual crop value')
+            raise ValidationError("Invalid manual crop value")
 
         self.manual_crop = manual_crop
         super(ImageField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        kwargs['manual_crop'] = self.manual_crop
-        kwargs['form_class'] = forms.ImageField
+        kwargs["manual_crop"] = self.manual_crop
+        kwargs["form_class"] = forms.ImageField
 
         return models.Field.formfield(self, **kwargs)
 
@@ -133,26 +132,22 @@ class FileGroupField(six.with_metaclass(SubfieldBase, models.Field)):
         return "TextField"
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
 
         if isinstance(value, FileGroup):
             return value
 
         if not isinstance(value, six.string_types):
-            raise ValidationError(
-                'Invalid value for a field: string was expected'
-            )
+            raise ValidationError("Invalid value for a field: string was expected")
 
         try:
             return FileGroup(value)
         except InvalidRequestError as exc:
-            raise ValidationError(
-                'Invalid value for a field: {exc}'.format(exc=exc)
-            )
+            raise ValidationError("Invalid value for a field: {exc}".format(exc=exc))
 
     def get_prep_value(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
         else:
             return value.cdn_url
@@ -162,7 +157,7 @@ class FileGroupField(six.with_metaclass(SubfieldBase, models.Field)):
         return self.get_prep_value(value)
 
     def formfield(self, **kwargs):
-        kwargs['form_class'] = forms.FileGroupField
+        kwargs["form_class"] = forms.FileGroupField
 
         return models.Field.formfield(self, **kwargs)
 
@@ -181,6 +176,6 @@ class ImageGroupField(FileGroupField):
     """
 
     def formfield(self, **kwargs):
-        kwargs['form_class'] = forms.ImageGroupField
+        kwargs["form_class"] = forms.ImageGroupField
 
         return models.Field.formfield(self, **kwargs)

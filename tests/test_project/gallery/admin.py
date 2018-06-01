@@ -10,7 +10,8 @@ class PhotoInline(admin.StackedInline):
 
 class GalleryAdmin(admin.ModelAdmin):
 
-    inlines = [PhotoInline, ]
+    inlines = [PhotoInline]
+
 
 admin.site.register(Photo)
 admin.site.register(Gallery, GalleryAdmin)

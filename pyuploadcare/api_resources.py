@@ -23,10 +23,11 @@ from .exceptions import InvalidParamError, APIError, UploadError, TimeoutError
 logger = logging.getLogger("pyuploadcare")
 
 
-RE_UUID = '[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}'
-RE_UUID_REGEX = re.compile('^{0}$'.format(RE_UUID))
-RE_EFFECTS = '(?:[^/]+/)+'  # -/resize/(200x300/)*
-UUID_WITH_EFFECTS_REGEX = re.compile('''
+RE_UUID = "[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}"
+RE_UUID_REGEX = re.compile("^{0}$".format(RE_UUID))
+RE_EFFECTS = "(?:[^/]+/)+"  # -/resize/(200x300/)*
+UUID_WITH_EFFECTS_REGEX = re.compile(
+    """
     /?
     (?P<uuid>{uuid})  # required
     (?:
@@ -34,7 +35,11 @@ UUID_WITH_EFFECTS_REGEX = re.compile('''
         (?:-/(?P<effects>{effects}))?
         ([^/]*)  # filename
     )?
-$'''.format(uuid=RE_UUID, effects=RE_EFFECTS), re.VERBOSE)
+$""".format(
+        uuid=RE_UUID, effects=RE_EFFECTS
+    ),
+    re.VERBOSE,
+)
 
 
 class File(object):
@@ -56,22 +61,21 @@ class File(object):
         if not matches:
             raise InvalidParamError("Couldn't find UUID")
 
-        self._uuid = matches.groupdict()['uuid']
-        self.default_effects = matches.groupdict()['effects']
+        self._uuid = matches.groupdict()["uuid"]
+        self.default_effects = matches.groupdict()["effects"]
 
         self._info_cache = None
 
     def __repr__(self):
-        return '<uploadcare.File {uuid}>'.format(uuid=self.uuid)
+        return "<uploadcare.File {uuid}>".format(uuid=self.uuid)
 
     def __str__(self):
         return self.cdn_url
 
-    def _build_effects(self, effects=''):
+    def _build_effects(self, effects=""):
         if self.default_effects is not None:
-            fmt = '{head}-/{tail}' if effects else '{head}'
-            effects = fmt.format(head=self.default_effects,
-                                 tail=effects)
+            fmt = "{head}-/{tail}" if effects else "{head}"
+            effects = fmt.format(head=self.default_effects, tail=effects)
         return effects
 
     @property
@@ -83,24 +87,21 @@ class File(object):
         match = RE_UUID_REGEX.match(value)
 
         if not match:
-            raise InvalidParamError('Invalid UUID: {0}'.format(value))
+            raise InvalidParamError("Invalid UUID: {0}".format(value))
 
         self._uuid = match.group(0)
 
     @property
     def _api_uri(self):
-        return 'files/{0}/'.format(self.uuid)
+        return "files/{0}/".format(self.uuid)
 
     @property
     def _api_storage_uri(self):
-        return 'files/{0}/storage/'.format(self.uuid)
+        return "files/{0}/storage/".format(self.uuid)
 
     def cdn_path(self, effects=None):
-        ptn = '{uuid}/-/{effects}' if effects else '{uuid}/'
-        return ptn.format(
-            uuid=self.uuid,
-            effects=effects
-        )
+        ptn = "{uuid}/-/{effects}" if effects else "{uuid}/"
+        return ptn.format(uuid=self.uuid, effects=effects)
 
     @property
     def cdn_url(self):
@@ -119,8 +120,9 @@ class File(object):
             https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
 
         """
-        return '{cdn_base}{path}'.format(cdn_base=conf.cdn_base,
-                                         path=self.cdn_path(self.default_effects))
+        return "{cdn_base}{path}".format(
+            cdn_base=conf.cdn_base, path=self.cdn_path(self.default_effects)
+        )
 
     def info(self):
         """Returns all available file information as ``dict``.
@@ -136,7 +138,7 @@ class File(object):
     def update_info(self):
         """Updates and returns file information by requesting Uploadcare API.
         """
-        self._info_cache = rest_request('GET', self._api_uri)
+        self._info_cache = rest_request("GET", self._api_uri)
         return self._info_cache
 
     def filename(self):
@@ -145,7 +147,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('original_filename')
+        return self.info().get("original_filename")
 
     def datetime_stored(self):
         """Returns file's store aware *datetime* in UTC format.
@@ -153,8 +155,8 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        if self.info().get('datetime_stored'):
-            return dateutil.parser.parse(self.info()['datetime_stored'])
+        if self.info().get("datetime_stored"):
+            return dateutil.parser.parse(self.info()["datetime_stored"])
 
     def datetime_removed(self):
         """Returns file's remove aware *datetime* in UTC format.
@@ -162,8 +164,8 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        if self.info().get('datetime_removed'):
-            return dateutil.parser.parse(self.info()['datetime_removed'])
+        if self.info().get("datetime_removed"):
+            return dateutil.parser.parse(self.info()["datetime_removed"])
 
     def datetime_uploaded(self):
         """Returns file's upload aware *datetime* in UTC format.
@@ -171,8 +173,8 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        if self.info().get('datetime_uploaded'):
-            return dateutil.parser.parse(self.info()['datetime_uploaded'])
+        if self.info().get("datetime_uploaded"):
+            return dateutil.parser.parse(self.info()["datetime_uploaded"])
 
     def is_stored(self):
         """Returns ``True`` if file is stored.
@@ -180,7 +182,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('datetime_stored') is not None
+        return self.info().get("datetime_stored") is not None
 
     def is_removed(self):
         """Returns ``True`` if file is removed.
@@ -188,7 +190,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('datetime_removed') is not None
+        return self.info().get("datetime_removed") is not None
 
     def is_image(self):
         """Returns ``True`` if the file is an image.
@@ -196,7 +198,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('is_image')
+        return self.info().get("is_image")
 
     def is_ready(self):
         """Returns ``True`` if the file is fully uploaded on S3.
@@ -204,7 +206,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('is_ready')
+        return self.info().get("is_ready")
 
     def size(self):
         """Returns the file size in bytes.
@@ -212,7 +214,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('size')
+        return self.info().get("size")
 
     def mime_type(self):
         """Returns the file MIME type, e.g. ``"image/png"``.
@@ -220,7 +222,7 @@ class File(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('mime_type')
+        return self.info().get("mime_type")
 
     def store(self):
         """Stores file by requesting Uploadcare API.
@@ -235,7 +237,7 @@ class File(object):
           on S3.
 
         """
-        self._info_cache = rest_request('PUT', self._api_storage_uri)
+        self._info_cache = rest_request("PUT", self._api_storage_uri)
 
     def copy(self, effects=None, target=None):
         """Creates a File Copy on Uploadcare or Custom Storage.
@@ -257,7 +259,7 @@ class File(object):
             Please use `create_local_copy`
             and `create_remote_copy` instead.
         """
-        logger.warn('API Warning: {0}'.format(warning))
+        logger.warn("API Warning: {0}".format(warning))
 
         if target is not None:
             return self.create_remote_copy(target, effects)
@@ -278,16 +280,13 @@ class File(object):
 
         """
         effects = self._build_effects(effects)
-        store = store or ''
-        data = {
-            'source': self.cdn_path(effects)
-        }
+        store = store or ""
+        data = {"source": self.cdn_path(effects)}
         if store:
-            data['store'] = store
-        return rest_request('POST', 'files/', data=data)
+            data["store"] = store
+        return rest_request("POST", "files/", data=data)
 
-    def create_remote_copy(self, target, effects=None, make_public=None,
-                           pattern=None):
+    def create_remote_copy(self, target, effects=None, make_public=None, pattern=None):
         """Creates file copy in remote storage.
 
         Args:
@@ -321,20 +320,17 @@ class File(object):
 
         """
         effects = self._build_effects(effects)
-        data = {
-            'source': self.cdn_path(effects),
-            'target': target
-        }
+        data = {"source": self.cdn_path(effects), "target": target}
 
         if make_public is not None:
-            data['make_public'] = make_public
+            data["make_public"] = make_public
         if pattern is not None:
-            data['pattern'] = pattern
-        return rest_request('POST', 'files/', data=data)
+            data["pattern"] = pattern
+        return rest_request("POST", "files/", data=data)
 
     def delete(self):
         """Deletes file by requesting Uploadcare API."""
-        self._info_cache = rest_request('DELETE', self._api_uri)
+        self._info_cache = rest_request("DELETE", self._api_uri)
 
     @classmethod
     def construct_from(cls, file_info):
@@ -352,8 +348,8 @@ class File(object):
             <uploadcare.File 1921953c-5d94-4e47-ba36-c2e1dd165e1a>
 
         """
-        file_ = cls(file_info['uuid'])
-        file_.default_effects = file_info.get('default_effects')
+        file_ = cls(file_info["uuid"])
+        file_.default_effects = file_info.get("default_effects")
         file_._info_cache = file_info
         return file_
 
@@ -375,19 +371,16 @@ class File(object):
 
         """
         if store is None:
-            store = 'auto'
+            store = "auto"
         elif store:
-            store = '1'
+            store = "1"
         else:
-            store = '0'
+            store = "0"
 
-        data = {
-            'UPLOADCARE_STORE': store,
-        }
+        data = {"UPLOADCARE_STORE": store}
 
-        files = uploading_request('POST', 'base/', data=data,
-                                  files={'file': file_obj})
-        file_ = cls(files['file'])
+        files = uploading_request("POST", "base/", data=data, files={"file": file_obj})
+        file_ = cls(files["file"])
         return file_
 
     @classmethod
@@ -411,31 +404,26 @@ class File(object):
 
         """
         if store is None:
-            store = 'auto'
+            store = "auto"
         elif store:
-            store = '1'
+            store = "1"
         else:
-            store = '0'
+            store = "0"
 
-        data = {
-            'source_url': url,
-            'store': store,
-        }
+        data = {"source_url": url, "store": store}
         if filename:
-            data['filename'] = filename
+            data["filename"] = filename
 
-        result = uploading_request('POST', 'from_url/',
-                                   data=data)
-        if 'token' not in result:
-            raise APIError(
-                'could not find token in result: {0}'.format(result)
-            )
-        file_from_url = cls.FileFromUrl(result['token'])
+        result = uploading_request("POST", "from_url/", data=data)
+        if "token" not in result:
+            raise APIError("could not find token in result: {0}".format(result))
+        file_from_url = cls.FileFromUrl(result["token"])
         return file_from_url
 
     @classmethod
-    def upload_from_url_sync(cls, url, timeout=30, interval=0.3,
-                             until_ready=False, store=None, filename=None):
+    def upload_from_url_sync(
+        cls, url, timeout=30, interval=0.3, until_ready=False, store=None, filename=None
+    ):
         """Uploads file from given url and returns ``File`` instance.
 
         Args:
@@ -464,8 +452,7 @@ class File(object):
 
         """
         ffu = cls.upload_from_url(url, store, filename)
-        return ffu.wait(timeout=timeout, interval=interval,
-                        until_ready=until_ready)
+        return ffu.wait(timeout=timeout, interval=interval, until_ready=until_ready)
 
     class FileFromUrl(object):
         """Contains the logic around an upload from url.
@@ -510,7 +497,7 @@ class File(object):
             self._info_cache = None
 
         def __repr__(self):
-            return '<uploadcare.File.FileFromUrl {0}>'.format(self.token)
+            return "<uploadcare.File.FileFromUrl {0}>".format(self.token)
 
         def info(self):
             """Returns actual information about uploading as ``dict``.
@@ -525,49 +512,49 @@ class File(object):
 
         def update_info(self):
             """Updates and returns information by requesting Uploadcare API."""
-            result = uploading_request('POST', 'from_url/status/',
-                                       data={'token': self.token})
-            if 'status' not in result:
-                raise APIError(
-                    'could not find status in result: {0}'.format(result)
-                )
+            result = uploading_request(
+                "POST", "from_url/status/", data={"token": self.token}
+            )
+            if "status" not in result:
+                raise APIError("could not find status in result: {0}".format(result))
             self._info_cache = result
             return result
 
         def get_file(self):
             """Returns ``File`` instance if upload is completed."""
-            if self.info()['status'] == 'success':
-                return File(self.info()['uuid'])
+            if self.info()["status"] == "success":
+                return File(self.info()["uuid"])
 
         def wait(self, timeout=30, interval=0.3, until_ready=False):
-
             def check_file():
-                status = self.update_info()['status']
-                if status == 'success':
+                status = self.update_info()["status"]
+                if status == "success":
                     return self.get_file()
-                if status in ('failed', 'error'):
+                if status in ("failed", "error"):
                     raise UploadError(
-                        'could not upload file from url: {0}'.format(self.info())
+                        "could not upload file from url: {0}".format(self.info())
                     )
 
             time_started = time.time()
             while time.time() - time_started < timeout:
                 file = check_file()
-                if file and (not until_ready or
-                             file.update_info().get('is_ready')):
+                if file and (not until_ready or file.update_info().get("is_ready")):
                     return file
                 time.sleep(interval)
             else:
-                raise TimeoutError('timed out during upload')
+                raise TimeoutError("timed out during upload")
 
 
-GROUP_ID_REGEX = re.compile('''
+GROUP_ID_REGEX = re.compile(
+    """
     (?P<group_id>
         [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
         ~
         (?P<files_qty>\d+)
     )
-''', re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 
 
 class FileGroup(object):
@@ -604,17 +591,17 @@ class FileGroup(object):
         if not matches:
             raise InvalidParamError("Couldn't find group id")
 
-        files_qty = int(matches.groupdict()['files_qty'])
+        files_qty = int(matches.groupdict()["files_qty"])
         if files_qty <= 0:
             raise InvalidParamError("Couldn't find group id")
 
-        self.id = matches.groupdict()['group_id']
+        self.id = matches.groupdict()["group_id"]
 
         self._files_qty = files_qty
         self._info_cache = None
 
     def __repr__(self):
-        return '<uploadcare.FileGroup {0}>'.format(self.id)
+        return "<uploadcare.FileGroup {0}>".format(self.id)
 
     def __str__(self):
         return self.cdn_url
@@ -625,19 +612,19 @@ class FileGroup(object):
     def __getitem__(self, key):
         """Returns file from group by key as ``File`` instance."""
         if isinstance(key, slice):
-            raise TypeError('slicing is not supported')
+            raise TypeError("slicing is not supported")
         else:
-            file_info = self.info()['files'][key]
+            file_info = self.info()["files"][key]
             if file_info is not None:
                 return File.construct_from(file_info)
 
     @property
     def _api_uri(self):
-        return 'groups/{0}/'.format(self.id)
+        return "groups/{0}/".format(self.id)
 
     @property
     def _api_storage_uri(self):
-        return 'groups/{0}/storage/'.format(self.id)
+        return "groups/{0}/storage/".format(self.id)
 
     @property
     def cdn_url(self):
@@ -650,10 +637,7 @@ class FileGroup(object):
             https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/
 
         """
-        return '{cdn_base}{group_id}/'.format(
-            cdn_base=conf.cdn_base,
-            group_id=self.id
-        )
+        return "{cdn_base}{group_id}/".format(cdn_base=conf.cdn_base, group_id=self.id)
 
     @property
     def file_cdn_urls(self):
@@ -668,9 +652,8 @@ class FileGroup(object):
         """
         file_cdn_urls = []
         for file_index in six.moves.xrange(len(self)):
-            file_cdn_url = '{group_cdn_url}nth/{file_index}/'.format(
-                group_cdn_url=self.cdn_url,
-                file_index=file_index
+            file_cdn_url = "{group_cdn_url}nth/{file_index}/".format(
+                group_cdn_url=self.cdn_url, file_index=file_index
             )
             file_cdn_urls.append(file_cdn_url)
         return file_cdn_urls
@@ -689,18 +672,18 @@ class FileGroup(object):
     def update_info(self):
         """Updates and returns group information by requesting Uploadcare API.
         """
-        self._info_cache = rest_request('GET', self._api_uri)
+        self._info_cache = rest_request("GET", self._api_uri)
         return self._info_cache
 
     def datetime_stored(self):
         """Returns file group's store aware *datetime* in UTC format."""
-        if self.info().get('datetime_stored'):
-            return dateutil.parser.parse(self.info()['datetime_stored'])
+        if self.info().get("datetime_stored"):
+            return dateutil.parser.parse(self.info()["datetime_stored"])
 
     def datetime_created(self):
         """Returns file group's create aware *datetime* in UTC format."""
-        if self.info().get('datetime_created'):
-            return dateutil.parser.parse(self.info()['datetime_created'])
+        if self.info().get("datetime_created"):
+            return dateutil.parser.parse(self.info()["datetime_created"])
 
     def is_stored(self):
         """Returns ``True`` if file is stored.
@@ -708,7 +691,7 @@ class FileGroup(object):
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get('datetime_stored') is not None
+        return self.info().get("datetime_stored") is not None
 
     def store(self):
         """Stores all group's files by requesting Uploadcare API.
@@ -719,12 +702,12 @@ class FileGroup(object):
         if self.is_stored():
             return
 
-        self._info_cache = rest_request('PUT', self._api_storage_uri)
+        self._info_cache = rest_request("PUT", self._api_storage_uri)
 
     @classmethod
     def construct_from(cls, group_info):
         """Constructs ``FileGroup`` instance from group information."""
-        group = cls(group_info['id'])
+        group = cls(group_info["id"])
         group._info_cache = group_info
         return group
 
@@ -743,16 +726,14 @@ class FileGroup(object):
         data = {}
         for index, file_ in enumerate(files):
             if isinstance(file_, File):
-                file_index = 'files[{index}]'.format(index=index)
+                file_index = "files[{index}]".format(index=index)
                 data[file_index] = six.text_type(file_)
             else:
-                raise InvalidParamError(
-                    'all items have to be ``File`` instance'
-                )
+                raise InvalidParamError("all items have to be ``File`` instance")
         if not data:
-            raise InvalidParamError('set of files is empty')
+            raise InvalidParamError("set of files is empty")
 
-        group_info = uploading_request('POST', 'group/', data=data)
+        group_info = uploading_request("POST", "group/", data=data)
 
         group = cls.construct_from(group_info)
         return group
@@ -760,9 +741,9 @@ class FileGroup(object):
 
 def api_iterator(cls, next_url, limit=None):
     while next_url and limit != 0:
-        result = rest_request('GET', next_url)
-        working_set = result['results']
-        next_url = result['next']
+        result = rest_request("GET", next_url)
+        working_set = result["results"]
+        next_url = result["next"]
 
         for item in working_set:
             yield cls(item)
@@ -780,8 +761,9 @@ class BaseApiList(object):
     # ordering fields names which must be handled as datetime
     datetime_ordering_fields = ()
 
-    def __init__(self, starting_point=None, ordering=None, limit=None,
-                 request_limit=None):
+    def __init__(
+        self, starting_point=None, ordering=None, limit=None, request_limit=None
+    ):
         self.ordering = ordering
         self.limit = limit
         self.request_limit = request_limit
@@ -794,38 +776,37 @@ class BaseApiList(object):
 
     @starting_point.setter
     def starting_point(self, value):
-        ordering_field = (self.ordering or '').lstrip('-')
+        ordering_field = (self.ordering or "").lstrip("-")
         datetime_fields = self.datetime_ordering_fields
 
         if value and ordering_field in datetime_fields:
             if not isinstance(value, (datetime, date)):
-                raise ValueError('The starting_point must be a datetime')
+                raise ValueError("The starting_point must be a datetime")
             value = value.isoformat()
 
         self._starting_point = value
 
     def api_url(self, **qs):
         if self.starting_point is not None:
-            qs.setdefault('from', self.starting_point)
+            qs.setdefault("from", self.starting_point)
 
         if self.ordering is not None:
-            qs.setdefault('ordering', self.ordering)
+            qs.setdefault("ordering", self.ordering)
 
         if self.request_limit:
-            qs.setdefault('limit', self.request_limit)
+            qs.setdefault("limit", self.request_limit)
 
-        return self.base_url + '?' + urlencode(qs)
+        return self.base_url + "?" + urlencode(qs)
 
     def __iter__(self):
         return api_iterator(self.constructor, self.api_url(), self.limit)
 
     def count(self):
         if self.starting_point:
-            raise ValueError(
-                'Can\'t count objects if the `starting_point` present')
+            raise ValueError("Can't count objects if the `starting_point` present")
         if self._count is None:
-            result = rest_request('GET', self.api_url(limit='1'))
-            self._count = result['total']
+            result = rest_request("GET", self.api_url(limit="1"))
+            self._count = result["total"]
         return self._count
 
 
@@ -866,21 +847,22 @@ class FileList(BaseApiList):
         >>> print('Number of stored files is', FileList(stored=True).count())
 
     """
-    base_url = '/files/'
+
+    base_url = "/files/"
     constructor = File.construct_from
-    datetime_ordering_fields = ('', 'datetime_uploaded')
+    datetime_ordering_fields = ("", "datetime_uploaded")
 
     def __init__(self, *args, **kwargs):
-        self.stored = kwargs.pop('stored', None)
-        self.removed = kwargs.pop('removed', None)
+        self.stored = kwargs.pop("stored", None)
+        self.removed = kwargs.pop("removed", None)
         super(FileList, self).__init__(*args, **kwargs)
 
     def api_url(self, **qs):
         if self.stored is not None:
-            qs.setdefault('stored', str(bool(self.stored)).lower())
+            qs.setdefault("stored", str(bool(self.stored)).lower())
 
         if self.removed is not None:
-            qs.setdefault('removed', str(bool(self.removed)).lower())
+            qs.setdefault("removed", str(bool(self.removed)).lower())
 
         return super(FileList, self).api_url(**qs)
 
@@ -889,7 +871,8 @@ class FilesStorage(object):
     """ Batch storage operations for the list of files.
     ``store`` and ``delete`` are supported.
     """
-    storage_url = '/files/storage/'
+
+    storage_url = "/files/storage/"
     chunk_size = 100
 
     def __init__(self, seq):
@@ -899,19 +882,19 @@ class FilesStorage(object):
         * instance of FileList
         """
         if not isinstance(seq, Iterable):
-            raise TypeError('``seq`` must be an iterable')
+            raise TypeError("``seq`` must be an iterable")
 
         self._seq = seq
 
     def store(self):
         """ Store all specified files.
         """
-        return self._base_opration('PUT')
+        return self._base_opration("PUT")
 
     def delete(self):
         """ Delete all specified files.
         """
-        return self._base_opration('DELETE')
+        return self._base_opration("DELETE")
 
     def _base_opration(self, method):
         """ Base method for storage operations.
@@ -935,8 +918,7 @@ class FilesStorage(object):
             elif isinstance(f, six.string_types):
                 yield f
             else:
-                raise ValueError(
-                    'Invalid type for sequence item: {0}'.format(type(f)))
+                raise ValueError("Invalid type for sequence item: {0}".format(type(f)))
 
 
 class GroupList(BaseApiList):
@@ -966,6 +948,7 @@ class GroupList(BaseApiList):
         >>> print('Number of groups is', GroupList().count())
 
     """
-    base_url = '/groups/'
+
+    base_url = "/groups/"
     constructor = FileGroup.construct_from
-    datetime_ordering_fields = ('', 'datetime_created')
+    datetime_ordering_fields = ("", "datetime_created")

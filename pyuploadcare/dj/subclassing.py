@@ -20,10 +20,11 @@ class SubfieldBase(type):
     A metaclass for custom Field subclasses. This ensures the model's attribute
     has the descriptor protocol attached to it.
     """
+
     def __new__(cls, name, bases, attrs):
         new_class = super(SubfieldBase, cls).__new__(cls, name, bases, attrs)
         new_class.contribute_to_class = make_contrib(
-            new_class, attrs.get('contribute_to_class')
+            new_class, attrs.get("contribute_to_class")
         )
         return new_class
 
@@ -32,6 +33,7 @@ class Creator(object):
     """
     A placeholder class that provides a way to set the attribute on the model.
     """
+
     def __init__(self, field):
         self.field = field
 
@@ -53,6 +55,7 @@ def make_contrib(superclass, func=None):
     case that the existing contribute_to_class() calls all the necessary
     superclass methods.
     """
+
     def contribute_to_class(self, cls, name, **kwargs):
         if func:
             func(self, cls, name, **kwargs)
