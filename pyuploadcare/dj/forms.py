@@ -41,8 +41,8 @@ class FileWidget(TextInput):
 
         super(FileWidget, self).__init__(default_attrs)
 
-    def render(self, name, value, attrs):
-        return super(FileWidget, self).render(name, value, attrs)
+    def render(self, name, value, attrs, renderer=None):
+        return super(FileWidget, self).render(name, value, attrs, renderer)
 
 
 class FileField(Field):
