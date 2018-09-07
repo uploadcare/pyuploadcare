@@ -25,7 +25,8 @@ hence rare.
 Our goal is to change the status quo.
 
 This library consists of the `Uploadcare`_ API interface and a couple
-of Django goodies.
+of Django goodies. You might also want to check out this `guide`_ as
+a starting point.
 
 Simple as that, Uploadcare ``ImageField`` can be added to an
 existing Django project in just a couple of `simple steps`_.
@@ -111,6 +112,7 @@ Contributors
 - `@andreshkovskii`_
 
 .. _Uploadcare: https://uploadcare.com/
+.. _guide: https://uploadcare.com/docs/guides/django/
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
 .. _Sławek Ehlert: https://github.com/slafs
 .. _Travis CI: https://travis-ci.org/uploadcare/pyuploadcare
