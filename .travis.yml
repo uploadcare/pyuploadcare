@@ -15,7 +15,7 @@ env:
     - SUITE="tests/functional"
 matrix:
   allow_failures:
-  - python: 3.7
+  - python: 3.7  # travis does not support 3.7 yet
 
   include:
     # django tests
