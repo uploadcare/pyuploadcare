@@ -9,15 +9,15 @@ python:
   - 3.4
   - 3.5
   - 3.6
-  - 3.7
 env:
   global:
     - SUITE="tests/functional"
 matrix:
-  allow_failures:
-  - python: 3.7  # travis does not support 3.7 yet
-
   include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+
     # django tests
     - stage: django tests
 
