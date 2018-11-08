@@ -14,36 +14,36 @@ env:
     - SUITE="tests/functional"
 matrix:
   include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+
     # django tests
     - stage: django tests
+
+      # django 1.11
       python: 2.7
       env:
-        - DJANGO=1.8
+        - DJANGO=1.11
         - SUITE="tests/dj"
-    - python: 2.7
+    - python: 3.4
+      env:
+        - DJANGO=1.11
+        - SUITE="tests/dj"
+    - python: 3.5
+      env:
+        - DJANGO=1.11
+        - SUITE="tests/dj"
+    - python: 3.6
       env:
         - DJANGO=1.11
         - SUITE="tests/dj"
 
-    - python: 3.4
-      env:
-        - DJANGO=1.8
-        - SUITE="tests/dj"
-    - python: 3.4
-      env:
-        - DJANGO=1.11
-        - SUITE="tests/dj"
+    # django 2.0
+
     - python: 3.4
       env:
         - DJANGO=2.0
-        - SUITE="tests/dj"
-    - python: 3.5
-      env:
-        - DJANGO=1.8
-        - SUITE="tests/dj"
-    - python: 3.5
-      env:
-        - DJANGO=1.11
         - SUITE="tests/dj"
     - python: 3.5
       env:
@@ -51,15 +51,30 @@ matrix:
         - SUITE="tests/dj"
     - python: 3.6
       env:
-        - DJANGO=1.8
+        - DJANGO=2.0
         - SUITE="tests/dj"
-    - python: 3.6
-      env:
-        - DJANGO=1.11
-        - SUITE="tests/dj"
-    - python: 3.6
+    - python: 3.7
+      dist: xenial
+      sudo: true
       env:
         - DJANGO=2.0
+        - SUITE="tests/dj"
+
+    # django 2.1
+
+    - python: 3.5
+      env:
+        - DJANGO=2.1
+        - SUITE="tests/dj"
+    - python: 3.6
+      env:
+        - DJANGO=2.1
+        - SUITE="tests/dj"
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      env:
+        - DJANGO=2.1
         - SUITE="tests/dj"
 
     # integration tests
@@ -67,7 +82,7 @@ matrix:
       python: 2.7
       env: SUITE="tests/integration"
     - stage: integration tests
-      python: 3.5
+      python: 3.6
       env: SUITE="tests/integration"
 
 cache:

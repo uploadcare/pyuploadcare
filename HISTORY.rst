@@ -3,6 +3,15 @@
 History
 -------
 
+Unreleased
+~~~~~~~~~~
+
+Fixed
++++++
+
+- `FileWidget.render()` now works in Django 2.1.
+
+
 2.5.0
 ~~~~~
 
