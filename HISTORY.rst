@@ -10,6 +10,7 @@ Fixed
 +++++
 
 - `FileWidget.render()` now works in Django 2.1.
+- Obsolete widget setting `data-upload-base-url` replaced with `data-url-base`
 
 
 2.5.0
