@@ -11,6 +11,11 @@ Fixed
 
 - `FileWidget.render()` now works in Django 2.1.
 
+Changed
++++++++
+
+- Improved error logging.
+
 
 2.5.0
 ~~~~~
