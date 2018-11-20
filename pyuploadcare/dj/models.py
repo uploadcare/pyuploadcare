@@ -63,7 +63,8 @@ class FileField(six.with_metaclass(SubfieldBase, models.Field)):
                 value.info()
             except InvalidRequestError as exc:
                 raise ValidationError(
-                    'The file could not be found in your Uploadcare project',
+                    'The file could not be found in your Uploadcare project. '
+                    'Underlying error: "{exc}".'.format(exc=exc),
                     code='invalid_url')
 
     def clean(self, value, model_instance):
