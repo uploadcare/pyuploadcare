@@ -1,7 +1,15 @@
+.. image:: https://ucarecdn.com/2f4864b7-ed0e-4411-965b-8148623aa680/-/inline/yes/uploadcare-logo-mark.svg
+   :target: https://uploadcare.com/?utm_source=github&utm_campaign=pyuploadcare
+   :height: 64 px
+   :width: 64 px
+   :align: left
+
 =============================================
 PyUploadcare: a Python library for Uploadcare
 =============================================
 
+.. image:: https://badge.fury.io/py/pyuploadcare.svg
+   :target: https://badge.fury.io/py/pyuploadcare
 .. image:: https://travis-ci.org/uploadcare/pyuploadcare.png?branch=master
    :target: https://travis-ci.org/uploadcare/pyuploadcare
    :alt: Build Status
@@ -14,6 +22,9 @@ PyUploadcare: a Python library for Uploadcare
 .. image:: https://landscape.io/github/uploadcare/pyuploadcare/master/landscape.svg?style=flat
    :target: https://landscape.io/github/uploadcare/pyuploadcare/master
    :alt: Code Health
+.. image:: https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat
+   :target: https://stackshare.io/uploadcare/stacks/
+   :alt: Uploadcare tech stack
 
 Simple file uploads for the web are of most importance
 for us at `Uploadcare`_. Today, everyone is used to the routine of
@@ -67,7 +78,7 @@ Features
 Requirements
 ------------
 
-``pyuploadcare`` requires Python 2.7, 3.4, 3.5 or 3.6.
+``pyuploadcare`` requires Python 2.7, 3.4, 3.5, 3.6, 3.7.
 
 If you're using ``pyuploadcare`` with Django, check ``.travis.yml`` for supported
 Python-Django combinations.
@@ -101,6 +112,22 @@ Besides the `Travis CI`_ we use tox. In order to run tests just:
     $ pip install tox
     $ tox
 
+Security issues
+---------------
+
+If you think you ran into something in Uploadcare libraries which might have
+security implications, please hit us up at `bugbounty@uploadcare.com`_
+or Hackerone.
+
+We'll contact you personally in a short time to fix an issue through co-op and
+prior to any public disclosure.
+
+Feedback
+--------
+
+Issues and PRs are welcome. You can provide your feedback or drop us a support
+request at `hello@uploadcare.com`_.
+
 Contributors
 ------------
 
@@ -110,6 +137,8 @@ Contributors
 - `@homm`_
 - `@va1en0k`_
 - `@andreshkovskii`_
+
+
 
 .. _Uploadcare: https://uploadcare.com/
 .. _guide: https://uploadcare.com/docs/guides/django/
@@ -124,3 +153,6 @@ Contributors
 .. _@homm: https://github.com/homm
 .. _@va1en0k: https://github.com/va1en0k
 .. _@andreshkovskii: https://github.com/andrewshkovskii/
+
+.. _bugbounty@uploadcare.com: mailto:bugbounty@uploadcare.com
+.. _hello@uploadcare.com: mailto:hello@uploadcare.com
