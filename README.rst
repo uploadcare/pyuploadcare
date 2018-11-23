@@ -140,13 +140,13 @@ Contributors
 
 
 
-.. _Uploadcare: https://uploadcare.com/
-.. _guide: https://uploadcare.com/docs/guides/django/
+.. _Uploadcare: https://uploadcare.com/?utm_source=github&utm_campaign=pyuploadcare
+.. _guide: https://uploadcare.com/docs/guides/django/?utm_source=github&utm_campaign=pyuploadcare
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
 .. _Sławek Ehlert: https://github.com/slafs
 .. _Travis CI: https://travis-ci.org/uploadcare/pyuploadcare
-.. _REST: https://uploadcare.com/docs/api_reference/rest/
-.. _Upload: https://uploadcare.com/docs/api_reference/upload/
+.. _REST: https://uploadcare.com/docs/api_reference/rest/?utm_source=github&utm_campaign=pyuploadcare
+.. _Upload: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=pyuploadcare
 .. _@marselester: https://github.com/marselester
 .. _@dmitry-mukhin: https://github.com/dmitry-mukhin
 .. _@zerc: https://github.com/zerc
