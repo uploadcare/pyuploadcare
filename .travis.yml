@@ -3,6 +3,7 @@
 # https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
 
 language: python
+dist: xenial
 python:
   - 2.7
   - 3.4
