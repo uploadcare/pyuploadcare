@@ -3,19 +3,27 @@
 History
 -------
 
-Unreleased
-~~~~~~~~~~
+All notable changes to this project will be documented in this file.
+
+The format is based on `Keep a Changelog`_,
+and this project adheres to `Semantic Versioning`_.
+
+
+
+`2.6.0`_ - 2018-11-2x
+~~~~~~~~~~~~~~~~~~~~~
+
+Changed
++++++++
+
+- Improved error logging.
+- Update bundled widget to version ``3.6.1``. See `widget changelog`_.
 
 Fixed
 +++++
 
 - `FileWidget.render()` now works in Django 2.1.
 - Obsolete widget setting `data-upload-base-url` replaced with `data-url-base`
-
-Changed
-+++++++
-
-- Improved error logging.
 
 
 2.5.0
@@ -385,3 +393,8 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
 
 .. _widget changelog: https://github.com/uploadcare/uploadcare-widget/blob/master/HISTORY.markdown
 .. _update to version 2.0: https://pyuploadcare.readthedocs.io/en/stable/install.html#update-to-version-2-0
+.. _Keep a Changelog: https://keepachangelog.com/en/1.0.0/
+.. _Semantic Versioning: https://semver.org/spec/v2.0.0.html
+
+.. _Unreleased: https://github.com/uploadcare/pyuploadcare/compare/v2.6.0...HEAD
+.. _2.6.0: https://github.com/uploadcare/pyuploadcare/compare/v2.5.0...v2.6.0

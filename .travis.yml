@@ -2,21 +2,19 @@
 # https://www.djangoproject.com/download/#supported-versions
 # https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
 
-sudo: false
 language: python
+dist: xenial
 python:
   - 2.7
   - 3.4
   - 3.5
   - 3.6
+  - 3.7
 env:
   global:
     - SUITE="tests/functional"
 matrix:
   include:
-    - python: 3.7
-      dist: xenial
-      sudo: true
 
     # django tests
     - stage: django tests
@@ -54,8 +52,6 @@ matrix:
         - DJANGO=2.0
         - SUITE="tests/dj"
     - python: 3.7
-      dist: xenial
-      sudo: true
       env:
         - DJANGO=2.0
         - SUITE="tests/dj"
@@ -71,8 +67,6 @@ matrix:
         - DJANGO=2.1
         - SUITE="tests/dj"
     - python: 3.7
-      dist: xenial
-      sudo: true
       env:
         - DJANGO=2.1
         - SUITE="tests/dj"
