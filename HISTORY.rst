@@ -10,7 +10,7 @@ and this project adheres to `Semantic Versioning`_.
 
 
 
-`2.6.0`_ - 2018-11-2x
+`2.6.0`_ - 2018-11-29
 ~~~~~~~~~~~~~~~~~~~~~
 
 Changed
