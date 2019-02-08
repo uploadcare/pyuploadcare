@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fuploadcare%2Fpyuploadcare.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fuploadcare%2Fpyuploadcare?ref=badge_shield)
+
 .. image:: https://ucarecdn.com/2f4864b7-ed0e-4411-965b-8148623aa680/-/inline/yes/uploadcare-logo-mark.svg
    :target: https://uploadcare.com/?utm_source=github&utm_campaign=pyuploadcare
    :height: 64 px
@@ -156,3 +158,7 @@ Contributors
 
 .. _bugbounty@uploadcare.com: mailto:bugbounty@uploadcare.com
 .. _hello@uploadcare.com: mailto:hello@uploadcare.com
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fuploadcare%2Fpyuploadcare.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fuploadcare%2Fpyuploadcare?ref=badge_large)
