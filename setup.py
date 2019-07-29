@@ -11,6 +11,7 @@ requirements = [
     'requests>=1.0',
     'python-dateutil>=2.1',
     'six>=1.2.0',
+    'akamai-edgeauth==0.3.2',
 ]
 
 if PY_VERSION < (3, 0):

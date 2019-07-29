@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
+Unreleased
+~~~~~~~~~~~~~~~~~~~~~
+
+Added
++++++
+
+- Add Authenticated (secure, signed) CDN URLs for Akamai and KeyCDN.
 
 
 `2.6.0`_ - 2018-11-29

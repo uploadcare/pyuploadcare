@@ -29,3 +29,8 @@ timeout = DEFAULT
 retry_throttled = 1
 
 user_agent_extension = None
+
+# expire period for signed URL uploads, in seconds
+window_period = None
+# can be 'akamai' or 'keycdn'
+cdn_provider = None

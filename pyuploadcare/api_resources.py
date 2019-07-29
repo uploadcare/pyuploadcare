@@ -1,5 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals, division
+import base64
+import hashlib
 import re
 import logging
 import time
@@ -9,6 +11,7 @@ from datetime import date, datetime
 
 import dateutil.parser
 import six
+from akamai.edgeauth import EdgeAuth
 
 if six.PY3:
     from urllib.parse import urlencode
@@ -35,6 +38,23 @@ UUID_WITH_EFFECTS_REGEX = re.compile('''
         ([^/]*)  # filename
     )?
 $'''.format(uuid=RE_UUID, effects=RE_EFFECTS), re.VERBOSE)
+
+
+def _generate_akamai_query_signature(secret, expire_window, path):
+    token_generator = EdgeAuth(key=secret, window_seconds=expire_window)
+    token = token_generator._generate_token(path, is_url=False)
+    return '?token={0}'.format(token)
+
+
+def _generate_keycdn_query_signature(secret, expire_window, path):
+    # refer: https://www.keycdn.com/support/secure-token
+    expire = int(time.time()) + expire_window
+    token = base64.b64encode(
+        hashlib.md5(
+            "{0}{1}{2}".format(path, secret, expire).encode(),
+        ).digest()
+    ).decode().replace("\n", "").replace("+", "-").replace("/", "_").replace("=", "")
+    return "?token={0}&expire={1}".format(token, expire)
 
 
 class File(object):
@@ -95,6 +115,32 @@ class File(object):
     def _api_storage_uri(self):
         return 'files/{0}/storage/'.format(self.uuid)
 
+    def generate_query_for_authenticated_url(self, path=None):
+        """Generate query for token authenticated URLs (signed URLs) if feature is on.
+
+        Implementation depends on cdn_provider.
+
+        For more information please refer to docs https://uploadcare.com/docs/delivery/file_api/#authenticated-urls
+        """
+        if conf.cdn_provider is None:
+            return ''
+
+        if conf.window_period is None:
+            raise ValueError('You should set window_period')
+
+        if path is None:
+            path = self.cdn_path(self.default_effects)
+
+        # signing function uses path with `/` in starting
+        path = '/' + path
+
+        if conf.cdn_provider.lower() == 'akamai':
+            return _generate_akamai_query_signature(conf.secret, conf.window_period, path)
+        elif conf.cdn_provider.lower() == 'keycdn':
+            return _generate_keycdn_query_signature(conf.secret, conf.window_period, path)
+        else:
+            raise ValueError('cdn_provider can be only akamai or keycdn')
+
     def cdn_path(self, effects=None):
         ptn = '{uuid}/-/{effects}' if effects else '{uuid}/'
         return ptn.format(
@@ -119,8 +165,13 @@ class File(object):
             https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
 
         """
-        return '{cdn_base}{path}'.format(cdn_base=conf.cdn_base,
-                                         path=self.cdn_path(self.default_effects))
+        path = self.cdn_path(self.default_effects)
+        query = self.generate_query_for_authenticated_url(path)
+        return '{cdn_base}{path}{query}'.format(
+            cdn_base=conf.cdn_base,
+            path=self.cdn_path(self.default_effects),
+            query=query,
+        )
 
     def info(self):
         """Returns all available file information as ``dict``.
@@ -239,7 +290,7 @@ class File(object):
 
     def copy(self, effects=None, target=None):
         """Creates a File Copy on Uploadcare or Custom Storage.
-        
+
         File.copy method is deprecated and will be removed in 4.0.0.
         Please use `create_local_copy` and `create_remote_copy` instead.
 
