@@ -3,6 +3,7 @@
 # https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
 
 language: python
+os: linux
 dist: xenial
 python:
   - 2.7
@@ -10,10 +11,11 @@ python:
   - 3.5
   - 3.6
   - 3.7
+  - 3.8
 env:
   global:
     - SUITE="tests/functional"
-matrix:
+jobs:
   include:
 
     # django tests
@@ -33,6 +35,10 @@ matrix:
         - DJANGO=1.11
         - SUITE="tests/dj"
     - python: 3.6
+      env:
+        - DJANGO=1.11
+        - SUITE="tests/dj"
+    - python: 3.7
       env:
         - DJANGO=1.11
         - SUITE="tests/dj"
@@ -71,12 +77,46 @@ matrix:
         - DJANGO=2.1
         - SUITE="tests/dj"
 
+    # django 2.2
+
+    - python: 3.5
+      env:
+        - DJANGO=2.2
+        - SUITE="tests/dj"
+    - python: 3.6
+      env:
+        - DJANGO=2.2
+        - SUITE="tests/dj"
+    - python: 3.7
+      env:
+        - DJANGO=2.2
+        - SUITE="tests/dj"
+    - python: 3.8
+      env:
+        - DJANGO=2.2
+        - SUITE="tests/dj"
+
+    # django 3.0
+
+    - python: 3.6
+      env:
+        - DJANGO=3.0
+        - SUITE="tests/dj"
+    - python: 3.7
+      env:
+        - DJANGO=3.0
+        - SUITE="tests/dj"
+    - python: 3.8
+      env:
+        - DJANGO=3.0
+        - SUITE="tests/dj"
+
     # integration tests
     - stage: integration tests
       python: 2.7
       env: SUITE="tests/integration"
     - stage: integration tests
-      python: 3.6
+      python: 3.7
       env: SUITE="tests/integration"
 
 cache:

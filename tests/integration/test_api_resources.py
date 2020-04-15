@@ -52,17 +52,15 @@ class FileUploadTest(RestAPITestCase):
 
 
 class FileUploadFromUrlTest(RestAPITestCase):
+    image_url = 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
+
     def test_get_some_token(self):
-        file_from_url = File.upload_from_url(
-            'https://github.com/images/error/angry_unicorn.png'
-        )
+        file_from_url = File.upload_from_url(self.image_url)
         self.assertTrue(file_from_url.token)
 
     @skip_on_travis
     def test_successful_upload_from_url(self):
-        file_from_url = File.upload_from_url(
-            'https://github.com/images/error/angry_unicorn.png'
-        )
+        file_from_url = File.upload_from_url(self.image_url)
 
         timeout = 30
         time_started = time.time()
@@ -77,42 +75,34 @@ class FileUploadFromUrlTest(RestAPITestCase):
 
     @skip_on_travis
     def test_successful_upload_from_url_sync_autostore(self):
-        file = File.upload_from_url_sync(
-            'https://github.com/images/error/angry_unicorn.png',
-            interval=1
-        )
+        file = File.upload_from_url_sync(self.image_url,
+                                         interval=1)
         self.assertIsInstance(file, File)
-        self.assertEqual(file.filename(), 'angry_unicorn.png')
+        self.assertEqual(file.filename(), 'Octocat.png')
         self.assertIsNotNone(file.datetime_stored())
 
     @skip_on_travis
     def test_successful_upload_from_url_sync_dont_store(self):
-        file = File.upload_from_url_sync(
-            'https://github.com/images/error/angry_unicorn.png',
-            store=False,
-            interval=1
-        )
+        file = File.upload_from_url_sync(self.image_url,
+                                         store=False,
+                                         interval=1)
         self.assertIsInstance(file, File)
-        self.assertEqual(file.filename(), 'angry_unicorn.png')
+        self.assertEqual(file.filename(), 'Octocat.png')
         self.assertIsNone(file.datetime_stored())
 
     @skip_on_travis
     def test_successful_upload_from_url_sync_store(self):
-        file = File.upload_from_url_sync(
-            'https://github.com/images/error/angry_unicorn.png',
-            store=True,
-            interval=1
-        )
+        file = File.upload_from_url_sync(self.image_url,
+                                         store=True,
+                                         interval=1)
         self.assertIsInstance(file, File)
         self.assertIsNotNone(file.datetime_stored())
 
     @skip_on_travis
     def test_successful_upload_from_url_sync_with_filename(self):
-        file = File.upload_from_url_sync(
-            'https://github.com/images/error/angry_unicorn.png',
-            filename='meh.png',
-            interval=1
-        )
+        file = File.upload_from_url_sync(self.image_url,
+                                         filename='meh.png',
+                                         interval=1)
         self.assertIsInstance(file, File)
         self.assertEqual(file.filename(), 'meh.png')
 
@@ -249,7 +239,7 @@ class FileCopyTest(RestAPITestCase):
 
         # create file to copy from
         file_from_url = File.upload_from_url(
-            'https://github.com/images/error/angry_unicorn.png'
+            'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
         )
 
         timeout = 30
