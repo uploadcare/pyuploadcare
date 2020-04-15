@@ -16,6 +16,9 @@ env:
   global:
     - SUITE="tests/functional"
 jobs:
+  allow_failures:
+    - python: 3.4  # todo: figure out reqs for coverage
+
   include:
 
     # django tests
