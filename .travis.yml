@@ -24,7 +24,7 @@ jobs:
     # django tests
     - stage: django tests
 
-      # django 1.11
+    # django 1.11
       python: 2.7
       env:
         - DJANGO=1.11
