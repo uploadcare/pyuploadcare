@@ -7,7 +7,6 @@ os: linux
 dist: xenial
 python:
   - 2.7
-  - 3.4
   - 3.5
   - 3.6
   - 3.7
@@ -16,9 +15,6 @@ env:
   global:
     - SUITE="tests/functional"
 jobs:
-  allow_failures:
-    - python: 3.4  # todo: figure out reqs for coverage
-
   include:
 
     # django tests
@@ -26,10 +22,6 @@ jobs:
 
     # django 1.11
       python: 2.7
-      env:
-        - DJANGO=1.11
-        - SUITE="tests/dj"
-    - python: 3.4
       env:
         - DJANGO=1.11
         - SUITE="tests/dj"
@@ -48,10 +40,6 @@ jobs:
 
     # django 2.0
 
-    - python: 3.4
-      env:
-        - DJANGO=2.0
-        - SUITE="tests/dj"
     - python: 3.5
       env:
         - DJANGO=2.0
@@ -128,8 +116,7 @@ cache:
 install:
   - if [[ $DJANGO != '' ]]; then pip install django~=$DJANGO.0; fi
   - pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
-  - pip install pytest-cov
-  - if [[ $TRAVIS_PYTHON_VERSION != '3.4.*' ]]; then pip install python-coveralls; else pip install 'python-coveralls==2.9.1'; fi
+  - pip install pytest-cov python-coveralls
   - pip install -e .
 script: py.test $SUITE --cov=pyuploadcare
 notifications:
