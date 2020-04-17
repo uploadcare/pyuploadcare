@@ -10,6 +10,18 @@ and this project adheres to `Semantic Versioning`_.
 
 
 
+`Unreleased`_ - 2020-04-xx
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Changed
++++++++
+- Dropped support for Python 3.4
+
+Fixed
++++++
+- Tests
+
+
 `2.6.0`_ - 2018-11-29
 ~~~~~~~~~~~~~~~~~~~~~
 
