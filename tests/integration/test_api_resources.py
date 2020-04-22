@@ -133,9 +133,9 @@ class SignedUploadsTest(RestAPITestCase):
     def test_upload_invalid_signature(self):
         conf.secret = 'abc'
         with self.assertRaises(AuthenticationError):
-            file = File.upload_from_url_sync(self.image_url,
-                                             store=False,
-                                             interval=1)
+            File.upload_from_url_sync(self.image_url,
+                                      store=False,
+                                      interval=1)
 
 
 class FileInfoTest(RestAPITestCase):

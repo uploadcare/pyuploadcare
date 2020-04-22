@@ -7,9 +7,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
 
-from pyuploadcare import conf, __version__
-from pyuploadcare.api import (rest_request, uploading_request,_build_user_agent,
-                              _signed_upload_signature)
+from pyuploadcare import conf
+from pyuploadcare.api import rest_request, uploading_request,_build_user_agent
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
