@@ -4,7 +4,6 @@ import re
 import logging
 import time
 from itertools import islice
-from collections import Iterable
 from datetime import date, datetime
 
 import dateutil.parser
@@ -12,8 +11,10 @@ import six
 
 if six.PY3:
     from urllib.parse import urlencode
+    from collections.abc import Iterable
 else:
     from urllib import urlencode
+    from collections import Iterable
 
 from . import conf
 from .api import rest_request, uploading_request

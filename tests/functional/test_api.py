@@ -8,14 +8,15 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 from mock import patch
 
 from pyuploadcare import conf, __version__
-from pyuploadcare.api import rest_request, _build_user_agent
+from pyuploadcare.api import (rest_request, uploading_request,_build_user_agent,
+                              _signed_upload_signature)
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
 
 class RESTClientTest(unittest.TestCase):
     def tearDown(self):
-        conf.api_version = '0.4'
+        conf.api_version = '0.5'
 
     @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
@@ -45,7 +46,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
-                         'application/vnd.uploadcare-v0.4+json')
+                         'application/vnd.uploadcare-v0.5+json')
         self.assertEqual(headers['User-Agent'], user_agent)
 
         conf.api_version = '0.1'
@@ -68,3 +69,28 @@ class RESTClientTest(unittest.TestCase):
         request.return_value = MockResponse(200, b'')
 
         rest_request('OPTIONS', 'files/')
+
+
+class SignatureTest(unittest.TestCase):
+    def tearDown(self):
+        conf.signed_uploads = False
+
+    @patch('requests.sessions.Session.request', autospec=True)
+    def test_signature_fields_added(self, request):
+        conf.signed_uploads = True
+
+        request.return_value = MockResponse(200, b'[]')
+
+        uploading_request('GET', '')
+        data = request.call_args[1]['data']
+        self.assertIn('expire', data)
+        self.assertIn('signature', data)
+
+    @patch('requests.sessions.Session.request', autospec=True)
+    def test_signature_fields_scipped(self, request):
+        request.return_value = MockResponse(200, b'[]')
+
+        uploading_request('GET', '')
+        data = request.call_args[1]['data']
+        self.assertNotIn('expire', data)
+        self.assertNotIn('signature', data)

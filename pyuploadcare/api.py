@@ -66,7 +66,8 @@ def _build_user_agent():
 
 
 def _signed_upload_signature(secret, expire):
-    return hmac.new(str(secret), str(expire), hashlib.sha256).hexdigest()
+    k, m = map(lambda x: str(x).encode(), (secret, expire))
+    return hmac.new(k, m, hashlib.sha256).hexdigest()
 
 
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
