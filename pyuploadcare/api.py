@@ -65,6 +65,10 @@ def _build_user_agent():
                                                       extension_info)
 
 
+def _signed_upload_signature(secret, expire):
+    return hmac.new(str(secret), str(expire), hashlib.sha256).hexdigest()
+
+
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
                  retry_throttled=conf.DEFAULT):
     """Makes REST API request and returns response as ``dict``.
@@ -229,6 +233,11 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     data['pub_key'] = conf.pub_key
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
+    if conf.signed_uploads:
+        expire = int(time.time()) + conf.signed_uploads_ttl
+        data['expire'] = str(expire)
+        data['signature'] = _signed_upload_signature(conf.secret, expire)
+
     headers = {
         'User-Agent': _build_user_agent(),
     }
@@ -255,6 +264,9 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
 
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
+
+    if response.status_code == 403:
+        raise AuthenticationError(response.content)
 
     # Not json or unknown status code.
     raise APIError(response.content)

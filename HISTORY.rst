@@ -10,8 +10,12 @@ and this project adheres to `Semantic Versioning`_.
 
 
 
-`Unreleased`_ - 2020-04-xx
+`2.7.0 - Unreleased`_ - 2020-04-xx
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Added
++++++
+- Support for signed uploads
 
 Changed
 +++++++
