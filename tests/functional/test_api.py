@@ -13,11 +13,11 @@ from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
 
+@patch('requests.sessions.Session.request', autospec=True)
 class RESTClientTest(unittest.TestCase):
     def tearDown(self):
         conf.api_version = '0.5'
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
         request.return_value = MockResponse(404, b'{}')
         with self.assertRaises(InvalidRequestError):
@@ -34,7 +34,6 @@ class RESTClientTest(unittest.TestCase):
             self.assertEqual('No JSON object could be decoded',
                              cm.exception.data)
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
         user_agent = _build_user_agent()
 
@@ -57,24 +56,22 @@ class RESTClientTest(unittest.TestCase):
                          'application/vnd.uploadcare-v0.1+json')
         self.assertEqual(headers['User-Agent'], user_agent)
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_head(self, request):
         request.return_value = MockResponse(200, b'')
 
         rest_request('HEAD', 'files/')
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_options(self, request):
         request.return_value = MockResponse(200, b'')
 
         rest_request('OPTIONS', 'files/')
 
 
+@patch('requests.sessions.Session.request', autospec=True)
 class SignatureTest(unittest.TestCase):
     def tearDown(self):
         conf.signed_uploads = False
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_signature_fields_added(self, request):
         conf.signed_uploads = True
 
@@ -85,8 +82,7 @@ class SignatureTest(unittest.TestCase):
         self.assertIn('expire', data)
         self.assertIn('signature', data)
 
-    @patch('requests.sessions.Session.request', autospec=True)
-    def test_signature_fields_scipped(self, request):
+    def test_signature_fields_skipped(self, request):
         request.return_value = MockResponse(200, b'[]')
 
         uploading_request('GET', '')
