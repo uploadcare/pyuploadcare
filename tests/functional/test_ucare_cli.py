@@ -26,6 +26,7 @@ def arg_namespace(arguments_str):
 
 
 @patch('requests.sessions.Session.request', autospec=True)
+@patch.object(conf, 'secret', 'secret')
 class UcareGetTest(unittest.TestCase):
     def test_get_by_uuid(self, request):
         request.return_value = MockResponse(status=200)
@@ -123,10 +124,10 @@ class UcareDeleteTest(UcareStorageOperationsMixin, unittest.TestCase):
 class UcareCommonArgsTest(unittest.TestCase):
 
     def setUp(self):
-        conf.pub_key = None
-        conf.secret = None
+        conf.pub_key = 'public'
+        conf.secret = 'secret'
 
-        conf.api_version = '0.4'
+        conf.api_version = '0.5'
         conf.api_base = 'https://api.uploadcare.com/'
         conf.upload_base = 'https://upload.uploadcare.com/'
 
@@ -199,6 +200,8 @@ class UcareCommonArgsTest(unittest.TestCase):
         self.assertEqual(conf.api_version, '0.777')
 
 
+@patch.object(conf, 'secret', 'secret')
+@patch('requests.sessions.Session.request', autospec=True)
 class UcareCommonConfigFileTest(unittest.TestCase):
 
     def setUp(self):
@@ -214,7 +217,6 @@ class UcareCommonConfigFileTest(unittest.TestCase):
         conf.verify_api_ssl = True
         conf.verify_upload_ssl = True
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_use_pub_key_from_config_file(self, request):
         request.return_value = MockListResponse()
 
@@ -228,7 +230,6 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
         self.assertEqual(conf.pub_key, 'demopublickey')
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_redefine_pub_key_by_second_config_file(self, request):
         request.return_value = MockListResponse()
 
@@ -250,7 +251,6 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
         self.assertEqual(conf.pub_key, 'demopublickey_modified')
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_use_available_pub_key_from_config_files(self, request):
         request.return_value = MockListResponse()
 
@@ -272,7 +272,6 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
         self.assertEqual(conf.pub_key, 'demopublickey')
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_redefine_config_pub_key_by_args(self, request):
         request.return_value = MockListResponse()
 
@@ -287,7 +286,6 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
         self.assertEqual(conf.pub_key, 'pub')
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_load_verify_api_ssl_false_value_from_config(self, request):
         request.return_value = MockListResponse()
 
@@ -301,7 +299,6 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
         self.assertFalse(conf.verify_api_ssl)
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_load_verify_api_ssl_true_value_from_config(self, request):
         request.return_value = MockListResponse()
 
@@ -315,7 +312,6 @@ class UcareCommonConfigFileTest(unittest.TestCase):
 
         self.assertTrue(conf.verify_api_ssl)
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_redefine_config_verify_api_ssl_by_args(self, request):
         request.return_value = MockListResponse()
 
@@ -361,6 +357,7 @@ class CreateFileGroupTest(unittest.TestCase):
 @patch('os.makedirs', autospec=True)
 @patch('os.path.exists', autospec=True)
 @patch('requests.sessions.Session.request', autospec=True)
+@patch.object(conf, 'secret', 'secret')
 class UcareSyncTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

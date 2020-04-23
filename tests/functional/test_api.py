@@ -7,17 +7,18 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from mock import patch
 
-from pyuploadcare import conf, __version__
-from pyuploadcare.api import rest_request, _build_user_agent
+from pyuploadcare import conf
+from pyuploadcare.api import rest_request, uploading_request,_build_user_agent
 from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
 
+@patch.object(conf, 'secret', 'secret')
+@patch('requests.sessions.Session.request', autospec=True)
 class RESTClientTest(unittest.TestCase):
     def tearDown(self):
-        conf.api_version = '0.4'
+        conf.api_version = '0.5'
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_raises(self, request):
         request.return_value = MockResponse(404, b'{}')
         with self.assertRaises(InvalidRequestError):
@@ -34,7 +35,6 @@ class RESTClientTest(unittest.TestCase):
             self.assertEqual('No JSON object could be decoded',
                              cm.exception.data)
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_request_headers(self, request):
         user_agent = _build_user_agent()
 
@@ -45,7 +45,7 @@ class RESTClientTest(unittest.TestCase):
         self.assertIn('Accept', headers)
         self.assertIn('User-Agent', headers)
         self.assertEqual(headers['Accept'],
-                         'application/vnd.uploadcare-v0.4+json')
+                         'application/vnd.uploadcare-v0.5+json')
         self.assertEqual(headers['User-Agent'], user_agent)
 
         conf.api_version = '0.1'
@@ -57,14 +57,37 @@ class RESTClientTest(unittest.TestCase):
                          'application/vnd.uploadcare-v0.1+json')
         self.assertEqual(headers['User-Agent'], user_agent)
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_head(self, request):
         request.return_value = MockResponse(200, b'')
 
         rest_request('HEAD', 'files/')
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_options(self, request):
         request.return_value = MockResponse(200, b'')
 
         rest_request('OPTIONS', 'files/')
+
+
+@patch.object(conf, 'secret', 'secret')
+@patch('requests.sessions.Session.request', autospec=True)
+class SignatureTest(unittest.TestCase):
+    def tearDown(self):
+        conf.signed_uploads = False
+
+    def test_signature_fields_added(self, request):
+        conf.signed_uploads = True
+
+        request.return_value = MockResponse(200, b'[]')
+
+        uploading_request('GET', '')
+        data = request.call_args[1]['data']
+        self.assertIn('expire', data)
+        self.assertIn('signature', data)
+
+    def test_signature_fields_skipped(self, request):
+        request.return_value = MockResponse(200, b'[]')
+
+        uploading_request('GET', '')
+        data = request.call_args[1]['data']
+        self.assertNotIn('expire', data)
+        self.assertNotIn('signature', data)

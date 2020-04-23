@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
+import os
 import unittest
 from tempfile import NamedTemporaryFile
 from datetime import datetime
@@ -11,6 +12,7 @@ from pyuploadcare.api import (
     rest_request as original_rest_request
 )
 from pyuploadcare.api_resources import File, FileGroup, FileList
+from pyuploadcare.exceptions import AuthenticationError
 
 from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
 
@@ -20,10 +22,12 @@ conf.retry_throttled = 10
 
 
 class RestAPITestCase(unittest.TestCase):
+    image_url = 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
+
     @classmethod
     def setUpClass(cls):
         conf.pub_key = 'demopublickey'
-        conf.secret = 'demoprivatekey'
+        conf.secret = 'demosecretkey'
 
     @classmethod
     def tearDownClass(cls):
@@ -52,8 +56,6 @@ class FileUploadTest(RestAPITestCase):
 
 
 class FileUploadFromUrlTest(RestAPITestCase):
-    image_url = 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
-
     def test_get_some_token(self):
         file_from_url = File.upload_from_url(self.image_url)
         self.assertTrue(file_from_url.token)
@@ -105,6 +107,35 @@ class FileUploadFromUrlTest(RestAPITestCase):
                                          interval=1)
         self.assertIsInstance(file, File)
         self.assertEqual(file.filename(), 'meh.png')
+
+
+@unittest.skipIf(not os.environ.get("SIGNED_UPLOADS_PUBKEY"),
+                 'Signed uploads project not configured')
+class SignedUploadsTest(RestAPITestCase):
+    def setUp(self):
+        conf.pub_key = os.environ.get("SIGNED_UPLOADS_PUBKEY")
+        conf.secret = os.environ.get("SIGNED_UPLOADS_SECKEY")
+        conf.signed_uploads = True
+
+    def tearDown(self):
+        conf.pub_key = None
+        conf.secret = None
+        conf.signed_uploads = False
+
+    def test_upload(self):
+        file = File.upload_from_url_sync(self.image_url,
+                                         store=False,
+                                         interval=1)
+        self.assertIsInstance(file, File)
+        self.assertEqual(file.filename(), 'Octocat.png')
+        self.assertIsNone(file.datetime_stored())
+
+    def test_upload_invalid_signature(self):
+        conf.secret = 'abc'
+        with self.assertRaises(AuthenticationError):
+            File.upload_from_url_sync(self.image_url,
+                                      store=False,
+                                      interval=1)
 
 
 class FileInfoTest(RestAPITestCase):
@@ -238,9 +269,7 @@ class FileCopyTest(RestAPITestCase):
         super(FileCopyTest, cls).setUpClass()
 
         # create file to copy from
-        file_from_url = File.upload_from_url(
-            'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
-        )
+        file_from_url = File.upload_from_url(cls.image_url)
 
         timeout = 30
         time_started = time.time()

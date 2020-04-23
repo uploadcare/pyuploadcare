@@ -65,6 +65,14 @@ def _build_user_agent():
                                                       extension_info)
 
 
+def _signed_upload_signature(secret, expire):
+    k, m = secret, str(expire).encode('utf-8')
+    if not isinstance(k, (bytes, bytearray)):
+        k = k.encode('utf-8')
+
+    return hmac.new(k, m, hashlib.sha256).hexdigest()
+
+
 def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
                  retry_throttled=conf.DEFAULT):
     """Makes REST API request and returns response as ``dict``.
@@ -123,14 +131,10 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             date,
             path,
         ])
-        sign_string_as_bytes = sign_string.encode('utf-8')
-
-        try:
-            secret_as_bytes = conf.secret.encode('utf-8')
-        except AttributeError:
-            secret_as_bytes = bytes()
-        sign = hmac.new(secret_as_bytes, sign_string_as_bytes, hashlib.sha1) \
-            .hexdigest()
+        k, m = conf.secret, sign_string.encode('utf-8')
+        if not isinstance(k, (bytes, bytearray)):
+            k = k.encode('utf-8')
+        sign = hmac.new(k, m, hashlib.sha1).hexdigest()
 
         headers = {
             'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),
@@ -229,6 +233,11 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
     data['pub_key'] = conf.pub_key
     data['UPLOADCARE_PUB_KEY'] = conf.pub_key
 
+    if conf.signed_uploads:
+        expire = int(time.time()) + conf.signed_uploads_ttl
+        data['expire'] = str(expire)
+        data['signature'] = _signed_upload_signature(conf.secret, expire)
+
     headers = {
         'User-Agent': _build_user_agent(),
     }
@@ -255,6 +264,9 @@ def uploading_request(verb, path, data=None, files=None, timeout=conf.DEFAULT):
 
     if response.status_code in (400, 404):
         raise InvalidRequestError(response.content)
+
+    if response.status_code == 403:
+        raise AuthenticationError(response.content)
 
     # Not json or unknown status code.
     raise APIError(response.content)
