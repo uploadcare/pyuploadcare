@@ -15,6 +15,7 @@ if six.PY3:
 else:
     from urllib import quote
 
+from pyuploadcare import conf
 from pyuploadcare.api_resources import File, FileGroup, FileList, FilesStorage
 from pyuploadcare.exceptions import InvalidParamError
 from .utils import MockResponse, api_response_from_file
@@ -253,6 +254,7 @@ class FileCopyTest(unittest.TestCase):
 class FileGroupAsContainerTypeTest(unittest.TestCase):
 
     @patch('requests.sessions.Session.request', autospec=True)
+    @patch.object(conf, 'secret', 'secret')
     def setUp(self, request):
         request.return_value = MockResponse(
             status=200,
@@ -294,9 +296,9 @@ class FileGroupAsContainerTypeTest(unittest.TestCase):
             self.group[0] = 123
 
 
+@patch('requests.sessions.Session.request', autospec=True)
+@patch.object(conf, 'secret', 'secret')
 class StoreFileGroupTest(unittest.TestCase):
-
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_successful_store(self, request):
         group = FileGroup(
             cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'
@@ -310,7 +312,6 @@ class StoreFileGroupTest(unittest.TestCase):
 
         self.assertEqual(request.call_count, 1)
 
-    @patch('requests.sessions.Session.request', autospec=True)
     def test_do_not_store_twice(self, request):
         group = FileGroup(
             cdn_url_or_group_id='0513dda0-582f-447d-846f-096e5df9e2bb~2'

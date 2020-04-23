@@ -66,7 +66,10 @@ def _build_user_agent():
 
 
 def _signed_upload_signature(secret, expire):
-    k, m = str(secret).encode(), str(expire).encode()
+    k, m = secret, str(expire).encode('utf-8')
+    if type(k) not in (bytes, bytearray):
+        k = k.encode('utf-8')
+
     return hmac.new(k, m, hashlib.sha256).hexdigest()
 
 
@@ -128,14 +131,10 @@ def rest_request(verb, path, data=None, timeout=conf.DEFAULT,
             date,
             path,
         ])
-        sign_string_as_bytes = sign_string.encode('utf-8')
-
-        try:
-            secret_as_bytes = conf.secret.encode('utf-8')
-        except AttributeError:
-            secret_as_bytes = bytes()
-        sign = hmac.new(secret_as_bytes, sign_string_as_bytes, hashlib.sha1) \
-            .hexdigest()
+        k, m = conf.secret, sign_string.encode('utf-8')
+        if type(k) not in (bytes, bytearray):
+            k = k.encode('utf-8')
+        sign = hmac.new(k, m, hashlib.sha1).hexdigest()
 
         headers = {
             'Authorization': 'Uploadcare {0}:{1}'.format(conf.pub_key, sign),

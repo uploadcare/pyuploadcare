@@ -13,6 +13,7 @@ from pyuploadcare.exceptions import APIError, InvalidRequestError
 from .utils import MockResponse
 
 
+@patch.object(conf, 'secret', 'secret')
 @patch('requests.sessions.Session.request', autospec=True)
 class RESTClientTest(unittest.TestCase):
     def tearDown(self):
@@ -67,6 +68,7 @@ class RESTClientTest(unittest.TestCase):
         rest_request('OPTIONS', 'files/')
 
 
+@patch.object(conf, 'secret', 'secret')
 @patch('requests.sessions.Session.request', autospec=True)
 class SignatureTest(unittest.TestCase):
     def tearDown(self):
