@@ -22,10 +22,10 @@ else:
 
 setup(
     name='pyuploadcare',
-    version='2.6.0',
+    version='2.7.0',
     description='Python library for Uploadcare.com',
     long_description=(long_description),
-    author='Uploadcare LLC',
+    author='Uploadcare Inc',
     author_email='hello@uploadcare.com',
     url='https://github.com/uploadcare/pyuploadcare',
     packages=['pyuploadcare', 'pyuploadcare.dj', 'pyuploadcare.ucare_cli'],

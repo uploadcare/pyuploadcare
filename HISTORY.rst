@@ -10,20 +10,21 @@ and this project adheres to `Semantic Versioning`_.
 
 
 
-`2.7.0 - Unreleased`_ - 2020-04-xx
+`2.7.0`_ - 2020-05-03
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Added
 +++++
-- Support for signed uploads
+- Support for signed uploads.
 
 Changed
 +++++++
-- Dropped support for Python 3.4
+- Dropped support for Python 3.4.
+- Update bundled widget to version ``3.6.1``. See `widget changelog`_.
 
 Fixed
 +++++
-- Tests
+- Tests.
 
 
 `2.6.0`_ - 2018-11-29
@@ -412,5 +413,6 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
 .. _Keep a Changelog: https://keepachangelog.com/en/1.0.0/
 .. _Semantic Versioning: https://semver.org/spec/v2.0.0.html
 
-.. _Unreleased: https://github.com/uploadcare/pyuploadcare/compare/v2.6.0...HEAD
+.. _Unreleased: https://github.com/uploadcare/pyuploadcare/compare/v2.7.0...HEAD
 .. _2.6.0: https://github.com/uploadcare/pyuploadcare/compare/v2.5.0...v2.6.0
+.. _2.7.0: https://github.com/uploadcare/pyuploadcare/compare/v2.6.0...v2.7.0
