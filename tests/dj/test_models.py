@@ -15,7 +15,13 @@ import django
 if hasattr(django, 'setup'):
     django.setup()
 
-from mock import patch
+import six
+
+if six.PY3:
+    from unittest.mock import patch
+else:
+    from mock import patch
+
 from django.core.exceptions import ValidationError
 from django.db import models
 

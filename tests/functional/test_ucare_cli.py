@@ -5,7 +5,13 @@ import json
 import unittest
 from tempfile import NamedTemporaryFile
 
-from mock import patch, MagicMock, Mock
+import six
+
+if six.PY3:
+    from unittest.mock import patch, MagicMock, Mock
+else:
+    from mock import patch, MagicMock, Mock
+
 from dateutil import parser
 
 from pyuploadcare import conf

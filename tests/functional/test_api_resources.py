@@ -5,15 +5,17 @@ import datetime
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
-from mock import patch, MagicMock
+
 from dateutil.tz import tzutc
 
 import six
 
 if six.PY3:
     from urllib.parse import quote
+    from unittest.mock import patch, MagicMock
 else:
     from urllib import quote
+    from mock import patch, MagicMock
 
 from pyuploadcare import conf
 from pyuploadcare.api_resources import File, FileGroup, FileList, FilesStorage
