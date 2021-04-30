@@ -29,7 +29,13 @@ jobs:
         pip install flake8 pytest
         pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
         pip install pytest-cov python-coveralls
+        if
         pip install -e .
+    - name: Install mock on py2.7
+      if: ${{ matrix.python-version == '2.7' }}
+      run: |
+        python -m pip install --upgrade pip
+        pip install mock
     - name: Lint with flake8
       continue-on-error: true
       run: |
