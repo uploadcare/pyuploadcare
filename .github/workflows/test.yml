@@ -62,13 +62,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install mock
-    # - name: Lint with flake8
-    #   continue-on-error: true
-    #   run: |
-    #     # stop the build if there are Python syntax errors or undefined names
-    #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-    #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-    #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
         pytest tests/functional --cov=pyuploadcare
@@ -78,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.6, 3.7, 3.8, 3.9]
+        python-version: [2.7, 3.8, 3.9]
         django-version: [1.11, 2.0, 3.0]
 
     steps:
@@ -93,20 +86,13 @@ jobs:
         pip install flake8 pytest
         pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
         pip install pytest-cov python-coveralls
-        pip install django~={{ matrix.django-version }}.0; fi
+        pip install django~={{ matrix.django-version }}.0
         pip install -e .
     - name: Install mock on py2.7
       if: ${{ matrix.python-version == '2.7' }}
       run: |
         python -m pip install --upgrade pip
         pip install mock
-    # - name: Lint with flake8
-    #   continue-on-error: true
-    #   run: |
-    #     # stop the build if there are Python syntax errors or undefined names
-    #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-    #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-    #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
         pytest tests/dj --cov=pyuploadcare
