@@ -86,7 +86,7 @@ jobs:
         pip install flake8 pytest
         pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
         pip install pytest-cov python-coveralls
-        pip install django~={{ matrix.django-version }}.0
+        pip install django~=${{ matrix.django-version }}.0
         pip install -e .
     - name: Install mock on py2.7
       if: ${{ matrix.python-version == '2.7' }}
