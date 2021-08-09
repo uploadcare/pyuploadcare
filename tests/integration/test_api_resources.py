@@ -6,7 +6,13 @@ from tempfile import NamedTemporaryFile
 from datetime import datetime
 import time
 
-import mock
+import six
+
+if six.PY3:
+    from unittest import mock
+else:
+    import mock
+
 from pyuploadcare import conf
 from pyuploadcare.api import (
     rest_request as original_rest_request

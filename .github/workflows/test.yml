@@ -60,7 +60,6 @@ jobs:
     - name: Install mock on py2.7
       if: ${{ matrix.python-version == '2.7' }}
       run: |
-        python -m pip install --upgrade pip
         pip install mock
     - name: Test with pytest
       run: |
@@ -102,7 +101,6 @@ jobs:
     - name: Install mock on py2.7
       if: ${{ matrix.python-version == '2.7' }}
       run: |
-        python -m pip install --upgrade pip
         pip install mock
     - name: Test with pytest
       run: |
@@ -128,6 +126,10 @@ jobs:
         pip install 'requests>=1.0' 'python-dateutil>=2.1' 'six>=1.2.0'
         pip install pytest-cov python-coveralls
         pip install -e .
+    - name: Install mock on py2.7
+      if: ${{ matrix.python-version == '2.7' }}
+      run: |
+        pip install mock
     - name: Test with pytest
       run: |
         pytest tests/integration --cov=pyuploadcare
