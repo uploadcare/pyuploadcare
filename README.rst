@@ -10,8 +10,8 @@ PyUploadcare: a Python library for Uploadcare
 
 .. image:: https://badge.fury.io/py/pyuploadcare.svg
    :target: https://badge.fury.io/py/pyuploadcare
-.. image:: https://travis-ci.org/uploadcare/pyuploadcare.png?branch=master
-   :target: https://travis-ci.org/uploadcare/pyuploadcare
+.. image:: https://github.com/uploadcare/pyuploadcare/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/uploadcare/pyuploadcare/actions/workflows/test.yml
    :alt: Build Status
 .. image:: https://readthedocs.org/projects/pyuploadcare/badge/?version=latest
    :target: https://readthedocs.org/projects/pyuploadcare/?badge=latest
