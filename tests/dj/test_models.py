@@ -1,8 +1,9 @@
 # coding: utf-8
 from __future__ import unicode_literals
-import unittest
+
 import os
 import sys
+import unittest
 
 # Add project folder to PATH for avoiding troubles in Django < 1.8
 # It can't find `gallery` app
@@ -12,6 +13,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 # Load models for avoiding 'AppRegistryNotReady: Models aren't loaded yet.'
 # in Django 1.7.10
 import django
+
 if hasattr(django, 'setup'):
     django.setup()
 
@@ -25,8 +27,8 @@ else:
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from pyuploadcare.dj.models import ImageField, FileField, FileGroupField
 from pyuploadcare.api_resources import File, FileGroup
+from pyuploadcare.dj.models import FileField, FileGroupField, ImageField
 from pyuploadcare.exceptions import InvalidRequestError
 
 

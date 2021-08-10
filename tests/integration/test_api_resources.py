@@ -1,10 +1,11 @@
 # coding: utf-8
 from __future__ import unicode_literals
+
 import os
-import unittest
-from tempfile import NamedTemporaryFile
-from datetime import datetime
 import time
+import unittest
+from datetime import datetime
+from tempfile import NamedTemporaryFile
 
 import six
 
@@ -14,14 +15,11 @@ else:
     import mock
 
 from pyuploadcare import conf
-from pyuploadcare.api import (
-    rest_request as original_rest_request
-)
+from pyuploadcare.api import rest_request as original_rest_request
 from pyuploadcare.api_resources import File, FileGroup, FileList
 from pyuploadcare.exceptions import AuthenticationError
 
-from .utils import upload_tmp_txt_file, create_file_group, skip_on_travis
-
+from .utils import create_file_group, skip_on_travis, upload_tmp_txt_file
 
 # increase throttle retries for Travis CI
 conf.retry_throttled = 10

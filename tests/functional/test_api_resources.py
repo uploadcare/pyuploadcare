@@ -1,25 +1,26 @@
 # coding: utf-8
 from __future__ import unicode_literals
-import unittest
+
 import datetime
 import os
+import unittest
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 
-from dateutil.tz import tzutc
-
 import six
+from dateutil.tz import tzutc
+from six.moves.urllib.parse import quote
 
 if six.PY3:
-    from urllib.parse import quote
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
 else:
-    from urllib import quote
     from mock import patch, MagicMock
 
 from pyuploadcare import conf
 from pyuploadcare.api_resources import File, FileGroup, FileList, FilesStorage
 from pyuploadcare.exceptions import InvalidParamError
+
 from .utils import MockResponse, api_response_from_file
 
 

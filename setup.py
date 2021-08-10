@@ -10,7 +10,7 @@ PY_VERSION = sys.version_info[0], sys.version_info[1]
 requirements = [
     'requests>=1.0',
     'python-dateutil>=2.1',
-    'six>=1.2.0',
+    'six>=1.16.0',
 ]
 
 if PY_VERSION < (3, 0):

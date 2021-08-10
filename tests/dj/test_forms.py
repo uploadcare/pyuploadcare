@@ -1,7 +1,9 @@
 # coding: utf-8
 from __future__ import unicode_literals
-import unittest
+
 import os
+import unittest
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
 from django import forms

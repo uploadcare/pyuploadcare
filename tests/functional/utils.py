@@ -1,7 +1,8 @@
 # coding: utf-8
 from __future__ import unicode_literals
-import os
+
 import json
+import os
 
 from requests import HTTPError
 
