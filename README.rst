@@ -78,14 +78,14 @@ Features
 Requirements
 ------------
 
-``pyuploadcare`` requires Python 2.7, 3.5, 3.6, 3.7, 3.8.
+``pyuploadcare`` requires Python 2.7, 3.6, 3.7, 3.8, 3.9.
 
-If you're using ``pyuploadcare`` with Django, check ``.travis.yml`` for supported
-Python-Django combinations.
+If you're using ``pyuploadcare`` with Django, check ``tox.ini``  or
+``.github/workflows``  for supported Python-Django combinations.
 
 Obsolete versions of Python and Django are officially not supported, but chances
-are everything still works. If you have to use those, modify tox.ini, test and
-run at your own risk ;) Or, you may use older versions of the library.
+are that everything still works. If you have to use those, modify ``tox.ini``,
+test and run at your own risk ;) Or, you may use older versions of the library.
 
 Installation
 ------------
@@ -105,7 +105,7 @@ or, if you prefer it the old way:
 Testing
 -------
 
-Besides the `Travis CI`_ we use tox. In order to run tests just:
+Besides the `Github Actions`_ we use tox. In order to run tests just:
 
 .. code-block:: console
 
@@ -144,7 +144,7 @@ Contributors
 .. _guide: https://uploadcare.com/docs/guides/django/?utm_source=github&utm_campaign=pyuploadcare
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
 .. _Sławek Ehlert: https://github.com/slafs
-.. _Travis CI: https://travis-ci.org/uploadcare/pyuploadcare
+.. _Github Actions: https://github.com/uploadcare/pyuploadcare/actions
 .. _REST: https://uploadcare.com/docs/api_reference/rest/?utm_source=github&utm_campaign=pyuploadcare
 .. _Upload: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=pyuploadcare
 .. _@marselester: https://github.com/marselester

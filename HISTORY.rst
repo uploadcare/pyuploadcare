@@ -16,6 +16,7 @@ and this project adheres to `Semantic Versioning`_.
 Changed
 +++++++
 - Moved from Travis to Github Actions
+- Dropped support for Python 3.5.
 
 
 `2.7.0`_ - 2020-05-03
