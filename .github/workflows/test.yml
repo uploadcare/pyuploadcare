@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
+        # https://docs.djangoproject.com/en/3.2/faq/install/#what-python-version-can-i-use-with-django
         # this is a bit excessive, probably should run only before
         #   releasing new version
         python-version: [3.6, 3.7, 3.8, 3.9]
