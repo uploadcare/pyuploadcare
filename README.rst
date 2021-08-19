@@ -35,57 +35,19 @@ Features like uploading from Facebook or manual crop are weighty,
 hence rare.
 Our goal is to change the status quo.
 
-This library consists of the `Uploadcare`_ API interface and a couple
-of Django goodies. You might also want to check out this `guide`_ as
+This library consists of the `Uploadcare`_ API interface. You might also want to check out this `guide`_ as
 a starting point.
-
-Simple as that, Uploadcare ``ImageField`` can be added to an
-existing Django project in just a couple of `simple steps`_.
-This will enable your users to see the upload progress, pick files
-from Google Drive or Instagram, and edit a form while files are
-being uploaded asynchronously.
-
-.. code-block:: python
-
-    from django import forms
-    from django.db import models
-
-    from pyuploadcare.dj.models import ImageField
-    from pyuploadcare.dj.forms import FileWidget
-
-
-    class Candidate(models.Model):
-        photo = ImageField(blank=True, manual_crop="")
-
-
-    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
-    class CandidateForm(forms.Form):
-        photo = ImageField(widget=FileWidget(attrs={
-            'data-cdn-base': 'https://cdn.super-candidates.com',
-            'data-image-shrink': '1024x1024',
-        }))
-
-.. image:: https://ucarecdn.com/dbb4021e-b20e-40fa-907b-3da0a4f8ed70/-/resize/800/manual_crop.png
 
 Features
 --------
 
 - Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
-- Django widget with useful manual crop and multi-upload.
 - *ucare* console utility.
-- hosted assets (Kudos to `Sławek Ehlert`_!).
 
 Requirements
 ------------
 
-``pyuploadcare`` requires Python 2.7, 3.5, 3.6, 3.7, 3.8.
-
-If you're using ``pyuploadcare`` with Django, check ``.travis.yml`` for supported
-Python-Django combinations.
-
-Obsolete versions of Python and Django are officially not supported, but chances
-are everything still works. If you have to use those, modify tox.ini, test and
-run at your own risk ;) Or, you may use older versions of the library.
+``pyuploadcare`` requires Python 3.6, 3.7, 3.8, 3.9.
 
 Installation
 ------------
@@ -95,6 +57,12 @@ In order to install ``pyuploadcare``, simply run:
 .. code-block:: console
 
     $ pip install pyuploadcare
+
+or with poetry:
+
+.. code-block:: console
+
+    $ poetry add pyuploadcare
 
 or, if you prefer it the old way:
 
