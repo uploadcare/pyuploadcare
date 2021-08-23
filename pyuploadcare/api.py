@@ -12,6 +12,7 @@ from pyuploadcare.base import (
 
 class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "files"
+    entity_class = entities.FileInfo
 
     def store(self, file_uuid: Union[UUID, str]):
         url = self._build_url(file_uuid, suffix="storage")
