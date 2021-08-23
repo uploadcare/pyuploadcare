@@ -4,6 +4,7 @@ from uuid import UUID
 from pyuploadcare import entities
 from pyuploadcare.base import (
     API,
+    CreateMixin,
     ListMixin,
     RetrieveMixin,
     DeleteMixin,
@@ -17,8 +18,7 @@ class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
     def store(self, file_uuid: Union[UUID, str]):
         url = self._build_url(file_uuid, suffix="storage")
         document = self._client.put(url).json()
-        for resource in document["results"]:
-            yield self._resource_to_entity(resource)
+        return self._resource_to_entity(document)
 
     def batch_store(self, file_uuids: Iterable[Union[UUID, str]]):
         url = self._build_url(suffix="storage")
@@ -56,3 +56,23 @@ class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
         }
         document = self._client.post(url, json=data).json()
         return document["result"]
+
+
+class GroupsAPI(API, ListMixin, RetrieveMixin):
+    resource_type = "groups"
+    entity_class = entities.GroupInfo
+
+    def store(self, file_uuid: Union[UUID, str]):
+        url = self._build_url(file_uuid, suffix="storage")
+        document = self._client.put(url).json()
+        return self._resource_to_entity(document)
+
+
+class ProjectAPI(API, RetrieveMixin):
+    resource_type = "project"
+    entity_class = entities.ProjectInfo
+
+
+class WebhooksAPI(API, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
+    resource_type = "webhooks"
+    entity_class = entities.WebhookInfo

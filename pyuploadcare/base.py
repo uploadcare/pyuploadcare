@@ -45,6 +45,14 @@ class API:
             url = urljoin(url, suffix) + "/"
         return url
 
+    def _post(
+        self,
+        data: Optional[Dict] = None,
+    ) -> dict:
+        url = self._build_url()
+        document = self._client.post(url, json=data)
+        return document.json()
+
     def _get(
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
@@ -72,6 +80,9 @@ class API:
 
 class APIProtocol(Protocol):
     def _resource_to_entity(self, resource: dict) -> UUIDEntity:
+        ...
+
+    def _post(self, data: Optional[Dict] = None) -> dict:
         ...
 
     def _get(
@@ -111,6 +122,15 @@ class ListMixin(APIProtocol):
         document = self._get()
         for resource in document["results"]:
             yield self._resource_to_entity(resource)
+
+
+class CreateMixin(APIProtocol):
+    def create(
+        self,
+        data: Optional[Dict] = None,
+    ):
+        document = self._post(data)
+        return self._resource_to_entity(document)
 
 
 class UpdateMixin(APIProtocol):

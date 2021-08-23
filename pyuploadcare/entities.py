@@ -1,10 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 from enum import Enum
 
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, EmailStr, PrivateAttr
 
 
 class Entity(BaseModel):
@@ -18,6 +18,7 @@ class Patterns(str, Enum):
     FILENAME = "${filename}"
     UUID = "${uuid}"
     EXT = "${ext}"
+
 
 class ColorMode(str, Enum):
     RGB = "RGB"
@@ -75,6 +76,10 @@ class VideoInfo(Entity):
     video: VideoStreamInfo
 
 
+class IDEntity(Entity):
+    uuid: UUID
+
+
 class UUIDEntity(Entity):
     uuid: UUID
 
@@ -96,3 +101,33 @@ class FileInfo(UUIDEntity):
     video_info: Optional[VideoInfo]
     source: Optional[str]
     rekognition_info: Optional[Dict[str, Decimal]]
+
+
+class GroupInfo(IDEntity):
+    _fetched: Optional[bool] = PrivateAttr(default=False)
+    datetime_created: Optional[datetime]
+    datetime_stored: Optional[datetime]
+    files_count: Optional[int]
+    cdn_url: Optional[str]
+    url: Optional[str]
+
+
+class ColaboratorInfo(Entity):
+    email: Optional[EmailStr]
+    name: Optional[str]
+
+
+class ProjectInfo(Entity):
+    collaborators: Optional[List[ColaboratorInfo]]
+    name: str
+    pub_key: str
+    autostore_enabled: Optional[bool]
+
+
+class WebhookInfo(IDEntity):
+    created: Optional[datetime]
+    updated: Optional[datetime]
+    event: Optional[str]
+    target_url: Optional[str]
+    project: Optional[str]
+    is_active: Optional[bool]
