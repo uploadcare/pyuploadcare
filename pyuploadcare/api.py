@@ -12,9 +12,14 @@ from pyuploadcare.base import (
 
 class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "files"
-    entity_class = entities.File
 
-    def batch_store(self, file_uuids: Iterable):
+    def store(self, file_uuid: Union[UUID, str]):
+        url = self._build_url(file_uuid, suffix="storage")
+        document = self._client.put(url).json()
+        for resource in document["results"]:
+            yield self._resource_to_entity(resource)
+
+    def batch_store(self, file_uuids: Iterable[Union[UUID, str]]):
         url = self._build_url(suffix="storage")
         document = self._client.put(url, json=file_uuids).json()
         for resource in document["results"]:
