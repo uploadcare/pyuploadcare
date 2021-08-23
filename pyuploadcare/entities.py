@@ -79,7 +79,7 @@ class UUIDEntity(Entity):
     uuid: UUID
 
 
-class File(UUIDEntity):
+class FileInfo(UUIDEntity):
     _fetched: Optional[bool] = PrivateAttr(default=False)
     datetime_removed: Optional[datetime]
     datetime_stored: Optional[datetime]
