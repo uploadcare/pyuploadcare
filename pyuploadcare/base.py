@@ -4,29 +4,31 @@ from uuid import UUID
 
 from httpx._types import URLTypes
 
-from pyuploadcare.auth import AuthBase
+from pyuploadcare.auth import AuthBase, UploadcareSimpleAuth
 from pyuploadcare.client import Client
+from pyuploadcare.config import settings
 from pyuploadcare.entities import Entity, UUIDEntity
 
 
 class API:
     resource_type: str
-    entity_class: Type[UUIDEntity]
+    entity_class: Type[Entity]
 
     def __init__(
         self,
-        base_url: URLTypes,
+        base_url: URLTypes = settings.BASE_URL,
         client: Optional[Client] = None,
         auth: Optional[AuthBase] = None,
     ) -> None:
-        if not (base_url and auth or client):
-            raise ValueError("client or auth and base_url are required")
-
-        if not client:
+        if auth is None:
+            auth = UploadcareSimpleAuth(
+                settings.PUBLIC_KEY, settings.SECRET_KEY
+            )
+        if client is None:
             client = Client(base_url=base_url, auth=auth)
         self._client = client
 
-    def _resource_to_entity(self, resource: dict) -> UUIDEntity:
+    def _resource_to_entity(self, resource: dict) -> Entity:
         entity = self.entity_class.parse_obj(resource)
         entity._fetched = True
         return entity
@@ -79,7 +81,7 @@ class API:
 
 
 class APIProtocol(Protocol):
-    def _resource_to_entity(self, resource: dict) -> UUIDEntity:
+    def _resource_to_entity(self, resource: dict) -> Entity:
         ...
 
     def _post(self, data: Optional[Dict] = None) -> dict:

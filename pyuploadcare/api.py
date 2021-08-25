@@ -1,13 +1,13 @@
-from typing import Union
-from typing import Iterable
+from typing import Iterable, Union
 from uuid import UUID
+
 from pyuploadcare import entities
 from pyuploadcare.base import (
     API,
     CreateMixin,
+    DeleteMixin,
     ListMixin,
     RetrieveMixin,
-    DeleteMixin,
 )
 
 
@@ -15,18 +15,20 @@ class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "files"
     entity_class = entities.FileInfo
 
-    def store(self, file_uuid: Union[UUID, str]):
+    def store(self, file_uuid: Union[UUID, str]) -> entities.Entity:
         url = self._build_url(file_uuid, suffix="storage")
         document = self._client.put(url).json()
         return self._resource_to_entity(document)
 
-    def batch_store(self, file_uuids: Iterable[Union[UUID, str]]):
+    def batch_store(
+        self, file_uuids: Iterable[Union[UUID, str]]
+    ) -> Iterable[entities.Entity]:
         url = self._build_url(suffix="storage")
         document = self._client.put(url, json=file_uuids).json()
         for resource in document["results"]:
             yield self._resource_to_entity(resource)
 
-    def batch_delete(self, file_uuids: Iterable):
+    def batch_delete(self, file_uuids: Iterable) -> Iterable[entities.Entity]:
         url = self._build_url(suffix="storage")
         document = self._client.delete_with_payload(
             url, json=file_uuids
@@ -34,7 +36,9 @@ class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
         for resource in document["results"]:
             yield self._resource_to_entity(resource)
 
-    def local_copy(self, source: Union[UUID, str], store: bool = False):
+    def local_copy(
+        self, source: Union[UUID, str], store: bool = False
+    ) -> entities.Entity:
         url = self._build_url(suffix="local_copy")
         data = {"source": source, "store": store}
         document = self._client.post(url, json=data).json()
@@ -46,7 +50,7 @@ class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
         target: str,
         make_public: bool = True,
         pattern: str = "${default}",
-    ):
+    ) -> entities.Entity:
         url = self._build_url(suffix="remote_copy")
         data = {
             "source": source,
@@ -62,7 +66,7 @@ class GroupsAPI(API, ListMixin, RetrieveMixin):
     resource_type = "groups"
     entity_class = entities.GroupInfo
 
-    def store(self, file_uuid: Union[UUID, str]):
+    def store(self, file_uuid: Union[UUID, str]) -> entities.Entity:
         url = self._build_url(file_uuid, suffix="storage")
         document = self._client.put(url).json()
         return self._resource_to_entity(document)
