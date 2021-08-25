@@ -19,6 +19,13 @@ class UUIDEntity(Entity):
     uuid: UUID
 
 
+class StrLogical(str, Enum):
+    ZERO = 0
+    FALSE = "false"
+    ONE = "1"
+    TRUE = "true"
+
+
 class Patterns(str, Enum):
     DEFAULT = "${default}"
     AUTO_FILENAME = "${auto_filename}"
@@ -130,3 +137,28 @@ class WebhookInfo(IDEntity):
     target_url: Optional[str]
     project: Optional[str]
     is_active: Optional[bool]
+
+
+class DocumentConvertInput(BaseModel):
+    paths: List[str]
+    store: Optional[StrLogical]
+
+
+class DocumentConvertInfo(UUIDEntity):
+    original_source: str
+    token: int
+
+
+class DocumentConvertStatus(UUIDEntity):
+    ...
+
+
+class VideoConvertInput(BaseModel):
+    paths: List[str]
+    store: Optional[StrLogical]
+
+
+class VideoConvertInfo(UUIDEntity):
+    original_source: str
+    token: int
+    thumbnails_group_uuid: UUID
