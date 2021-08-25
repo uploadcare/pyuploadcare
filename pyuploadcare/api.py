@@ -80,3 +80,39 @@ class ProjectAPI(API, RetrieveMixin):
 class WebhooksAPI(API, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "webhooks"
     entity_class = entities.WebhookInfo
+
+
+class DocumentConvertAPI(API):
+    resource_type = "convert/document"
+    entity_class = entities.DocumentConvertInfo
+
+    def convert(
+        self, input_document: entities.DocumentConvertInput
+    ) -> entities.Entity:
+        url = self._build_url()
+        document = self._client.post(url, json=input_document.dict()).json()
+        return self._resource_to_entity(document["result"])
+
+    def status(
+        self, document_convert_info: entities.DocumentConvertInfo
+    ) -> entities.DocumentConvertStatus:
+        url = self._build_url(suffix=f"status/{document_convert_info.token}")
+        document = self._client.get(url).json()
+        return entities.DocumentConvertStatus.parse_obj(document["result"])
+
+
+class VideoConvertAPI(API):
+    resource_type = "convert/video"
+    entity_class = entities.VideoConvertInfo
+
+    def convert(
+        self, input_document: entities.VideoConvertInput
+    ) -> entities.Entity:
+        url = self._build_url()
+        document = self._client.post(url, json=input_document.dict()).json()
+        return self._resource_to_entity(document["result"])
+
+    def status(self, video_convert_info: entities.VideoConvertInfo):
+        url = self._build_url(suffix=f"status/{video_convert_info.token}")
+        document = self._client.get(url).json()
+        return self._resource_to_entity(document["result"])
