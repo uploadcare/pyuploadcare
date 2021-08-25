@@ -1,19 +1,17 @@
 from typing import Any, Union
-from httpx import Response, USE_CLIENT_DEFAULT
-from httpx._client import UseClientDefault, Client as HTTPXClient
+
+from httpx import USE_CLIENT_DEFAULT, Response
+from httpx._client import Client as HTTPXClient
+from httpx._client import UseClientDefault
 from httpx._types import (
     AuthTypes,
-    CertTypes,
     CookieTypes,
     HeaderTypes,
-    ProxiesTypes,
     QueryParamTypes,
     RequestContent,
     RequestData,
-    RequestFiles,
     TimeoutTypes,
     URLTypes,
-    VerifyTypes,
 )
 
 

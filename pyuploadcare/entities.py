@@ -1,14 +1,22 @@
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID
-from enum import Enum
 
 from pydantic import BaseModel, EmailStr, PrivateAttr
 
 
 class Entity(BaseModel):
-    pass
+    _fetched: Optional[bool] = PrivateAttr(default=False)
+
+
+class IDEntity(Entity):
+    uuid: UUID
+
+
+class UUIDEntity(Entity):
+    uuid: UUID
 
 
 class Patterns(str, Enum):
@@ -76,16 +84,7 @@ class VideoInfo(Entity):
     video: VideoStreamInfo
 
 
-class IDEntity(Entity):
-    uuid: UUID
-
-
-class UUIDEntity(Entity):
-    uuid: UUID
-
-
 class FileInfo(UUIDEntity):
-    _fetched: Optional[bool] = PrivateAttr(default=False)
     datetime_removed: Optional[datetime]
     datetime_stored: Optional[datetime]
     datetime_uploaded: Optional[datetime]
