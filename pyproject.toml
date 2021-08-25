@@ -23,7 +23,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.6.2"
 httpx = "^0.18.2"
-pydantic = "^1.8.2"
+pydantic = {extras = ["email"], version = "^1.8.2"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
