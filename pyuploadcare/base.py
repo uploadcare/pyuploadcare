@@ -36,9 +36,13 @@ class API:
     def _build_url(
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        base: Optional[str] = None,
         suffix: Optional[str] = None,
     ) -> str:
-        url = urljoin(str(self._client.base_url), self.resource_type) + "/"
+        if base is not None:
+            url = urljoin(str(self._client.base_url), base) + "/"
+        else:
+            url = urljoin(str(self._client.base_url), self.resource_type) + "/"
         if resource_uuid is not None:
             if isinstance(resource_uuid, UUIDEntity):
                 resource_uuid = resource_uuid.uuid
