@@ -125,6 +125,8 @@ class VideoConvertAPI(API):
 
 
 class UploadAPI(API):
+    resource_type = "base"
+
     @staticmethod
     def _generate_secure_signature(secret: str, expire: int):
         return hmac.new(
