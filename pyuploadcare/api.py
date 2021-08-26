@@ -1,5 +1,10 @@
-from typing import Iterable, Union
+import hashlib
+import hmac
+from time import time
+from typing import Iterable, Optional, Union
 from uuid import UUID
+
+from httpx._types import RequestFiles
 
 from pyuploadcare import entities
 from pyuploadcare.base import (
@@ -9,6 +14,7 @@ from pyuploadcare.base import (
     ListMixin,
     RetrieveMixin,
 )
+from pyuploadcare.config import settings
 
 
 class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
@@ -116,3 +122,41 @@ class VideoConvertAPI(API):
         url = self._build_url(suffix=f"status/{video_convert_info.token}")
         document = self._client.get(url).json()
         return self._resource_to_entity(document["result"])
+
+
+class UploadAPI(API):
+    @staticmethod
+    def _generate_secure_signature(secret: str, expire: int):
+        return hmac.new(
+            secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
+        ).hexdigest()
+
+    def upload(
+        self,
+        files: RequestFiles,
+        secure_upload: bool = False,
+        public_key: Optional[str] = None,
+        secret_key: Optional[str] = None,
+        store: Optional[str] = None,
+        expire: Optional[int] = None,
+    ):
+        data = {}
+
+        data["UPLOADCARE_STORE"] = store
+
+        if public_key is None:
+            data["UPLOADCARE_PUB_KEY"] = settings.PUBLIC_KEY
+
+        if secure_upload:
+            if secret_key is None:
+                secret_key = settings.SECRET_KEY
+
+            if expire is None:
+                expire = (
+                    int(time()) + settings.SECURE_UPLOAD_DEFAULT_EXPIRE_DELTA
+                )
+            data["expire"] = str(expire)
+
+            signature = self._generate_secure_signature(secret_key, expire)
+            data["signature"] = signature
+        return self._post(data=data, files=files)

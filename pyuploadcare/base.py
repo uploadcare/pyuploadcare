@@ -2,7 +2,7 @@ from typing import Dict, Optional, Protocol, Type, Union
 from urllib.parse import urljoin
 from uuid import UUID
 
-from httpx._types import URLTypes
+from httpx._types import RequestFiles, URLTypes
 
 from pyuploadcare.auth import AuthBase, UploadcareSimpleAuth
 from pyuploadcare.client import Client
@@ -48,11 +48,10 @@ class API:
         return url
 
     def _post(
-        self,
-        data: Optional[Dict] = None,
+        self, data: Optional[Dict] = None, files: Optional[RequestFiles] = None
     ) -> dict:
         url = self._build_url()
-        document = self._client.post(url, json=data)
+        document = self._client.post(url, json=data, files=files)
         return document.json()
 
     def _get(
