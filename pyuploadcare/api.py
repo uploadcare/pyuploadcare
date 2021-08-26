@@ -162,3 +162,65 @@ class UploadAPI(API):
             signature = self._generate_secure_signature(secret_key, expire)
             data["signature"] = signature
         return self._post(data=data, files=files)
+
+    def start_multipart_upload(
+        self,
+        file_name: str,
+        file_size: int,
+        content_type: str,
+        secure_upload: bool = False,
+        public_key: Optional[str] = None,
+        secret_key: Optional[str] = None,
+        store: Optional[str] = None,
+        expire: Optional[int] = None,
+    ):
+        data = {}
+
+        data["filename"] = file_name
+        data["size"] = str(file_size)
+        data["content_type"] = content_type
+
+        if store is not None:
+            data["UPLOADCARE_STORE"] = store
+
+        data["UPLOADCARE_PUB_KEY"] = (
+            settings.PUBLIC_KEY if public_key is None else public_key
+        )
+
+        if secure_upload:
+            if secret_key is None:
+                secret_key = settings.SECRET_KEY
+
+            expire = (
+                (int(time()) + settings.SECURE_UPLOAD_DEFAULT_EXPIRE_DELTA)
+                if expire is None
+                else expire
+            )
+            data["expire"] = str(expire)
+
+            data["signature"] = self._generate_secure_signature(
+                secret_key, expire
+            )
+
+        url = self._build_url(base="multipart/start")
+        document = self._client.post(url, json=data)
+        return document.json()
+
+    def multipart_upload_chunk(self, url: str, chunk: bytes):
+        document = self._client.put(
+            url,
+            content=chunk,
+            headers={"Content-Type": "application/octet-stream"},
+        )
+        return document.content
+
+    def multipart_complete(self, uuid: UUID, public_key: Optional[str] = None):
+        data = {"uuid": str(uuid)}
+
+        data["UPLOADCARE_PUB_KEY"] = (
+            settings.PUBLIC_KEY if public_key is None else public_key
+        )
+
+        url = self._build_url(base="multipart/complete")
+        document = self._client.post(url, json=data)
+        return document.json()
