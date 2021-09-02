@@ -1,24 +1,29 @@
 # coding: utf-8
 from __future__ import unicode_literals
-import os
+
 import json
+import os
 import unittest
 from tempfile import NamedTemporaryFile
 
-from mock import patch, MagicMock, Mock
+import six
+
+if six.PY3:
+    from unittest.mock import MagicMock, Mock, patch
+else:
+    from mock import patch, MagicMock, Mock
+
 from dateutil import parser
 
 from pyuploadcare import conf
-from pyuploadcare.exceptions import InvalidRequestError
-from pyuploadcare.ucare_cli import (
-    ucare_argparser, get_file, store_files, delete_files, main,
-    create_group
-)
 from pyuploadcare.api_resources import File
-from pyuploadcare.ucare_cli.sync import (
-    sync_files, save_file_locally, TrackedFileList, SyncSession
-)
-from .utils import MockResponse, MockListResponse, api_response_from_file
+from pyuploadcare.exceptions import InvalidRequestError
+from pyuploadcare.ucare_cli import (create_group, delete_files, get_file, main,
+                                    store_files, ucare_argparser)
+from pyuploadcare.ucare_cli.sync import (SyncSession, TrackedFileList,
+                                         save_file_locally, sync_files)
+
+from .utils import MockListResponse, MockResponse, api_response_from_file
 
 
 def arg_namespace(arguments_str):

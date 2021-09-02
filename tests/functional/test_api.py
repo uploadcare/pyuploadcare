@@ -1,15 +1,23 @@
 # coding: utf-8
 from __future__ import unicode_literals
-import unittest
-import sys
+
 import os
+import sys
+import unittest
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_project.settings'
 
-from mock import patch
+import six
+
+if six.PY3:
+    from unittest.mock import patch
+else:
+    from mock import patch
 
 from pyuploadcare import conf
-from pyuploadcare.api import rest_request, uploading_request,_build_user_agent
+from pyuploadcare.api import _build_user_agent, rest_request, uploading_request
 from pyuploadcare.exceptions import APIError, InvalidRequestError
+
 from .utils import MockResponse
 
 

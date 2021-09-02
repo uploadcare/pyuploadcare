@@ -10,7 +10,7 @@ PY_VERSION = sys.version_info[0], sys.version_info[1]
 requirements = [
     'requests>=1.0',
     'python-dateutil>=2.1',
-    'six>=1.2.0',
+    'six>=1.16.0',
 ]
 
 if PY_VERSION < (3, 0):
@@ -45,16 +45,16 @@ setup(
         'Intended Audience :: Developers',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Framework :: Django',
         'Framework :: Django :: 1.11',
-        'Framework :: Django :: 2.0',
-        'Framework :: Django :: 2.1',
         'Framework :: Django :: 2.2',
         'Framework :: Django :: 3.0',
+        'Framework :: Django :: 3.1',
+        'Framework :: Django :: 3.2',
         'License :: OSI Approved :: MIT License',
     ],
 )
