@@ -1,6 +1,11 @@
 from httpx import Request, Response
 
 
+class DefaultResponseClassNotDefined(Exception):
+    def __init__(self) -> None:
+        super().__init__("Need define default response class for API.")
+
+
 class UploadCareError(Exception):
     def __init__(self, message: str) -> None:
         super().__init__(message)
