@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+from pyuploadcare import response
 from time import time
 from typing import Iterable, Optional, Union
 from uuid import UUID
@@ -19,36 +20,50 @@ from pyuploadcare.config import settings
 
 class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "files"
-    entity_class = entities.FileInfo
+    response_classes = {
+        "retrieve": entities.FileInfo,
+        "list": response.FileListResponse,
+        "store": entities.FileInfo,
+        "batch_store": response.BatchFileOperationResponse,
+        "batch_delete": response.BatchFileOperationResponse,
+        "local_copy": response.CopyFile2LocalStorageResponse,
+        "remote_copy": response.CopyFile2RemoteStorageResponse,
+    }
 
-    def store(self, file_uuid: Union[UUID, str]) -> entities.Entity:
+    def store(
+        self, file_uuid: Union[UUID, str]
+    ) -> Union[response.Response, entities.Entity]:
         url = self._build_url(file_uuid, suffix="storage")
-        document = self._client.put(url).json()
-        return self._resource_to_entity(document)
+        response_class = self._get_response_class("store")
+        json_response = self._client.put(url).json()
+        return self._parse_response(json_response, response_class)
 
     def batch_store(
         self, file_uuids: Iterable[Union[UUID, str]]
-    ) -> Iterable[entities.Entity]:
+    ) -> Union[response.Response, entities.Entity]:
         url = self._build_url(suffix="storage")
-        document = self._client.put(url, json=file_uuids).json()
-        for resource in document["results"]:
-            yield self._resource_to_entity(resource)
+        response_class = self._get_response_class("batch_store")
+        json_response = self._client.put(url, json=file_uuids).json()
+        return self._parse_response(json_response, response_class)
 
-    def batch_delete(self, file_uuids: Iterable) -> Iterable[entities.Entity]:
+    def batch_delete(
+        self, file_uuids: Iterable
+    ) -> Union[response.Response, entities.Entity]:
         url = self._build_url(suffix="storage")
-        document = self._client.delete_with_payload(
+        response_class = self._get_response_class("batch_delete")
+        json_response = self._client.delete_with_payload(
             url, json=file_uuids
         ).json()
-        for resource in document["results"]:
-            yield self._resource_to_entity(resource)
+        return self._parse_response(json_response, response_class)
 
     def local_copy(
         self, source: Union[UUID, str], store: bool = False
-    ) -> entities.Entity:
+    ) -> Union[response.Response, entities.Entity]:
         url = self._build_url(suffix="local_copy")
         data = {"source": source, "store": store}
-        document = self._client.post(url, json=data).json()
-        return document["result"]
+        response_class = self._get_response_class("batch_delete")
+        json_response = self._client.post(url, json=data).json()
+        return self._parse_response(json_response, response_class)
 
     def remote_copy(
         self,
@@ -56,7 +71,7 @@ class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
         target: str,
         make_public: bool = True,
         pattern: str = "${default}",
-    ) -> entities.Entity:
+    ) -> Union[response.Response, entities.Entity]:
         url = self._build_url(suffix="remote_copy")
         data = {
             "source": source,
@@ -64,8 +79,9 @@ class FilesAPI(API, ListMixin, RetrieveMixin, DeleteMixin):
             "make_public": make_public,
             "pattern": pattern,
         }
-        document = self._client.post(url, json=data).json()
-        return document["result"]
+        response_class = self._get_response_class("remote_copy")
+        json_response = self._client.post(url, json=data).json()
+        return self._parse_response(json_response, response_class)
 
 
 class GroupsAPI(API, ListMixin, RetrieveMixin):
@@ -75,7 +91,7 @@ class GroupsAPI(API, ListMixin, RetrieveMixin):
     def store(self, file_uuid: Union[UUID, str]) -> entities.Entity:
         url = self._build_url(file_uuid, suffix="storage")
         document = self._client.put(url).json()
-        return self._resource_to_entity(document)
+        return self._parse_response(document)
 
 
 class ProjectAPI(API, RetrieveMixin):
@@ -97,7 +113,7 @@ class DocumentConvertAPI(API):
     ) -> entities.Entity:
         url = self._build_url()
         document = self._client.post(url, json=input_document.dict()).json()
-        return self._resource_to_entity(document["result"])
+        return self._parse_response(document["result"])
 
     def status(
         self, document_convert_info: entities.DocumentConvertInfo
@@ -116,12 +132,12 @@ class VideoConvertAPI(API):
     ) -> entities.Entity:
         url = self._build_url()
         document = self._client.post(url, json=input_document.dict()).json()
-        return self._resource_to_entity(document["result"])
+        return self._parse_response(document["result"])
 
     def status(self, video_convert_info: entities.VideoConvertInfo):
         url = self._build_url(suffix=f"status/{video_convert_info.token}")
         document = self._client.get(url).json()
-        return self._resource_to_entity(document["result"])
+        return self._parse_response(document["result"])
 
 
 class UploadAPI(API):

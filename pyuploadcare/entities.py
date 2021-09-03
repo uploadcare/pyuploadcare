@@ -8,11 +8,11 @@ from pydantic import BaseModel, EmailStr, PrivateAttr
 
 
 class Entity(BaseModel):
-    _fetched: Optional[bool] = PrivateAttr(default=False)
+    ...
 
 
 class IDEntity(Entity):
-    uuid: UUID
+    id: UUID
 
 
 class UUIDEntity(Entity):
