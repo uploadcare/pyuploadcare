@@ -132,7 +132,7 @@ def build_filepath(path, file_):
     return os.path.normpath(PATTERNS_REGEX.sub(_replace, path))
 
 
-class SyncSession(object):
+class SyncSession:
     """Provides an ability to save current state of iteration if any errors
     happened during iteration. After that is possible to restore this state
     and continue from that point.

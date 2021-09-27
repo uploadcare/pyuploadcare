@@ -29,7 +29,7 @@ class SubfieldBase(type):
         return new_class
 
 
-class Creator(object):
+class Creator:
     """
     A placeholder class that provides a way to set the attribute on the model.
     """
