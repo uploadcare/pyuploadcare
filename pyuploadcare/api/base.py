@@ -39,7 +39,7 @@ class API:
 
     def _parse_response(
         self,
-        raw_resource: dict,
+        raw_resource: Dict[str, Any],
         response_class: Union[Type[Response], Type[Entity]],
     ) -> Union[Response, Entity]:
         response = response_class.parse_obj(raw_resource)
@@ -78,7 +78,7 @@ class API:
 
     def _post(
         self, data: Optional[Dict] = None, files: Optional[RequestFiles] = None
-    ) -> dict:
+    ) -> Dict[str, Any]:
         url = self._build_url()
         document = self._client.post(url, data=data, files=files)
         return document.json()
@@ -87,7 +87,7 @@ class API:
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         **query_parameters,
-    ) -> dict:
+    ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid, query_parameters=query_parameters)
         document = self._client.get(url)
         return document.json()
@@ -96,14 +96,14 @@ class API:
         self,
         resource_uuid: Union[UUID, str, UUIDEntity] = None,
         data: Optional[Dict] = None,
-    ) -> dict:
+    ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid)
         document = self._client.put(url, json=data)
         return document.json()
 
     def _delete(
         self, resource_uuid: Union[UUID, str, UUIDEntity] = None
-    ) -> dict:
+    ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid)
         document = self._client.delete(url)
         return document.json()
@@ -116,7 +116,7 @@ class APIProtocol(Protocol):
 
     def _parse_response(
         self,
-        raw_resource: dict,
+        raw_resource: Dict[str, Any],
         response_class: Union[Type[Response], Type[Entity]],
     ) -> Union[Response, Entity]:
         ...
@@ -135,26 +135,26 @@ class APIProtocol(Protocol):
     ) -> Union[Type[Response], Type[Entity]]:
         ...
 
-    def _post(self, data: Optional[Dict] = None) -> dict:
+    def _post(self, data: Optional[Dict] = None) -> Dict[str, Any]:
         ...
 
     def _get(
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         **query_parameters,
-    ) -> dict:
+    ) -> Dict[str, Any]:
         ...
 
     def _put(
         self,
         resource_uuid: Union[UUID, str, UUIDEntity] = None,
         data: Optional[Dict] = None,
-    ) -> dict:
+    ) -> Dict[str, Any]:
         ...
 
     def _delete(
         self, resource_uuid: Union[UUID, str, UUIDEntity] = None
-    ) -> dict:
+    ) -> Dict[str, Any]:
         ...
 
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, PrivateAttr
@@ -65,7 +65,7 @@ class ImageInfo(Entity):
     width: int
     geo_location: Optional[GEOPoint]
     datetime_original: Optional[datetime]
-    dpi: Optional[tuple[int, int]]
+    dpi: Optional[Tuple[int, int]]
 
 
 class AudioStreamInfo(Entity):
