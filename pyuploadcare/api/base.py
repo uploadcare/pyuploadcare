@@ -1,9 +1,9 @@
 from typing import Any, Dict, Optional, Type, Union, cast
-from typing_extensions import Protocol
 from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
 from httpx._types import RequestFiles, URLTypes
+from typing_extensions import Protocol
 
 from pyuploadcare import conf
 from pyuploadcare.api.auth import AuthBase, UploadcareAuth
