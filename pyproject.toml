@@ -24,6 +24,8 @@ classifiers = [
 python = "^3.6.2"
 httpx = "^0.18.2"
 pydantic = {extras = ["email"], version = "^1.8.2"}
+python-dateutil = "^2.8.2"
+pytz = "^2021.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -33,6 +35,10 @@ isort = "^5.9.3"
 flake8 = "^3.9.2"
 mypy = "^0.910"
 flake8-print = "^4.0.0"
+pytest-vcr = "^1.0.2"
+Django = "^3.2.7"
+pytest-cov = "^2.12.1"
+python-coveralls = "^2.9.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

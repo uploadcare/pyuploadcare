@@ -4,10 +4,9 @@ from __future__ import unicode_literals
 from django.core.exceptions import ValidationError
 from django.forms import Field, TextInput
 
-from .. import conf
-from ..exceptions import InvalidRequestError
-from ..api_resources import File, FileGroup
-from . import conf as dj_conf
+from pyuploadcare import File, FileGroup, conf
+from pyuploadcare.dj import conf as dj_conf
+from pyuploadcare.exceptions import InvalidRequestError
 
 
 class FileWidget(TextInput):
@@ -18,7 +17,7 @@ class FileWidget(TextInput):
 
     """
 
-    input_type = 'hidden'
+    input_type = "hidden"
     is_hidden = False
 
     class Media:
@@ -26,15 +25,15 @@ class FileWidget(TextInput):
 
     def __init__(self, attrs=None):
         default_attrs = {
-            'role': 'uploadcare-uploader',
-            'data-public-key': conf.pub_key,
+            "role": "uploadcare-uploader",
+            "data-public-key": conf.pub_key,
         }
 
         if conf.user_agent_extension is not None:
-            default_attrs['data-integration'] = conf.user_agent_extension
+            default_attrs["data-integration"] = conf.user_agent_extension
 
         if dj_conf.upload_base_url is not None:
-            default_attrs['data-url-base'] = dj_conf.upload_base_url
+            default_attrs["data-url-base"] = dj_conf.upload_base_url
 
         if attrs is not None:
             default_attrs.update(attrs)
@@ -55,26 +54,25 @@ class FileField(Field):
     widget = FileWidget
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
 
         try:
             return File(value).cdn_url
         except InvalidRequestError as exc:
             raise ValidationError(
-                'Invalid value for a field: {exc}'.format(exc=exc)
+                "Invalid value for a field: {exc}".format(exc=exc)
             )
 
     def widget_attrs(self, widget):
         attrs = {}
         if not self.required:
-            attrs['data-clearable'] = ''
+            attrs["data-clearable"] = ""
         return attrs
 
 
 class ImageField(FileField):
-    """Django form field that sets up ``FileWidget`` to work with images.
-    """
+    """Django form field that sets up ``FileWidget`` to work with images."""
 
     def __init__(self, manual_crop=None, *args, **kwargs):
         self.manual_crop = manual_crop
@@ -82,41 +80,39 @@ class ImageField(FileField):
 
     def widget_attrs(self, widget):
         attrs = super(ImageField, self).widget_attrs(widget)
-        attrs['data-images-only'] = ''
+        attrs["data-images-only"] = ""
         if self.manual_crop is not None:
-            attrs['data-crop'] = self.manual_crop
+            attrs["data-crop"] = self.manual_crop
         return attrs
 
 
 class FileGroupField(Field):
-    """Django form field that sets up ``FileWidget`` in multiupload mode.
-    """
+    """Django form field that sets up ``FileWidget`` in multiupload mode."""
 
     widget = FileWidget
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
 
         try:
             return FileGroup(value).cdn_url
         except InvalidRequestError as exc:
             raise ValidationError(
-                'Invalid value for a field: {exc}'.format(exc=exc)
+                "Invalid value for a field: {exc}".format(exc=exc)
             )
 
     def widget_attrs(self, widget):
-        attrs = {'data-multiple': ''}
+        attrs = {"data-multiple": ""}
         if not self.required:
-            attrs['data-clearable'] = ''
+            attrs["data-clearable"] = ""
         return attrs
 
 
 class ImageGroupField(FileGroupField):
-    """Django form field that sets up ``FileWidget`` in image multiupload mode.
-    """
+    """Django form field that sets up ``FileWidget`` in image multiupload mode."""
 
     def widget_attrs(self, widget):
         attrs = super(ImageGroupField, self).widget_attrs(widget)
-        attrs['data-images-only'] = ''
+        attrs["data-images-only"] = ""
         return attrs

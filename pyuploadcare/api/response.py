@@ -1,0 +1,48 @@
+import typing
+
+from pydantic import BaseModel
+
+from pyuploadcare.api.entities import Entity, FileInfo, GroupInfo
+
+
+class Response(BaseModel):
+    ...
+
+
+class EntityListResponse(Response):
+    results: typing.List[Entity]
+
+
+class PaginatedResponse(EntityListResponse):
+    next: typing.Optional[str]
+    previous: typing.Optional[str]
+    total: int
+    per_page: int
+
+
+class FileListResponse(PaginatedResponse):
+    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesList
+    results: typing.List[FileInfo]
+
+
+class GroupListResponse(PaginatedResponse):
+    # https://uploadcare.com/api-refs/rest-api/v0.5.0/#operation/groupsList
+    results: typing.List[GroupInfo]
+
+
+class BatchFileOperationResponse(EntityListResponse):
+    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesStoring
+    status: str
+    problems: typing.Optional[typing.Dict[str, typing.Any]]
+
+
+class CreateLocalCopyResponse(Response):
+    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/createLocalCopy
+    type: str
+    result: FileInfo
+
+
+class CreateRemoteCopyResponse(Response):
+    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/createRemoteCopy
+    type: str
+    result: str

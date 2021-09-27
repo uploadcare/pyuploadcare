@@ -4,67 +4,65 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'temp.db',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "temp.db",
     }
 }
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
-SECRET_KEY = 't8vl&nd*x5*#vtgn7@@t11n3ve0+hbs)6z2hn&@s_)ityxqv1^'
+SECRET_KEY = "t8vl&nd*x5*#vtgn7@@t11n3ve0+hbs)6z2hn&@s_)ityxqv1^"
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
+    "django.template.loaders.filesystem.Loader",
+    "django.template.loaders.app_directories.Loader",
 )
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    "django.middleware.common.CommonMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
 )
 
-ROOT_URLCONF = 'test_project.urls'
+ROOT_URLCONF = "test_project.urls"
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.admin',
-
-    'pyuploadcare.dj',
-
-    'test_project.gallery',
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.admin",
+    "pyuploadcare.dj",
+    "test_project.gallery",
 )
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
         }
     },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_false'],
+    "handlers": {
+        "mail_admins": {
+            "level": "ERROR",
+            "class": "django.utils.log.AdminEmailHandler",
+            "filters": ["require_debug_false"],
         }
     },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
+    "loggers": {
+        "django.request": {
+            "handlers": ["mail_admins"],
+            "level": "ERROR",
+            "propagate": True,
         },
-    }
+    },
 }
 
 
@@ -72,8 +70,8 @@ LOGGING = {
 # NB: files uploaded by demo account are removed daily, use it to fool around
 # or signup on https://uploadcare.com to get your own keys.
 UPLOADCARE = {
-    'pub_key': 'demopublickey',
-    'secret': 'demoprivatekey',
+    "pub_key": "demopublickey",
+    "secret": "demoprivatekey",
     # 'use_hosted_assets': False,
     # 'widget_url': 'http://static.example.com/widget.js',
     # 'upload_base_url': 'http://other.upload.handler/',

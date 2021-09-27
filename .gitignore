@@ -8,3 +8,5 @@ docs/_build
 .tox/
 .cache/
 .pytest_cache/
+.vscode
+poetry.lock
