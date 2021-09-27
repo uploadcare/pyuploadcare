@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional, Protocol, Type, Union, cast
+from typing import Any, Dict, Optional, Type, Union, cast
+from typing_extensions import Protocol
 from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
