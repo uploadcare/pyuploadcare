@@ -1,7 +1,8 @@
 [flake8]
 max-line-length = 100
 max-complexity = 5
-exclude = .venv,venv,**/migrations/*,snapshots, script.py, tests/functional/test_ucare_cli.py, pyuploadcare/ucare_cli/*
+exclude = .venv,venv,**/migrations/*,snapshots
 per-file-ignores =
     tests/**: S101
     **/tests/**: S101
+    pyuploadcare/ucare_cli/**: T003,T001,T004

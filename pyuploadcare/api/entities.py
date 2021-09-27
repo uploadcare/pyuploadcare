@@ -109,7 +109,8 @@ class FileInfo(UUIDEntity):
     rekognition_info: Optional[Dict[str, Decimal]]
 
 
-class GroupInfo(IDEntity):
+class GroupInfo(Entity):
+    id: str
     _fetched: Optional[bool] = PrivateAttr(default=False)
     datetime_created: Optional[datetime]
     datetime_stored: Optional[datetime]

@@ -1,0 +1,55 @@
+interactions:
+- request:
+    body: pub_key=demopublickey&files%5B0%5D=https%3A%2F%2Fucarecdn.com%2Fa42464a4-b57a-458e-8b9d-3e6d72db9d60%2F&files%5B1%5D=https%3A%2F%2Fucarecdn.com%2F7ac0a1c3-5476-4d6a-b03d-0acf7ae6d4ae%2F
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.6+json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '185'
+      content-type:
+      - application/json
+      host:
+      - upload.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: POST
+    uri: https://upload.uploadcare.com/group//
+  response:
+    content: '{"id":"8d117c1f-9560-483a-aa5c-965b5031017d~2","datetime_created":"2021-09-27T10:58:50.915933Z","datetime_stored":null,"files_count":2,"cdn_url":"https://ucarecdn.com/8d117c1f-9560-483a-aa5c-965b5031017d~2/","url":"https://api.uploadcare.com/groups/8d117c1f-9560-483a-aa5c-965b5031017d~2/","files":[{"size":191176,"total":191176,"done":191176,"uuid":"a42464a4-b57a-458e-8b9d-3e6d72db9d60","file_id":"a42464a4-b57a-458e-8b9d-3e6d72db9d60","original_filename":"camera.jpg","is_image":true,"is_stored":true,"image_info":{"width":1280,"height":720,"format":"JPEG","color_mode":"RGB","geo_location":null,"orientation":null,"dpi":null,"datetime_original":null,"sequence":false},"video_info":null,"is_ready":true,"filename":"camera.jpg","mime_type":"image/jpeg","default_effects":""},{"size":325913,"total":325913,"done":325913,"uuid":"7ac0a1c3-5476-4d6a-b03d-0acf7ae6d4ae","file_id":"7ac0a1c3-5476-4d6a-b03d-0acf7ae6d4ae","original_filename":"LXXL713338_CON_B.jpg","is_image":true,"is_stored":true,"image_info":{"width":2081,"height":2081,"format":"JPEG","color_mode":"RGB","geo_location":null,"orientation":null,"dpi":null,"datetime_original":null,"sequence":false},"video_info":null,"is_ready":true,"filename":"LXXL713338_CON_B.jpg","mime_type":"image/jpeg","default_effects":""}]}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - X-UC-User-Agent, X-PINGOTHER, DNT
+      Access-Control-Allow-Methods:
+      - GET, POST, HEAD, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '1'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 27 Sep 2021 10:58:50 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

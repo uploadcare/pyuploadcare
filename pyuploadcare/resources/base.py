@@ -49,10 +49,10 @@ class BaseApiList:
         if self.ordering is not None:
             parameters.setdefault("ordering", self.ordering)
 
-        if self.limit:
+        if self.limit is not None:
             parameters.setdefault("limit", self.limit)
 
-        if self.request_limit:
+        if self.request_limit is not None:
             parameters.setdefault("request_limit", self.request_limit)
 
         return parameters

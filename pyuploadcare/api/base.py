@@ -6,7 +6,7 @@ from httpx._types import RequestFiles, URLTypes
 
 from pyuploadcare import conf
 from pyuploadcare.api.auth import AuthBase, UploadcareAuth
-from pyuploadcare.api.client import Client
+from pyuploadcare.api.client import Client, get_timeout
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.response import (
     EntityListResponse,
@@ -27,9 +27,14 @@ class API:
         auth: Optional[AuthBase] = None,
     ) -> None:
         if auth is None:
-            auth = UploadcareAuth(conf.pub_key, conf.secret)
+            auth = UploadcareAuth(conf.pub_key, conf.secret)  # type: ignore
         if client is None:
-            client = Client(base_url=base_url, auth=auth)
+            client = Client(
+                base_url=base_url,
+                auth=auth,
+                verify=conf.verify_api_ssl,
+                timeout=get_timeout(conf.timeout),
+            )
         self._client = client
 
     def _parse_response(
@@ -136,7 +141,7 @@ class APIProtocol(Protocol):
     def _get(
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        **query_parameters,
     ) -> dict:
         ...
 

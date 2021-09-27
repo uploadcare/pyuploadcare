@@ -477,26 +477,22 @@ class File(ApiMixin):
     @classmethod
     def batch_store(cls, files: Iterable[Union[str, "File"]]):
         uuids = cls._extracts_uuids(files)
-
-        while True:
-            chunk = list(islice(uuids, 0, cls.batch_chunk_size))
-
-            if not chunk:
-                return
-
-            return cls.files_api.batch_store(uuids)
+        start = 0
+        chunk = list(islice(uuids, start, cls.batch_chunk_size))
+        while chunk:
+            cls.files_api.batch_store(uuids)
+            start += cls.batch_chunk_size
+            chunk = list(islice(uuids, start, cls.batch_chunk_size))
 
     @classmethod
     def batch_delete(cls, files: Iterable[Union[str, "File"]]):
         uuids = cls._extracts_uuids(files)
-
-        while True:
-            chunk = list(islice(uuids, 0, cls.batch_chunk_size))
-
-            if not chunk:
-                return
-
+        start = 0
+        chunk = list(islice(uuids, start, cls.batch_chunk_size))
+        while chunk:
             cls.files_api.batch_delete(uuids)
+            start += cls.batch_chunk_size
+            chunk = list(islice(uuids, start, cls.batch_chunk_size))
 
 
 class FileFromUrl(ApiMixin):

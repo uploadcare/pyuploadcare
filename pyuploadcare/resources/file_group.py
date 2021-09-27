@@ -145,7 +145,6 @@ class FileGroup(ApiMixin):
         if isinstance(datetime_, str):
             return dateutil.parser.parse(datetime_)
 
-
     def datetime_created(self):
         """Returns file group's create aware *datetime* in UTC format."""
         datetime_ = self.info().get("datetime_created")

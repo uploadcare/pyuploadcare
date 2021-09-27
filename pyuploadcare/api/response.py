@@ -22,18 +22,19 @@ class PaginatedResponse(EntityListResponse):
 
 class FileListResponse(PaginatedResponse):
     # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesList
-    results: typing.List[FileInfo]
+    results: typing.List[FileInfo]  # type: ignore
 
 
 class GroupListResponse(PaginatedResponse):
     # https://uploadcare.com/api-refs/rest-api/v0.5.0/#operation/groupsList
-    results: typing.List[GroupInfo]
+    results: typing.List[GroupInfo]  # type: ignore
 
 
-class BatchFileOperationResponse(EntityListResponse):
+class BatchFileOperationResponse(Response):
     # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesStoring
     status: str
     problems: typing.Optional[typing.Dict[str, typing.Any]]
+    result: typing.Optional[typing.List[FileInfo]]
 
 
 class CreateLocalCopyResponse(Response):

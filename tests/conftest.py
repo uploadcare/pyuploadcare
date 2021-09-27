@@ -23,16 +23,11 @@ def big_file():
 
 @pytest.fixture(autouse=True)
 def setup_settings():
-    old_pub_key = conf.pub_key
-    old_secret_key = conf.secret
-
     conf.pub_key = "demopublickey"
     conf.secret = "demosecretkey"
-
-    yield
-
-    conf.pub_key = old_pub_key
-    conf.secret = old_secret_key
+    conf.api_version = "0.6"
+    conf.api_base = "https://api.uploadcare.com/"
+    conf.upload_base = "https://upload.uploadcare.com/"
 
 
 @pytest.fixture
@@ -44,3 +39,10 @@ def signed_uploads():
     yield
 
     conf.signed_uploads = old_value
+
+
+@pytest.fixture(scope="module")
+def vcr_config():
+    return {
+        "filter_headers": [("authorization", "DUMMY")],
+    }

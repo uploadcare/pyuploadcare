@@ -1,3 +1,4 @@
+import socket
 import typing
 from platform import python_implementation, python_version
 
@@ -75,9 +76,9 @@ class Client(HTTPXClient):
         ] = USE_CLIENT_DEFAULT,
     ) -> Response:
         if not headers:
-            headers = {}
+            headers = {}  # type: ignore
 
-        headers["User-Agent"] = self._build_user_agent()
+        headers["User-Agent"] = self._build_user_agent()  # type: ignore
 
         response = super().request(
             method,
@@ -110,3 +111,11 @@ class Client(HTTPXClient):
             python_version(),
             extension_info,
         )
+
+
+def get_timeout(timeout):
+    if timeout is not conf.DEFAULT:
+        return timeout
+    if conf.timeout is not conf.DEFAULT:
+        return conf.timeout
+    return socket.getdefaulttimeout()

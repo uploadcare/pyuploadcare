@@ -16,11 +16,11 @@ from pyuploadcare.api.base import (
     ListMixin,
     RetrieveMixin,
 )
-from pyuploadcare.api.client import Client
+from pyuploadcare.api.client import Client, get_timeout
 from pyuploadcare.exceptions import APIError
 
 
-class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
+class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):  # type: ignore
     resource_type = "files"
     response_classes = {
         "retrieve": entities.FileInfo,
@@ -67,7 +67,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
         data = {"source": source, "store": store}
         response_class = self._get_response_class("local_copy")
         json_response = self._client.post(url, json=data).json()
-        return self._parse_response(json_response, response_class)
+        return self._parse_response(json_response, response_class)  # type: ignore
 
     def remote_copy(
         self,
@@ -85,7 +85,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
         }
         response_class = self._get_response_class("remote_copy")
         json_response = self._client.post(url, json=data).json()
-        return self._parse_response(json_response, response_class)
+        return self._parse_response(json_response, response_class)  # type: ignore
 
 
 class GroupsAPI(API, ListCountMixin, RetrieveMixin):
@@ -122,7 +122,7 @@ class DocumentConvertAPI(API):
     ) -> entities.Entity:
         url = self._build_url()
         document = self._client.post(url, json=input_document.dict()).json()
-        return self._parse_response(document["result"])
+        return self._parse_response(document["result"])  # type: ignore
 
     def status(
         self, document_convert_info: entities.DocumentConvertInfo
@@ -141,12 +141,12 @@ class VideoConvertAPI(API):
     ) -> entities.Entity:
         url = self._build_url()
         document = self._client.post(url, json=input_document.dict()).json()
-        return self._parse_response(document["result"])
+        return self._parse_response(document["result"])  # type: ignore
 
     def status(self, video_convert_info: entities.VideoConvertInfo):
         url = self._build_url(suffix=f"status/{video_convert_info.token}")
         document = self._client.get(url).json()
-        return self._parse_response(document["result"])
+        return self._parse_response(document["result"])  # type: ignore
 
 
 class UploadAPI(API):
@@ -158,7 +158,11 @@ class UploadAPI(API):
         client: Optional[Client] = None,
     ) -> None:
         if client is None:
-            client = Client(base_url=base_url)
+            client = Client(
+                base_url=base_url,
+                verify=conf.verify_upload_ssl,
+                timeout=get_timeout(conf.timeout),
+            )
         self._client = client
 
     @staticmethod
@@ -193,7 +197,7 @@ class UploadAPI(API):
                 expire = int(time()) + conf.signed_uploads_ttl
             data["expire"] = str(expire)
 
-            signature = self._generate_secure_signature(secret_key, expire)
+            signature = self._generate_secure_signature(secret_key, expire)  # type: ignore
             data["signature"] = signature
 
         url = self._build_url()
@@ -228,7 +232,7 @@ class UploadAPI(API):
 
             data["expire"] = str(expire)
             data["signature"] = self._generate_secure_signature(
-                conf.secret, expire
+                conf.secret, expire  # type: ignore
             )
 
         url = self._build_url(base="multipart/start")
@@ -277,7 +281,7 @@ class UploadAPI(API):
 
             data["expire"] = str(expire)
             data["signature"] = self._generate_secure_signature(
-                conf.secret, expire
+                conf.secret, expire  # type: ignore
             )
 
         url = self._build_url(base="/from_url/")
@@ -315,7 +319,7 @@ class UploadAPI(API):
         }
 
         for index, file in enumerate(files):
-            data[f"files[{index}]"] = file
+            data[f"files[{index}]"] = file  # type: ignore
 
         if secure_upload:
             expire = (
@@ -326,7 +330,7 @@ class UploadAPI(API):
 
             data["expire"] = str(expire)
             data["signature"] = self._generate_secure_signature(
-                conf.secret, expire
+                conf.secret, expire  # type: ignore
             )
 
         url = self._build_url(base="/group/")
