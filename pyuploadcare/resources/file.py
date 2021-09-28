@@ -91,6 +91,17 @@ class File(ApiMixin):
         self._uuid = match.group(0)
 
     def cdn_path(self, effects=None):
+        """Returns CDN path with applied effects.
+
+        Usage example::
+
+            >>> >>> file = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+            >>> file.cdn_path()
+            a771f854-c2cb-408a-8c36-71af77811f3b/
+            >>> file.cdn_path('effect/flip/-/effect/mirror/')
+            a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
+
+        """
         ptn = "{uuid}/-/{effects}" if effects else "{uuid}/"
         return ptn.format(uuid=self.uuid, effects=effects)
 
@@ -476,6 +487,20 @@ class File(ApiMixin):
 
     @classmethod
     def batch_store(cls, files: Iterable[Union[str, "File"]]):
+        """Stores multiple files by requesting Uploadcare API.
+
+        Usage example::
+
+            >>> files = [
+            ... '6c5e9526-b0fe-4739-8975-72e8d5ee6342',
+            ... 'a771f854-c2cb-408a-8c36-71af77811f3b'
+            ... ]
+            >>> File.batch_store(files)
+
+        Args:
+            - files:
+                List of file UUIDs, CND urls or ``File`` instances.
+        """
         uuids = cls._extracts_uuids(files)
         start = 0
         chunk = list(islice(uuids, start, cls.batch_chunk_size))
@@ -486,6 +511,20 @@ class File(ApiMixin):
 
     @classmethod
     def batch_delete(cls, files: Iterable[Union[str, "File"]]):
+        """Deletes multiple files by requesting Uploadcare API.
+
+        Usage example::
+
+            >>> files = [
+            ... '6c5e9526-b0fe-4739-8975-72e8d5ee6342',
+            ... 'a771f854-c2cb-408a-8c36-71af77811f3b'
+            ... ]
+            >>> File.batch_delete(files)
+
+        Args:
+            - files:
+                List of file UUIDs, CND urls or ``File`` instances.
+        """
         uuids = cls._extracts_uuids(files)
         start = 0
         chunk = list(islice(uuids, start, cls.batch_chunk_size))

@@ -17,6 +17,8 @@ Changed
 +++++++
 - Moved from Travis to Github Actions
 - Dropped support for Python 3.5.
+- Dropped support for Python 2.7.
+- Implemented low-level API.
 
 
 `2.7.0`_ - 2020-05-03

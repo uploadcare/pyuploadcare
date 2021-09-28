@@ -5,6 +5,6 @@ Command Line Tool
 =================
 
 .. argparse::
-   :module: pyuploadcare.ucare_cli.__init__
+   :module: pyuploadcare.ucare_cli.main
    :func: ucare_argparser
    :prog: ucare

@@ -38,7 +38,7 @@ After that you can install it:
 
 .. code-block:: console
 
-    $ python setup.py install
+    $ pip install .
 
 
 Update to version 2.0
