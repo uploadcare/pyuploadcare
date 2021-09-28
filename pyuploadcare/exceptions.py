@@ -1,13 +1,3 @@
-from json import JSONDecodeError
-
-from httpx import Request, Response
-
-
-class DefaultResponseClassNotDefined(Exception):
-    def __init__(self) -> None:
-        super().__init__("Need define default response class for API.")
-
-
 class UploadcareException(Exception):
     def __init__(self, message: str) -> None:
         super().__init__(message)
@@ -66,18 +56,6 @@ class UploadError(UploadcareException):
     """
 
 
-class UploadcareHTTPStatusError(UploadcareException):
-    def __init__(self, request: "Request", response: "Response") -> None:
-        self.request = request
-        self.response = response
-        if response.status_code == 429:
-            wait_time = response.headers.get("Retry-After")
-            super().__init__(
-                f"Number of seconds to wait before the next request = '{wait_time}'."
-            )
-        try:
-            detail = response.json().get("detail", None)
-        except JSONDecodeError:
-            detail = response.text
-
-        super().__init__(detail)
+class DefaultResponseClassNotDefined(Exception):
+    def __init__(self) -> None:
+        super().__init__("Need define default response class for API.")
