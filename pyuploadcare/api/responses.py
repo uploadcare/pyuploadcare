@@ -1,8 +1,15 @@
 import typing
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-from pyuploadcare.api.entities import Entity, FileInfo, GroupInfo
+from pyuploadcare.api.entities import (
+    DocumentConvertInfo,
+    Entity,
+    FileInfo,
+    GroupInfo,
+    VideoConvertInfo,
+)
 
 
 class Response(BaseModel):
@@ -47,3 +54,13 @@ class CreateRemoteCopyResponse(Response):
     # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/createRemoteCopy
     type: str
     result: str
+
+
+class DocumentConvertResponse(Entity):
+    problems: Optional[Dict[str, Any]]
+    result: Optional[List[DocumentConvertInfo]]
+
+
+class VideoConvertResponse(Entity):
+    problems: Optional[Dict[str, Any]]
+    result: Optional[List[VideoConvertInfo]]

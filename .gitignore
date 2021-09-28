@@ -10,3 +10,4 @@ docs/_build
 .pytest_cache/
 .vscode
 poetry.lock
+.coverage

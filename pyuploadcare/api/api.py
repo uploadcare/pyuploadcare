@@ -1,13 +1,13 @@
 import hashlib
 import hmac
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union, cast
 from uuid import UUID
 
 from httpx._types import RequestFiles, URLTypes
 
 from pyuploadcare import conf
-from pyuploadcare.api import entities, response
+from pyuploadcare.api import entities, responses
 from pyuploadcare.api.base import (
     API,
     CreateMixin,
@@ -24,50 +24,52 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):  # type: ignore
     resource_type = "files"
     response_classes = {
         "retrieve": entities.FileInfo,
-        "list": response.FileListResponse,
-        "count": response.FileListResponse,
+        "list": responses.FileListResponse,
+        "count": responses.FileListResponse,
         "store": entities.FileInfo,
         "update": entities.FileInfo,
-        "batch_store": response.BatchFileOperationResponse,
-        "batch_delete": response.BatchFileOperationResponse,
-        "local_copy": response.CreateLocalCopyResponse,
-        "remote_copy": response.CreateRemoteCopyResponse,
+        "batch_store": responses.BatchFileOperationResponse,
+        "batch_delete": responses.BatchFileOperationResponse,
+        "local_copy": responses.CreateLocalCopyResponse,
+        "remote_copy": responses.CreateRemoteCopyResponse,
     }
 
-    def store(
-        self, file_uuid: Union[UUID, str]
-    ) -> Union[response.Response, entities.Entity]:
+    def store(self, file_uuid: Union[UUID, str]) -> entities.FileInfo:
         url = self._build_url(file_uuid, suffix="storage")
         response_class = self._get_response_class("store")
         json_response = self._client.put(url).json()
-        return self._parse_response(json_response, response_class)
+        response = self._parse_response(json_response, response_class)
+        return cast(entities.FileInfo, response)
 
     def batch_store(
         self, file_uuids: Iterable[Union[UUID, str]]
-    ) -> Union[response.Response, entities.Entity]:
+    ) -> responses.BatchFileOperationResponse:
         url = self._build_url(suffix="storage")
         response_class = self._get_response_class("batch_store")
         json_response = self._client.put(url, json=file_uuids).json()
-        return self._parse_response(json_response, response_class)
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.BatchFileOperationResponse, response)
 
     def batch_delete(
         self, file_uuids: Iterable
-    ) -> Union[response.Response, entities.Entity]:
+    ) -> responses.BatchFileOperationResponse:
         url = self._build_url(suffix="storage")
         response_class = self._get_response_class("batch_delete")
         json_response = self._client.delete_with_payload(
             url, json=file_uuids
         ).json()
-        return self._parse_response(json_response, response_class)
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.BatchFileOperationResponse, response)
 
     def local_copy(
         self, source: Union[UUID, str], store: bool = False
-    ) -> response.CreateLocalCopyResponse:
+    ) -> responses.CreateLocalCopyResponse:
         url = self._build_url(suffix="local_copy")
         data = {"source": source, "store": store}
         response_class = self._get_response_class("local_copy")
         json_response = self._client.post(url, json=data).json()
-        return self._parse_response(json_response, response_class)  # type: ignore
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.CreateLocalCopyResponse, response)
 
     def remote_copy(
         self,
@@ -75,7 +77,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):  # type: ignore
         target: str,
         make_public: bool = True,
         pattern: str = "${default}",
-    ) -> response.CreateRemoteCopyResponse:
+    ) -> responses.CreateRemoteCopyResponse:
         url = self._build_url(suffix="remote_copy")
         data = {
             "source": source,
@@ -85,7 +87,9 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):  # type: ignore
         }
         response_class = self._get_response_class("remote_copy")
         json_response = self._client.post(url, json=data).json()
-        return self._parse_response(json_response, response_class)  # type: ignore
+        response = self._parse_response(json_response, response_class)
+        response = cast(responses.CreateRemoteCopyResponse, response)
+        return cast(responses.CreateRemoteCopyResponse, response)
 
 
 class GroupsAPI(API, ListCountMixin, RetrieveMixin):
@@ -94,11 +98,11 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin):
 
     response_classes = {
         "retrieve": entities.GroupInfo,
-        "list": response.GroupListResponse,
-        "count": response.GroupListResponse,
+        "list": responses.GroupListResponse,
+        "count": responses.GroupListResponse,
     }
 
-    def store(self, file_uuid: Union[UUID, str]) -> entities.Entity:
+    def store(self, file_uuid: Union[UUID, str]) -> Dict[str, Any]:
         url = self._build_url(file_uuid, suffix="storage")
         return self._client.put(url).json()
 
@@ -117,36 +121,70 @@ class DocumentConvertAPI(API):
     resource_type = "convert/document"
     entity_class = entities.DocumentConvertInfo
 
-    def convert(
-        self, input_document: entities.DocumentConvertInput
-    ) -> entities.Entity:
-        url = self._build_url()
-        document = self._client.post(url, json=input_document.dict()).json()
-        return self._parse_response(document["result"])  # type: ignore
+    response_classes = {
+        "convert": responses.DocumentConvertResponse,
+        "status": entities.DocumentConvertStatus,
+    }
 
-    def status(
-        self, document_convert_info: entities.DocumentConvertInfo
-    ) -> entities.DocumentConvertStatus:
-        url = self._build_url(suffix=f"status/{document_convert_info.token}")
+    def convert(
+        self,
+        paths: List[str],
+        store: Optional[bool] = None,
+    ) -> responses.DocumentConvertResponse:
+        url = self._build_url()
+
+        data = {
+            "paths": paths,
+        }
+        if isinstance(store, bool):
+            data["store"] = str(store).lower()  # type: ignore
+
+        response_class = self._get_response_class("convert")
+        document = self._client.post(url, json=data).json()
+        response = self._parse_response(document, response_class)
+        return cast(responses.DocumentConvertResponse, response)
+
+    def status(self, token: int) -> entities.DocumentConvertStatus:
+        url = self._build_url(suffix=f"status/{token}")
+        response_class = self._get_response_class("status")
         document = self._client.get(url).json()
-        return entities.DocumentConvertStatus.parse_obj(document["result"])
+        response = self._parse_response(document, response_class)
+        return cast(entities.DocumentConvertStatus, response)
 
 
 class VideoConvertAPI(API):
     resource_type = "convert/video"
     entity_class = entities.VideoConvertInfo
 
-    def convert(
-        self, input_document: entities.VideoConvertInput
-    ) -> entities.Entity:
-        url = self._build_url()
-        document = self._client.post(url, json=input_document.dict()).json()
-        return self._parse_response(document["result"])  # type: ignore
+    response_classes = {
+        "convert": responses.VideoConvertResponse,
+        "status": entities.VideoConvertStatus,
+    }
 
-    def status(self, video_convert_info: entities.VideoConvertInfo):
-        url = self._build_url(suffix=f"status/{video_convert_info.token}")
+    def convert(
+        self,
+        paths: List[str],
+        store: Optional[bool] = None,
+    ) -> responses.VideoConvertResponse:
+        url = self._build_url()
+
+        data = {
+            "paths": paths,
+        }
+        if isinstance(store, bool):
+            data["store"] = str(store).lower()  # type: ignore
+
+        response_class = self._get_response_class("convert")
+        document = self._client.post(url, json=data).json()
+        response = self._parse_response(document, response_class)
+        return cast(responses.VideoConvertResponse, response)
+
+    def status(self, token: int) -> entities.VideoConvertStatus:
+        url = self._build_url(suffix=f"status/{token}")
+        response_class = self._get_response_class("status")
         document = self._client.get(url).json()
-        return self._parse_response(document["result"])  # type: ignore
+        response = self._parse_response(document, response_class)
+        return cast(entities.VideoConvertStatus, response)
 
 
 class UploadAPI(API):

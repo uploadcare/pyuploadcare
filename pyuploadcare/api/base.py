@@ -9,7 +9,7 @@ from pyuploadcare import conf
 from pyuploadcare.api.auth import AuthBase, UploadcareAuth
 from pyuploadcare.api.client import Client, get_timeout
 from pyuploadcare.api.entities import Entity, UUIDEntity
-from pyuploadcare.api.response import (
+from pyuploadcare.api.responses import (
     EntityListResponse,
     PaginatedResponse,
     Response,

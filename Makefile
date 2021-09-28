@@ -16,4 +16,4 @@ lint:
 	poetry run mypy --namespace-packages --show-error-codes .
 
 test:
-	poetry run pytest -v tests/
+	poetry run pytest -v tests/ --cov=pyuploadcare
