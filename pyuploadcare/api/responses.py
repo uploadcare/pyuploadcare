@@ -1,5 +1,4 @@
 import typing
-from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -57,10 +56,10 @@ class CreateRemoteCopyResponse(Response):
 
 
 class DocumentConvertResponse(Entity):
-    problems: Optional[Dict[str, Any]]
-    result: Optional[List[DocumentConvertInfo]]
+    problems: typing.Optional[typing.Dict[str, typing.Any]]
+    result: typing.Optional[typing.List[DocumentConvertInfo]]
 
 
 class VideoConvertResponse(Entity):
-    problems: Optional[Dict[str, Any]]
-    result: Optional[List[VideoConvertInfo]]
+    problems: typing.Optional[typing.Dict[str, typing.Any]]
+    result: typing.Optional[typing.List[VideoConvertInfo]]

@@ -619,5 +619,5 @@ class FileFromUrl(ApiMixin):
             ):
                 return file
             time.sleep(interval)
-        else:
-            raise TimeoutError("timed out during upload")
+
+        raise TimeoutError("timed out during upload")

@@ -88,7 +88,6 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):  # type: ignore
         response_class = self._get_response_class("remote_copy")
         json_response = self._client.post(url, json=data).json()
         response = self._parse_response(json_response, response_class)
-        response = cast(responses.CreateRemoteCopyResponse, response)
         return cast(responses.CreateRemoteCopyResponse, response)
 
 
