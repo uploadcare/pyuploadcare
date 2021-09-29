@@ -20,23 +20,7 @@ from pyuploadcare.exceptions import DefaultResponseClassNotDefined
 class API:
     resource_type: str
     response_classes: Dict[str, Union[Type[Response], Type[Entity]]]
-
-    def __init__(
-        self,
-        base_url: URLTypes = conf.api_base,
-        client: Optional[Client] = None,
-        auth: Optional[AuthBase] = None,
-    ) -> None:
-        if auth is None:
-            auth = UploadcareAuth(conf.pub_key, conf.secret)  # type: ignore
-        if client is None:
-            client = Client(
-                base_url=base_url,
-                auth=auth,
-                verify=conf.verify_api_ssl,
-                timeout=get_timeout(conf.timeout),
-            )
-        self._client = client
+    _client: Client
 
     def _parse_response(
         self,
@@ -108,6 +92,25 @@ class API:
         url = self._build_url(resource_uuid)
         document = self._client.delete(url)
         return document.json()
+
+
+class RestAPI(API):
+    def __init__(
+        self,
+        base_url: URLTypes = conf.api_base,
+        client: Optional[Client] = None,
+        auth: Optional[AuthBase] = None,
+    ) -> None:
+        if auth is None:
+            auth = UploadcareAuth(conf.pub_key, conf.secret)  # type: ignore
+        if client is None:
+            client = Client(
+                base_url=base_url,
+                auth=auth,
+                verify=conf.verify_api_ssl,
+                timeout=get_timeout(conf.timeout),
+            )
+        self._client = client
 
 
 class APIProtocol(Protocol):

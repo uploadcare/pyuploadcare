@@ -14,13 +14,14 @@ from pyuploadcare.api.base import (
     DeleteMixin,
     ListCountMixin,
     ListMixin,
+    RestAPI,
     RetrieveMixin,
 )
 from pyuploadcare.api.client import Client, get_timeout
 from pyuploadcare.exceptions import APIError
 
 
-class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):  # type: ignore
+class FilesAPI(RestAPI, ListCountMixin, RetrieveMixin, DeleteMixin):
     resource_type = "files"
     response_classes = {
         "retrieve": entities.FileInfo,
@@ -91,7 +92,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):  # type: ignore
         return cast(responses.CreateRemoteCopyResponse, response)
 
 
-class GroupsAPI(API, ListCountMixin, RetrieveMixin):
+class GroupsAPI(RestAPI, ListCountMixin, RetrieveMixin):
     resource_type = "groups"
     entity_class = entities.GroupInfo
 
@@ -106,17 +107,17 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin):
         return self._client.put(url).json()
 
 
-class ProjectAPI(API, RetrieveMixin):
+class ProjectAPI(RestAPI, RetrieveMixin):
     resource_type = "project"
     entity_class = entities.ProjectInfo
 
 
-class WebhooksAPI(API, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
+class WebhooksAPI(RestAPI, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "webhooks"
     entity_class = entities.WebhookInfo
 
 
-class DocumentConvertAPI(API):
+class DocumentConvertAPI(RestAPI):
     resource_type = "convert/document"
     entity_class = entities.DocumentConvertInfo
 
@@ -151,7 +152,7 @@ class DocumentConvertAPI(API):
         return cast(entities.DocumentConvertStatus, response)
 
 
-class VideoConvertAPI(API):
+class VideoConvertAPI(RestAPI):
     resource_type = "convert/video"
     entity_class = entities.VideoConvertInfo
 
