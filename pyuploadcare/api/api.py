@@ -322,7 +322,7 @@ class UploadAPI(API):
                 conf.secret, expire  # type: ignore
             )
 
-        url = self._build_url(base="/from_url/")
+        url = self._build_url(base="/from_url")
         document = self._client.post(url, data=data)
         response = document.json()
         if "token" not in response:

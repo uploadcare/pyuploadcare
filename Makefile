@@ -17,3 +17,6 @@ lint:
 
 test:
 	poetry run pytest -v tests/ --cov=pyuploadcare
+
+docs_html:
+	poetry run sh -c "cd docs && make html"

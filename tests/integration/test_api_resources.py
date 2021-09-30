@@ -70,6 +70,12 @@ def test_successful_upload_from_url_sync_autostore():
     assert file.datetime_stored() is not None
 
 
+def test_successful_upload_by_url():
+    file = File.upload(IMAGE_URL)
+    assert isinstance(file, File)
+    assert file.filename() == "Octocat.png"
+
+
 @skip_on_travis
 def test_successful_upload_from_url_signed(signed_uploads):
     file_from_url = File.upload_from_url(IMAGE_URL)

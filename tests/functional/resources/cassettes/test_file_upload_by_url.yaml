@@ -1,0 +1,150 @@
+interactions:
+- request:
+    body: source_url=https%3A%2F%2Fgithub.githubassets.com%2Fimages%2Fmodules%2Flogos_page%2FOctocat.png&store=1&pub_key=e5b76258e05f2aabe85c&expire=60&signature=061ed204a72402498e7a39014822ec303b9c4cc7c768ea4e4e00ba3023a9b532
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '216'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - upload.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: POST
+    uri: https://upload.uploadcare.com/from_url/
+  response:
+    content: '{"type":"token","token":"9746feb2-935b-43e6-a839-f8bb47a3a6f3"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - X-PINGOTHER, X-UC-User-Agent, DNT
+      Access-Control-Allow-Methods:
+      - OPTIONS, GET, POST
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '1'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 29 Sep 2021 13:47:47 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - upload.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: GET
+    uri: https://upload.uploadcare.com/from_url/status/?token=9746feb2-935b-43e6-a839-f8bb47a3a6f3
+  response:
+    content: '{"size":32590,"total":32590,"done":32590,"uuid":"73135a42-4c01-41c8-a86a-fe35ab03d086","file_id":"73135a42-4c01-41c8-a86a-fe35ab03d086","original_filename":"Octocat.png","is_image":true,"is_stored":true,"image_info":{"width":800,"height":665,"format":"PNG","color_mode":"RGBA","geo_location":null,"orientation":null,"dpi":null,"datetime_original":null,"sequence":false},"video_info":null,"is_ready":true,"filename":"Octocat.png","mime_type":"image/png","status":"success"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - DNT, X-UC-User-Agent, X-PINGOTHER
+      Access-Control-Allow-Methods:
+      - GET, POST, HEAD, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Max-Age:
+      - '1'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 29 Sep 2021 13:47:48 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/files/73135a42-4c01-41c8-a86a-fe35ab03d086/
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2021-09-29T13:47:47.840857Z","datetime_uploaded":"2021-09-29T13:47:47.773887Z","image_info":{"width":800,"height":665,"format":"PNG","color_mode":"RGBA","geo_location":null,"orientation":null,"dpi":null,"datetime_original":null,"sequence":false},"is_image":true,"is_ready":true,"mime_type":"image/png","original_file_url":"https://ucarecdn.com/73135a42-4c01-41c8-a86a-fe35ab03d086/Octocat.png","original_filename":"Octocat.png","size":32590,"url":"https://api.uploadcare.com/files/73135a42-4c01-41c8-a86a-fe35ab03d086/","uuid":"73135a42-4c01-41c8-a86a-fe35ab03d086","variations":null,"video_info":null}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '646'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Wed, 29 Sep 2021 13:47:48 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: Please use API version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

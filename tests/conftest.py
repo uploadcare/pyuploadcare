@@ -1,4 +1,5 @@
-from tempfile import NamedTemporaryFile
+import os
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -6,19 +7,32 @@ from pyuploadcare import conf
 
 
 @pytest.fixture()
-def small_file():
-    tmp_file = NamedTemporaryFile(mode="wb", delete=False)
-    tmp_file.write("test".encode("utf-8"))
-    tmp_file.close()
-    return tmp_file
+def temp_directory():
+    return TemporaryDirectory()
 
 
 @pytest.fixture()
-def big_file():
-    tmp_file = NamedTemporaryFile(mode="wb", delete=False)
-    tmp_file.write(b"1" * 11_000_000)
-    tmp_file.close()
-    return tmp_file
+def small_file(temp_directory):
+    path = os.path.join(temp_directory.name, "sample1.txt")
+    with open(path, "w") as fh:
+        fh.write("test1")
+    return fh
+
+
+@pytest.fixture()
+def small_file2(temp_directory):
+    path = os.path.join(temp_directory.name, "sample2.txt")
+    with open(path, "w") as fh:
+        fh.write("test2")
+    return fh
+
+
+@pytest.fixture()
+def big_file(temp_directory):
+    path = os.path.join(temp_directory.name, "big_file.txt")
+    with open(path, "wb") as fh:
+        fh.write(b"0" * 11_000_000)
+    return fh
 
 
 @pytest.fixture(autouse=True)
