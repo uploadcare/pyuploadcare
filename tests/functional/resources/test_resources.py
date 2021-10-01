@@ -4,6 +4,11 @@ import pytest
 
 from pyuploadcare import File, FileList
 from pyuploadcare.resources.file import UploadProgress
+from pyuploadcare.transformations.document import (
+    DocumentFormat,
+    DocumentTransformation,
+)
+from pyuploadcare.transformations.video import VideoFormat, VideoTransformation
 
 
 @pytest.mark.vcr
@@ -140,3 +145,30 @@ def test_file_list_iterate():
         iterated_count += 1
 
     assert iterated_count == count
+
+
+@pytest.mark.vcr
+def test_file_convert_video():
+    file = File("740e1b8c-1ad8-4324-b7ec-112c79d8eac2")
+    transformation = VideoTransformation().format(VideoFormat.webm).thumbs(2)
+    converted_file = file.convert(transformation)
+    assert not converted_file.is_ready()
+    assert converted_file.thumbnails_group_uuid
+
+
+@pytest.mark.vcr
+def test_file_convert_document():
+    file = File("0e1cac48-1296-417f-9e7f-9bf13e330dcf")
+    transformation = DocumentTransformation().format(DocumentFormat.pdf)
+    converted_file = file.convert(transformation)
+    assert not converted_file.is_ready()
+
+
+@pytest.mark.vcr
+def test_file_convert_document_page():
+    file = File("5dddafa0-a742-4a51-ac40-ae491201ff97")
+    transformation = (
+        DocumentTransformation().format(DocumentFormat.png).page(1)
+    )
+    converted_file = file.convert(transformation)
+    assert not converted_file.is_ready()

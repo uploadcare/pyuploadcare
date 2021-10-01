@@ -68,7 +68,7 @@ being uploaded asynchronously.
 .. image:: https://ucarecdn.com/dbb4021e-b20e-40fa-907b-3da0a4f8ed70/-/resize/800/manual_crop.png
 
 Features
---------
+========
 
 - Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
 - Django widget with useful manual crop and multi-upload.
@@ -76,7 +76,7 @@ Features
 - hosted assets (Kudos to `Sławek Ehlert`_!).
 
 Requirements
-------------
+============
 
 ``pyuploadcare`` requires Python 3.6, 3.7, 3.8, 3.9.
 
@@ -90,7 +90,7 @@ are that everything still works. If you have to use those, modify ``tox.ini``,
 test and run at your own risk ;) Or, you may use older versions of the library.
 
 Installation
-------------
+============
 
 In order to install ``pyuploadcare``, simply run:
 
@@ -106,10 +106,10 @@ or, if you prefer it the old way:
 
 
 Usage
------
+=====
 
 Core API
-^^^^^^^^
+--------
 
 You can use pyuploadcare in any Python project. At first you need assign
 your project keys to conf object. After that you will be able
@@ -118,6 +118,9 @@ to do direct api calls or use api resources::
     import pyuploadcare
     pyuploadcare.conf.pub_key = '<your public key>'
     pyuploadcare.conf.secret = '<your private key>'
+
+Uploading files
+^^^^^^^^^^^^^^^
 
 Upload single file. ``File.upload`` method can accept file object or URL. Depending of file object size
 direct or multipart upload method will be chosen::
@@ -164,8 +167,71 @@ Example of using callback function for printing progress::
     ...     File.upload(fh, callback=print_progress)
     56780/56780 B
 
+
+Video conversion
+^^^^^^^^^^^^^^^^
+Uploadcare can encode video files from all popular formats, adjust their quality, format and dimensions, cut out a video fragment, and generate thumbnails via REST API.
+
+After each video file upload you obtain a file identifier in UUID format. Then you can use this file identifier to convert your video in multiple ways::
+
+    file = File('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
+    transformation = (
+        VideoTransformation()
+            .format(Format.mp4)
+            .size(width=640, height=480, resize_mode=ResizeMode.add_padding)
+            .quality(Quality.lighter)
+            .cut(start_time='2:30.535', length='2:20.0')
+            .thumbs(10)
+    )
+    converted_file: File = file.convert(transformation)
+
+or you can use API directly to convert single or multiple files::
+
+    video_convert_api = api.VideoConvertAPI()
+    transformation = VideoTransformation().format(VideoFormat.webm).thumbs(2)
+    paths: List[str] = [
+        transformation.path("740e1b8c-1ad8-4324-b7ec-112c79d8eac2"),
+    ]
+
+    response = video_convert_api.convert(paths)
+    video_convert_info = response.result[0]
+    converted_file = File(video_convert_info.uuid)
+
+    video_convert_status = video_convert_api.status(video_convert_info.token)
+
+Document Conversion
+^^^^^^^^^^^^^^^^^^^
+Uploadcare allows converting documents to the following target formats: doc, docx, xls, xlsx, odt, ods, rtf, txt, pdf, jpg, png. Document Conversion works via our REST API.
+
+After each document file upload you obtain a file identifier in UUID format. Then you can use this file identifier to convert your document to a new format::
+
+    file = File('0e1cac48-1296-417f-9e7f-9bf13e330dcf')
+    transformation = DocumentTransformation().format(DocumentFormat.pdf)
+    converted_file: File = file.convert(transformation)
+
+or create an image of a particular page (if using image format)::
+
+    file = File('5dddafa0-a742-4a51-ac40-ae491201ff97')
+    transformation = DocumentTransformation().format(DocumentFormat.png).page(1)
+    converted_file: File = file.convert(transformation)
+
+or you can use API directly to convert single or multiple files::
+
+    document_convert_api = api.DocumentConvertAPI()
+    transformation = DocumentTransformation().format(DocumentFormat.pdf)
+
+    paths: List[str] = [
+        transformation.path("0e1cac48-1296-417f-9e7f-9bf13e330dcf"),
+    ]
+
+    response = document_convert_api.convert([path])
+    document_convert_info = response.result[0]
+    converted_file = File(document_convert_info.uuid)
+
+    document_convert_status = document_convert_api.status(document_convert_info.token)
+
 Testing
--------
+=======
 
 Besides the `Github Actions`_ we use tox. In order to run tests just:
 
@@ -175,7 +241,7 @@ Besides the `Github Actions`_ we use tox. In order to run tests just:
     $ tox
 
 Security issues
----------------
+===============
 
 If you think you ran into something in Uploadcare libraries which might have
 security implications, please hit us up at `bugbounty@uploadcare.com`_
@@ -185,13 +251,13 @@ We'll contact you personally in a short time to fix an issue through co-op and
 prior to any public disclosure.
 
 Feedback
---------
+========
 
 Issues and PRs are welcome. You can provide your feedback or drop us a support
 request at `hello@uploadcare.com`_.
 
 Contributors
-------------
+============
 
 - `@marselester`_
 - `@dmitry-mukhin`_

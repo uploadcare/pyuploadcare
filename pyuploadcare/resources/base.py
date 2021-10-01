@@ -1,6 +1,12 @@
 from datetime import date, datetime
 
-from pyuploadcare.api.api import FilesAPI, GroupsAPI, UploadAPI
+from pyuploadcare.api.api import (
+    DocumentConvertAPI,
+    FilesAPI,
+    GroupsAPI,
+    UploadAPI,
+    VideoConvertAPI,
+)
 from pyuploadcare.api.base import ListCountMixin
 from pyuploadcare.resources.helpers import classproperty
 
@@ -85,3 +91,11 @@ class ApiMixin:
     @classproperty
     def groups_api(cls) -> GroupsAPI:
         return GroupsAPI()
+
+    @classproperty
+    def video_convert_api(cls) -> VideoConvertAPI:
+        return VideoConvertAPI()
+
+    @classproperty
+    def document_convert_api(cls) -> DocumentConvertAPI:
+        return DocumentConvertAPI()

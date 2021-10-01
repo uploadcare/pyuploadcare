@@ -1,0 +1,103 @@
+interactions:
+- request:
+    body: '{"paths": ["0e1cac48-1296-417f-9e7f-9bf13e330dcf/document/-/format/pdf/"]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '74'
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/5d5bb5639e3f2df33674 (CPython/3.9.6)
+    method: POST
+    uri: https://api.uploadcare.com/convert/document/
+  response:
+    content: '{"result": [{"original_source": "0e1cac48-1296-417f-9e7f-9bf13e330dcf/document/-/format/pdf/",
+      "token": 22449438, "uuid": "5dddafa0-a742-4a51-ac40-ae491201ff97"}], "problems":
+      {}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - OPTIONS, POST
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 01 Oct 2021 07:57:46 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: Please use API version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/5d5bb5639e3f2df33674 (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/files/5dddafa0-a742-4a51-ac40-ae491201ff97/
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2021-10-01T07:57:45.368217Z","datetime_uploaded":"2021-10-01T07:57:45.368217Z","image_info":null,"is_image":null,"is_ready":false,"mime_type":"","original_file_url":null,"original_filename":"","size":0,"url":"https://api.uploadcare.com/files/5dddafa0-a742-4a51-ac40-ae491201ff97/","uuid":"5dddafa0-a742-4a51-ac40-ae491201ff97","variations":null,"video_info":null}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '407'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Fri, 01 Oct 2021 07:57:47 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: Please use API version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
