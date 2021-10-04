@@ -1,26 +1,24 @@
 from datetime import date, datetime
+from typing import TYPE_CHECKING
 
-from pyuploadcare.api.api import (
-    DocumentConvertAPI,
-    FilesAPI,
-    GroupsAPI,
-    UploadAPI,
-    VideoConvertAPI,
-)
 from pyuploadcare.api.base import ListCountMixin
-from pyuploadcare.resources.helpers import classproperty
+
+
+if TYPE_CHECKING:
+    from pyuploadcare.client import Uploadcare
 
 
 class BaseApiList:
-    # abstract
-    constructor = None
     # ordering fields names which must be handled as datetime
     datetime_ordering_fields = ()
 
     resource_api: ListCountMixin
+    constractor_name: str
+    resource_id_field: str
 
     def __init__(
         self,
+        client: "Uploadcare",
         starting_point=None,
         ordering=None,
         limit=None,
@@ -31,6 +29,7 @@ class BaseApiList:
         self.limit = limit
         self.request_limit = request_limit
         self._count = None
+        self._client = client
 
     @property
     def starting_point(self):
@@ -66,7 +65,10 @@ class BaseApiList:
     def __iter__(self):
         qs = self.query_parameters()
         for entity in self.resource_api.list(**qs):
-            yield self.constructor(entity.dict())
+            resource_info = entity.dict()
+            resource_id = resource_info.get(self.resource_id_field)
+            constractor = getattr(self._client, self.constractor_name)
+            yield constractor(resource_id, resource_info)
 
     def count(self):
         if self.starting_point:
@@ -77,25 +79,3 @@ class BaseApiList:
             qs = self.query_parameters(limit=None)
             self._count = self.resource_api.count(**qs)
         return self._count
-
-
-class ApiMixin:
-    @classproperty
-    def files_api(cls) -> FilesAPI:
-        return FilesAPI()
-
-    @classproperty
-    def upload_api(cls) -> UploadAPI:
-        return UploadAPI()
-
-    @classproperty
-    def groups_api(cls) -> GroupsAPI:
-        return GroupsAPI()
-
-    @classproperty
-    def video_convert_api(cls) -> VideoConvertAPI:
-        return VideoConvertAPI()
-
-    @classproperty
-    def document_convert_api(cls) -> DocumentConvertAPI:
-        return DocumentConvertAPI()

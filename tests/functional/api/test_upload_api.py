@@ -8,20 +8,18 @@ from pyuploadcare import api
 
 
 @pytest.mark.vcr
-def test_upload_file(small_file):
-    upload_api = api.UploadAPI()
+def test_upload_file(small_file, uploadcare):
     filename = "file.txt"
     with open(small_file.name, "rb") as fh:
-        response = upload_api.upload({filename: fh})
+        response = uploadcare.upload_api.upload({filename: fh})
     assert response == {filename: ANY}
 
 
 @pytest.mark.vcr
-def test_upload_file_secure(small_file):
-    upload_api = api.UploadAPI()
+def test_upload_file_secure(small_file, uploadcare):
     filename = "file.txt"
     with open(small_file.name, "rb") as fh:
-        response = upload_api.upload(
+        response = uploadcare.upload_api.upload(
             {filename: fh},
             secure_upload=True,
         )
@@ -30,8 +28,7 @@ def test_upload_file_secure(small_file):
 
 
 @pytest.mark.vcr
-def test_multipart_upload(big_file):
-    upload_api = api.UploadAPI()
+def test_multipart_upload(big_file, uploadcare):
     filename = "file.txt"
     chunk_size = 5 * 1024 * 1024
 
@@ -40,7 +37,7 @@ def test_multipart_upload(big_file):
 
         content_type = "text/plain"
 
-        response = upload_api.start_multipart_upload(
+        response = uploadcare.upload_api.start_multipart_upload(
             filename, size, content_type
         )
 
@@ -53,9 +50,9 @@ def test_multipart_upload(big_file):
 
         while chunk:
             chunk_url = parts.pop(0)
-            upload_api.multipart_upload_chunk(chunk_url, chunk)
+            uploadcare.upload_api.multipart_upload_chunk(chunk_url, chunk)
 
             chunk = fh.read(chunk_size)
 
-    response = upload_api.multipart_complete(multipart_uuid)
+    response = uploadcare.upload_api.multipart_complete(multipart_uuid)
     assert "file_id" in response

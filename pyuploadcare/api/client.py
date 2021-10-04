@@ -32,6 +32,13 @@ logger = logging.getLogger("pyuploadcare")
 
 
 class Client(HTTPXClient):
+    def __init__(self, *args, **kwargs):
+        self.user_agent_extension = kwargs.pop("user_agent_extension", None)
+        self.retry_throttled = kwargs.pop("retry_throttled", None)
+        self.public_key = kwargs.pop("public_key", None)
+
+        super().__init__(*args, **kwargs)
+
     def delete_with_payload(
         self,
         url: URLTypes,
@@ -90,7 +97,7 @@ class Client(HTTPXClient):
 
         headers["User-Agent"] = self._build_user_agent()  # type: ignore
 
-        retry_throttled = conf.retry_throttled
+        retry_throttled = self.retry_throttled
 
         while True:
             try:
@@ -178,11 +185,11 @@ class Client(HTTPXClient):
 
     def _build_user_agent(self):
         extension_info = ""
-        if conf.user_agent_extension:
-            extension_info = f"; {conf.user_agent_extension}"
+        if self.user_agent_extension:
+            extension_info = f"; {self.user_agent_extension}"
         return "PyUploadcare/{0}/{1} ({2}/{3}{4})".format(
             __version__,
-            conf.pub_key,
+            self.public_key,
             python_implementation(),
             python_version(),
             extension_info,

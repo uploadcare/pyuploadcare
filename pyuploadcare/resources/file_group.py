@@ -1,11 +1,13 @@
 import re
+from typing import TYPE_CHECKING
 
 import dateutil.parser
 
-from pyuploadcare import conf
 from pyuploadcare.exceptions import InvalidParamError
-from pyuploadcare.resources.base import ApiMixin
-from pyuploadcare.resources.file import File
+
+
+if TYPE_CHECKING:
+    from pyuploadcare.client import Uploadcare
 
 
 GROUP_ID_REGEX = re.compile(
@@ -20,12 +22,12 @@ GROUP_ID_REGEX = re.compile(
 )
 
 
-class FileGroup(ApiMixin):
+class FileGroup:
     """File Group resource for working with user-uploaded group of files.
 
     It can take group id or group CDN url::
 
-        >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+        >>> file_group = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
 
     You can iterate ``file_group`` or get ``File`` instance by key::
 
@@ -48,7 +50,7 @@ class FileGroup(ApiMixin):
 
     """
 
-    def __init__(self, cdn_url_or_group_id):
+    def __init__(self, cdn_url_or_group_id: str, client: "Uploadcare"):
         matches = GROUP_ID_REGEX.search(cdn_url_or_group_id)
 
         if not matches:
@@ -62,6 +64,8 @@ class FileGroup(ApiMixin):
 
         self._files_qty = files_qty
         self._info_cache = None
+
+        self._client = client
 
     def __repr__(self):
         return "<uploadcare.FileGroup {0}>".format(self.id)
@@ -79,7 +83,7 @@ class FileGroup(ApiMixin):
         else:
             file_info = self.info()["files"][key]
             if file_info is not None:
-                return File.construct_from(file_info)
+                return self._client.file(file_info["uuid"], file_info)
 
     @property
     def _api_uri(self):
@@ -95,13 +99,13 @@ class FileGroup(ApiMixin):
 
         Usage example::
 
-            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+            >>> file_group = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
             >>> file_group.cdn_url
             https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/
 
         """
         return "{cdn_base}{group_id}/".format(
-            cdn_base=conf.cdn_base, group_id=self.id
+            cdn_base=self._client.cdn_base, group_id=self.id
         )
 
     @property
@@ -110,7 +114,7 @@ class FileGroup(ApiMixin):
 
         Usage example::
 
-            >>> file_group = FileGroup('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+            >>> file_group = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
             >>> file_group.file_cdn_urls[0]
             'https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/nth/0/'
 
@@ -136,7 +140,7 @@ class FileGroup(ApiMixin):
 
     def update_info(self):
         """Updates and returns group information by requesting Uploadcare API."""
-        self._info_cache = self.groups_api.retrieve(self.id).dict()
+        self._info_cache = self._client.groups_api.retrieve(self.id).dict()
         return self._info_cache
 
     def datetime_stored(self):
@@ -168,42 +172,4 @@ class FileGroup(ApiMixin):
         if self.is_stored():
             return
 
-        self._info_cache = self.groups_api.store(self.id)
-
-    @classmethod
-    def construct_from(cls, group_info):
-        """Constructs ``FileGroup`` instance from group information."""
-        group = cls(group_info["id"])
-        group._info_cache = group_info
-        return group
-
-    @classmethod
-    def create(cls, files):
-        """Creates file group and returns ``FileGroup`` instance.
-
-        It expects iterable object that contains ``File`` instances, e.g.::
-
-            >>> file_1 = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-            >>> file_2 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
-            >>> FileGroup.create((file_1, file_2))
-            <uploadcare.FileGroup 0513dda0-6666-447d-846f-096e5df9e2bb~2>
-
-        """
-        if not files:
-            raise InvalidParamError("set of files is empty")
-
-        for file_ in files:
-            if not isinstance(file_, File):
-                raise InvalidParamError(
-                    "all items have to be ``File`` instance"
-                )
-
-        file_urls = [str(file_) for file_ in files]
-        group_info = cls.upload_api.create_group(
-            files=file_urls,
-            secure_upload=conf.signed_uploads,
-            expire=conf.signed_uploads_ttl,
-        )
-
-        group = cls.construct_from(group_info)
-        return group
+        self._info_cache = self._client.groups_api.store(self.id)

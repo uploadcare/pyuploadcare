@@ -4,7 +4,7 @@ from time import time
 from typing import Any, Dict, Iterable, List, Optional, Union, cast
 from uuid import UUID
 
-from httpx._types import RequestFiles, URLTypes
+from httpx._types import RequestFiles
 
 from pyuploadcare import conf
 from pyuploadcare.api import entities, responses
@@ -14,14 +14,12 @@ from pyuploadcare.api.base import (
     DeleteMixin,
     ListCountMixin,
     ListMixin,
-    RestAPI,
     RetrieveMixin,
 )
-from pyuploadcare.api.client import Client, get_timeout
 from pyuploadcare.exceptions import APIError
 
 
-class FilesAPI(RestAPI, ListCountMixin, RetrieveMixin, DeleteMixin):
+class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
     resource_type = "files"
     response_classes = {
         "retrieve": entities.FileInfo,
@@ -92,7 +90,7 @@ class FilesAPI(RestAPI, ListCountMixin, RetrieveMixin, DeleteMixin):
         return cast(responses.CreateRemoteCopyResponse, response)
 
 
-class GroupsAPI(RestAPI, ListCountMixin, RetrieveMixin):
+class GroupsAPI(API, ListCountMixin, RetrieveMixin):
     resource_type = "groups"
     entity_class = entities.GroupInfo
 
@@ -107,17 +105,17 @@ class GroupsAPI(RestAPI, ListCountMixin, RetrieveMixin):
         return self._client.put(url).json()
 
 
-class ProjectAPI(RestAPI, RetrieveMixin):
+class ProjectAPI(API, RetrieveMixin):
     resource_type = "project"
     entity_class = entities.ProjectInfo
 
 
-class WebhooksAPI(RestAPI, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
+class WebhooksAPI(API, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "webhooks"
     entity_class = entities.WebhookInfo
 
 
-class DocumentConvertAPI(RestAPI):
+class DocumentConvertAPI(API):
     resource_type = "convert/document"
     entity_class = entities.DocumentConvertInfo
 
@@ -152,7 +150,7 @@ class DocumentConvertAPI(RestAPI):
         return cast(entities.DocumentConvertStatus, response)
 
 
-class VideoConvertAPI(RestAPI):
+class VideoConvertAPI(API):
     resource_type = "convert/video"
     entity_class = entities.VideoConvertInfo
 
@@ -189,19 +187,6 @@ class VideoConvertAPI(RestAPI):
 
 class UploadAPI(API):
     resource_type = "base"
-
-    def __init__(
-        self,
-        base_url: URLTypes = conf.upload_base,
-        client: Optional[Client] = None,
-    ) -> None:
-        if client is None:
-            client = Client(
-                base_url=base_url,
-                verify=conf.verify_upload_ssl,
-                timeout=get_timeout(conf.timeout),
-            )
-        self._client = client
 
     @staticmethod
     def _generate_secure_signature(secret: str, expire: int):

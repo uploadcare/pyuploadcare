@@ -1,8 +1,7 @@
-from pyuploadcare.resources.base import ApiMixin, BaseApiList
-from pyuploadcare.resources.file_group import FileGroup
+from pyuploadcare.resources.base import BaseApiList
 
 
-class GroupList(BaseApiList, ApiMixin):
+class GroupList(BaseApiList):
     """List of FileGroup resources.
 
     This class provides iteration over all groups for project. You can specify:
@@ -21,18 +20,19 @@ class GroupList(BaseApiList, ApiMixin):
 
         >>> from datetime import datetime, timedelta
         >>> last_week = datetime.now() - timedelta(weeks=1)
-        >>> for f in GroupList(starting_point=last_week):
+        >>> for f in uploadcare.list_file_groups(starting_point=last_week):
         >>>     print(f.datetime_created())
 
     Count objects::
 
-        >>> print('Number of groups is', GroupList().count())
+        >>> print('Number of groups is', uploadcare.list_file_groups().count())
 
     """
 
-    constructor = FileGroup.construct_from
+    constractor_name = "file_group"
+    resource_id_field = "id"
     datetime_ordering_fields = ("", "datetime_created")
 
     @property
     def resource_api(self):
-        return self.groups_api
+        return self._client.groups_api

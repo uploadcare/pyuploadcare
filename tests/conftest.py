@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from pyuploadcare import conf
+from pyuploadcare.client import Uploadcare
 
 
 @pytest.fixture()
@@ -60,3 +61,11 @@ def vcr_config():
     return {
         "filter_headers": [("authorization", "DUMMY")],
     }
+
+
+@pytest.fixture(scope="module")
+def uploadcare():
+    return Uploadcare(
+        public_key="demopublickey",
+        secret_key="demosecretkey",
+    )

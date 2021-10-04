@@ -1,14 +1,10 @@
 import dataclasses
 import logging
-import mimetypes
-import os
 import re
 import time
-from itertools import islice
-from typing import IO, Any, Callable, Dict, Iterable, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 from uuid import UUID
 
-from pyuploadcare import conf
 from pyuploadcare.api.entities import DocumentConvertInfo, VideoConvertInfo
 from pyuploadcare.exceptions import (
     InvalidParamError,
@@ -16,9 +12,12 @@ from pyuploadcare.exceptions import (
     TimeoutError,
     UploadError,
 )
-from pyuploadcare.resources.base import ApiMixin
 from pyuploadcare.transformations.document import DocumentTransformation
 from pyuploadcare.transformations.video import VideoTransformation
+
+
+if TYPE_CHECKING:
+    from pyuploadcare.client import Uploadcare
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -49,7 +48,7 @@ class UploadProgress:
     done: int
 
 
-class File(ApiMixin):
+class File:
     """File resource for working with user-uploaded files.
 
     It can take file UUID or group CDN url::
@@ -62,18 +61,11 @@ class File(ApiMixin):
 
     """
 
-    # batch size for multiple delete and store requests
-    batch_chunk_size = 500
-
-    #  minimum file size for multipart uploads
-    multipart_min_file_size = 10485760
-
-    # chunk size for multipart uploads
-    multipart_chunk_size = 5 * 1024 * 1024
-
     thumbnails_group_uuid: Optional[str] = None
 
-    def __init__(self, cdn_url_or_file_id):
+    _client: "Uploadcare"
+
+    def __init__(self, cdn_url_or_file_id, client: "Uploadcare"):
         if isinstance(cdn_url_or_file_id, UUID):
             cdn_url_or_file_id = str(cdn_url_or_file_id)
 
@@ -86,6 +78,8 @@ class File(ApiMixin):
         self.default_effects = matches.groupdict()["effects"]
 
         self._info_cache = None
+
+        self._client = client
 
     def __repr__(self):
         return "<uploadcare.File {uuid}>".format(uuid=self.uuid)
@@ -145,7 +139,8 @@ class File(ApiMixin):
 
         """
         return "{cdn_base}{path}".format(
-            cdn_base=conf.cdn_base, path=self.cdn_path(self.default_effects)
+            cdn_base=self._client.cdn_base,
+            path=self.cdn_path(self.default_effects),
         )
 
     def info(self):
@@ -161,7 +156,7 @@ class File(ApiMixin):
 
     def update_info(self):
         """Updates and returns file information by requesting Uploadcare API."""
-        self._info_cache = self.files_api.retrieve(self.uuid).dict()
+        self._info_cache = self._client.files_api.retrieve(self.uuid).dict()
         return self._info_cache
 
     def filename(self):
@@ -257,7 +252,7 @@ class File(ApiMixin):
           on S3.
 
         """
-        self._info_cache = self.files_api.store(self.uuid).dict()
+        self._info_cache = self._client.files_api.store(self.uuid).dict()
 
     def copy(self, effects=None, target=None) -> Union[str, "File"]:
         """Creates a File Copy on Uploadcare or Custom Storage.
@@ -300,10 +295,10 @@ class File(ApiMixin):
 
         """
         effects = self._build_effects(effects)
-        response = self.files_api.local_copy(
+        response = self._client.files_api.local_copy(
             source=self.cdn_path(effects), store=store
         )
-        return File(response.result.uuid)
+        return self._client.file(response.result.uuid)
 
     def create_remote_copy(
         self, target, effects=None, make_public=None, pattern=None
@@ -347,403 +342,12 @@ class File(ApiMixin):
             data["make_public"] = make_public
         if pattern is not None:
             data["pattern"] = pattern
-        response = self.files_api.remote_copy(**data)
+        response = self._client.files_api.remote_copy(**data)
         return response.result
 
     def delete(self) -> "None":
         """Deletes file by requesting Uploadcare API."""
-        self._info_cache = self.files_api.delete(self.uuid).dict()
-
-    @classmethod
-    def construct_from(cls, file_info) -> "File":
-        """Constructs ``File`` instance from file information.
-
-        For example you have result of
-        ``/files/1921953c-5d94-4e47-ba36-c2e1dd165e1a/`` API request::
-
-            >>> file_info = {
-                    # ...
-                    'uuid': '1921953c-5d94-4e47-ba36-c2e1dd165e1a',
-                    # ...
-                }
-            >>> File.construct_from(file_info)
-            <uploadcare.File 1921953c-5d94-4e47-ba36-c2e1dd165e1a>
-
-        """
-        file_ = cls(str(file_info["uuid"]))
-        file_.default_effects = file_info.get("default_effects")
-        file_._info_cache = file_info
-        return file_
-
-    @staticmethod
-    def _get_file_size(file_object: IO) -> int:
-        return os.fstat(file_object.fileno()).st_size
-
-    @classmethod  # noqa: C901
-    def upload(  # noqa: C901
-        cls,
-        file_obj_or_url: Union[IO, str],
-        store=None,
-        size: Optional[int] = None,
-        callback: Optional[Callable[[UploadProgress], Any]] = None,
-    ) -> "File":
-        """Uploads a file and returns ``File`` instance.
-
-        Method can accept file object or URL. Depending of file object size
-        direct or multipart upload method will be chosen.
-
-        Upload from url::
-
-            >>> file: File = File.upload("https://shorturl.at/fAX28")
-
-        Upload small file, direct upload is used::
-
-            >>> fh = open('small_file.jpg', 'rb')
-            >>> file: File = File.upload(fh)
-
-        Upload big file, multipart upload is used::
-
-            >>> with open('big_file.mp4', 'rb') as fh:
-            >>>     file: File = File.upload(fh)
-
-        To track uploading progress you can pass optional callback function::
-
-            >>> def print_progress(info: UploadProgress):
-            ...     print(f'{info.done}/{info.total} B')
-            >>>
-            >>> with open('big_file.mp4', 'rb') as fh:
-            ...    file: File = File.upload(fh, callback=print_progress)
-            0/11000000 B
-            5242880/11000000 B
-            10485760/11000000 B
-            11000000/11000000 B
-
-        Args:
-            - file_obj_or_url: file object or url to upload to. If file object
-                is passed, ``File.upload_files`` (direct upload) or
-                ``File.multipart_upload`` (multipart upload) will be used.
-                If file URL is passed, ``File.upload_from_url_sync`` will be
-                used for uploading.
-            - store (Optional[bool]): Should the file be automatically stored
-                upon upload. Defaults to None.
-                - False - do not store file
-                - True - store file (can result in error if autostore
-                               is disabled for project)
-                - None - use project settings
-            - size (Optional[int]): file size in bytes.
-                If not set, it is calculated by ``os.fstat``.
-                Used for multipart uploading.
-            - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
-                accepting ``UploadProgress`` to track uploading progress.
-
-        Returns:
-            ``File`` instance
-
-        """
-
-        # assume url is passed if str
-        if isinstance(file_obj_or_url, str):
-            file_url: str = file_obj_or_url
-            return cls.upload_from_url_sync(
-                file_url,
-                store=cls._format_store(store),
-                callback=callback,
-            )
-
-        file_obj: IO = file_obj_or_url
-
-        if size is None:
-            size = os.fstat(file_obj.fileno()).st_size
-
-        # use direct upload for files less then multipart_min_file_size
-        if size < cls.multipart_min_file_size:
-            files = cls.upload_files([file_obj], store=store)
-            if not files:
-                raise ValueError("Failed to get uploaded file from response")
-            file: "File" = files[0]
-
-            if callback:
-                callback(UploadProgress(total=size, done=size))
-
-            return file
-
-        file = cls.multipart_upload(
-            file_obj, store=store, size=size, callback=callback
-        )
-        return file
-
-    @staticmethod
-    def _format_store(store: Optional[bool]) -> str:
-        values_map: Dict[Any, str] = {
-            None: "auto",
-            True: "1",
-            False: "0",
-        }
-
-        if store not in values_map:
-            store = None
-
-        return values_map[store]
-
-    @classmethod
-    def upload_files(
-        cls, file_objects: List[IO], store: Optional[bool] = None
-    ) -> List["File"]:
-        """Upload multiple files using direct upload.
-
-        It support files smaller than 100MB only. If you want to upload larger files,
-        use Multipart Uploads.
-
-        Args:
-            - file_objects: list of file objects to upload to
-            - store (Optional[bool]): Should the file be automatically stored
-                upon upload. Defaults to None.
-                - False - do not store file
-                - True - store file (can result in error if autostore
-                               is disabled for project)
-                - None - use project settings
-
-        Returns:
-            ``File`` instance
-
-        """
-        files = {
-            os.path.basename(file_object.name or "")
-            or f"file{index}": file_object
-            for index, file_object in enumerate(file_objects)
-        }
-
-        response = cls.upload_api.upload(
-            files=files,
-            store=cls._format_store(store),
-            secure_upload=conf.signed_uploads,
-            expire=conf.signed_uploads_ttl,
-        )
-        ucare_files = [cls(response[file_name]) for file_name in files]
-        return ucare_files
-
-    @classmethod  # noqa: C901
-    def multipart_upload(  # noqa: C901
-        cls,
-        file_obj: IO,
-        store: Optional[bool] = None,
-        size: Optional[int] = None,
-        mime_type: Optional[str] = None,
-        callback: Optional[Callable[[UploadProgress], Any]] = None,
-    ) -> "File":
-        """Upload file straight to s3 by chunks.
-
-        Multipart Uploads are useful when you are dealing with files larger than 100MB
-        or explicitly want to use accelerated uploads.
-
-        Args:
-            - file_obj: file object to upload to
-            - store (Optional[bool]): Should the file be automatically stored
-                upon upload. Defaults to None.
-                - False - do not store file
-                - True - store file (can result in error if autostore
-                               is disabled for project)
-                - None - use project settings
-            - size (Optional[int]): file size in bytes.
-                If not set, it is calculated by ``os.fstat``
-            - mime_type (Optional[str]): file mime type.
-                If not set, it is guessed from filename extension.
-            - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
-                accepting ``UploadProgress`` to track uploading progress.
-
-        Returns:
-            ``File`` instance
-
-        """
-        if size is None:
-            size = cls._get_file_size(file_obj)
-
-        if not mime_type:
-            mime_type, _encoding = mimetypes.guess_type(file_obj.name)
-
-        if not mime_type:
-            raise ValueError(
-                "Unable to determine file mime type, please set manually"
-            )
-
-        complete_response = cls.upload_api.start_multipart_upload(
-            file_name=file_obj.name,
-            file_size=size,
-            content_type=mime_type,
-            store=cls._format_store(store),
-            secure_upload=conf.signed_uploads,
-            expire=conf.signed_uploads_ttl,
-        )
-
-        multipart_uuid = complete_response["uuid"]
-
-        parts: List[str] = complete_response["parts"]
-
-        chunk = file_obj.read(cls.multipart_chunk_size)
-
-        uploaded_size = 0
-
-        while chunk:
-            chunk_url = parts.pop(0)
-            cls.upload_api.multipart_upload_chunk(chunk_url, chunk)
-            uploaded_size += len(chunk)
-
-            if callback:
-                callback(UploadProgress(total=size, done=uploaded_size))
-
-            chunk = file_obj.read(cls.multipart_chunk_size)
-
-        file_info: Dict = cls.upload_api.multipart_complete(multipart_uuid)
-        return cls.construct_from(file_info)
-
-    @classmethod
-    def upload_from_url(cls, url, store=None, filename=None) -> "FileFromUrl":
-        """Uploads file from given url and returns ``FileFromUrl`` instance.
-
-        Args:
-            - url (str): URL of file to upload to
-            - store (Optional[bool]): Should the file be automatically stored
-                upon upload. Defaults to None.
-                - False - do not store file
-                - True - store file (can result in error if autostore
-                               is disabled for project)
-                - None - use project settings
-            - filename (Optional[str]): Name of the uploaded file. If this not
-                specified the filename will be obtained from response headers
-                or source URL. Defaults to None.
-
-        Returns:
-            ``FileFromUrl`` instance
-
-        """
-        if store is None:
-            store = "auto"
-        elif store:
-            store = "1"
-        else:
-            store = "0"
-
-        token = cls.upload_api.upload_from_url(
-            source_url=url,
-            store=store,
-            filename=filename,
-            secure_upload=conf.signed_uploads,
-            expire=conf.signed_uploads_ttl,
-        )
-        file_from_url = FileFromUrl(token)
-        return file_from_url
-
-    @classmethod
-    def upload_from_url_sync(
-        cls,
-        url,
-        timeout=30,
-        interval=0.3,
-        until_ready=False,
-        store=None,
-        filename=None,
-        callback: Optional[Callable[[UploadProgress], Any]] = None,
-    ) -> "File":
-        """Uploads file from given url and returns ``File`` instance.
-
-        Args:
-            - url (str): URL of file to upload to
-            - store (Optional[bool]): Should the file be automatically stored
-                upon upload. Defaults to None.
-                - False - do not store file
-                - True - store file (can result in error if autostore
-                               is disabled for project)
-                - None - use project settings
-            - filename (Optional[str]): Name of the uploaded file. If this not
-                specified the filename will be obtained from response headers
-                or source URL. Defaults to None.
-            - timeout (Optional[int]): seconds to wait for successful upload.
-                Defaults to 30.
-            - interval (Optional[float]): interval between upload status checks.
-                Defaults to 0.3.
-            - until_ready (Optional[bool]): should we wait until file is
-                available via CDN. Defaults to False.
-            - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
-                accepting ``UploadProgress`` to track uploading progress.
-
-        Returns:
-            ``File`` instance
-
-        Raises:
-            ``TimeoutError`` if file wasn't uploaded in time
-
-        """
-        ffu = cls.upload_from_url(url, store, filename)
-        return ffu.wait(
-            timeout=timeout,
-            interval=interval,
-            until_ready=until_ready,
-            callback=callback,
-        )
-
-    @staticmethod
-    def _extracts_uuids(files: Iterable[Union[str, "File"]]) -> List[str]:
-        uuids: List[str] = []
-
-        for file_ in files:
-            if isinstance(file_, File):
-                uuids.append(file_.uuid)
-            elif isinstance(file_, str):
-                uuids.append(file_)
-            else:
-                raise ValueError(
-                    "Invalid type for sequence item: {0}".format(type(file_))
-                )
-
-        return uuids
-
-    @classmethod
-    def batch_store(cls, files: Iterable[Union[str, "File"]]) -> None:
-        """Stores multiple files by requesting Uploadcare API.
-
-        Usage example::
-
-            >>> files = [
-            ... '6c5e9526-b0fe-4739-8975-72e8d5ee6342',
-            ... 'a771f854-c2cb-408a-8c36-71af77811f3b'
-            ... ]
-            >>> File.batch_store(files)
-
-        Args:
-            - files:
-                List of file UUIDs, CND urls or ``File`` instances.
-        """
-        uuids = cls._extracts_uuids(files)
-        start = 0
-        chunk = list(islice(uuids, start, cls.batch_chunk_size))
-        while chunk:
-            cls.files_api.batch_store(uuids)
-            start += cls.batch_chunk_size
-            chunk = list(islice(uuids, start, cls.batch_chunk_size))
-
-    @classmethod
-    def batch_delete(cls, files: Iterable[Union[str, "File"]]) -> None:
-        """Deletes multiple files by requesting Uploadcare API.
-
-        Usage example::
-
-            >>> files = [
-            ... '6c5e9526-b0fe-4739-8975-72e8d5ee6342',
-            ... 'a771f854-c2cb-408a-8c36-71af77811f3b'
-            ... ]
-            >>> File.batch_delete(files)
-
-        Args:
-            - files:
-                List of file UUIDs, CND urls or ``File`` instances.
-        """
-        uuids = cls._extracts_uuids(files)
-        start = 0
-        chunk = list(islice(uuids, start, cls.batch_chunk_size))
-        while chunk:
-            cls.files_api.batch_delete(uuids)
-            start += cls.batch_chunk_size
-            chunk = list(islice(uuids, start, cls.batch_chunk_size))
+        self._info_cache = self._client.files_api.delete(self.uuid).dict()
 
     def convert(
         self,
@@ -803,14 +407,16 @@ class File(ApiMixin):
                 - None - use project settings
         """
         path = transformation.path(self.uuid)
-        response = self.video_convert_api.convert(paths=[path], store=store)
+        response = self._client.video_convert_api.convert(
+            paths=[path], store=store
+        )
         if response.problems:
             raise InvalidRequestError(response.problems)
 
         conversion_info: VideoConvertInfo = response.result[0]
         new_uuid = conversion_info.uuid
         thumbnails_group_uuid = conversion_info.thumbnails_group_uuid
-        converted_file = File(new_uuid)
+        converted_file = self._client.file(new_uuid)
         converted_file.thumbnails_group_uuid = thumbnails_group_uuid
         return converted_file
 
@@ -830,16 +436,18 @@ class File(ApiMixin):
                 - None - use project settings
         """
         path = transformation.path(self.uuid)
-        response = self.document_convert_api.convert(paths=[path], store=store)
+        response = self._client.document_convert_api.convert(
+            paths=[path], store=store
+        )
         if response.problems:
             raise InvalidRequestError(response.problems)
 
         conversion_info: DocumentConvertInfo = response.result[0]
         new_uuid = conversion_info.uuid
-        return File(new_uuid)
+        return File(new_uuid, self._client)
 
 
-class FileFromUrl(ApiMixin):
+class FileFromUrl:
     """Contains the logic around an upload from url.
 
     It expects uploading token, for instance::
@@ -876,8 +484,9 @@ class FileFromUrl(ApiMixin):
 
     """
 
-    def __init__(self, token):
+    def __init__(self, token, client: "Uploadcare"):
         self.token = token
+        self._client = client
 
         self._info_cache = None
 
@@ -891,20 +500,21 @@ class FileFromUrl(ApiMixin):
         it for further using.
 
         """
-        if self._info_cache is None:
+        if not self._info_cache:
             self.update_info()
         return self._info_cache
 
     def update_info(self):
         """Updates and returns information by requesting Uploadcare API."""
-        result = self.upload_api.get_upload_from_url_status(self.token)
+        result = self._client.upload_api.get_upload_from_url_status(self.token)
         self._info_cache = result
         return result
 
     def get_file(self):
         """Returns ``File`` instance if upload is completed."""
         if self.info()["status"] == "success":
-            return File(self.info()["uuid"])
+            file_id = self.info()["uuid"]
+            return self._client.file(file_id)
 
     def wait(  # noqa: C901
         self,
