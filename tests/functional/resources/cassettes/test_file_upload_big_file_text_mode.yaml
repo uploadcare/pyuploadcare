@@ -1,0 +1,252 @@
+interactions:
+- request:
+    body: filename=%2Fvar%2Ffolders%2Fc0%2F9fpn0kv11dq0flr9jnm2bhs80000gn%2FT%2Ftmpgktov6bf%2Fbig_file_text.txt&size=22000000&content_type=text%2Fplain&UPLOADCARE_PUB_KEY=e5b76258e05f2aabe85c&UPLOADCARE_STORE=1&expire=60&signature=061ed204a72402498e7a39014822ec303b9c4cc7c768ea4e4e00ba3023a9b532
+    headers:
+ accept:
+ - '*/*'
+ accept-encoding:
+ - gzip, deflate
+ connection:
+ - keep-alive
+ content-length:
+ - '285'
+ content-type:
+ - application/x-www-form-urlencoded
+ host:
+ - upload.uploadcare.com
+ user-agent:
+ - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: POST
+    uri: https://upload.uploadcare.com/multipart/start/
+  response:
+    content: '{"uuid":"26e03e6d-82cc-49a0-a1d4-e7e73e82a12b","parts":["https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=1&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=e56b08c5c3e7e4009f947c0a4476d7833200a3d1f5a604f33822b6aa9309a766","https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=2&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=12c67a83816ed765bc72480490c114781952996364191ad3e2a4ebb2614a8e9c","https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=3&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=188ee8d24a839d4e6ef12ee7a905518da7443eb7a9058baf21db360fb50ed125","https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=b4604d0c23fd5f704bf8e7004f43f5b1ce5f9e343967a4c4d7db54aa83659358","https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=5&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=31d6c2d147ed34a3a3a5d2de260810e62f0389e9c65d25aa7682402857902d32"]}'
+    headers:
+ Access-Control-Allow-Credentials:
+ - 'true'
+ Access-Control-Allow-Headers:
+ - DNT, X-UC-User-Agent, X-PINGOTHER
+ Access-Control-Allow-Methods:
+ - POST, OPTIONS
+ Access-Control-Allow-Origin:
+ - '*'
+ Access-Control-Max-Age:
+ - '1'
+ Connection:
+ - keep-alive
+ Content-Encoding:
+ - gzip
+ Content-Type:
+ - application/json
+ Date:
+ - Thu, 30 Sep 2021 06:35:00 GMT
+ Server:
+ - nginx
+ Transfer-Encoding:
+ - chunked
+ Vary:
+ - Accept-Encoding
+ - Origin
+ X-Content-Type-Options:
+ - nosniff
+ X-XSS-Protection:
+ - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+ accept:
+ - '*/*'
+ accept-encoding:
+ - gzip, deflate
+ connection:
+ - keep-alive
+ content-length:
+ - '10485760'
+ content-type:
+ - application/octet-stream
+ host:
+ - uploadcare.s3-accelerate.amazonaws.com
+ user-agent:
+ - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: PUT
+    uri: https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=1&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=e56b08c5c3e7e4009f947c0a4476d7833200a3d1f5a604f33822b6aa9309a766
+  response:
+    content: ''
+    headers:
+ Connection:
+ - keep-alive
+ Content-Length:
+ - '0'
+ Date:
+ - Thu, 30 Sep 2021 06:35:03 GMT
+ ETag:
+ - '"f9a5194c73e76cf15098e9f134af01d6"'
+ Server:
+ - AmazonS3
+ Via:
+ - 1.1 978313776816dba934d16309fa2c65c9.cloudfront.net (CloudFront)
+ X-Amz-Cf-Id:
+ - -zJVnTKn5gxX0BgWvHJUvlkhDTr1cEtv3LzK8LGruBJIMyh0a1_pog==
+ X-Amz-Cf-Pop:
+ - ARN54-C1
+ X-Cache:
+ - Miss from cloudfront
+ x-amz-id-2:
+ - i0b/e0EW6NruIZ3BkG5Q/l1q3iHLF4LFNpRoYJPoTpyQDKGUmC9dIu6LF/aSqhAYCcVMOtziQ8o=
+ x-amz-request-id:
+ - NTRBBQNMWCJSKNR5
+ x-amz-server-side-encryption:
+ - AES256
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: "removed vcr body due to big file size"
+    headers:
+ accept:
+ - '*/*'
+ accept-encoding:
+ - gzip, deflate
+ connection:
+ - keep-alive
+ content-length:
+ - '10485760'
+ content-type:
+ - application/octet-stream
+ host:
+ - uploadcare.s3-accelerate.amazonaws.com
+ user-agent:
+ - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: PUT
+    uri: https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=2&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=12c67a83816ed765bc72480490c114781952996364191ad3e2a4ebb2614a8e9c
+  response:
+    content: ''
+    headers:
+ Connection:
+ - keep-alive
+ Content-Length:
+ - '0'
+ Date:
+ - Thu, 30 Sep 2021 06:35:05 GMT
+ ETag:
+ - '"f9a5194c73e76cf15098e9f134af01d6"'
+ Server:
+ - AmazonS3
+ Via:
+ - 1.1 5a96272b81254403ef5ef083d36ce62a.cloudfront.net (CloudFront)
+ X-Amz-Cf-Id:
+ - 6J5wEpIHex7g82B72C-JJBcdoM0V8huj1fzT-kr3YScq6Qqe9VYLGA==
+ X-Amz-Cf-Pop:
+ - ARN54-C1
+ X-Cache:
+ - Miss from cloudfront
+ x-amz-id-2:
+ - 1vmUGna9hbkl2lRjcWaC16EitBj2sestR7rjHvTofOHL+N1NDJh6mnNuejT538+iqwokOYJw0EM=
+ x-amz-request-id:
+ - B6YXPRC2BDVSZSCK
+ x-amz-server-side-encryption:
+ - AES256
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+ accept:
+ - '*/*'
+ accept-encoding:
+ - gzip, deflate
+ connection:
+ - keep-alive
+ content-length:
+ - '1028480'
+ content-type:
+ - application/octet-stream
+ host:
+ - uploadcare.s3-accelerate.amazonaws.com
+ user-agent:
+ - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: PUT
+    uri: https://uploadcare.s3-accelerate.amazonaws.com/26e03e6d-82cc-49a0-a1d4-e7e73e82a12b/big_file_text.txt?uploadId=sIbRHEHDbYOXv57.5zp6W6MtJRKPlDLtGNwbMldHKitF4McbrYwRSPB1Os_vsn.CPShUe1pA1fHnfYg_qZQmYV6czXP0gwXdI7lPmw9oxcC5co1rCdnqVPxcHJ50iyQ7&partNumber=3&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA5C7IQCBHORWBLSGS%2F20210930%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20210930T063500Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=188ee8d24a839d4e6ef12ee7a905518da7443eb7a9058baf21db360fb50ed125
+  response:
+    content: ''
+    headers:
+ Connection:
+ - keep-alive
+ Content-Length:
+ - '0'
+ Date:
+ - Thu, 30 Sep 2021 06:35:07 GMT
+ ETag:
+ - '"2bbd27b6ad4150d0fc1fbbcfd7b8b76c"'
+ Server:
+ - AmazonS3
+ Via:
+ - 1.1 f6020f10d519a41b0c116dad7dcb2798.cloudfront.net (CloudFront)
+ X-Amz-Cf-Id:
+ - ZoRB_yKnQ_35KMUOhJ_LmveKOWy9Q6Wsaa-dC169XQl06B9dJLeq-w==
+ X-Amz-Cf-Pop:
+ - ARN54-C1
+ X-Cache:
+ - Miss from cloudfront
+ x-amz-id-2:
+ - OAjZILTOKq2QBfVo6mK5DxYvJ/699Hupx6LcAFD+qMGRmAhKbQDZsDFfL/5s3FNmtGlkVK/G/s4=
+ x-amz-request-id:
+ - 4BN808PQ0NBBFMZP
+ x-amz-server-side-encryption:
+ - AES256
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: uuid=26e03e6d-82cc-49a0-a1d4-e7e73e82a12b&UPLOADCARE_PUB_KEY=e5b76258e05f2aabe85c
+    headers:
+ accept:
+ - '*/*'
+ accept-encoding:
+ - gzip, deflate
+ connection:
+ - keep-alive
+ content-length:
+ - '81'
+ content-type:
+ - application/x-www-form-urlencoded
+ host:
+ - upload.uploadcare.com
+ user-agent:
+ - PyUploadcare/3.0.0/e5b76258e05f2aabe85c (CPython/3.9.6)
+    method: POST
+    uri: https://upload.uploadcare.com/multipart/complete/
+  response:
+    content: '{"size":22000000,"total":22000000,"done":22000000,"uuid":"26e03e6d-82cc-49a0-a1d4-e7e73e82a12b","file_id":"26e03e6d-82cc-49a0-a1d4-e7e73e82a12b","original_filename":"big_file_text.txt","is_image":false,"is_stored":true,"image_info":null,"video_info":null,"is_ready":true,"filename":"big_file_text.txt","mime_type":"text/plain"}'
+    headers:
+ Access-Control-Allow-Credentials:
+ - 'true'
+ Access-Control-Allow-Headers:
+ - X-PINGOTHER, X-UC-User-Agent, DNT
+ Access-Control-Allow-Methods:
+ - POST, OPTIONS
+ Access-Control-Allow-Origin:
+ - '*'
+ Access-Control-Max-Age:
+ - '1'
+ Connection:
+ - keep-alive
+ Content-Encoding:
+ - gzip
+ Content-Type:
+ - application/json
+ Date:
+ - Thu, 30 Sep 2021 06:35:07 GMT
+ Server:
+ - nginx
+ Transfer-Encoding:
+ - chunked
+ Vary:
+ - Accept-Encoding
+ - Origin
+ X-Content-Type-Options:
+ - nosniff
+ X-XSS-Protection:
+ - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

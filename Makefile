@@ -26,3 +26,6 @@ test-django:
 
 test-integration:
 	poetry run pytest tests/integration --cov=pyuploadcare
+
+docs_html:
+	poetry run sh -c "cd docs && make html"

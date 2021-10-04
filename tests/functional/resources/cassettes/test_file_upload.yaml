@@ -1,11 +1,13 @@
 interactions:
 - request:
-    body: "--a734a60e1715e2dee7b77dfbf6980eac\r\nContent-Disposition: form-data; name=\"\
-      UPLOADCARE_STORE\"\r\n\r\nauto\r\n--a734a60e1715e2dee7b77dfbf6980eac\r\nContent-Disposition:\
-      \ form-data; name=\"UPLOADCARE_PUB_KEY\"\r\n\r\ndemopublickey\r\n--a734a60e1715e2dee7b77dfbf6980eac\r\
-      \nContent-Disposition: form-data; name=\"file\"; filename=\"tmpzikpyoms\"\r\n\
-      Content-Type: application/octet-stream\r\n\r\ntest\r\n--a734a60e1715e2dee7b77dfbf6980eac--\r\
-      \n"
+    body: "--4c8df1a4ab33a7bff11b573b8ca830f7\r\nContent-Disposition: form-data; name=\"\
+      UPLOADCARE_STORE\"\r\n\r\nauto\r\n--4c8df1a4ab33a7bff11b573b8ca830f7\r\nContent-Disposition:\
+      \ form-data; name=\"UPLOADCARE_PUB_KEY\"\r\n\r\ndemopublickey\r\n--4c8df1a4ab33a7bff11b573b8ca830f7\r\
+      \nContent-Disposition: form-data; name=\"expire\"\r\n\r\n60\r\n--4c8df1a4ab33a7bff11b573b8ca830f7\r\
+      \nContent-Disposition: form-data; name=\"signature\"\r\n\r\n7d2e71d1843788a02d0c7fe6f5d71edf657363a369112e78d4f37ace3f884b00\r\
+      \n--4c8df1a4ab33a7bff11b573b8ca830f7\r\nContent-Disposition: form-data; name=\"\
+      sample1.txt\"; filename=\"sample1.txt\"\r\nContent-Type: text/plain\r\n\r\n\
+      test1\r\n--4c8df1a4ab33a7bff11b573b8ca830f7--\r\n"
     headers:
       accept:
       - '*/*'
@@ -14,9 +16,9 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '404'
+      - '641'
       content-type:
-      - multipart/form-data; boundary=a734a60e1715e2dee7b77dfbf6980eac
+      - multipart/form-data; boundary=4c8df1a4ab33a7bff11b573b8ca830f7
       host:
       - upload.uploadcare.com
       user-agent:
@@ -24,12 +26,12 @@ interactions:
     method: POST
     uri: https://upload.uploadcare.com/base/
   response:
-    content: '{"file":"59f16dbd-f130-496c-9304-f5e05ce230d1"}'
+    content: '{"sample1.txt":"9d149d14-1f94-434c-b791-698f9e3c62df"}'
     headers:
       Access-Control-Allow-Credentials:
       - 'true'
       Access-Control-Allow-Headers:
-      - X-UC-User-Agent, X-PINGOTHER, DNT
+      - DNT, X-UC-User-Agent, X-PINGOTHER
       Access-Control-Allow-Methods:
       - POST, OPTIONS
       Access-Control-Allow-Origin:
@@ -43,7 +45,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 24 Sep 2021 07:37:48 GMT
+      - Wed, 29 Sep 2021 13:22:03 GMT
       Server:
       - nginx
       Transfer-Encoding:
@@ -71,9 +73,9 @@ interactions:
       user-agent:
       - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
     method: GET
-    uri: https://api.uploadcare.com/files/59f16dbd-f130-496c-9304-f5e05ce230d1/
+    uri: https://api.uploadcare.com/files/9d149d14-1f94-434c-b791-698f9e3c62df/
   response:
-    content: '{"datetime_removed":null,"datetime_stored":"2021-09-24T07:37:48.579401Z","datetime_uploaded":"2021-09-24T07:37:48.516044Z","image_info":null,"is_image":false,"is_ready":true,"mime_type":"application/octet-stream","original_file_url":"https://ucarecdn.com/59f16dbd-f130-496c-9304-f5e05ce230d1/tmpzikpyoms","original_filename":"tmpzikpyoms","size":4,"url":"https://api.uploadcare.com/files/59f16dbd-f130-496c-9304-f5e05ce230d1/","uuid":"59f16dbd-f130-496c-9304-f5e05ce230d1","variations":null,"video_info":null}'
+    content: '{"datetime_removed":null,"datetime_stored":"2021-09-29T13:22:03.925291Z","datetime_uploaded":"2021-09-29T13:22:03.859595Z","image_info":null,"is_image":false,"is_ready":true,"mime_type":"text/plain","original_file_url":"https://ucarecdn.com/9d149d14-1f94-434c-b791-698f9e3c62df/sample1.txt","original_filename":"sample1.txt","size":5,"url":"https://api.uploadcare.com/files/9d149d14-1f94-434c-b791-698f9e3c62df/","uuid":"9d149d14-1f94-434c-b791-698f9e3c62df","variations":null,"video_info":null}'
     headers:
       Access-Control-Allow-Origin:
       - https://uploadcare.com
@@ -82,11 +84,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '509'
+      - '495'
       Content-Type:
       - application/vnd.uploadcare-v0.6+json
       Date:
-      - Fri, 24 Sep 2021 07:37:49 GMT
+      - Wed, 29 Sep 2021 13:22:04 GMT
       Server:
       - nginx
       Vary:

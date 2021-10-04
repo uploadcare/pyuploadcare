@@ -104,6 +104,66 @@ or, if you prefer it the old way:
 
     $ easy_install pyuploadcare
 
+
+Usage
+-----
+
+Core API
+^^^^^^^^
+
+You can use pyuploadcare in any Python project. At first you need assign
+your project keys to conf object. After that you will be able
+to do direct api calls or use api resources::
+
+    import pyuploadcare
+    pyuploadcare.conf.pub_key = '<your public key>'
+    pyuploadcare.conf.secret = '<your private key>'
+
+Upload single file. ``File.upload`` method can accept file object or URL. Depending of file object size
+direct or multipart upload method will be chosen::
+
+    with open('file.txt') as file_object:
+        ucare_file: File = File.upload(file_object)
+
+
+Upload file from url::
+
+    ucare_file: File = File.upload("https://github.githubassets.com/images/modules/logos_page/Octocat.png")
+
+Upload multiple files. Direct upload method is used::
+
+    file1 = open('file1.txt')
+    file2 = open('file2.txt')
+    ucare_files: List[File] = File.upload_files([file1, file2])
+
+Send single file via multipart upload::
+
+    with open('file.txt') as file_object:
+        ucare_file: File = File.upload(file_object)
+
+``File.upload`` method accepts optional callback function to track uploading progress.
+Example of using callback function for printing progress::
+
+    >>> def print_progress(info: UploadProgress):
+    ...     print(f'{info.done}/{info.total} B')
+
+    >>> # multipart upload is used
+    >>> with open('big_file.jpg', 'rb') as fh:
+    ...    File.upload(fh, callback=print_progress)
+    0/11000000 B
+    5242880/11000000 B
+    10485760/11000000 B
+    11000000/11000000 B
+
+    >>> # upload from url is used
+    >>> File.upload("https://github.githubassets.com/images/modules/logos_page/Octocat.png", callback=print_progress)
+    32590/32590 B
+
+    >>> # direct upload is used. Callback is called just once after successful upload
+    >>> with open('small_file.jpg', 'rb') as fh:
+    ...     File.upload(fh, callback=print_progress)
+    56780/56780 B
+
 Testing
 -------
 
