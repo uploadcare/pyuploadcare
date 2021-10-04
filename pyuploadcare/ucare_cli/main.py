@@ -8,16 +8,16 @@ import configparser
 import logging
 import os
 import time
+from typing import Any, Dict, List, Optional
 
 from dateutil import parser
 
-from pyuploadcare import (
-    File,
-    FileGroup,
-    FileList,
-    GroupList,
-    __version__,
-    conf,
+from pyuploadcare import __version__
+from pyuploadcare.client import (
+    DEFAULT_API_BASE,
+    DEFAULT_API_VERSION,
+    DEFAULT_UPLOAD_BASE,
+    Uploadcare,
 )
 from pyuploadcare.exceptions import (
     TimeoutError,
@@ -31,8 +31,8 @@ from pyuploadcare.ucare_cli.utils import bool_or_none, int_or_none, pprint
 logger = logging.getLogger("pyuploadcare")
 
 str_settings = (
-    "pub_key",
-    "secret",
+    "public_key",
+    "secret_key",
     "api_version",
     "api_base",
     "upload_base",
@@ -43,7 +43,7 @@ bool_settings = (
 )
 
 
-def _list(api_list_class, arg_namespace, **extra):
+def _list(api_list_method, arg_namespace, **extra):
     """A common function for building methods of the "list showing"."""
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
@@ -52,54 +52,58 @@ def _list(api_list_class, arg_namespace, **extra):
                 arg_namespace.starting_point
             )
 
-    items = api_list_class(
+    items = api_list_method(
         starting_point=arg_namespace.starting_point,
         ordering=arg_namespace.ordering,
         limit=arg_namespace.limit,
         request_limit=arg_namespace.request_limit,
         **extra,
     )
-    items.constructor = lambda x: x
 
     try:
-        pprint(list(items))
+        pprint([item.info() for item in items])
     except ValueError as e:
         print(e)
 
 
-def list_files(arg_namespace):
+def list_files(arg_namespace, client: Uploadcare):
     return _list(
-        FileList,
+        client.list_files,
         arg_namespace,
         stored=arg_namespace.stored,
         removed=arg_namespace.removed,
     )
 
 
-def list_groups(arg_namespace):
-    return _list(GroupList, arg_namespace)
+def list_groups(arg_namespace, client: Uploadcare):
+    return _list(client.list_file_groups, arg_namespace)
 
 
-def get_file(arg_namespace):
-    file = File(arg_namespace.path)
+def get_file(arg_namespace, client: Uploadcare):
+    file = client.file(arg_namespace.path)
     pprint(file.info())
 
 
-def store_files(arg_namespace):
-    File.batch_store(arg_namespace.paths)
-    _wait_if_needed(arg_namespace, File.is_stored, "timed out trying to store")
+def store_files(arg_namespace, client: Uploadcare):
+    client.store_files(arg_namespace.paths)
+    _wait_if_needed(
+        arg_namespace,
+        client,
+        lambda file: file.is_stored(),
+        "timed out trying to store",
+    )
 
 
-def delete_files(arg_namespace):
-    File.batch_delete(arg_namespace.paths)
+def delete_files(arg_namespace, client: Uploadcare):
+    client.delete_files(arg_namespace.paths)
 
 
-def _wait_if_needed(arg_namespace, check_func, error_msg):
+def _wait_if_needed(arg_namespace, client: Uploadcare, check_func, error_msg):
     if not arg_namespace.wait:
         return
 
     for path in arg_namespace.paths:
-        file_ = File(path)
+        file_ = client.file(path)
         timeout = arg_namespace.timeout
         time_started = time.time()
         while not check_func(file_):
@@ -109,8 +113,8 @@ def _wait_if_needed(arg_namespace, check_func, error_msg):
             time.sleep(0.1)
 
 
-def _check_upload_args(arg_namespace):
-    if not conf.secret and (arg_namespace.store or arg_namespace.info):
+def _check_upload_args(arg_namespace, client: Uploadcare):
+    if not client.secret_key and (arg_namespace.store or arg_namespace.info):
         pprint('Cannot store or get info without "--secret" key')
         return False
     return True
@@ -128,10 +132,10 @@ def _handle_uploaded_file(file_, arg_namespace):
         pprint("CDN url: {0}".format(file_.cdn_url))
 
 
-def upload_from_url(arg_namespace):  # noqa: C901
-    if not _check_upload_args(arg_namespace):
+def upload_from_url(arg_namespace, client: Uploadcare):  # noqa: C901
+    if not _check_upload_args(arg_namespace, client):
         return
-    file_from_url = File.upload_from_url(arg_namespace.url)
+    file_from_url = client.upload_from_url(arg_namespace.url)
     pprint(file_from_url)
 
     if arg_namespace.wait or arg_namespace.store:
@@ -160,17 +164,17 @@ def upload_from_url(arg_namespace):  # noqa: C901
         _handle_uploaded_file(file_, arg_namespace)
 
 
-def upload(arg_namespace):
-    if not _check_upload_args(arg_namespace):
+def upload(arg_namespace, client: Uploadcare):
+    if not _check_upload_args(arg_namespace, client):
         return
     with open(arg_namespace.filename, "rb") as fh:
-        file_ = File.upload(fh)
+        file_ = client.upload(fh)
         _handle_uploaded_file(file_, arg_namespace)
 
 
-def create_group(arg_namespace):
-    files = [File(uuid) for uuid in arg_namespace.paths]
-    group = FileGroup.create(files)
+def create_group(arg_namespace, client: Uploadcare):
+    files = [client.file(uuid) for uuid in arg_namespace.paths]
+    group = client.create_file_group(files)
     pprint(group.info())
 
 
@@ -366,12 +370,12 @@ def ucare_argparser():
 
     # common arguments
     parser.add_argument(
-        "--pub_key",
+        "--public_key",
         help="API key, if not set is read from uploadcare.ini"
         " and ~/.uploadcare config files",
     )
     parser.add_argument(
-        "--secret",
+        "--secret_key",
         help="API secret, if not set is read from uploadcare.ini"
         " and ~/.uploadcare config files",
     )
@@ -379,13 +383,13 @@ def ucare_argparser():
         "--api_base",
         help="API url, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(conf.api_base),
+        " Default value is {0}".format(DEFAULT_API_BASE),
     )
     parser.add_argument(
         "--upload_base",
         help="Upload API url, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(conf.upload_base),
+        " Default value is {0}".format(DEFAULT_UPLOAD_BASE),
     )
     parser.add_argument(
         "--no_check_upload_certificate",
@@ -405,45 +409,75 @@ def ucare_argparser():
         "--api_version",
         help="API version, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(conf.api_version),
+        " Default value is {0}".format(DEFAULT_API_VERSION),
     )
 
     return parser
 
 
-def load_config_from_file(filename):  # noqa: C901
+def load_config_from_file(  # noqa: C901
+    filename, conf: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    if not conf:
+        conf = {}
+
     filename = os.path.expanduser(filename)
     if not os.path.exists(filename):
-        return
+        return conf
 
     config = configparser.RawConfigParser()
     config.read(filename)
 
     for name in str_settings:
         try:
-            setattr(conf, name, config.get("ucare", name))
+            conf[name] = config.get("ucare", name)
         except (configparser.NoOptionError, configparser.NoSectionError):
             pass
     for name in bool_settings:
         try:
-            setattr(conf, name, config.getboolean("ucare", name))
+            conf[name] = config.getboolean("ucare", name)
         except (configparser.NoOptionError, configparser.NoSectionError):
             pass
 
+    return conf
 
-def load_config_from_args(arg_namespace):  # noqa: C901
+
+def load_config_from_args(  # noqa: C901
+    arg_namespace, conf: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    if not conf:
+        conf = {}
+
     for name in str_settings:
         arg = getattr(arg_namespace, name, None)
         if arg is not None:
-            setattr(conf, name, arg)
+            conf[name] = arg
 
     if arg_namespace and arg_namespace.no_check_upload_certificate:
-        conf.verify_upload_ssl = False
+        conf["verify_upload_ssl"] = False
     if arg_namespace and arg_namespace.no_check_api_certificate:
-        conf.verify_api_ssl = False
+        conf["verify_api_ssl"] = False
 
     if getattr(arg_namespace, "cdnurl", False):
         arg_namespace.store = True
+
+    return conf
+
+
+def load_config(
+    arg_namespace: Optional[argparse.Namespace] = None,
+    config_file_names: Optional[List[str]] = None,
+):
+    conf = {}
+
+    if config_file_names:
+        for file_name in config_file_names:
+            conf = load_config_from_file(file_name, conf)
+
+    if arg_namespace:
+        conf = load_config_from_args(arg_namespace, conf)
+
+    return conf
 
 
 def main(  # noqa: C901
@@ -452,14 +486,13 @@ def main(  # noqa: C901
     if arg_namespace is None:
         arg_namespace = ucare_argparser().parse_args()
 
-    if config_file_names:
-        for file_name in config_file_names:
-            load_config_from_file(file_name)
-    load_config_from_args(arg_namespace)
+    conf = load_config(arg_namespace, config_file_names)
+
+    client = Uploadcare(**conf)
 
     if hasattr(arg_namespace, "func"):
         try:
-            arg_namespace.func(arg_namespace)
+            arg_namespace.func(arg_namespace, client)
         except UploadcareException as exc:
             pprint("ERROR: {0}".format(exc))
 

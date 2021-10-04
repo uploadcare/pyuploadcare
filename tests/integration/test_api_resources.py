@@ -6,7 +6,7 @@ from datetime import datetime
 
 import pytest
 
-from pyuploadcare import File, FileGroup, FileList, conf
+from pyuploadcare import File, FileGroup, conf
 
 from .utils import create_file_group, skip_on_travis, upload_tmp_txt_file
 

@@ -5,8 +5,6 @@ import os
 import unittest
 from tempfile import NamedTemporaryFile
 
-from pyuploadcare import File, FileGroup
-
 
 def upload_tmp_txt_file(uploadcare, content=""):
     tmp_txt_file = NamedTemporaryFile(mode="wb", delete=False)

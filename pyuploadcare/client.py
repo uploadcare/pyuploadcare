@@ -21,6 +21,11 @@ from pyuploadcare.resources.file import FileFromUrl, UploadProgress
 
 DEFAULT = object()
 
+DEFAULT_API_VERSION = "0.6"
+DEFAULT_API_BASE = "https://api.uploadcare.com/"
+DEFAULT_UPLOAD_BASE = "https://upload.uploadcare.com/"
+DEFAULT_CDN_BASE = "https://ucarecdn.com/"
+
 
 class Uploadcare:
     """Uploadcare client.
@@ -44,10 +49,10 @@ class Uploadcare:
         self,
         public_key: str,
         secret_key: Optional[str] = None,
-        api_version="0.6",
-        api_base="https://api.uploadcare.com/",
-        upload_base="https://upload.uploadcare.com/",
-        cdn_base="https://ucarecdn.com/",
+        api_version=DEFAULT_API_VERSION,
+        api_base=DEFAULT_API_BASE,
+        upload_base=DEFAULT_UPLOAD_BASE,
+        cdn_base=DEFAULT_CDN_BASE,
         signed_uploads=True,
         signed_uploads_ttl=60,
         verify_api_ssl=True,

@@ -11,8 +11,9 @@ from math import ceil
 from dateutil import parser
 from httpx._exceptions import HTTPError
 
-from pyuploadcare import File, FileList, conf
+from pyuploadcare import FileList, conf
 from pyuploadcare.api.client import Client, get_timeout
+from pyuploadcare.client import Uploadcare
 from pyuploadcare.ucare_cli.utils import (
     bar,
     bool_or_none,
@@ -22,7 +23,7 @@ from pyuploadcare.ucare_cli.utils import (
 )
 
 
-def sync_files(arg_namespace):  # noqa: C901
+def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
         if ordering_field in ("", "datetime_uploaded"):
@@ -44,7 +45,8 @@ def sync_files(arg_namespace):  # noqa: C901
         )
 
     with SyncSession(
-        TrackedFileList(**kwargs), no_input=arg_namespace.no_input
+        TrackedFileList(client=client, **kwargs),
+        no_input=arg_namespace.no_input,
     ) as files:
         for f in files:
             if f.is_image() and arg_namespace.effects:
@@ -151,7 +153,9 @@ class SyncSession:
         if os.path.exists(self.session_filepath):
             if not self.no_input and promt("Continue last sync?"):
                 with open(self.session_filepath, "rb") as f:
+                    client = self.session._client
                     self.session = pickle.load(f)
+                    self.session._client = client
                     return
 
     def __enter__(self):
@@ -160,7 +164,10 @@ class SyncSession:
     def __exit__(self, *args):
         if all(args):
             with open(self.session_filepath, "wb") as f:
+                client = self.session._client
+                self.session._client = None
                 pickle.dump(self.session, f)
+                self.session._client = client
             return False
 
         # Iteration is complete without errors.
@@ -198,7 +205,7 @@ class TrackedFileList(FileList):
         for uuid in self.uuids:
             if uuid in self.handled_uuids:
                 continue
-            yield File(uuid)
+            yield self._client.file(uuid)
             self.handled_uuids.append(uuid)
 
 

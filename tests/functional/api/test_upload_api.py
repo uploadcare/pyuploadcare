@@ -4,8 +4,6 @@ from unittest.mock import ANY
 
 import pytest
 
-from pyuploadcare import api
-
 
 @pytest.mark.vcr
 def test_upload_file(small_file, uploadcare):

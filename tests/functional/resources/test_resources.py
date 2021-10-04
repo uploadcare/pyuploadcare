@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pyuploadcare import File, FileList
+from pyuploadcare import File
 from pyuploadcare.resources.file import UploadProgress
 from pyuploadcare.transformations.document import (
     DocumentFormat,
