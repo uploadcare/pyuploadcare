@@ -36,15 +36,6 @@ class Uploadcare:
 
     """
 
-    # batch size for multiple delete and store requests
-    batch_chunk_size = 500
-
-    #  minimum file size for multipart uploads
-    multipart_min_file_size = 10485760
-
-    # chunk size for multipart uploads
-    multipart_chunk_size = 5 * 1024 * 1024
-
     def __init__(
         self,
         public_key: str,
@@ -60,7 +51,31 @@ class Uploadcare:
         retry_throttled=1,
         user_agent_extension=None,
         timeout=DEFAULT,
+        batch_chunk_size=500,
+        multipart_min_file_size=10485760,
+        multipart_chunk_size=5 * 1024 * 1024,
     ):
+        """
+        Uploadcare client.
+
+        Args:
+            - public_key: Public key to access Uploadcare API.
+            - secret_key: Secret ket to access Uploadcare API.
+            - api_version: Uploadcare Rest API version.
+            - api_base: Rest API base url.
+            - upload_base: Upload API base url.
+            - cdn_base: CDN base url.
+            - signed_uploads: Enable signed uploads.
+            - signed_uploads_ttl: Signed uploads signature timeout in seconds.
+            - verify_api_ssl: Verify Rest API SSL certificate.
+            - verify_upload_ssl: Verify Upload API SSL certificate.
+            - retry_throttled: Amount of retries after throttling header received.
+            - user_agent_extension: Extra suffix to user agent to identify client.
+            - timeout: HTTP requests timeout. If not set, default socket timeout is used.
+            - batch_chunk_size: Amount of files to process at once in batch store and delete requests.
+            - multipart_min_file_size: Mininum file size to use multipart uploading.
+            - multipart_chunk_size: Chunk size in bytes for multipart uploading.
+        """
         self.public_key = public_key
         self.secret_key = secret_key
         self.api_version = api_version
@@ -73,6 +88,9 @@ class Uploadcare:
         self.verify_upload_ssl = verify_upload_ssl
         self.retry_throttled = retry_throttled
         self.user_agent_extension = user_agent_extension
+        self.batch_chunk_size = batch_chunk_size
+        self.multipart_min_file_size = multipart_min_file_size
+        self.multipart_chunk_size = multipart_chunk_size
 
         if timeout is DEFAULT:
             timeout = socket.getdefaulttimeout()
