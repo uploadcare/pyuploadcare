@@ -75,13 +75,13 @@ class BaseApiList:
 
 class ApiMixin:
     @classproperty
-    def files_api(cls) -> FilesAPI:
+    def files_api(cls):
         return FilesAPI()
 
     @classproperty
-    def upload_api(cls) -> UploadAPI:
+    def upload_api(cls):
         return UploadAPI()
 
     @classproperty
-    def groups_api(cls) -> GroupsAPI:
+    def groups_api(cls):
         return GroupsAPI()

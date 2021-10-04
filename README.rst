@@ -139,7 +139,7 @@ Upload multiple files. Direct upload method is used::
 Send single file via multipart upload::
 
     with open('file.txt') as file_object:
-        ucare_file: File = File.multipart_upload(file_object)
+        ucare_file: File = File.upload(file_object)
 
 ``File.upload`` method accepts optional callback function to track uploading progress.
 Example of using callback function for printing progress::

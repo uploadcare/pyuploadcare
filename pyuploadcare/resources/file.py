@@ -385,7 +385,7 @@ class File(ApiMixin):
     @classmethod
     def upload(  # noqa: C901
         cls,
-        file_obj_or_url: Union[IO, str],
+        file_handle: Union[IO, str],
         store=None,
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
@@ -422,7 +422,7 @@ class File(ApiMixin):
             11000000/11000000 B
 
         Args:
-            - file_obj_or_url: file object or url to upload to. If file object
+            - file_handle: file object or url to upload to. If file object
                 is passed, ``File.upload_files`` (direct upload) or
                 ``File.multipart_upload`` (multipart upload) will be used.
                 If file URL is passed, ``File.upload_from_url_sync`` will be
@@ -445,15 +445,15 @@ class File(ApiMixin):
         """
 
         # assume url is passed if str
-        if isinstance(file_obj_or_url, str):
-            file_url: str = file_obj_or_url
+        if isinstance(file_handle, str):
+            file_url: str = file_handle
             return cls.upload_from_url_sync(
                 file_url,
                 store=cls._format_store(store),
                 callback=callback,
             )
 
-        file_obj: IO = file_obj_or_url
+        file_obj: IO = file_handle
 
         if size is None:
             size = os.fstat(file_obj.fileno()).st_size
@@ -565,11 +565,9 @@ class File(ApiMixin):
             mime_type, _encoding = mimetypes.guess_type(file_obj.name)
 
         if not mime_type:
-            raise ValueError(
-                "Unable to determine file mime type, please set manually"
-            )
+            mime_type = "application/octet-stream"
 
-        complete_response = cls.upload_api.start_multipart_upload(
+        start_response = cls.upload_api.start_multipart_upload(
             file_name=file_obj.name,
             file_size=size,
             content_type=mime_type,
@@ -578,9 +576,9 @@ class File(ApiMixin):
             expire=conf.signed_uploads_ttl,
         )
 
-        multipart_uuid = complete_response["uuid"]
+        multipart_uuid = start_response["uuid"]
 
-        parts: List[str] = complete_response["parts"]
+        parts: List[str] = start_response["parts"]
 
         chunk = file_obj.read(cls.multipart_chunk_size)
 
