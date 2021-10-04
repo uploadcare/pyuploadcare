@@ -22,7 +22,7 @@ class GroupList(BaseApiList, ApiMixin):
         >>> from datetime import datetime, timedelta
         >>> last_week = datetime.now() - timedelta(weeks=1)
         >>> for f in GroupList(starting_point=last_week):
-        >>>     print(f.datetime_created())
+        >>>     print(f.datetime_created)
 
     Count objects::
 

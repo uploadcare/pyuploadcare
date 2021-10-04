@@ -56,7 +56,7 @@ jobs:
         poetry install
     - name: Test with pytest
       run: |
-        poetry run pytest tests/functional --cov=pyuploadcare
+        make test-functional
 
   django:
     needs: functional
@@ -90,7 +90,7 @@ jobs:
         poetry install
     - name: Test with pytest
       run: |
-        poetry run pytest tests/dj --cov=pyuploadcare
+        make test-django
 
   integration:
     needs: functional
@@ -115,4 +115,4 @@ jobs:
         poetry install
     - name: Test with pytest
       run: |
-        poetry run pytest tests/integration --cov=pyuploadcare
+        make test-integration

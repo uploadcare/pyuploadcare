@@ -60,7 +60,7 @@ def test_sync_patterns(sync_path):
     expected_filenames = [
         "{}_{}".format(
             str(file.uuid),
-            os.path.splitext(file.filename())[1],
+            os.path.splitext(file.filename)[1],
         )
         for file in file_list
     ]
