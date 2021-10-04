@@ -17,3 +17,12 @@ lint:
 
 test:
 	poetry run pytest -v tests/ --cov=pyuploadcare
+
+test-functional:
+	poetry run pytest tests/functional --cov=pyuploadcare
+
+test-django:
+	poetry run pytest tests/dj --cov=pyuploadcare
+
+test-integration:
+	poetry run pytest tests/integration --cov=pyuploadcare
