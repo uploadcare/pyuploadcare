@@ -3,23 +3,26 @@
 Configuration variables.
 
 """
+import os
 
-from __future__ import unicode_literals
 
 # Do not import vars from this module.
 # Instead import whole module and work with attributes.
+
 __all__ = []
 
 DEFAULT = object()
 
-pub_key = None
-secret = None
+pub_key = os.getenv("UPLOADCARE_PUBLIC_KEY")
+secret = os.getenv("UPLOADCARE_SECRET_KEY")
 
-api_version = '0.5'
-api_base = 'https://api.uploadcare.com/'
-upload_base = 'https://upload.uploadcare.com/'
-cdn_base = 'https://ucarecdn.com/'
-signed_uploads = False
+api_version = "0.6"
+api_base = os.getenv("UPLOADCARE_API_BASE", "https://api.uploadcare.com/")
+upload_base = os.getenv(
+    "UPLOADCARE_UPLOAD_BASE", "https://upload.uploadcare.com/"
+)
+cdn_base = os.getenv("UPLOADCARE_CDN_BASE", "https://ucarecdn.com/")
+signed_uploads = True
 signed_uploads_ttl = 60
 
 verify_api_ssl = True

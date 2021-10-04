@@ -1,33 +1,38 @@
 #!/bin/python
 
 # installation:
-# pip install pytz pyuploadcare~=2.1.0
+# pip install pytz pyuploadcare~=3.0.0
+
+import time
+from datetime import datetime, timedelta
 
 import pytz
-from datetime import timedelta, datetime
-import time
-from pyuploadcare import conf
-from pyuploadcare.api_resources import FileList, FilesStorage
+
+from pyuploadcare import File, FileList, conf
 
 
-MAX_LIFETIME = 30  # days
-conf.pub_key = 'demopublickey'
-conf.secret = 'demoprivatekey'
+MAX_LIFETIME = 10  # days
+conf.pub_key = "demopublickey"
+conf.secret = "demoprivatekey"
 
 
 dt_cutoff = datetime.now(pytz.utc) - timedelta(days=MAX_LIFETIME)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    print('Selecting files to be deleted...')
-    uuid_list = [f.uuid for f in FileList(starting_point=dt_cutoff,
-                                          ordering='-datetime_uploaded',
-                                          stored=True,
-                                          request_limit=500)]
-    print('Batch delete of selected files')
+    print("Selecting files to be deleted...")  # noqa: T001
+    uuid_list = [
+        f.uuid
+        for f in FileList(
+            starting_point=dt_cutoff,
+            ordering="-datetime_uploaded",
+            stored=True,
+            limit=500,
+        )
+    ]
+    print("Batch delete of selected files", len(uuid_list))  # noqa: T001
     ts1 = time.time()
-    fs = FilesStorage(uuid_list)
-    fs.delete()
+    File.batch_delete(uuid_list)
     ts2 = time.time()
-    print('Operation completed in %f seconds' % (ts2 - ts1))
+    print("Operation completed in %f seconds" % (ts2 - ts1))  # noqa: T001

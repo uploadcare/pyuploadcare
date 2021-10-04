@@ -1,0 +1,102 @@
+interactions:
+- request:
+    body: '["23762be6-cfe3-4d27-86be-9ed7d403dd43"]'
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.6+json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '40'
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: DELETE
+    uri: https://api.uploadcare.com/files/storage/
+  response:
+    content: '{"status":"ok","result":[{"datetime_removed":"2021-09-27T08:27:43.310084Z","datetime_stored":null,"datetime_uploaded":"2021-09-20T09:47:24.067490Z","image_info":{"width":2081,"height":2081,"format":"JPEG","color_mode":"RGB","geo_location":null,"orientation":null,"dpi":null,"datetime_original":null,"sequence":false},"is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":null,"original_filename":"LXXL713338_CON_B.jpg","size":325913,"url":"https://api.uploadcare.com/files/23762be6-cfe3-4d27-86be-9ed7d403dd43/","uuid":"23762be6-cfe3-4d27-86be-9ed7d403dd43","variations":null,"video_info":null}],"problems":{}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, OPTIONS, PUT
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '633'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Mon, 27 Sep 2021 08:43:46 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.6+json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/files/23762be6-cfe3-4d27-86be-9ed7d403dd43/
+  response:
+    content: '{"datetime_removed":"2021-09-27T08:27:43.310084Z","datetime_stored":null,"datetime_uploaded":"2021-09-20T09:47:24.067490Z","image_info":{"width":2081,"height":2081,"format":"JPEG","color_mode":"RGB","geo_location":null,"orientation":null,"dpi":null,"datetime_original":null,"sequence":false},"is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":null,"original_filename":"LXXL713338_CON_B.jpg","size":325913,"url":"https://api.uploadcare.com/files/23762be6-cfe3-4d27-86be-9ed7d403dd43/","uuid":"23762be6-cfe3-4d27-86be-9ed7d403dd43","variations":null,"video_info":null}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '592'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Mon, 27 Sep 2021 08:43:52 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

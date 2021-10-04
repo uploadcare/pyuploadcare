@@ -15,13 +15,12 @@ to do direct api calls or use api resources::
     >>> f.cdn_url
     https://ucarecdn.com/6c5e9526-b0fe-4739-8975-72e8d5ee6342/
 
-
 .. _core_api-file-ref:
 
 File API Resource
 -----------------
 
-.. autoclass:: pyuploadcare.api_resources.File
+.. autoclass:: pyuploadcare.resources.file.File
    :members:
    :undoc-members:
 
@@ -34,12 +33,19 @@ File API Resource
       String of default effects that is used by ``File.cdn_url``, e.g.
       ``effect/flip/-/effect/mirror/``.
 
+FileFromUrl API Resource
+------------------------
+
+.. autoclass:: pyuploadcare.resources.file.FileFromUrl
+   :members:
+
+
 .. _core_api-filegroup-ref:
 
 File Group API Resource
 -----------------------
 
-.. autoclass:: pyuploadcare.api_resources.FileGroup
+.. autoclass:: pyuploadcare.resources.file_group.FileGroup
    :members:
    :undoc-members:
 
@@ -53,7 +59,7 @@ File Group API Resource
 File List API Resource
 ----------------------
 
-.. autoclass:: pyuploadcare.api_resources.FileList
+.. autoclass:: pyuploadcare.resources.file_list.FileList
    :members:
    :undoc-members:
 
@@ -62,18 +68,11 @@ File List API Resource
 Group List API Resource
 -----------------------
 
-.. autoclass:: pyuploadcare.api_resources.GroupList
+.. autoclass:: pyuploadcare.resources.group_list.GroupList
    :members:
    :undoc-members:
 
 .. _core_api-api-ref:
-
-API Clients
------------
-
-.. automodule:: pyuploadcare.api
-   :members:
-   :undoc-members:
 
 .. _core_api-exceptions-ref:
 

@@ -1,0 +1,51 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.6+json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/files/638d0296-fda1-4102-9b18-d28b37494298/
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2021-09-20T09:42:18.871653Z","datetime_uploaded":"2021-09-20T09:42:18.747099Z","image_info":{"width":752,"height":934,"format":"JPEG","color_mode":"RGB","geo_location":null,"orientation":1,"dpi":[144,144],"datetime_original":null,"sequence":false},"is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/638d0296-fda1-4102-9b18-d28b37494298/D1D2F7C8FEDE49BEA0A5B3242D9DA28B.jpeg","original_filename":"D1D2F7C8-FEDE-49BE-A0A5-B3242D9DA28B.jpeg","size":201610,"url":"https://api.uploadcare.com/files/638d0296-fda1-4102-9b18-d28b37494298/","uuid":"638d0296-fda1-4102-9b18-d28b37494298","variations":null,"video_info":null}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '706'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Mon, 27 Sep 2021 09:09:17 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

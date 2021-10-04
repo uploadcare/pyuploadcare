@@ -1,0 +1,47 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.777+json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/public (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/files/?removed=false&limit=100
+  response:
+    content: '{"detail":"Incorrect Accept header provided. Make sure to specify API
+      version. Refer to REST API docs for details"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS, POST
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '115'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 27 Sep 2021 07:49:33 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 406
+version: 1

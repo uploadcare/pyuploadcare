@@ -16,7 +16,7 @@ class Photo(models.Model):
     gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     arbitrary_file = FileField(blank=True, null=True)
-    photo_2x3 = ImageField(manual_crop='2:3', blank=True)
+    photo_2x3 = ImageField(manual_crop="2:3", blank=True)
 
     def __unicode__(self):
         return self.title

@@ -1,0 +1,100 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.6+json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/groups/?from=2015-10-21T00%3A00%3A00&ordering=-datetime_created&limit=5
+  response:
+    content: '{"next":"https://api.uploadcare.com/groups/?from=2015-10-20T14%3A31%3A47.315379%2B00%3A00&ordering=-datetime_created&limit=5&offset=0","previous":"https://api.uploadcare.com/groups/?ordering=-datetime_created&limit=5&to=2015-10-20T14%3A41%3A41.891200%2B00%3A00&offset=0","total":173658,"per_page":5,"results":[{"id":"5873ad80-9959-44e8-8eb5-783bad67e3a0~1","datetime_created":"2015-10-20T14:41:41.891200Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/5873ad80-9959-44e8-8eb5-783bad67e3a0~1/","url":"https://api.uploadcare.com/groups/5873ad80-9959-44e8-8eb5-783bad67e3a0~1/"},{"id":"adeb1a8a-d506-4fef-9b7f-07fcd331da1f~1","datetime_created":"2015-10-20T14:40:34.831278Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/adeb1a8a-d506-4fef-9b7f-07fcd331da1f~1/","url":"https://api.uploadcare.com/groups/adeb1a8a-d506-4fef-9b7f-07fcd331da1f~1/"},{"id":"81fddaeb-4c5a-4269-b115-4470a1659066~1","datetime_created":"2015-10-20T14:38:46.409414Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/81fddaeb-4c5a-4269-b115-4470a1659066~1/","url":"https://api.uploadcare.com/groups/81fddaeb-4c5a-4269-b115-4470a1659066~1/"},{"id":"cefef9a2-f6db-4217-85f7-90389518a38e~1","datetime_created":"2015-10-20T14:33:16.468241Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/cefef9a2-f6db-4217-85f7-90389518a38e~1/","url":"https://api.uploadcare.com/groups/cefef9a2-f6db-4217-85f7-90389518a38e~1/"},{"id":"03f9c71f-1e97-4409-8585-9967d1eca63d~1","datetime_created":"2015-10-20T14:31:47.315379Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/03f9c71f-1e97-4409-8585-9967d1eca63d~1/","url":"https://api.uploadcare.com/groups/03f9c71f-1e97-4409-8585-9967d1eca63d~1/"}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1766'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Mon, 27 Sep 2021 11:15:15 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.6+json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/groups/?from=2015-10-20T14%3A31%3A47.315379%2B00%3A00&ordering=-datetime_created&limit=5&offset=0
+  response:
+    content: '{"next":"https://api.uploadcare.com/groups/?from=2015-10-20T13%3A56%3A32.128295%2B00%3A00&ordering=-datetime_created&limit=5&offset=0","previous":"https://api.uploadcare.com/groups/?ordering=-datetime_created&limit=5&offset=0&to=2015-10-20T14%3A12%3A24.659267%2B00%3A00","total":173658,"per_page":5,"results":[{"id":"1e863dd9-e4b7-41b8-bc59-7fcc01fcdc44~1","datetime_created":"2015-10-20T14:12:24.659267Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/1e863dd9-e4b7-41b8-bc59-7fcc01fcdc44~1/","url":"https://api.uploadcare.com/groups/1e863dd9-e4b7-41b8-bc59-7fcc01fcdc44~1/"},{"id":"b2373837-9c64-449b-b6ab-4306a83c39d2~2","datetime_created":"2015-10-20T14:04:51.031090Z","datetime_stored":null,"files_count":2,"cdn_url":"https://ucarecdn.com/b2373837-9c64-449b-b6ab-4306a83c39d2~2/","url":"https://api.uploadcare.com/groups/b2373837-9c64-449b-b6ab-4306a83c39d2~2/"},{"id":"b4ff5322-ff70-46c5-933f-a608adab85cd~2","datetime_created":"2015-10-20T14:02:38.559515Z","datetime_stored":null,"files_count":2,"cdn_url":"https://ucarecdn.com/b4ff5322-ff70-46c5-933f-a608adab85cd~2/","url":"https://api.uploadcare.com/groups/b4ff5322-ff70-46c5-933f-a608adab85cd~2/"},{"id":"67a65a8a-6e1c-4ddb-9a28-9f43cde87d18~1","datetime_created":"2015-10-20T13:57:38.969603Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/67a65a8a-6e1c-4ddb-9a28-9f43cde87d18~1/","url":"https://api.uploadcare.com/groups/67a65a8a-6e1c-4ddb-9a28-9f43cde87d18~1/"},{"id":"8162ab4c-0ae4-45a3-af6a-eb210170057a~1","datetime_created":"2015-10-20T13:56:32.128295Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/8162ab4c-0ae4-45a3-af6a-eb210170057a~1/","url":"https://api.uploadcare.com/groups/8162ab4c-0ae4-45a3-af6a-eb210170057a~1/"}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1766'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Mon, 27 Sep 2021 11:15:15 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

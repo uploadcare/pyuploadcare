@@ -78,7 +78,9 @@ Features
 Requirements
 ------------
 
-``pyuploadcare`` requires Python 2.7, 3.6, 3.7, 3.8, 3.9.
+``pyuploadcare`` requires Python 3.6, 3.7, 3.8, 3.9.
+
+To use ``pyuploadcare`` with Python 2.7 please install ``pyuploadcare < 3.0``.
 
 If you're using ``pyuploadcare`` with Django, check ``tox.ini``  or
 ``.github/workflows``  for supported Python-Django combinations.

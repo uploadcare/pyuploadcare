@@ -38,7 +38,7 @@ After that you can install it:
 
 .. code-block:: console
 
-    $ python setup.py install
+    $ pip install .
 
 
 Update to version 2.0
@@ -61,3 +61,13 @@ So that means you can’t use these classes correctly with versions prior 0.5
 Also, note that Django configuration option ``UPLOADCARE['widget_variant']``
 now is deprecated and it will be removed in next major release. Use
 ``UPLOADCARE['widget_build']`` instead.
+
+Update to version 3.0
+---------------------
+
+Some caveats about migration process from version 2.x to 3.x.
+
+A version 3.0 contains the next breaking changes:
+
+* Resource attributes can be accessed now as properies, not methods.
+  In 2.x version use ``file.is_stored()``, in 3.x verisons use ``file.is_stored``.

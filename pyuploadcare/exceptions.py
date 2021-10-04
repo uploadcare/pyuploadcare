@@ -1,12 +1,6 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
-
 class UploadcareException(Exception):
-    """Base exception class of library."""
-    def __init__(self, data='', *args, **kwargs):
-        self.data = str(data)
-        super(UploadcareException, self).__init__(data, *args, **kwargs)
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
 
 
 class APIConnectionError(UploadcareException):
@@ -41,9 +35,12 @@ class InvalidParamError(InvalidRequestError):
 
 class ThrottledRequestError(UploadcareException):
     """Raised when request was throttled."""
+
     def __init__(self, response):
         try:
-            self.wait = int(response.headers.get('x-throttle-wait-seconds', 15))
+            self.wait = int(
+                response.headers.get("x-throttle-wait-seconds", 15)
+            )
         except ValueError:
             self.wait = 15
         self.wait += 1
@@ -57,3 +54,8 @@ class UploadError(UploadcareException):
         $ ucare upload_from_url --wait http://path.to/file.jpg
 
     """
+
+
+class DefaultResponseClassNotDefined(Exception):
+    def __init__(self) -> None:
+        super().__init__("Need define default response class for API.")

@@ -1,379 +1,312 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
-import os
 import time
-import unittest
 from datetime import datetime
-from tempfile import NamedTemporaryFile
 
-import six
+import pytest
 
-if six.PY3:
-    from unittest import mock
-else:
-    import mock
+from pyuploadcare import File, FileGroup, FileList, conf
 
-from pyuploadcare import conf
-from pyuploadcare.api import rest_request as original_rest_request
-from pyuploadcare.api_resources import File, FileGroup, FileList
-from pyuploadcare.exceptions import AuthenticationError
+from .utils import create_file_group, upload_tmp_txt_file
 
-from .utils import create_file_group, skip_on_travis, upload_tmp_txt_file
 
 # increase throttle retries for Travis CI
 conf.retry_throttled = 10
 
-
-class RestAPITestCase(unittest.TestCase):
-    image_url = 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
-
-    @classmethod
-    def setUpClass(cls):
-        conf.pub_key = 'demopublickey'
-        conf.secret = 'demosecretkey'
-
-    @classmethod
-    def tearDownClass(cls):
-        conf.pub_key = None
-        conf.secret = None
+IMAGE_URL = (
+    "https://github.githubassets.com/images/modules/logos_page/Octocat.png"
+)
 
 
-class FileUploadTest(RestAPITestCase):
-
-    def setUp(self):
-        self.tmp_txt_file = NamedTemporaryFile(mode='wb', delete=False)
-        self.tmp_txt_file.write('привет'.encode('utf-8'))
-        self.tmp_txt_file.close()
-
-    def test_successful_upload_when_file_is_opened_in_txt_mode(self):
-        with open(self.tmp_txt_file.name, 'rt') as fh:
-            file_ = File.upload(fh)
-
-        self.assertIsInstance(file_, File)
-
-    def test_successful_upload_when_file_is_opened_in_binary_mode(self):
-        with open(self.tmp_txt_file.name, 'rb') as fh:
-            file_ = File.upload(fh)
-
-        self.assertIsInstance(file_, File)
+@pytest.fixture
+def group():
+    group = create_file_group(files_qty=1)
+    yield group
+    for file in group:
+        file.delete()
 
 
-class FileUploadFromUrlTest(RestAPITestCase):
-    def test_get_some_token(self):
-        file_from_url = File.upload_from_url(self.image_url)
-        self.assertTrue(file_from_url.token)
+def test_successful_upload_when_file_is_opened_in_txt_mode(small_file):
+    with open(small_file.name, "rt") as fh:
+        file = File.upload(fh)
 
-    @skip_on_travis
-    def test_successful_upload_from_url(self):
-        file_from_url = File.upload_from_url(self.image_url)
+    assert isinstance(file, File)
 
-        timeout = 30
-        time_started = time.time()
 
+def test_successful_upload_when_file_is_opened_in_binary_mode(small_file):
+    with open(small_file.name, "rb") as fh:
+        file = File.upload(fh)
+
+    assert isinstance(file, File)
+
+
+def test_get_some_token():
+    file_from_url = File.upload_from_url(IMAGE_URL)
+    assert file_from_url.token
+
+
+def test_successful_upload_from_url():
+    file_from_url = File.upload_from_url(IMAGE_URL)
+
+    timeout = 30
+    time_started = time.time()
+
+    while time.time() - time_started < timeout:
+        status = file_from_url.update_info()["status"]
+        if status in ("success", "failed", "error"):
+            break
+        time.sleep(1)
+
+    assert isinstance(file_from_url.get_file(), File)
+
+
+def test_successful_upload_from_url_sync_autostore():
+    file = File.upload_from_url_sync(IMAGE_URL, interval=1)
+    assert isinstance(file, File)
+    assert file.filename == "Octocat.png"
+    assert file.datetime_stored is not None
+
+
+def test_successful_upload_from_url_signed(signed_uploads):
+    file_from_url = File.upload_from_url(IMAGE_URL)
+
+    timeout = 30
+    time_started = time.time()
+
+    while time.time() - time_started < timeout:
+        status = file_from_url.update_info()["status"]
+        if status in ("success", "failed", "error"):
+            break
+        time.sleep(1)
+
+    assert isinstance(file_from_url.get_file(), File)
+
+
+def test_successful_upload_from_url_sync_autostore_signed(signed_uploads):
+    file = File.upload_from_url_sync(IMAGE_URL, interval=1)
+    assert isinstance(file, File)
+    assert file.filename == "Octocat.png"
+    assert file.datetime_stored is not None
+
+
+def test_successful_upload_from_url_sync_dont_store():
+    file = File.upload_from_url_sync(IMAGE_URL, store=False, interval=1)
+    assert isinstance(file, File)
+    assert file.filename == "Octocat.png"
+    assert file.datetime_stored is None
+
+
+def test_successful_upload_from_url_sync_store():
+    file = File.upload_from_url_sync(IMAGE_URL, store=True, interval=1)
+    assert isinstance(file, File)
+    assert file.datetime_stored is not None
+
+
+def test_successful_upload_from_url_sync_with_filename():
+    file = File.upload_from_url_sync(IMAGE_URL, filename="meh.png", interval=1)
+    assert isinstance(file, File)
+    assert file.filename == "meh.png"
+
+
+@pytest.fixture(scope="module")
+def uploaded_file():
+    file = upload_tmp_txt_file(content="hello")
+    yield file
+    file.delete()
+
+
+def test_info_is_non_empty_dict(uploaded_file):
+    assert isinstance(uploaded_file.info, dict)
+    assert uploaded_file.info
+
+
+def test_original_filename_starts_with_tmp(uploaded_file):
+    assert uploaded_file.filename.startswith("tmp")
+
+
+def test_datetime_stored_is_none(uploaded_file):
+    assert uploaded_file.datetime_stored is None
+
+
+def test_datetime_removed_is_none(uploaded_file):
+    assert uploaded_file.datetime_removed is None
+
+
+def test_datetime_uploaded_is_datetime_instance(uploaded_file):
+    assert isinstance(uploaded_file.datetime_uploaded, datetime)
+
+
+def test_file_is_not_stored(uploaded_file):
+    assert not uploaded_file.is_stored
+
+
+def test_file_is_not_removed(uploaded_file):
+    assert not uploaded_file.is_removed
+
+
+def test_file_is_not_image(uploaded_file):
+    assert not uploaded_file.is_image
+
+
+def test_file_should_be_ready_in_5_seconds_after_upload():
+    timeout = 5
+
+    file = upload_tmp_txt_file(content="hello")
+
+    time_started = time.time()
+
+    try:
         while time.time() - time_started < timeout:
-            status = file_from_url.update_info()['status']
-            if status in ('success', 'failed', 'error'):
+            if file.is_ready:
                 break
             time.sleep(1)
+            file.update_info()
 
-        self.assertIsInstance(file_from_url.get_file(), File)
-
-    @skip_on_travis
-    def test_successful_upload_from_url_sync_autostore(self):
-        file = File.upload_from_url_sync(self.image_url,
-                                         interval=1)
-        self.assertIsInstance(file, File)
-        self.assertEqual(file.filename(), 'Octocat.png')
-        self.assertIsNotNone(file.datetime_stored())
-
-    @skip_on_travis
-    def test_successful_upload_from_url_sync_dont_store(self):
-        file = File.upload_from_url_sync(self.image_url,
-                                         store=False,
-                                         interval=1)
-        self.assertIsInstance(file, File)
-        self.assertEqual(file.filename(), 'Octocat.png')
-        self.assertIsNone(file.datetime_stored())
-
-    @skip_on_travis
-    def test_successful_upload_from_url_sync_store(self):
-        file = File.upload_from_url_sync(self.image_url,
-                                         store=True,
-                                         interval=1)
-        self.assertIsInstance(file, File)
-        self.assertIsNotNone(file.datetime_stored())
-
-    @skip_on_travis
-    def test_successful_upload_from_url_sync_with_filename(self):
-        file = File.upload_from_url_sync(self.image_url,
-                                         filename='meh.png',
-                                         interval=1)
-        self.assertIsInstance(file, File)
-        self.assertEqual(file.filename(), 'meh.png')
+        assert file.is_ready
+    finally:
+        file.delete()
 
 
-@unittest.skipIf(not os.environ.get("SIGNED_UPLOADS_PUBKEY"),
-                 'Signed uploads project not configured')
-class SignedUploadsTest(RestAPITestCase):
-    def setUp(self):
-        conf.pub_key = os.environ.get("SIGNED_UPLOADS_PUBKEY")
-        conf.secret = os.environ.get("SIGNED_UPLOADS_SECKEY")
-        conf.signed_uploads = True
+def test_file_size_is_5_bytes(uploaded_file):
+    # "hello" + new line
+    assert uploaded_file.size == 5
 
-    def tearDown(self):
-        conf.pub_key = None
-        conf.secret = None
-        conf.signed_uploads = False
 
-    def test_upload(self):
-        file = File.upload_from_url_sync(self.image_url,
-                                         store=False,
-                                         interval=1)
-        self.assertIsInstance(file, File)
-        self.assertEqual(file.filename(), 'Octocat.png')
-        self.assertIsNone(file.datetime_stored())
+def test_mime_type_is_application_octet_stream(uploaded_file):
+    assert uploaded_file.mime_type == "application/octet-stream"
 
-    def test_upload_invalid_signature(self):
-        conf.secret = 'abc'
-        with self.assertRaises(AuthenticationError):
-            File.upload_from_url_sync(self.image_url,
-                                      store=False,
-                                      interval=1)
 
+def test_file_successful_store():
+    file = upload_tmp_txt_file(content="temp")
 
-class FileInfoTest(RestAPITestCase):
-    @classmethod
-    def setUpClass(cls):
-        super(FileInfoTest, cls).setUpClass()
-        cls.file_ = upload_tmp_txt_file(content='hello')
+    assert not file.is_stored
 
-    def test_info_is_non_empty_dict(self):
-        self.assertIsInstance(self.file_.info(), dict)
-        self.assertTrue(self.file_.info())
+    file.store()
 
-    def test_original_filename_starts_with_tmp(self):
-        self.assertTrue(self.file_.filename().startswith('tmp'))
+    assert file.is_stored
 
-    def test_datetime_stored_is_none(self):
-        self.assertIsNone(self.file_.datetime_stored())
 
-    def test_datetime_removed_is_none(self):
-        self.assertIsNone(self.file_.datetime_removed())
+def test_file_successful_delete():
+    file = upload_tmp_txt_file(content="привет")
+    assert not file.is_removed
+    file.delete()
+    assert file.is_removed
 
-    def test_datetime_uploaded_is_datetime_instance(self):
-        self.assertIsInstance(self.file_.datetime_uploaded(), datetime)
 
-    def test_file_is_not_stored(self):
-        self.assertFalse(self.file_.is_stored())
+def test_group_successful_create():
+    files = [
+        upload_tmp_txt_file(content="пока"),
+    ]
+    group = FileGroup.create(files)
+    assert isinstance(group, FileGroup)
 
-    def test_file_is_not_removed(self):
-        self.assertFalse(self.file_.is_removed())
 
-    def test_file_is_not_image(self):
-        self.assertFalse(self.file_.is_image())
+def test_group_info_is_non_empty_dict(group):
+    assert isinstance(group.info, dict)
+    assert group.info
 
-    @skip_on_travis
-    def test_file_should_be_ready_in_5_seconds_after_upload(self):
-        timeout = 5
-        time_started = time.time()
 
-        while time.time() - time_started < timeout:
-            if self.file_.is_ready():
-                break
-            time.sleep(1)
-            self.file_.update_info()
+def test_group_datetime_stored_is_none(group):
+    assert group.datetime_stored is None
 
-        self.assertTrue(self.file_.is_ready())
 
-    def test_file_size_is_5_bytes(self):
-        # "hello" + new line
-        self.assertEqual(self.file_.size(), 5)
+def test_group_datetime_created_is_datetime_instance(group):
+    assert isinstance(group.datetime_created, datetime)
 
-    def test_mime_type_is_application_octet_stream(self):
-        self.assertEqual(self.file_.mime_type(), 'application/octet-stream')
 
+def test_group_is_not_stored(group):
+    assert not group.is_stored
 
-class FileStoreTest(RestAPITestCase):
 
-    def setUp(self):
-        self.file_ = upload_tmp_txt_file(content='пока')
+def test_successful_group_store(group):
+    assert not group.is_stored
 
-    def tearDown(self):
-        self.file_.delete()
+    group.store()
 
-    def test_successful_store(self):
-        self.assertFalse(self.file_.is_stored())
+    assert group.is_stored
 
-        self.file_.store()
 
-        self.assertTrue(self.file_.is_stored())
+@pytest.fixture
+def image_file():
+    # create file to copy from
+    file_from_url = File.upload_from_url(IMAGE_URL)
 
+    timeout = 30
+    time_started = time.time()
 
-class FileDeleteTest(RestAPITestCase):
+    while time.time() - time_started < timeout:
+        status = file_from_url.update_info()["status"]
+        if status in ("success", "failed", "error"):
+            break
+        time.sleep(1)
 
-    def setUp(self):
-        self.file_ = upload_tmp_txt_file(content='привет')
+    file = file_from_url.get_file()
+    time_started = time.time()
+    while time.time() - time_started < timeout:
+        if file.is_ready:
+            break
+        time.sleep(1)
+        file.update_info()
 
-    def test_successful_delete(self):
-        self.assertFalse(self.file_.is_removed())
+    yield file
 
-        self.file_.delete()
+    file.delete()
 
-        self.assertTrue(self.file_.is_removed())
 
+def test_local_copy(image_file):
+    file = image_file.copy(effects="resize/50x/")
+    assert isinstance(file, File)
 
-class FileGroupCreateTest(RestAPITestCase):
-    def test_successful_create(self):
-        files = [
-            upload_tmp_txt_file(content='пока'),
-        ]
-        group = FileGroup.create(files)
-        self.assertIsInstance(group, FileGroup)
 
+def test_create_local_copy(image_file):
+    file = image_file.create_local_copy()
+    assert isinstance(file, File)
 
-class FileGroupInfoTest(RestAPITestCase):
+    file = image_file.create_local_copy(effects="resize/50x/")
+    assert not file.is_stored
 
-    @classmethod
-    def setUpClass(cls):
-        super(FileGroupInfoTest, cls).setUpClass()
-        cls.group = create_file_group(files_qty=1)
+    file = image_file.create_local_copy(effects="resize/50x/", store=True)
+    time.sleep(2)
+    file.update_info()
+    assert file.is_stored
 
-    def test_info_is_non_empty_dict(self):
-        self.assertIsInstance(self.group.info(), dict)
-        self.assertTrue(self.group.info())
+    file = image_file.create_local_copy(store=False)
+    time.sleep(2)
+    file.update_info()
+    assert not file.is_stored
 
-    def test_datetime_stored_is_none(self):
-        self.assertIsNone(self.group.datetime_stored())
 
-    def test_datetime_created_is_datetime_instance(self):
-        self.assertIsInstance(self.group.datetime_created(), datetime)
+def test_iteration_over_all_files():
+    files = list(FileList(limit=10))
+    assert len(files) >= 0
 
-    def test_group_is_not_stored(self):
-        self.assertFalse(self.group.is_stored())
 
+def test_iteration_over_limited_count_of_files():
+    files = list(FileList(limit=2))
+    assert len(files) == 2
 
-class FileGroupStoreTest(RestAPITestCase):
 
-    def setUp(self):
-        self.group = create_file_group(files_qty=1)
+def test_iteration_over_stored_files():
+    for file_ in FileList(stored=True, limit=10):
+        assert file_.is_stored
 
-    def test_successful_store(self):
-        self.assertFalse(self.group.is_stored())
 
-        self.group.store()
+def test_iteration_over_not_stored_files():
+    for file_ in FileList(stored=False, limit=10):
+        assert not file_.is_stored
 
-        self.assertTrue(self.group.is_stored())
 
+def test_iteration_over_removed_files():
+    for file_ in FileList(removed=True, limit=10):
+        assert file_.is_removed
 
-class FileCopyTest(RestAPITestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super(FileCopyTest, cls).setUpClass()
+def test_iteration_over_not_removed_files():
+    for file_ in FileList(removed=False, limit=10):
+        assert not file_.is_removed
 
-        # create file to copy from
-        file_from_url = File.upload_from_url(cls.image_url)
 
-        timeout = 30
-        time_started = time.time()
-
-        while time.time() - time_started < timeout:
-            status = file_from_url.update_info()['status']
-            if status in ('success', 'failed', 'error'):
-                break
-            time.sleep(1)
-
-        cls.f = file_from_url.get_file()
-        time_started = time.time()
-        while time.time() - time_started < timeout:
-            if cls.f.is_ready():
-                break
-            time.sleep(1)
-            cls.f.update_info()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.f.delete()
-        super(FileCopyTest, cls).tearDownClass()
-
-    def test_local_copy(self):
-        response = self.f.copy(effects='resize/50x/')
-        self.assertEqual('file', response['type'])
-
-    def test_create_local_copy(self):
-        response = self.f.create_local_copy()
-        self.assertEqual('file', response['type'])
-
-        response = self.f.create_local_copy(effects='resize/50x/')
-        self.assertEqual('file', response['type'])
-
-        response = self.f.create_local_copy(effects='resize/50x/', store=True)
-        file = File(response['result']['uuid'])
-        time.sleep(2)
-        self.assertEqual(file.is_stored(), True)
-
-        response = self.f.create_local_copy(store=False)
-        file = File(response['result']['uuid'])
-        time.sleep(2)
-        self.assertEqual(file.is_stored(), False)
-
-
-class FileListIterationTest(RestAPITestCase):
-    def test_iteration_over_all_files(self):
-        files = list(FileList(limit=10))
-        self.assertTrue(len(files) >= 0)
-
-    def test_iteration_over_limited_count_of_files(self):
-        files = list(FileList(limit=2))
-        self.assertEqual(len(files), 2)
-
-    def test_iteration_over_stored_files(self):
-        for file_ in FileList(stored=True, limit=10):
-            self.assertTrue(file_.is_stored())
-
-    def test_iteration_over_not_stored_files(self):
-        for file_ in FileList(stored=False, limit=10):
-            self.assertFalse(file_.is_stored())
-
-    def test_iteration_over_removed_files(self):
-        for file_ in FileList(removed=True, limit=10):
-            self.assertTrue(file_.is_removed())
-
-    def test_iteration_over_not_removed_files(self):
-        for file_ in FileList(removed=False, limit=10):
-            self.assertFalse(file_.is_removed())
-
-    def test_iteration_over_stored_removed_files(self):
-        files = list(FileList(stored=True, removed=True, limit=10))
-        self.assertEqual(len(files), 0)
-
-    @mock.patch('pyuploadcare.api_resources.rest_request',
-                side_effect=original_rest_request)
-    def test_iterate_through_all_pages(self, rest_request):
-        list(FileList(request_limit=3, limit=10))
-        for call in rest_request.call_args_list:
-            self.assertIn('/files/?', call[0][1])
-
-    @mock.patch('pyuploadcare.api_resources.rest_request',
-                side_effect=original_rest_request)
-    def test_count_files(self, rest_request):
-        self.assertNotEqual(0, FileList(stored=None, removed=None).count())
-        self.assertEqual(1, rest_request.call_count)
-        self.assertIn('limit=1', rest_request.call_args[0][1])
-        rest_request.reset_mock()
-
-        self.assertNotEqual(0, FileList(stored=True, removed=None).count())
-        self.assertEqual(1, rest_request.call_count)
-        self.assertIn('limit=1', rest_request.call_args[0][1])
-        rest_request.reset_mock()
-
-        self.assertNotEqual(0, FileList(stored=False, removed=True).count())
-        self.assertEqual(1, rest_request.call_count)
-        self.assertIn('limit=1', rest_request.call_args[0][1])
-        rest_request.reset_mock()
-
-        self.assertEqual(0, FileList(stored=True, removed=True).count())
-        self.assertEqual(1, rest_request.call_count)
-        self.assertIn('limit=1', rest_request.call_args[0][1])
-        rest_request.reset_mock()
+def test_iteration_over_stored_removed_files():
+    files = list(FileList(stored=True, removed=True, limit=10))
+    assert not files
