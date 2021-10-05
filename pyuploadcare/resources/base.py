@@ -13,7 +13,7 @@ class BaseApiList:
     datetime_ordering_fields = ()
 
     resource_api: ListCountMixin
-    constractor_name: str
+    constructor_name: str
     resource_id_field: str
 
     def __init__(
@@ -67,8 +67,8 @@ class BaseApiList:
         for entity in self.resource_api.list(**qs):
             resource_info = entity.dict()
             resource_id = resource_info.get(self.resource_id_field)
-            constractor = getattr(self._client, self.constractor_name)
-            yield constractor(resource_id, resource_info)
+            constructor = getattr(self._client, self.constructor_name)
+            yield constructor(resource_id, resource_info)
 
     def count(self):
         if self.starting_point:

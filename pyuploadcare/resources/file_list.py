@@ -39,7 +39,7 @@ class FileList(BaseApiList):
 
     """
 
-    constractor_name = "file"
+    constructor_name = "file"
     resource_id_field = "uuid"
     datetime_ordering_fields = ("", "datetime_uploaded")
 

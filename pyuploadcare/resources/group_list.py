@@ -29,7 +29,7 @@ class GroupList(BaseApiList):
 
     """
 
-    constractor_name = "file_group"
+    constructor_name = "file_group"
     resource_id_field = "id"
     datetime_ordering_fields = ("", "datetime_created")
 
