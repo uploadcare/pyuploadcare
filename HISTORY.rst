@@ -21,6 +21,7 @@ Changed
 - Implemented low-level API.
 - Support multipart uploads.
 - Allow uploading by url in``File.upload`` method.
+- Support document and video conversions.
 
 
 `2.7.0`_ - 2020-05-03
