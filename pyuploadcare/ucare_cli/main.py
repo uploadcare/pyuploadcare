@@ -6,13 +6,8 @@ from __future__ import unicode_literals
 import argparse
 import logging
 
-from pyuploadcare import __version__
-from pyuploadcare.client import (
-    DEFAULT_API_BASE,
-    DEFAULT_API_VERSION,
-    DEFAULT_UPLOAD_BASE,
-    Uploadcare,
-)
+from pyuploadcare import __version__, conf
+from pyuploadcare.client import Uploadcare
 from pyuploadcare.exceptions import UploadcareException
 from pyuploadcare.ucare_cli.commands import (
     create_group,
@@ -65,13 +60,13 @@ def ucare_argparser():
         "--api_base",
         help="API url, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(DEFAULT_API_BASE),
+        " Default value is {0}".format(conf.api_base),
     )
     parser.add_argument(
         "--upload_base",
         help="Upload API url, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(DEFAULT_UPLOAD_BASE),
+        " Default value is {0}".format(conf.upload_base),
     )
     parser.add_argument(
         "--no_check_upload_certificate",
@@ -91,7 +86,7 @@ def ucare_argparser():
         "--api_version",
         help="API version, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(DEFAULT_API_VERSION),
+        " Default value is {0}".format(conf.api_version),
     )
 
     return parser

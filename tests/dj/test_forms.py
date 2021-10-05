@@ -12,12 +12,14 @@ from pyuploadcare.dj import forms as uc_forms
 
 class FormFieldsAttributesTest(unittest.TestCase):
     def setUp(self):
+        self._pub_key = dj_conf.pub_key
+        self._secret = dj_conf.secret
         dj_conf.pub_key = "asdf"
         dj_conf.secret = "qwer"
 
     def tearDown(self):
-        dj_conf.pub_key = None
-        dj_conf.secret = None
+        dj_conf.pub_key = self._pub_key
+        dj_conf.secret = self._secret
 
     def test_default_form_field(self):
         class SomeForm(forms.Form):

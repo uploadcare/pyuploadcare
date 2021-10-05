@@ -4,7 +4,7 @@ import socket
 from itertools import islice
 from typing import IO, Any, Callable, Dict, Iterable, List, Optional, Union
 
-from pyuploadcare import File, FileGroup, FileList, GroupList
+from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
     DocumentConvertAPI,
     FilesAPI,
@@ -19,14 +19,6 @@ from pyuploadcare.helpers import extracts_uuids, get_file_size
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
 
 
-DEFAULT = object()
-
-DEFAULT_API_VERSION = "0.6"
-DEFAULT_API_BASE = "https://api.uploadcare.com/"
-DEFAULT_UPLOAD_BASE = "https://upload.uploadcare.com/"
-DEFAULT_CDN_BASE = "https://ucarecdn.com/"
-
-
 class Uploadcare:
     """Uploadcare client.
 
@@ -38,22 +30,22 @@ class Uploadcare:
 
     def __init__(
         self,
-        public_key: str,
-        secret_key: Optional[str] = None,
-        api_version=DEFAULT_API_VERSION,
-        api_base=DEFAULT_API_BASE,
-        upload_base=DEFAULT_UPLOAD_BASE,
-        cdn_base=DEFAULT_CDN_BASE,
-        signed_uploads=True,
-        signed_uploads_ttl=60,
-        verify_api_ssl=True,
-        verify_upload_ssl=True,
-        retry_throttled=1,
-        user_agent_extension=None,
-        timeout=DEFAULT,
-        batch_chunk_size=500,
-        multipart_min_file_size=10485760,
-        multipart_chunk_size=5 * 1024 * 1024,
+        public_key: str = conf.pub_key,
+        secret_key: Optional[str] = conf.secret,
+        api_version=conf.api_version,
+        api_base=conf.api_base,
+        upload_base=conf.upload_base,
+        cdn_base=conf.cdn_base,
+        signed_uploads=conf.signed_uploads,
+        signed_uploads_ttl=conf.signed_uploads_ttl,
+        verify_api_ssl=conf.verify_api_ssl,
+        verify_upload_ssl=conf.verify_upload_ssl,
+        retry_throttled=conf.retry_throttled,
+        user_agent_extension=conf.user_agent_extension,
+        timeout=conf.timeout,
+        batch_chunk_size=conf.batch_chunk_size,
+        multipart_min_file_size=conf.multipart_min_file_size,
+        multipart_chunk_size=conf.multipart_chunk_size,
     ):
         """
         Uploadcare client.
@@ -77,6 +69,9 @@ class Uploadcare:
             - multipart_min_file_size: Mininum file size to use multipart uploading.
             - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         """
+        if not public_key:
+            raise ValueError("public_key is required")
+
         self.public_key = public_key
         self.secret_key = secret_key
         self.api_version = api_version
@@ -93,7 +88,7 @@ class Uploadcare:
         self.multipart_min_file_size = multipart_min_file_size
         self.multipart_chunk_size = multipart_chunk_size
 
-        if timeout is DEFAULT:
+        if timeout is conf.DEFAULT:
             timeout = socket.getdefaulttimeout()
 
         self.timeout = timeout
