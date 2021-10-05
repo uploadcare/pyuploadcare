@@ -22,7 +22,7 @@ def test_sync_created_directory_for_upload(sync_path):
 
     main(
         arg_namespace(
-            f"--public_key demopublickey --secret_key demosecretkey "
+            f"--pub_key demopublickey --secret demosecretkey "
             f"sync --limit 1 --no-input {sync_path}"
         )
     )
@@ -35,7 +35,7 @@ def test_sync_created_directory_for_upload(sync_path):
 def test_sync_file_exists_and_replace_flag(sync_path):
     main(
         arg_namespace(
-            f"--public_key demopublickey --secret_key demosecretkey "
+            f"--pub_key demopublickey --secret demosecretkey "
             f"sync --limit 1 --no-input {sync_path}"
         )
     )
@@ -45,7 +45,7 @@ def test_sync_file_exists_and_replace_flag(sync_path):
     created_time = os.path.getmtime(filepath)
     main(
         arg_namespace(
-            f"--public_key demopublickey --secret_key demosecretkey "
+            f"--pub_key demopublickey --secret demosecretkey "
             f"sync --limit 1 --replace --no-input {sync_path}"
         )
     )
@@ -58,7 +58,7 @@ def test_sync_uuids(sync_path, uploadcare):
 
     main(
         arg_namespace(
-            f"--public_key demopublickey --secret_key demosecretkey "
+            f"--pub_key demopublickey --secret demosecretkey "
             f"sync --no-input {sync_path} --uuids {' '.join(uuids)}"
         )
     )
@@ -84,7 +84,7 @@ def test_sync_patterns(sync_path, uploadcare):
 
     main(
         arg_namespace(
-            "--public_key demopublickey --secret_key demosecretkey "
+            "--pub_key demopublickey --secret demosecretkey "
             "sync --no-input {} --uuids {}".format(
                 sync_path + "/${uuid}_${ext}", " ".join(uuids)
             )

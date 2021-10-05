@@ -1,16 +1,16 @@
 from tests.functional.ucare_cli.helpers import arg_namespace
 
-from pyuploadcare.ucare_cli.main import load_config
+from pyuploadcare.ucare_cli.settings import load_config
 
 
 def test_change_pub_key():
-    conf = load_config(arg_namespace("--public_key demopublickey list_files"))
+    conf = load_config(arg_namespace("--pub_key demopublickey list_files"))
 
     assert conf["public_key"] == "demopublickey"
 
 
 def test_change_secret():
-    conf = load_config(arg_namespace("--secret_key demosecretkey list_files"))
+    conf = load_config(arg_namespace("--secret demosecretkey list_files"))
 
     assert conf["secret_key"] == "demosecretkey"
 

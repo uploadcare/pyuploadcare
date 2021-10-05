@@ -1,7 +1,8 @@
 import pytest
 from tests.functional.ucare_cli.helpers import arg_namespace
 
-from pyuploadcare.ucare_cli.main import create_group, list_groups
+from pyuploadcare.ucare_cli.commands.create_group import create_group
+from pyuploadcare.ucare_cli.commands.list_groups import list_groups
 
 
 @pytest.mark.vcr

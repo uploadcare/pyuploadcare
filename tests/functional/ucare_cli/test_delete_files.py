@@ -1,7 +1,7 @@
 import pytest
 from tests.functional.ucare_cli.helpers import arg_namespace
 
-from pyuploadcare.ucare_cli.main import delete_files
+from pyuploadcare.ucare_cli.commands.delete_files import delete_files
 
 
 def test_delete_parse_wait_arg():

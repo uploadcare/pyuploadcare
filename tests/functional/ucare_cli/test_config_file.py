@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from tests.functional.ucare_cli.helpers import arg_namespace
 
-from pyuploadcare.ucare_cli.main import load_config
+from pyuploadcare.ucare_cli.settings import load_config
 
 
 @pytest.fixture
@@ -12,7 +12,7 @@ def config_file():
 
 
 def test_use_pub_key_from_config_file(config_file):
-    config_file.write("[ucare]\n" "public_key = demopublickey")
+    config_file.write("[ucare]\n" "pub_key = demopublickey")
     config_file.close()
 
     args = arg_namespace("list_files")
@@ -27,9 +27,7 @@ def test_redefine_pub_key_by_second_config_file(config_file):
     config_file.close()
 
     second_tmp_conf_file = NamedTemporaryFile(mode="w+t", delete=False)
-    second_tmp_conf_file.write(
-        "[ucare]\n" "public_key = demopublickey_modified"
-    )
+    second_tmp_conf_file.write("[ucare]\n" "pub_key = demopublickey_modified")
     second_tmp_conf_file.close()
 
     args = arg_namespace("list_files")
@@ -39,11 +37,11 @@ def test_redefine_pub_key_by_second_config_file(config_file):
 
 
 def test_use_available_pub_key_from_config_files(config_file):
-    config_file.write("[ucare]\n" "public_key = demopublickey")
+    config_file.write("[ucare]\n" "pub_key = demopublickey")
     config_file.close()
 
     second_tmp_conf_file = NamedTemporaryFile(mode="w+t", delete=False)
-    second_tmp_conf_file.write("[ucare]\n" "secret_key = demosecretkey")
+    second_tmp_conf_file.write("[ucare]\n" "secret = demosecretkey")
     second_tmp_conf_file.close()
 
     conf = load_config(
@@ -55,11 +53,11 @@ def test_use_available_pub_key_from_config_files(config_file):
 
 
 def test_redefine_config_pub_key_by_args(config_file):
-    config_file.write("[ucare]\n" "public_key = demopublickey")
+    config_file.write("[ucare]\n" "pub_key = demopublickey")
     config_file.close()
 
     conf = load_config(
-        arg_namespace("--public_key pub list_files"),
+        arg_namespace("--pub_key pub list_files"),
         [config_file.name],
     )
 
