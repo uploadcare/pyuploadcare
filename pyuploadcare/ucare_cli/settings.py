@@ -71,11 +71,11 @@ def load_config_from_args(  # noqa: C901
     return conf
 
 
-def load_config(
+def load_config(  # noqa: C901
     arg_namespace: Optional[argparse.Namespace] = None,
     config_file_names: Optional[List[str]] = None,
-):
-    conf = {}
+) -> Dict[str, Any]:
+    conf: Dict[str, Any] = {}
 
     if config_file_names:
         for file_name in config_file_names:

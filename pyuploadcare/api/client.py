@@ -1,5 +1,4 @@
 import logging
-import socket
 import time
 import typing
 from platform import python_implementation, python_version
@@ -19,7 +18,7 @@ from httpx._types import (
     URLTypes,
 )
 
-from pyuploadcare import __version__, conf
+from pyuploadcare import __version__
 from pyuploadcare.exceptions import (
     APIError,
     AuthenticationError,
@@ -192,11 +191,3 @@ class Client(HTTPXClient):
             python_version(),
             extension_info,
         )
-
-
-def get_timeout(timeout):
-    if timeout is not conf.DEFAULT:
-        return timeout
-    if conf.timeout is not conf.DEFAULT:
-        return conf.timeout
-    return socket.getdefaulttimeout()

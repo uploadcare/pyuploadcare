@@ -2,7 +2,7 @@ import dataclasses
 import logging
 import re
 import time
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Union
 from uuid import UUID
 
 from pyuploadcare.api.entities import DocumentConvertInfo, VideoConvertInfo
@@ -73,9 +73,9 @@ class File:
             raise InvalidParamError("Couldn't find UUID")
 
         self._uuid = matches.groupdict()["uuid"]
-        self.default_effects = matches.groupdict()["effects"]
+        self.default_effects: Optional[str] = matches.groupdict()["effects"]
 
-        self._info_cache = None
+        self._info_cache: Optional[Dict[str, Any]] = None
 
         self._client = client
 
@@ -419,9 +419,9 @@ class File:
             paths=[path], store=store
         )
         if response.problems:
-            raise InvalidRequestError(response.problems)
+            raise InvalidRequestError(str(response.problems))
 
-        conversion_info: VideoConvertInfo = response.result[0]
+        conversion_info: VideoConvertInfo = response.result[0]  # type: ignore
         new_uuid = conversion_info.uuid
         thumbnails_group_uuid = conversion_info.thumbnails_group_uuid
         converted_file = self._client.file(new_uuid)
@@ -448,9 +448,9 @@ class File:
             paths=[path], store=store
         )
         if response.problems:
-            raise InvalidRequestError(response.problems)
+            raise InvalidRequestError(str(response.problems))
 
-        conversion_info: DocumentConvertInfo = response.result[0]
+        conversion_info: DocumentConvertInfo = response.result[0]  # type: ignore
         new_uuid = conversion_info.uuid
         return File(new_uuid, self._client)
 

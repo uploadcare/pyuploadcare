@@ -2,7 +2,18 @@ import mimetypes
 import os
 import socket
 from itertools import islice
-from typing import IO, Any, Callable, Dict, Iterable, List, Optional, Union
+from typing import (
+    IO,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Type,
+    Union,
+)
+from uuid import UUID
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
@@ -30,7 +41,7 @@ class Uploadcare:
 
     def __init__(
         self,
-        public_key: str = conf.pub_key,
+        public_key: Optional[str] = conf.pub_key,
         secret_key: Optional[str] = conf.secret,
         api_version=conf.api_version,
         api_base=conf.api_base,
@@ -46,6 +57,7 @@ class Uploadcare:
         batch_chunk_size=conf.batch_chunk_size,
         multipart_min_file_size=conf.multipart_min_file_size,
         multipart_chunk_size=conf.multipart_chunk_size,
+        auth_class: Type[UploadcareAuth] = UploadcareAuth,
     ):
         """
         Uploadcare client.
@@ -68,6 +80,7 @@ class Uploadcare:
               in batch store and delete requests.
             - multipart_min_file_size: Mininum file size to use multipart uploading.
             - multipart_chunk_size: Chunk size in bytes for multipart uploading.
+            - auth_class: Authentication class to use for API.
         """
         if not public_key:
             raise ValueError("public_key is required")
@@ -93,7 +106,7 @@ class Uploadcare:
 
         self.timeout = timeout
 
-        auth = UploadcareAuth(public_key, secret_key)
+        auth = auth_class(public_key, secret_key, api_version)  # type: ignore
 
         self.rest_client = Client(
             base_url=api_base,
@@ -114,15 +127,24 @@ class Uploadcare:
             public_key=public_key,
         )
 
-        self.upload_api = UploadAPI(client=self.upload_client)
-        self.files_api = FilesAPI(client=self.rest_client)
-        self.groups_api = GroupsAPI(client=self.rest_client)
-        self.video_convert_api = VideoConvertAPI(client=self.rest_client)
-        self.document_convert_api = DocumentConvertAPI(client=self.rest_client)
+        api_config = {
+            "public_key": public_key,
+            "secret_key": secret_key,
+            "signed_uploads_ttl": signed_uploads_ttl,
+        }
+        self.upload_api = UploadAPI(client=self.upload_client, **api_config)  # type: ignore
+        self.files_api = FilesAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.groups_api = GroupsAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.video_convert_api = VideoConvertAPI(
+            client=self.rest_client, **api_config  # type: ignore
+        )
+        self.document_convert_api = DocumentConvertAPI(
+            client=self.rest_client, **api_config  # type: ignore
+        )
 
     def file(
         self,
-        cdn_url_or_file_id: str,
+        cdn_url_or_file_id: Union[str, UUID],
         file_info: Optional[Dict[str, Any]] = None,
     ) -> File:
         file_ = File(cdn_url_or_file_id, client=self)

@@ -2,6 +2,7 @@ import hashlib
 import os
 import pickle
 import re
+import socket
 import time
 from math import ceil
 
@@ -9,7 +10,7 @@ from dateutil import parser
 from httpx import HTTPError
 
 from pyuploadcare import FileList, conf
-from pyuploadcare.api.client import Client, get_timeout
+from pyuploadcare.api.client import Client
 from pyuploadcare.client import Uploadcare
 from pyuploadcare.ucare_cli.commands.helpers import (
     bar,
@@ -281,3 +282,11 @@ class TrackedFileList(FileList):
                 continue
             yield self._client.file(uuid)
             self.handled_uuids.append(uuid)
+
+
+def get_timeout(timeout):
+    if timeout is not conf.DEFAULT:
+        return timeout
+    if conf.timeout is not conf.DEFAULT:
+        return conf.timeout
+    return socket.getdefaulttimeout()

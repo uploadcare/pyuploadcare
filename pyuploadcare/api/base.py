@@ -23,7 +23,13 @@ class API:
     def __init__(
         self,
         client: Client,
+        public_key: str,
+        secret_key: Optional[str] = None,
+        signed_uploads_ttl: int = 60,
     ) -> None:
+        self.public_key = public_key
+        self.secret_key = secret_key
+        self.signed_uploads_ttl = signed_uploads_ttl
         self._client = client
 
     def _parse_response(

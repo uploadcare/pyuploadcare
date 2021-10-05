@@ -6,8 +6,6 @@ from typing import Generator, Union
 from httpx import Auth, Request, Response
 from httpx._utils import to_bytes, to_str
 
-from pyuploadcare import conf
-
 
 class AuthBase(Auth):
     ...
@@ -15,10 +13,14 @@ class AuthBase(Auth):
 
 class UploadcareSimpleAuth(AuthBase):
     def __init__(
-        self, public_key: Union[str, bytes], secret_key: Union[str, bytes]
+        self,
+        public_key: Union[str, bytes],
+        secret_key: Union[str, bytes],
+        api_version: str,
     ) -> None:
         self.public_key = public_key
         self.secret_key = secret_key
+        self.api_version = api_version
 
     def auth_flow(
         self, request: Request
@@ -28,7 +30,7 @@ class UploadcareSimpleAuth(AuthBase):
 
         request.headers[
             "Accept"
-        ] = f"application/vnd.uploadcare-v{conf.api_version}+json"
+        ] = f"application/vnd.uploadcare-v{self.api_version}+json"
         request.headers["Authorization"] = self._build_auth_header(
             request, self.public_key, self.secret_key
         )
@@ -56,7 +58,7 @@ class UploadcareAuth(UploadcareSimpleAuth):
 
         request.headers[
             "Accept"
-        ] = f"application/vnd.uploadcare-v{conf.api_version}+json"
+        ] = f"application/vnd.uploadcare-v{self.api_version}+json"
         request.headers["Authorization"] = self._build_auth_header(
             request, self.public_key, self.secret_key, formated_date_time
         )

@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import dateutil.parser
 
@@ -63,7 +63,7 @@ class FileGroup:
         self.id = matches.groupdict()["group_id"]
 
         self._files_qty = files_qty
-        self._info_cache = None
+        self._info_cache: Optional[Dict[str, Any]] = None
 
         self._client = client
 
