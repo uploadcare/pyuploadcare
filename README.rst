@@ -170,6 +170,7 @@ Example of using callback function for printing progress::
 
 Video conversion
 ^^^^^^^^^^^^^^^^
+
 Uploadcare can encode video files from all popular formats, adjust their quality, format and dimensions, cut out a video fragment, and generate thumbnails via REST API.
 
 After each video file upload you obtain a file identifier in UUID format. Then you can use this file identifier to convert your video in multiple ways::
@@ -201,6 +202,7 @@ or you can use API directly to convert single or multiple files::
 
 Document Conversion
 ^^^^^^^^^^^^^^^^^^^
+
 Uploadcare allows converting documents to the following target formats: doc, docx, xls, xlsx, odt, ods, rtf, txt, pdf, jpg, png. Document Conversion works via our REST API.
 
 After each document file upload you obtain a file identifier in UUID format. Then you can use this file identifier to convert your document to a new format::
