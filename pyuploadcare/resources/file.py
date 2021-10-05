@@ -51,10 +51,11 @@ class File:
 
     It can take file UUID or group CDN url::
 
-        >>> file_ = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+        >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
         >>> file_.cdn_url
         https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
-        >>> print File('https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/')
+        >>> print uploadcare.file(
+        ...     'https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/')
         https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/
 
     """
@@ -161,7 +162,7 @@ class File:
     def filename(self):
         """Returns original file name, e.g. ``"olympia.jpg"``.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("original_filename")
@@ -170,7 +171,7 @@ class File:
     def datetime_stored(self):
         """Returns file's store aware *datetime* in UTC format.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("datetime_stored")
@@ -179,7 +180,7 @@ class File:
     def datetime_removed(self):
         """Returns file's remove aware *datetime* in UTC format.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("datetime_removed")
@@ -188,7 +189,7 @@ class File:
     def datetime_uploaded(self):
         """Returns file's upload aware *datetime* in UTC format.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("datetime_uploaded")
@@ -197,7 +198,7 @@ class File:
     def is_stored(self):
         """Returns ``True`` if file is stored.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("datetime_stored") is not None
@@ -206,7 +207,7 @@ class File:
     def is_removed(self):
         """Returns ``True`` if file is removed.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("datetime_removed") is not None
@@ -215,7 +216,7 @@ class File:
     def is_image(self):
         """Returns ``True`` if the file is an image.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("is_image")
@@ -224,7 +225,7 @@ class File:
     def is_ready(self):
         """Returns ``True`` if the file is fully uploaded on S3.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("is_ready")
@@ -233,7 +234,7 @@ class File:
     def size(self):
         """Returns the file size in bytes.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("size")
@@ -242,7 +243,7 @@ class File:
     def mime_type(self):
         """Returns the file MIME type, e.g. ``"image/png"``.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("mime_type")

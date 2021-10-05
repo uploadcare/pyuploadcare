@@ -150,7 +150,7 @@ class FileGroup:
     def is_stored(self):
         """Returns ``True`` if file is stored.
 
-        It might do API request once because it depends on ``info()``.
+        It might do API request once because it depends on ``info``.
 
         """
         return self.info.get("datetime_stored") is not None

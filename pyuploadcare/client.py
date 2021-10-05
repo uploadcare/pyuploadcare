@@ -37,6 +37,25 @@ class Uploadcare:
 
         >>> uploadcare = Uploadcare(public_key='<public-key>', secret_key='<secret-key>')
 
+    Args:
+        - public_key: Public key to access Uploadcare API.
+        - secret_key: Secret ket to access Uploadcare API.
+        - api_version: Uploadcare Rest API version.
+        - api_base: Rest API base url.
+        - upload_base: Upload API base url.
+        - cdn_base: CDN base url.
+        - signed_uploads: Enable signed uploads.
+        - signed_uploads_ttl: Signed uploads signature timeout in seconds.
+        - verify_api_ssl: Verify Rest API SSL certificate.
+        - verify_upload_ssl: Verify Upload API SSL certificate.
+        - retry_throttled: Amount of retries after throttling header received.
+        - user_agent_extension: Extra suffix to user agent to identify client.
+        - timeout: HTTP requests timeout. If not set, default socket timeout is used.
+        - batch_chunk_size: Amount of files to process at once
+          in batch store and delete requests.
+        - multipart_min_file_size: Mininum file size to use multipart uploading.
+        - multipart_chunk_size: Chunk size in bytes for multipart uploading.
+        - auth_class: Authentication class to use for API.
     """
 
     def __init__(
@@ -59,29 +78,6 @@ class Uploadcare:
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: Type[UploadcareAuth] = UploadcareAuth,
     ):
-        """
-        Uploadcare client.
-
-        Args:
-            - public_key: Public key to access Uploadcare API.
-            - secret_key: Secret ket to access Uploadcare API.
-            - api_version: Uploadcare Rest API version.
-            - api_base: Rest API base url.
-            - upload_base: Upload API base url.
-            - cdn_base: CDN base url.
-            - signed_uploads: Enable signed uploads.
-            - signed_uploads_ttl: Signed uploads signature timeout in seconds.
-            - verify_api_ssl: Verify Rest API SSL certificate.
-            - verify_upload_ssl: Verify Upload API SSL certificate.
-            - retry_throttled: Amount of retries after throttling header received.
-            - user_agent_extension: Extra suffix to user agent to identify client.
-            - timeout: HTTP requests timeout. If not set, default socket timeout is used.
-            - batch_chunk_size: Amount of files to process at once
-              in batch store and delete requests.
-            - multipart_min_file_size: Mininum file size to use multipart uploading.
-            - multipart_chunk_size: Chunk size in bytes for multipart uploading.
-            - auth_class: Authentication class to use for API.
-        """
         if not public_key:
             raise ValueError("public_key is required")
 
@@ -147,6 +143,18 @@ class Uploadcare:
         cdn_url_or_file_id: Union[str, UUID],
         file_info: Optional[Dict[str, Any]] = None,
     ) -> File:
+        """File resource for working with user-uploaded files.
+
+        It can take file UUID or group CDN url::
+
+            >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
+            >>> file_.cdn_url
+            https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
+            >>> print uploadcare.file(
+            ...    'https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/')
+            https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/
+
+        """
         file_ = File(cdn_url_or_file_id, client=self)
         if file_info:
             file_.default_effects = file_info.get("default_effects")
@@ -159,6 +167,33 @@ class Uploadcare:
     def file_group(
         self, group_id: str, group_info: Optional[Dict[str, Any]] = None
     ) -> FileGroup:
+        """
+        File Group resource for working with user-uploaded group of files.
+
+        It can take group id or group CDN url::
+
+            >>> file_group = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+
+        You can iterate ``file_group`` or get ``File`` instance by key::
+
+            >>> [file_ for file_ in file_group]
+            [<uploadcare.File 6c5e9526-b0fe-4739-8975-72e8d5ee6342>, None]
+            >>> file_group[0]
+            <uploadcare.File 6c5e9526-b0fe-4739-8975-72e8d5ee6342>
+            >>> len(file_group)
+            2
+
+        But slicing is not supported because ``FileGroup`` is immutable::
+
+            >>> file_group[:]
+            TypeError: slicing is not supported
+
+        If file was deleted then you will get ``None``::
+
+            >>> file_group[1]
+            None
+
+        """
         file_group_ = FileGroup(group_id, client=self)
         file_group_._info_cache = group_info
         return file_group_
@@ -515,8 +550,8 @@ class Uploadcare:
         It expects iterable object that contains ``File`` instances, e.g.::
 
             >>> uploadcare = Uploadcare(public_key='<public-key>', secret_key='<secret-key>')
-            >>> file_1 = File('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
-            >>> file_2 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+            >>> file_1 = uploadcare.file('6c5e9526-b0fe-4739-8975-72e8d5ee6342')
+            >>> file_2 = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
             >>> uploadcare.create_file_group([file_1, file_2])
             <uploadcare.FileGroup 0513dda0-6666-447d-846f-096e5df9e2bb~2>
 
@@ -549,6 +584,42 @@ class Uploadcare:
         stored: Optional[bool] = None,
         removed: Optional[bool] = None,
     ) -> FileList:
+        """List files.
+
+        Returns ``FileList`` instance providing iteration over all uploaded files.
+
+        Args:m
+            - ``starting_point`` -- a starting point for filtering files.
+              It is reflects a ``from`` parameter from REST API.
+            - ``ordering`` -- a string with name of the field what must be used
+              for sorting files. The actual list of supported fields you can find in
+              documentation: http://uploadcare.com/documentation/rest/#file-files
+            - ``limit`` -- a total number of objects to be iterated.
+              If not specified, all available objects are iterated;
+            - ``request_limit`` -- a number of objects retrieved per request (page).
+              Usually, you don't need worry about this parameter.
+            - ``stored`` -- ``True`` to include only stored files,
+              ``False`` to exclude, ``None`` is default, will not exclude anything;
+            - ``removed`` -- ``True`` to include only removed files,
+              ``False`` to exclude, ``None`` will not exclude anything.
+              The default is ``False``.
+
+        Files can't be stored and removed at the same time, such query will
+        always return an empty set.
+
+        But files can be not stored and not removed (just uploaded files).
+
+        Usage example::
+
+            >>> for f in uploadcare.list_files(removed=None):
+            >>>     print(f.datetime_uploaded)
+
+        Count objects::
+
+            >>> print('Number of stored files is', uploadcare.list_files(stored=True).count())
+
+        """
+
         return FileList(
             client=self,
             starting_point=starting_point,
@@ -566,6 +637,33 @@ class Uploadcare:
         limit: Optional[int] = None,
         request_limit: Optional[int] = None,
     ):
+        """List file groups.
+
+        Return ``GroupList`` instance providing iteration over all groups for project.
+
+        Args:
+            - ``starting_point`` -- a starting point for filtering groups.
+              It is reflects a ``from`` parameter from the REST API.
+            - ``ordering`` -- a string with name of the field what must be used
+              for sorting files. The actual list of supported fields you can find in
+              documentation.
+            - ``limit`` -- a total number of objects to be iterated.
+              If not specified, all available objects are iterated;
+            - ``request_limit`` -- a number of objects retrieved per request (page).
+              Usually, you don't need worry about this parameter.
+
+        Usage example::
+
+            >>> from datetime import datetime, timedelta
+            >>> last_week = datetime.now() - timedelta(weeks=1)
+            >>> for f in uploadcare.list_file_groups(starting_point=last_week):
+            >>>     print(f.datetime_created)
+
+        Count objects::
+
+            >>> print('Number of groups is', uploadcare.list_file_groups().count())
+
+        """
         return GroupList(
             client=self,
             starting_point=starting_point,
