@@ -27,7 +27,7 @@ def test_store_one_file(uploadcare):
     )
 
     file = uploadcare.file("f4d55a4d-dda5-4fca-ace8-c87799d77a3c")
-    assert file.is_stored()
+    assert file.is_stored
 
 
 @pytest.mark.vcr
@@ -45,4 +45,4 @@ def test_store_several_files(uploadcare):
         "ff75ad5f-be9a-4f28-8db8-fcd14aa3ee15",
     ]:
         file = uploadcare.file(file_uuid)
-        assert file.is_stored()
+        assert file.is_stored

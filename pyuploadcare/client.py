@@ -72,7 +72,8 @@ class Uploadcare:
             - retry_throttled: Amount of retries after throttling header received.
             - user_agent_extension: Extra suffix to user agent to identify client.
             - timeout: HTTP requests timeout. If not set, default socket timeout is used.
-            - batch_chunk_size: Amount of files to process at once in batch store and delete requests.
+            - batch_chunk_size: Amount of files to process at once
+              in batch store and delete requests.
             - multipart_min_file_size: Mininum file size to use multipart uploading.
             - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         """

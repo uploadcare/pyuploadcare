@@ -30,7 +30,7 @@ def test_delete_one_file(uploadcare):
     delete_files(args, uploadcare)
 
     file = uploadcare.file("23762be6-cfe3-4d27-86be-9ed7d403dd43")
-    assert file.is_removed()
+    assert file.is_removed
 
 
 @pytest.mark.vcr
@@ -47,4 +47,4 @@ def test_delete_several_files(uploadcare):
         "dda35f47-3add-4736-b406-f48af2548c5b",
     ]:
         file = uploadcare.file(file_uuid)
-        assert file.is_removed()
+        assert file.is_removed

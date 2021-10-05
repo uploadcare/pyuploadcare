@@ -117,9 +117,7 @@ class Client(HTTPXClient):
                 )
             except ThrottledRequestError as e:
                 if retry_throttled > 0:
-                    logger.debug(
-                        "Throttled, retry in {0} seconds".format(e.wait)
-                    )
+                    logger.debug(f"Throttled, retry in {e.wait} seconds")
                     time.sleep(e.wait)
                     retry_throttled -= 1
                     continue

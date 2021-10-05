@@ -61,7 +61,7 @@ def _list(api_list_method, arg_namespace, **extra):
     )
 
     try:
-        pprint([item.info() for item in items])
+        pprint([item.info for item in items])
     except ValueError as e:
         print(e)
 
@@ -81,7 +81,7 @@ def list_groups(arg_namespace, client: Uploadcare):
 
 def get_file(arg_namespace, client: Uploadcare):
     file = client.file(arg_namespace.path)
-    pprint(file.info())
+    pprint(file.info)
 
 
 def store_files(arg_namespace, client: Uploadcare):
@@ -126,7 +126,7 @@ def _handle_uploaded_file(file_, arg_namespace):
         pprint("File stored successfully.")
 
     if arg_namespace.info:
-        pprint(file_.info())
+        pprint(file_.info)
 
     if arg_namespace.cdnurl:
         pprint("CDN url: {0}".format(file_.cdn_url))
@@ -148,7 +148,7 @@ def upload_from_url(arg_namespace, client: Uploadcare):  # noqa: C901
             if status in ("failed", "error"):
                 raise UploadError(
                     "could not upload file from url: {0}".format(
-                        file_from_url.info()
+                        file_from_url.info
                     )
                 )
             time.sleep(1)
@@ -175,7 +175,7 @@ def upload(arg_namespace, client: Uploadcare):
 def create_group(arg_namespace, client: Uploadcare):
     files = [client.file(uuid) for uuid in arg_namespace.paths]
     group = client.create_file_group(files)
-    pprint(group.info())
+    pprint(group.info)
 
 
 def ucare_argparser():

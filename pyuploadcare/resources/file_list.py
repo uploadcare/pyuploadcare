@@ -31,7 +31,7 @@ class FileList(BaseApiList):
     Usage example::
 
         >>> for f in uploadcare.list_files(removed=None):
-        >>>     print(f.datetime_uploaded())
+        >>>     print(f.datetime_uploaded)
 
     Count objects::
 

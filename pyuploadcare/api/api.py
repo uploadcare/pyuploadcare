@@ -311,9 +311,7 @@ class UploadAPI(API):
         document = self._client.post(url, data=data)
         response = document.json()
         if "token" not in response:
-            raise APIError(
-                "could not find token in result: {0}".format(response)
-            )
+            raise APIError(f"could not find token in result: {response}")
         return response["token"]
 
     def get_upload_from_url_status(self, token: str) -> Dict[str, Any]:
@@ -326,9 +324,7 @@ class UploadAPI(API):
         document = self._client.get(url)
         response = document.json()
         if "status" not in response:
-            raise APIError(
-                "could not find status in result: {0}".format(response)
-            )
+            raise APIError(f"could not find status in result: {response}")
         return response
 
     def create_group(

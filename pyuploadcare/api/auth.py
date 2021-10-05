@@ -28,7 +28,7 @@ class UploadcareSimpleAuth(AuthBase):
 
         request.headers[
             "Accept"
-        ] = "application/vnd.uploadcare-v{}+json".format(conf.api_version)
+        ] = f"application/vnd.uploadcare-v{conf.api_version}+json"
         request.headers["Authorization"] = self._build_auth_header(
             request, self.public_key, self.secret_key
         )
@@ -56,7 +56,7 @@ class UploadcareAuth(UploadcareSimpleAuth):
 
         request.headers[
             "Accept"
-        ] = "application/vnd.uploadcare-v{}+json".format(conf.api_version)
+        ] = f"application/vnd.uploadcare-v{conf.api_version}+json"
         request.headers["Authorization"] = self._build_auth_header(
             request, self.public_key, self.secret_key, formated_date_time
         )

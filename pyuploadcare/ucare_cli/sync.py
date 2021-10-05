@@ -49,7 +49,7 @@ def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
         no_input=arg_namespace.no_input,
     ) as files:
         for f in files:
-            if f.is_image() and arg_namespace.effects:
+            if f.is_image and arg_namespace.effects:
                 f.default_effects = arg_namespace.effects.lstrip("-/")
 
             local_filepath = build_filepath(arg_namespace.path, f)
@@ -68,7 +68,7 @@ def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
                 continue
 
             url = f.cdn_url
-            _download_file(url, local_filepath, file_size=f.size())
+            _download_file(url, local_filepath, file_size=f.size)
 
 
 def _download_file(url: str, local_filepath: str, file_size: int, max_retry=3):
@@ -113,9 +113,9 @@ def save_file_locally(fname, response, size):
 PATTERNS_REGEX = re.compile(r"(\${\w+})")
 PATTERNS_MAPPING = {
     "${uuid}": lambda f: f.uuid,
-    "${filename}": lambda f: f.filename(),
+    "${filename}": lambda f: f.filename,
     "${effects}": lambda f: f.default_effects,
-    "${ext}": lambda f: os.path.splitext(f.filename() or "")[-1],
+    "${ext}": lambda f: os.path.splitext(f.filename or "")[-1],
 }
 DEFAULT_PATTERN_FILENAME = "${uuid}${ext}"
 

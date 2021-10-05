@@ -67,9 +67,7 @@ class FileField(Field):
         try:
             return self._client.file(value).cdn_url
         except InvalidRequestError as exc:
-            raise ValidationError(
-                "Invalid value for a field: {exc}".format(exc=exc)
-            )
+            raise ValidationError(f"Invalid value for a field: {exc}")
 
     def widget_attrs(self, widget):
         attrs = {}
@@ -112,9 +110,7 @@ class FileGroupField(Field):
         try:
             return self._client.file_group(value).cdn_url
         except InvalidRequestError as exc:
-            raise ValidationError(
-                "Invalid value for a field: {exc}".format(exc=exc)
-            )
+            raise ValidationError(f"Invalid value for a field: {exc}")
 
     def widget_attrs(self, widget):
         attrs = {"data-multiple": ""}

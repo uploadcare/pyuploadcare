@@ -68,7 +68,7 @@ class FileField(models.Field, metaclass=SubfieldBase):
                 # Hack for receiving information about file and if error
                 # happens (e.g. file not found) we catching it and
                 # re-raise as ValidationError.
-                value.info()
+                value.info
             except InvalidRequestError as exc:
                 raise ValidationError(
                     "The file could not be found in your Uploadcare project. "
@@ -78,7 +78,7 @@ class FileField(models.Field, metaclass=SubfieldBase):
 
     def clean(self, value, model_instance):
         cleaned_value = super(FileField, self).clean(value, model_instance)
-        if cleaned_value and not cleaned_value.is_stored():
+        if cleaned_value and not cleaned_value.is_stored:
             cleaned_value.store()
         return cleaned_value
 

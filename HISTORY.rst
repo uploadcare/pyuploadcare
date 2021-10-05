@@ -19,6 +19,8 @@ Changed
 - Dropped support for Python 3.5.
 - Dropped support for Python 2.7.
 - Implemented low-level API.
+- Support multipart uploads.
+- Allow uploading by url in``File.upload`` method.
 
 
 `2.7.0`_ - 2020-05-03

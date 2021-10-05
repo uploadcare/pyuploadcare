@@ -68,7 +68,7 @@ class FileGroup:
         self._client = client
 
     def __repr__(self):
-        return "<uploadcare.FileGroup {0}>".format(self.id)
+        return f"<uploadcare.FileGroup {self.id}>"
 
     def __str__(self):
         return self.cdn_url
@@ -81,17 +81,9 @@ class FileGroup:
         if isinstance(key, slice):
             raise TypeError("slicing is not supported")
         else:
-            file_info = self.info()["files"][key]
+            file_info = self.info["files"][key]
             if file_info is not None:
                 return self._client.file(file_info["uuid"], file_info)
-
-    @property
-    def _api_uri(self):
-        return "groups/{0}/".format(self.id)
-
-    @property
-    def _api_storage_uri(self):
-        return "groups/{0}/storage/".format(self.id)
 
     @property
     def cdn_url(self):
@@ -104,9 +96,7 @@ class FileGroup:
             https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/
 
         """
-        return "{cdn_base}{group_id}/".format(
-            cdn_base=self._client.cdn_base, group_id=self.id
-        )
+        return f"{self._client.cdn_base}{self.id}/"
 
     @property
     def file_cdn_urls(self):
@@ -121,12 +111,11 @@ class FileGroup:
         """
         file_cdn_urls = []
         for file_index in range(len(self)):
-            file_cdn_url = "{group_cdn_url}nth/{file_index}/".format(
-                group_cdn_url=self.cdn_url, file_index=file_index
-            )
+            file_cdn_url = f"{self.cdn_url}nth/{file_index}/"
             file_cdn_urls.append(file_cdn_url)
         return file_cdn_urls
 
+    @property
     def info(self):
         """Returns all available group information as ``dict``.
 
@@ -143,25 +132,28 @@ class FileGroup:
         self._info_cache = self._client.groups_api.retrieve(self.id).dict()
         return self._info_cache
 
+    @property
     def datetime_stored(self):
         """Returns file group's store aware *datetime* in UTC format."""
-        datetime_ = self.info().get("datetime_stored")
+        datetime_ = self.info.get("datetime_stored")
         if isinstance(datetime_, str):
             return dateutil.parser.parse(datetime_)
 
+    @property
     def datetime_created(self):
         """Returns file group's create aware *datetime* in UTC format."""
-        datetime_ = self.info().get("datetime_created")
+        datetime_ = self.info.get("datetime_created")
         if isinstance(datetime_, str):
             return dateutil.parser.parse(datetime_)
 
+    @property
     def is_stored(self):
         """Returns ``True`` if file is stored.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("datetime_stored") is not None
+        return self.info.get("datetime_stored") is not None
 
     def store(self):
         """Stores all group's files by requesting Uploadcare API.
@@ -169,7 +161,7 @@ class FileGroup:
         Uploaded files do not immediately appear on Uploadcare CDN.
 
         """
-        if self.is_stored():
+        if self.is_stored:
             return
 
         self._info_cache = self._client.groups_api.store(self.id)
