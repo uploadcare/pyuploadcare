@@ -25,20 +25,18 @@ logger = logging.getLogger("pyuploadcare")
 
 
 RE_UUID = "[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}"
-RE_UUID_REGEX = re.compile("^{0}$".format(RE_UUID))
+RE_UUID_REGEX = re.compile(f"^{RE_UUID}$")
 RE_EFFECTS = "(?:[^/]+/)+"  # -/resize/(200x300/)*
 UUID_WITH_EFFECTS_REGEX = re.compile(
-    """
+    f"""
     /?
-    (?P<uuid>{uuid})  # required
+    (?P<uuid>{RE_UUID})  # required
     (?:
         /
-        (?:-/(?P<effects>{effects}))?
+        (?:-/(?P<effects>{RE_EFFECTS}))?
         ([^/]*)  # filename
     )?
-$""".format(
-        uuid=RE_UUID, effects=RE_EFFECTS
-    ),
+$""",
     re.VERBOSE,
 )
 
@@ -88,15 +86,18 @@ class File(ApiMixin):
         self._info_cache = None
 
     def __repr__(self):
-        return "<uploadcare.File {uuid}>".format(uuid=self.uuid)
+        return f"<uploadcare.File {self.uuid}>"
 
     def __str__(self):
         return self.cdn_url
 
     def _build_effects(self, effects=""):
         if self.default_effects is not None:
-            fmt = "{head}-/{tail}" if effects else "{head}"
-            effects = fmt.format(head=self.default_effects, tail=effects)
+            effects = (
+                f"{self.default_effects}-/{effects}"
+                if effects
+                else f"{self.default_effects}"
+            )
         return effects
 
     @property
@@ -108,7 +109,7 @@ class File(ApiMixin):
         match = RE_UUID_REGEX.match(value)
 
         if not match:
-            raise InvalidParamError("Invalid UUID: {0}".format(value))
+            raise InvalidParamError(f"Invalid UUID: {value}")
 
         self._uuid = match.group(0)
 
@@ -124,8 +125,7 @@ class File(ApiMixin):
             a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
 
         """
-        ptn = "{uuid}/-/{effects}" if effects else "{uuid}/"
-        return ptn.format(uuid=self.uuid, effects=effects)
+        return f"{self.uuid}/-/{effects}" if effects else f"{self.uuid}/"
 
     @property
     def cdn_url(self):
@@ -144,10 +144,9 @@ class File(ApiMixin):
             https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
 
         """
-        return "{cdn_base}{path}".format(
-            cdn_base=conf.cdn_base, path=self.cdn_path(self.default_effects)
-        )
+        return f"{conf.cdn_base}{self.cdn_path(self.default_effects)}"
 
+    @property
     def info(self):
         """Returns all available file information as ``dict``.
 
@@ -164,87 +163,97 @@ class File(ApiMixin):
         self._info_cache = self.files_api.retrieve(self.uuid).dict()
         return self._info_cache
 
+    @property
     def filename(self):
         """Returns original file name, e.g. ``"olympia.jpg"``.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("original_filename")
+        return self.info.get("original_filename")
 
+    @property
     def datetime_stored(self):
         """Returns file's store aware *datetime* in UTC format.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("datetime_stored")
+        return self.info.get("datetime_stored")
 
+    @property
     def datetime_removed(self):
         """Returns file's remove aware *datetime* in UTC format.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("datetime_removed")
+        return self.info.get("datetime_removed")
 
+    @property
     def datetime_uploaded(self):
         """Returns file's upload aware *datetime* in UTC format.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("datetime_uploaded")
+        return self.info.get("datetime_uploaded")
 
+    @property
     def is_stored(self):
         """Returns ``True`` if file is stored.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("datetime_stored") is not None
+        return self.info.get("datetime_stored") is not None
 
+    @property
     def is_removed(self):
         """Returns ``True`` if file is removed.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("datetime_removed") is not None
+        return self.info.get("datetime_removed") is not None
 
+    @property
     def is_image(self):
         """Returns ``True`` if the file is an image.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("is_image")
+        return self.info.get("is_image")
 
+    @property
     def is_ready(self):
         """Returns ``True`` if the file is fully uploaded on S3.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("is_ready")
+        return self.info.get("is_ready")
 
+    @property
     def size(self):
         """Returns the file size in bytes.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("size")
+        return self.info.get("size")
 
-    def mime_type(self) -> str:
+    @property
+    def mime_type(self):
         """Returns the file MIME type, e.g. ``"image/png"``.
 
         It might do API request once because it depends on ``info()``.
 
         """
-        return self.info().get("mime_type")
+        return self.info.get("mime_type")
 
-    def store(self) -> None:
+    def store(self):
         """Stores file by requesting Uploadcare API.
 
         Uploaded files do not immediately appear on Uploadcare CDN.
@@ -259,7 +268,7 @@ class File(ApiMixin):
         """
         self._info_cache = self.files_api.store(self.uuid).dict()
 
-    def copy(self, effects=None, target=None) -> Union[str, "File"]:
+    def copy(self, effects=None, target=None):
         """Creates a File Copy on Uploadcare or Custom Storage.
 
         File.copy method is deprecated and will be removed in 4.0.0.
@@ -279,7 +288,7 @@ class File(ApiMixin):
             Please use `create_local_copy`
             and `create_remote_copy` instead.
         """
-        logger.warn("API Warning: {0}".format(warning))
+        logger.warning(f"API Warning: {warning}")
 
         if target is not None:
             return self.create_remote_copy(target, effects)
@@ -350,12 +359,12 @@ class File(ApiMixin):
         response = self.files_api.remote_copy(**data)
         return response.result
 
-    def delete(self) -> "None":
+    def delete(self):
         """Deletes file by requesting Uploadcare API."""
         self._info_cache = self.files_api.delete(self.uuid).dict()
 
     @classmethod
-    def construct_from(cls, file_info) -> "File":
+    def construct_from(cls, file_info):
         """Constructs ``File`` instance from file information.
 
         For example you have result of
@@ -379,10 +388,10 @@ class File(ApiMixin):
     def _get_file_size(file_object: IO) -> int:
         return os.fstat(file_object.fileno()).st_size
 
-    @classmethod  # noqa: C901
+    @classmethod
     def upload(  # noqa: C901
         cls,
-        file_obj_or_url: Union[IO, str],
+        file_handle: Union[IO, str],
         store=None,
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
@@ -419,7 +428,7 @@ class File(ApiMixin):
             11000000/11000000 B
 
         Args:
-            - file_obj_or_url: file object or url to upload to. If file object
+            - file_handle: file object or url to upload to. If file object
                 is passed, ``File.upload_files`` (direct upload) or
                 ``File.multipart_upload`` (multipart upload) will be used.
                 If file URL is passed, ``File.upload_from_url_sync`` will be
@@ -442,15 +451,15 @@ class File(ApiMixin):
         """
 
         # assume url is passed if str
-        if isinstance(file_obj_or_url, str):
-            file_url: str = file_obj_or_url
+        if isinstance(file_handle, str):
+            file_url: str = file_handle
             return cls.upload_from_url_sync(
                 file_url,
                 store=cls._format_store(store),
                 callback=callback,
             )
 
-        file_obj: IO = file_obj_or_url
+        file_obj: IO = file_handle
 
         if size is None:
             size = os.fstat(file_obj.fileno()).st_size
@@ -522,7 +531,7 @@ class File(ApiMixin):
         ucare_files = [cls(response[file_name]) for file_name in files]
         return ucare_files
 
-    @classmethod  # noqa: C901
+    @classmethod
     def multipart_upload(  # noqa: C901
         cls,
         file_obj: IO,
@@ -562,11 +571,9 @@ class File(ApiMixin):
             mime_type, _encoding = mimetypes.guess_type(file_obj.name)
 
         if not mime_type:
-            raise ValueError(
-                "Unable to determine file mime type, please set manually"
-            )
+            mime_type = "application/octet-stream"
 
-        complete_response = cls.upload_api.start_multipart_upload(
+        start_response = cls.upload_api.start_multipart_upload(
             file_name=file_obj.name,
             file_size=size,
             content_type=mime_type,
@@ -575,9 +582,9 @@ class File(ApiMixin):
             expire=conf.signed_uploads_ttl,
         )
 
-        multipart_uuid = complete_response["uuid"]
+        multipart_uuid = start_response["uuid"]
 
-        parts: List[str] = complete_response["parts"]
+        parts: List[str] = start_response["parts"]
 
         chunk = file_obj.read(cls.multipart_chunk_size)
 
@@ -597,7 +604,7 @@ class File(ApiMixin):
         return cls.construct_from(file_info)
 
     @classmethod
-    def upload_from_url(cls, url, store=None, filename=None) -> "FileFromUrl":
+    def upload_from_url(cls, url, store=None, filename=None):
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
         Args:
@@ -692,13 +699,13 @@ class File(ApiMixin):
                 uuids.append(file_)
             else:
                 raise ValueError(
-                    "Invalid type for sequence item: {0}".format(type(file_))
+                    f"Invalid type for sequence item: {type(file_)}"
                 )
 
         return uuids
 
     @classmethod
-    def batch_store(cls, files: Iterable[Union[str, "File"]]) -> None:
+    def batch_store(cls, files: Iterable[Union[str, "File"]]):
         """Stores multiple files by requesting Uploadcare API.
 
         Usage example::
@@ -722,7 +729,7 @@ class File(ApiMixin):
             chunk = list(islice(uuids, start, cls.batch_chunk_size))
 
     @classmethod
-    def batch_delete(cls, files: Iterable[Union[str, "File"]]) -> None:
+    def batch_delete(cls, files: Iterable[Union[str, "File"]]):
         """Deletes multiple files by requesting Uploadcare API.
 
         Usage example::
@@ -845,7 +852,7 @@ class FileFromUrl(ApiMixin):
     It expects uploading token, for instance::
 
         >>> ffu = FileFromUrl(token='a6a2db73-2aaf-4124-b2e7-039aec022e18')
-        >>> ffu.info()
+        >>> ffu.info
         {
             "status': "progress",
             "done": 226038,
@@ -882,8 +889,9 @@ class FileFromUrl(ApiMixin):
         self._info_cache = None
 
     def __repr__(self):
-        return "<uploadcare.File.FileFromUrl {0}>".format(self.token)
+        return f"<uploadcare.FileFromUrl {self.token}>"
 
+    @property
     def info(self):
         """Returns actual information about uploading as ``dict``.
 
@@ -903,8 +911,8 @@ class FileFromUrl(ApiMixin):
 
     def get_file(self):
         """Returns ``File`` instance if upload is completed."""
-        if self.info()["status"] == "success":
-            return File(self.info()["uuid"])
+        if self.info["status"] == "success":
+            return File(self.info["uuid"])
 
     def wait(  # noqa: C901
         self,
@@ -926,7 +934,7 @@ class FileFromUrl(ApiMixin):
                 return self.get_file()
             if status in ("failed", "error"):
                 raise UploadError(
-                    "could not upload file from url: {0}".format(self.info())
+                    f"could not upload file from url: {self.info}"
                 )
 
         time_started = time.time()

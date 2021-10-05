@@ -25,7 +25,7 @@ def test_store_one_file():
     main(arg_namespace("store --nowait f4d55a4d-dda5-4fca-ace8-c87799d77a3c"))
 
     file = File("f4d55a4d-dda5-4fca-ace8-c87799d77a3c")
-    assert file.is_stored()
+    assert file.is_stored
 
 
 @pytest.mark.vcr
@@ -42,4 +42,4 @@ def test_store_several_files():
         "ff75ad5f-be9a-4f28-8db8-fcd14aa3ee15",
     ]:
         file = File(file_uuid)
-        assert file.is_stored()
+        assert file.is_stored
