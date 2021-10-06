@@ -22,6 +22,7 @@ from pyuploadcare.api import (
     GroupsAPI,
     UploadAPI,
     VideoConvertAPI,
+    WebhooksAPI,
 )
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
@@ -137,6 +138,7 @@ class Uploadcare:
         self.document_convert_api = DocumentConvertAPI(
             client=self.rest_client, **api_config  # type: ignore
         )
+        self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
 
     def file(
         self,

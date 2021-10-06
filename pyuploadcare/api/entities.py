@@ -124,7 +124,8 @@ class ProjectInfo(Entity):
     autostore_enabled: Optional[bool]
 
 
-class WebhookInfo(IDEntity):
+class Webhook(Entity):
+    id: int
     created: Optional[datetime]
     updated: Optional[datetime]
     event: Optional[str]
