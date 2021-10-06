@@ -9,12 +9,16 @@ from typing import IO, Any, Callable, Dict, Iterable, List, Optional, Union
 from uuid import UUID
 
 from pyuploadcare import conf
+from pyuploadcare.api.entities import DocumentConvertInfo, VideoConvertInfo
 from pyuploadcare.exceptions import (
     InvalidParamError,
+    InvalidRequestError,
     TimeoutError,
     UploadError,
 )
 from pyuploadcare.resources.base import ApiMixin
+from pyuploadcare.transformations.document import DocumentTransformation
+from pyuploadcare.transformations.video import VideoTransformation
 
 
 logger = logging.getLogger("pyuploadcare")
@@ -64,6 +68,8 @@ class File(ApiMixin):
 
     # chunk size for multipart uploads
     multipart_chunk_size = 5 * 1024 * 1024
+
+    thumbnails_group_uuid: Optional[str] = None
 
     def __init__(self, cdn_url_or_file_id):
         if isinstance(cdn_url_or_file_id, UUID):
@@ -745,6 +751,99 @@ class File(ApiMixin):
             cls.files_api.batch_delete(uuids)
             start += cls.batch_chunk_size
             chunk = list(islice(uuids, start, cls.batch_chunk_size))
+
+    def convert(
+        self,
+        transformation: Union[VideoTransformation, DocumentTransformation],
+        store: Optional[bool] = None,
+    ) -> "File":
+        """Convert video or document and return converted file.
+
+        Convert video::
+
+            >>> file = File('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
+            >>> transformation = (
+            ...     VideoTransformation()
+            ...         .format(Format.mp4)
+            ...         .size(width=640,height=480, resize_mode=ResizeMode.add_padding)
+            ...         .quality(Quality.lighter)
+            ...         .cut(start_time='2:30.535', length='2:20.0')
+            ...         .thumbs(10)
+            ... )
+            >>> converted_file: File = file.convert(transformation)
+            >>> converted_file.thumbnails_group_uuid
+            e16536ff-7250-4376-81a4-596e3fef37b0~10
+
+        Convert document::
+
+            >>> file = File('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
+            >>> transformation = DocumentTransformation().format(DocumentFormat.pdf)
+            >>> converted_file: File = file.convert(transformation)
+
+        Arguments:
+            - transformation (Union[VideoTransformation, Documenttransformation]): transformation
+                path builder with configured parameters.
+                Depending on type video or document conversion will be performed.
+            - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
+                - False - do not store file
+                - True - store file
+                - None - use project settings
+        """
+        if isinstance(transformation, VideoTransformation):
+            return self.convert_video(transformation, store=store)
+        elif isinstance(transformation, DocumentTransformation):
+            return self.convert_document(transformation, store=store)
+
+        raise ValueError(f"Unsupported transformation: {transformation}")
+
+    def convert_video(
+        self, transformation: VideoTransformation, store: Optional[bool] = None
+    ) -> "File":
+        """Convert video and return converted file instance.
+
+        Arguments:
+            - transformation (VideoTransformation): transformation path builder
+                with configured parameters.
+            - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
+                - False - do not store file
+                - True - store file
+                - None - use project settings
+        """
+        path = transformation.path(self.uuid)
+        response = self.video_convert_api.convert(paths=[path], store=store)
+        if response.problems:
+            raise InvalidRequestError(response.problems)
+
+        conversion_info: VideoConvertInfo = response.result[0]
+        new_uuid = conversion_info.uuid
+        thumbnails_group_uuid = conversion_info.thumbnails_group_uuid
+        converted_file = File(new_uuid)
+        converted_file.thumbnails_group_uuid = thumbnails_group_uuid
+        return converted_file
+
+    def convert_document(
+        self,
+        transformation: DocumentTransformation,
+        store: Optional[bool] = None,
+    ) -> "File":
+        """Convert document and return converted file instance.
+
+        Arguments:
+            - transformation (DocumentTransformation): transformation path builder
+                with configured parameters.
+            - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
+                - False - do not store file
+                - True - store file
+                - None - use project settings
+        """
+        path = transformation.path(self.uuid)
+        response = self.document_convert_api.convert(paths=[path], store=store)
+        if response.problems:
+            raise InvalidRequestError(response.problems)
+
+        conversion_info: DocumentConvertInfo = response.result[0]
+        new_uuid = conversion_info.uuid
+        return File(new_uuid)
 
 
 class FileFromUrl(ApiMixin):

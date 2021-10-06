@@ -142,18 +142,19 @@ class DocumentConvertInfo(DocumentConvertShortInfo):
     token: int
 
 
-class DocumentConvertStatus(UUIDEntity):
+class DocumentConvertStatus(Entity):
     status: str
     error: Optional[str]
     result: DocumentConvertShortInfo
 
 
 class VideoConvertShortInfo(Entity):
-    token: int
-    thumbnails_group_uuid: UUID
+    uuid: UUID
+    thumbnails_group_uuid: str
 
 
 class VideoConvertInfo(VideoConvertShortInfo):
+    token: int
     original_source: str
 
 
