@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pyuploadcare import File, FileList
+from pyuploadcare import File
 from pyuploadcare.resources.file import UploadProgress
 from pyuploadcare.transformations.document import (
     DocumentFormat,
@@ -12,15 +12,15 @@ from pyuploadcare.transformations.video import VideoFormat, VideoTransformation
 
 
 @pytest.mark.vcr
-def test_file_upload(small_file):
+def test_file_upload(small_file, uploadcare):
     with open(small_file.name, "rb") as fh:
-        file = File.upload(fh)
+        file = uploadcare.upload(fh)
 
     assert isinstance(file, File)
     assert file.is_stored
 
 
-def test_file_upload_callback(small_file, vcr):
+def test_file_upload_callback(small_file, vcr, uploadcare):
     progresses = []
 
     def callback(upload_progress: UploadProgress):
@@ -28,7 +28,7 @@ def test_file_upload_callback(small_file, vcr):
 
     with open(small_file.name, "rb") as fh:
         with vcr.use_cassette("test_file_upload"):
-            file = File.upload(fh, callback=callback)
+            file = uploadcare.upload(fh, callback=callback)
 
     assert isinstance(file, File)
     assert progresses
@@ -36,26 +36,16 @@ def test_file_upload_callback(small_file, vcr):
 
 
 @pytest.mark.vcr
-def test_file_upload_secure(small_file, signed_uploads):
-
-    with open(small_file.name, "rb") as fh:
-        file = File.upload(fh)
-
-    assert isinstance(file, File)
-    assert file.is_stored
-
-
-@pytest.mark.vcr
-def test_file_upload_big_file(big_file):
+def test_file_upload_big_file(big_file, uploadcare):
     with open(big_file.name, "rb") as fh:
-        file = File.upload(fh, store=True)
+        file = uploadcare.upload(fh, store=True)
 
     assert isinstance(file, File)
     assert file.is_ready
 
 
 @pytest.mark.vcr
-def test_file_upload_big_file_callback(big_file, vcr):
+def test_file_upload_big_file_callback(big_file, vcr, uploadcare):
     progresses = []
 
     def callback(upload_progress: UploadProgress):
@@ -63,7 +53,7 @@ def test_file_upload_big_file_callback(big_file, vcr):
 
     with open(big_file.name, "rb") as fh:
         with vcr.use_cassette("test_file_upload_big_file"):
-            file = File.upload(fh, store=True, callback=callback)
+            file = uploadcare.upload(fh, store=True, callback=callback)
 
     assert isinstance(file, File)
     assert progresses
@@ -71,8 +61,8 @@ def test_file_upload_big_file_callback(big_file, vcr):
 
 
 @pytest.mark.vcr
-def test_file_upload_by_url():
-    file = File.upload(
+def test_file_upload_by_url(uploadcare):
+    file = uploadcare.upload(
         "https://github.githubassets.com/images/modules/logos_page/Octocat.png"
     )
     assert isinstance(file, File)
@@ -80,14 +70,14 @@ def test_file_upload_by_url():
 
 
 @pytest.mark.vcr
-def test_file_upload_by_url_callback(vcr):
+def test_file_upload_by_url_callback(vcr, uploadcare):
     progresses = []
 
     def callback(upload_progress: UploadProgress):
         progresses.append(upload_progress)
 
     with vcr.use_cassette("test_file_upload_by_url"):
-        file = File.upload(
+        file = uploadcare.upload(
             "https://github.githubassets.com/images/modules/logos_page/Octocat.png",
             callback=callback,
         )
@@ -95,11 +85,11 @@ def test_file_upload_by_url_callback(vcr):
 
 
 @pytest.mark.vcr
-def test_file_upload_multiple(small_file, small_file2):
+def test_file_upload_multiple(small_file, small_file2, uploadcare):
     file1 = open(small_file.name)
     file2 = open(small_file2.name)
 
-    files = File.upload_files([file1, file2])
+    files = uploadcare.upload_files([file1, file2])
     created_filenames = [file.filename for file in files]
     assert sorted(created_filenames) == sorted(
         [
@@ -110,8 +100,8 @@ def test_file_upload_multiple(small_file, small_file2):
 
 
 @pytest.mark.vcr
-def test_file_create_local_copy():
-    file = File("35ea470d-216c-4752-91d2-5176b34c1225")
+def test_file_create_local_copy(uploadcare):
+    file = uploadcare.file("35ea470d-216c-4752-91d2-5176b34c1225")
     copied_file = file.create_local_copy(
         effects="effect/flip/-/effect/mirror/", store=True
     )
@@ -124,8 +114,10 @@ def test_file_create_local_copy():
 
 
 @pytest.mark.vcr
-def test_file_delete():
-    file = File("35ea470d-216c-4752-91d2-5176b34c1225").create_local_copy(
+def test_file_delete(uploadcare):
+    file = uploadcare.file(
+        "35ea470d-216c-4752-91d2-5176b34c1225"
+    ).create_local_copy(
         effects="effect/flip/-/effect/mirror/",
         store=True,
     )
@@ -136,10 +128,10 @@ def test_file_delete():
 
 
 @pytest.mark.vcr
-def test_file_list_iterate():
+def test_file_list_iterate(uploadcare):
     count = 10
     iterated_count = 0
-    for file in FileList(limit=10):
+    for file in uploadcare.list_files(limit=10):
         assert isinstance(file, File)
         assert file.is_stored
         iterated_count += 1
@@ -148,8 +140,8 @@ def test_file_list_iterate():
 
 
 @pytest.mark.vcr
-def test_file_convert_video():
-    file = File("740e1b8c-1ad8-4324-b7ec-112c79d8eac2")
+def test_file_convert_video(uploadcare):
+    file = uploadcare.file("740e1b8c-1ad8-4324-b7ec-112c79d8eac2")
     transformation = VideoTransformation().format(VideoFormat.webm).thumbs(2)
     converted_file = file.convert(transformation)
     assert not converted_file.is_ready
@@ -157,16 +149,16 @@ def test_file_convert_video():
 
 
 @pytest.mark.vcr
-def test_file_convert_document():
-    file = File("0e1cac48-1296-417f-9e7f-9bf13e330dcf")
+def test_file_convert_document(uploadcare):
+    file = uploadcare.file("0e1cac48-1296-417f-9e7f-9bf13e330dcf")
     transformation = DocumentTransformation().format(DocumentFormat.pdf)
     converted_file = file.convert(transformation)
     assert not converted_file.is_ready
 
 
 @pytest.mark.vcr
-def test_file_convert_document_page():
-    file = File("5dddafa0-a742-4a51-ac40-ae491201ff97")
+def test_file_convert_document_page(uploadcare):
+    file = uploadcare.file("5dddafa0-a742-4a51-ac40-ae491201ff97")
     transformation = (
         DocumentTransformation().format(DocumentFormat.png).page(1)
     )

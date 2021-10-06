@@ -1,8 +1,7 @@
-from pyuploadcare.resources.base import ApiMixin, BaseApiList
-from pyuploadcare.resources.file import File
+from pyuploadcare.resources.base import BaseApiList
 
 
-class FileList(BaseApiList, ApiMixin):
+class FileList(BaseApiList):
     """List of File resources.
 
     This class provides iteration over all uploaded files.
@@ -31,16 +30,17 @@ class FileList(BaseApiList, ApiMixin):
 
     Usage example::
 
-        >>> for f in FileList(removed=None):
+        >>> for f in uploadcare.list_files(removed=None):
         >>>     print(f.datetime_uploaded)
 
     Count objects::
 
-        >>> print('Number of stored files is', FileList(stored=True).count())
+        >>> print('Number of stored files is', uploadcare.list_files(stored=True).count())
 
     """
 
-    constructor = File.construct_from
+    constructor_name = "file"
+    resource_id_field = "uuid"
     datetime_ordering_fields = ("", "datetime_uploaded")
 
     def __init__(self, *args, **kwargs):
@@ -50,7 +50,7 @@ class FileList(BaseApiList, ApiMixin):
 
     @property
     def resource_api(self):
-        return self.files_api
+        return self._client.files_api
 
     def query_parameters(self, **parameters):
         if self.stored is not None:

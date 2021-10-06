@@ -2,12 +2,10 @@ from typing import Any, Dict, Optional, Type, Union, cast
 from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
-from httpx._types import RequestFiles, URLTypes
+from httpx._types import RequestFiles
 from typing_extensions import Protocol
 
-from pyuploadcare import conf
-from pyuploadcare.api.auth import AuthBase, UploadcareAuth
-from pyuploadcare.api.client import Client, get_timeout
+from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import (
     EntityListResponse,
@@ -21,6 +19,18 @@ class API:
     resource_type: str
     response_classes: Dict[str, Union[Type[Response], Type[Entity]]]
     _client: Client
+
+    def __init__(
+        self,
+        client: Client,
+        public_key: str,
+        secret_key: Optional[str] = None,
+        signed_uploads_ttl: int = 60,
+    ) -> None:
+        self.public_key = public_key
+        self.secret_key = secret_key
+        self.signed_uploads_ttl = signed_uploads_ttl
+        self._client = client
 
     def _parse_response(
         self,
@@ -92,25 +102,6 @@ class API:
         url = self._build_url(resource_uuid)
         document = self._client.delete(url)
         return document.json()
-
-
-class RestAPI(API):
-    def __init__(
-        self,
-        base_url: URLTypes = conf.api_base,
-        client: Optional[Client] = None,
-        auth: Optional[AuthBase] = None,
-    ) -> None:
-        if auth is None:
-            auth = UploadcareAuth(conf.pub_key, conf.secret)  # type: ignore
-        if client is None:
-            client = Client(
-                base_url=base_url,
-                auth=auth,
-                verify=conf.verify_api_ssl,
-                timeout=get_timeout(conf.timeout),
-            )
-        self._client = client
 
 
 class APIProtocol(Protocol):

@@ -34,3 +34,7 @@ timeout = DEFAULT
 retry_throttled = 1
 
 user_agent_extension = None
+
+batch_chunk_size = 500
+multipart_min_file_size = 10485760
+multipart_chunk_size = 5 * 1024 * 1024
