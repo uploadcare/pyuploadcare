@@ -229,11 +229,3 @@ Delete webhook
 Delete webhook::
 
     uploadcare.delete_webhook(webhook_id)
-
-
-Get project info
-^^^^^^^^^^^^^^^^
-
-Get project info::
-
-    project_info: ProjectInfo = uploadcare.get_project_info()
