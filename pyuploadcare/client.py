@@ -26,6 +26,7 @@ from pyuploadcare.api import (
 )
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
+from pyuploadcare.api.entities import Webhook
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.helpers import extracts_uuids, get_file_size
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
@@ -673,3 +674,50 @@ class Uploadcare:
             limit=limit,
             request_limit=request_limit,
         )
+
+    def create_webhook(
+        self, target_url: str, event="file.uploaded", is_active=True
+    ) -> Webhook:
+        """Create and subscribe to a webhook."""
+
+        data = {
+            "target_url": target_url,
+            "event": event,
+            "is_active": is_active,
+        }
+        return self.webhooks_api.create(data)
+
+    def list_webhooks(self, limit=None) -> Iterable[Webhook]:
+        """List of project webhooks."""
+
+        return self.webhooks_api.list(limit=limit)
+
+    def update_webhook(
+        self,
+        webhook_id: Union[Webhook, int],
+        target_url=None,
+        event=None,
+        is_active=None,
+    ) -> Webhook:
+        """Update webhook attributes."""
+
+        if isinstance(webhook_id, Webhook):
+            webhook_id = webhook_id.id
+
+        data = {}
+        if target_url is not None:
+            data["target_url"] = target_url
+        if event is not None:
+            data["event"] = event
+        if is_active is not None:
+            data["is_active"] = is_active
+
+        return self.webhooks_api.update(webhook_id, data)  # type: ignore
+
+    def delete_webhook(self, webhook_id: Union[Webhook, int]) -> None:
+        """Unsubscribe and delete a webhook."""
+
+        if isinstance(webhook_id, Webhook):
+            webhook_id = webhook_id.id
+
+        return self.webhooks_api.delete(webhook_id)  # type: ignore
