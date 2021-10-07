@@ -27,7 +27,7 @@ from pyuploadcare.api import (
 )
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
-from pyuploadcare.api.entities import Webhook
+from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.helpers import extracts_uuids, get_file_size
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
@@ -723,3 +723,8 @@ class Uploadcare:
             webhook_id = webhook_id.id
 
         return self.webhooks_api.delete(webhook_id)  # type: ignore
+
+    def get_project_info(self) -> ProjectInfo:
+        """Get info about account project."""
+
+        return self.project_api.retrieve()
