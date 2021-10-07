@@ -202,3 +202,30 @@ List file groups::
     for file_group in file_groups:
         print(file_group.info)
 
+
+Create webhook
+^^^^^^^^^^^^^^
+
+Create webhook::
+
+    webhook: Webhook = uploadcare.create_webhook("https://path/to/webhook")
+
+List webhooks
+^^^^^^^^^^^^^
+
+List webhooks::
+
+    webhooks: List[Webhook] = list(uploadcare.list_webhooks(limit=10))
+
+Update webhook
+
+Update webhook::
+
+    webhook: Webhook = uploadcare.update_webhook(webhook_id, is_active=False)
+
+Delete webhook
+^^^^^^^^^^^^^^
+
+Delete webhook::
+
+    uploadcare.delete_webhook(webhook_id)
