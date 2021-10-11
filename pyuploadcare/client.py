@@ -40,7 +40,6 @@ class Uploadcare:
     Args:
         - public_key: Public key to access Uploadcare API.
         - secret_key: Secret ket to access Uploadcare API.
-        - api_version: Uploadcare Rest API version.
         - api_base: Rest API base url.
         - upload_base: Upload API base url.
         - cdn_base: CDN base url.
@@ -62,7 +61,6 @@ class Uploadcare:
         self,
         public_key: Optional[str] = conf.pub_key,
         secret_key: Optional[str] = conf.secret,
-        api_version=conf.api_version,
         api_base=conf.api_base,
         upload_base=conf.upload_base,
         cdn_base=conf.cdn_base,
@@ -83,7 +81,7 @@ class Uploadcare:
 
         self.public_key = public_key
         self.secret_key = secret_key
-        self.api_version = api_version
+        self.api_version = conf.api_version
         self.api_base = api_base
         self.upload_base = upload_base
         self.cdn_base = cdn_base
@@ -102,7 +100,7 @@ class Uploadcare:
 
         self.timeout = timeout
 
-        auth = auth_class(public_key, secret_key, api_version)  # type: ignore
+        auth = auth_class(public_key, secret_key, self.api_version)  # type: ignore
 
         self.rest_client = Client(
             base_url=api_base,
@@ -200,7 +198,7 @@ class Uploadcare:
 
     def upload(  # noqa: C901
         self,
-        file_obj_or_url: Union[IO, str],
+        file_handle: Union[IO, str],
         store=None,
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
@@ -238,7 +236,7 @@ class Uploadcare:
             11000000/11000000 B
 
         Args:
-            - file_obj_or_url: file object or url to upload to. If file object
+            - file_handle: file object or url to upload to. If file object
                 is passed, ``File.upload_files`` (direct upload) or
                 ``File.multipart_upload`` (multipart upload) will be used.
                 If file URL is passed, ``File.upload_from_url_sync`` will be
@@ -261,15 +259,15 @@ class Uploadcare:
         """
 
         # assume url is passed if str
-        if isinstance(file_obj_or_url, str):
-            file_url: str = file_obj_or_url
+        if isinstance(file_handle, str):
+            file_url: str = file_handle
             return self.upload_from_url_sync(
                 file_url,
                 store=self._format_store(store),
                 callback=callback,
             )
 
-        file_obj: IO = file_obj_or_url
+        file_obj: IO = file_handle
 
         if size is None:
             size = os.fstat(file_obj.fileno()).st_size
