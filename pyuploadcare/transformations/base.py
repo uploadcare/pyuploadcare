@@ -4,7 +4,8 @@ from typing import List
 
 
 class StrEnum(str, Enum):
-    pass
+    def __str__(self):
+        return self.value
 
 
 class BaseTransformation:
@@ -28,17 +29,28 @@ class BaseTransformation:
         return self
 
     def _prefix(self, file_id: str) -> str:
-        raise NotImplementedError
+        return f"{file_id}/"
 
-    def path(self, file_id: str) -> str:
-        path_ = self._prefix(file_id)
+    def __str__(self):
+        return self.effects
 
+    @property
+    def effects(self):
+        effects_ = ""
         for (
             transformation_name,
             transformation_parameters,
         ) in self._transformation_parameters.items():
-            path_ += f"-/{transformation_name}/"
+            effects_ += f"-/{transformation_name}/"
             if transformation_parameters:
-                path_ += f"{transformation_parameters}/"
+                effects_ += f"{transformation_parameters}/"
+        return effects_.lstrip("-/")
+
+    def path(self, file_id: str) -> str:
+        path_ = self._prefix(file_id)
+
+        effects = self.effects
+        if effects:
+            path_ += "-/" + effects
 
         return path_
