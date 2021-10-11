@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Optional, Union
 
 from pyuploadcare.transformations.base import BaseTransformation, StrEnum

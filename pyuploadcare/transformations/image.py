@@ -10,7 +10,7 @@ class StretchMode(StrEnum):
 
 
 class CropAlignment(StrEnum):
-    center = "center"
+    center = "center"  # type: ignore
     top = "top"
     right = "right"
     bottom = "bottom"
@@ -18,7 +18,7 @@ class CropAlignment(StrEnum):
 
 
 class ScaleCropMode(StrEnum):
-    center = "center"
+    center = "center"  # type: ignore
     smart = "smart"
     smart_faces_objects = "smart_faces_objects"
     smart_faces_points = "smart_faces_points"
@@ -124,7 +124,7 @@ class OverlayOffset(StrEnum):
     right = "right"
     top = "top"
     bottom = "bottom"
-    center = "center"
+    center = "center"  # type: ignore
 
 
 class ImageTransformation(BaseTransformation):
@@ -155,7 +155,7 @@ class ImageTransformation(BaseTransformation):
         return self
 
     def smart_resize(self, width: int, height: int) -> "ImageTransformation":
-        parameters = [f"{width}x{height}"]
+        parameters: List[str] = [f"{width}x{height}"]
         self.set("smart_resize", parameters)
         return self
 
@@ -167,7 +167,7 @@ class ImageTransformation(BaseTransformation):
         offset_y: Optional[Union[int, str]] = None,
         alignment: Optional[CropAlignment] = None,
     ) -> "ImageTransformation":
-        parameters = [f"{width}x{height}"]
+        parameters: List[str] = [f"{width}x{height}"]
 
         if alignment:
             parameters.append(alignment)
@@ -185,12 +185,13 @@ class ImageTransformation(BaseTransformation):
         offset_y_percent: Optional[int] = None,
         mode: Optional[ScaleCropMode] = None,
     ) -> "ImageTransformation":
-        parameters = [f"{width}x{height}"]
+        parameters: List[str] = [f"{width}x{height}"]
 
         if offset_x_percent and offset_y_percent:
             parameters.append(f"{offset_x_percent}p,{offset_y_percent}p")
         elif mode:
             parameters.append(mode)
+        self.set("scale_crop", parameters)
         return self
 
     def setfill(self, color: str) -> "ImageTransformation":
@@ -214,7 +215,7 @@ class ImageTransformation(BaseTransformation):
         return self
 
     def gif2video_format(
-        self, format: Optional[Gif2VideoFormat]
+        self, format: Gif2VideoFormat
     ) -> "ImageTransformation":
         self.set("format", [format])
         return self
@@ -228,48 +229,50 @@ class ImageTransformation(BaseTransformation):
     def adjust_color(
         self, adjustment: ColorAdjustment, value: Optional[int] = None
     ) -> "ImageTransformation":
-        parameters = []
+        parameters: List[str] = []
         if value is not None:
             parameters.append(str(value))
         self.set(str(adjustment), parameters)
         return self
 
     def enhance(self, value: Optional[int] = None) -> "ImageTransformation":
-        parameters = []
+        parameters: List[str] = []
         if value is not None:
             parameters.append(str(value))
         self.set("enhance", parameters)
         return self
 
-    def grayscale(self):
+    def grayscale(self) -> "ImageTransformation":
         self.set("grayscale", [])
         return self
 
-    def invert(self):
+    def invert(self) -> "ImageTransformation":
         self.set("invert", [])
         return self
 
-    def filter(self, image_filter: ImageFilter, value: Optional[int] = None):
-        parameters = [image_filter]
+    def filter(
+        self, image_filter: ImageFilter, value: Optional[int] = None
+    ) -> "ImageTransformation":
+        parameters: List[str] = [image_filter]
         if value is not None:
             parameters.append(str(value))
         self.set("filter", parameters)
         return self
 
-    def srgb(self, conversion: SRGBConversion):
-        parameters = [conversion]
+    def srgb(self, conversion: SRGBConversion) -> "ImageTransformation":
+        parameters: List[str] = [conversion]
         self.set("srgb", parameters)
         return self
 
-    def max_icc_size(self, threshold: int):
-        parameters = [str(threshold)]
+    def max_icc_size(self, threshold: int) -> "ImageTransformation":
+        parameters: List[str] = [str(threshold)]
         self.set("max_icc_size", parameters)
         return self
 
     def blur(
         self, strength: Optional[int] = None, amount: Optional[int] = None
-    ):
-        parameters = []
+    ) -> "ImageTransformation":
+        parameters: List[str] = []
         if strength:
             parameters.append(str(strength))
             if amount:
@@ -284,8 +287,8 @@ class ImageTransformation(BaseTransformation):
         offset_x: Union[str, int],
         offset_y: Union[str, int],
         strength: Optional[int] = None,
-    ):
-        parameters = [
+    ) -> "ImageTransformation":
+        parameters: List[str] = [
             f"{region_width}x{region_height}",
             f"{offset_x},{offset_y}",
         ]
@@ -294,15 +297,17 @@ class ImageTransformation(BaseTransformation):
         self.set("blur_region", parameters)
         return self
 
-    def blur_faces(self, strength: Optional[int] = None):
-        parameters = ["faces"]
+    def blur_faces(
+        self, strength: Optional[int] = None
+    ) -> "ImageTransformation":
+        parameters: List[str] = ["faces"]
         if strength is not None:
             parameters.append(str(strength))
         self.set("blur_region", parameters)
         return self
 
-    def sharp(self, strength: Optional[int] = None):
-        parameters = []
+    def sharp(self, strength: Optional[int] = None) -> "ImageTransformation":
+        parameters: List[str] = []
         if strength is not None:
             parameters.append(str(strength))
         self.set("sharp", parameters)
@@ -313,18 +318,18 @@ class ImageTransformation(BaseTransformation):
         uuid: str,
         overlay_width: Union[str, int],
         overlay_height: Union[str, int],
-        offset: Optional[str] = None,
+        offset: Optional[OverlayOffset] = None,
         offset_x: Optional[Union[str, int]] = None,
         offset_y: Optional[Union[str, int]] = None,
         strength: Optional[int] = None,
-    ):
-        parameters = [
+    ) -> "ImageTransformation":
+        parameters: List[str] = [
             uuid,
             f"{overlay_width}x{overlay_height}",
         ]
 
         if offset:
-            parameters.append(offset)
+            parameters.append(str(offset))
         else:
             parameters.append(f"{offset_x},{offset_y}")
 
@@ -338,13 +343,13 @@ class ImageTransformation(BaseTransformation):
         self,
         overlay_width: Union[str, int],
         overlay_height: Union[str, int],
-        offset: Optional[str] = None,
+        offset: Optional[OverlayOffset] = None,
         offset_x: Optional[Union[str, int]] = None,
         offset_y: Optional[Union[str, int]] = None,
         strength: Optional[int] = None,
-    ):
-        parameters = [
-            self,
+    ) -> "ImageTransformation":
+        parameters: List[str] = [
+            "self",
             f"{overlay_width}x{overlay_height}",
         ]
 
@@ -359,21 +364,21 @@ class ImageTransformation(BaseTransformation):
         self.set("overlay", parameters)
         return self
 
-    def autorotate(self, enabled=True):
-        parameters = ["yes" if enabled else "no"]
+    def autorotate(self, enabled=True) -> "ImageTransformation":
+        parameters: List[str] = ["yes" if enabled else "no"]
         self.set("autorotate", parameters)
         return self
 
-    def rotate(self, angle: int):
-        parameters = [str(angle)]
+    def rotate(self, angle: int) -> "ImageTransformation":
+        parameters: List[str] = [str(angle)]
         self.set("rotate", parameters)
         return self
 
-    def flip(self):
+    def flip(self) -> "ImageTransformation":
         self.set("flip", [])
         return self
 
-    def mirror(self):
+    def mirror(self) -> "ImageTransformation":
         self.set("mirror", [])
         return self
 

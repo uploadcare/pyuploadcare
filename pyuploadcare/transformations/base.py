@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from enum import Enum
 from typing import List
 
@@ -12,20 +11,15 @@ class BaseTransformation:
     def __init__(
         self,
     ):
-        self._transformation_parameters = OrderedDict()
-
-    def unset(self, transformation_name: str) -> "BaseTransformation":
-        """Remove transformations"""
-        if transformation_name in self._transformation_parameters:
-            self._transformation_parameters.pop(transformation_name)
-        return self
+        self._effects = []
 
     def set(
         self, transformation_name: str, parameters: List[str]
     ) -> "BaseTransformation":
-        self._transformation_parameters[transformation_name] = "/".join(
-            parameters
-        )
+        effect = transformation_name
+        if parameters:
+            effect += "/" + "/".join(parameters)
+        self._effects.append(effect)
         return self
 
     def _prefix(self, file_id: str) -> str:
@@ -36,15 +30,10 @@ class BaseTransformation:
 
     @property
     def effects(self):
-        effects_ = ""
-        for (
-            transformation_name,
-            transformation_parameters,
-        ) in self._transformation_parameters.items():
-            effects_ += f"-/{transformation_name}/"
-            if transformation_parameters:
-                effects_ += f"{transformation_parameters}/"
-        return effects_.lstrip("-/")
+        effects_ = "/-/".join(self._effects)
+        if effects_:
+            effects_ += "/"
+        return effects_
 
     def path(self, file_id: str) -> str:
         path_ = self._prefix(file_id)
