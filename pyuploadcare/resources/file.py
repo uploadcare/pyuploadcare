@@ -13,6 +13,7 @@ from pyuploadcare.exceptions import (
     UploadError,
 )
 from pyuploadcare.transformations.document import DocumentTransformation
+from pyuploadcare.transformations.image import ImageTransformation
 from pyuploadcare.transformations.video import VideoTransformation
 
 
@@ -86,7 +87,17 @@ class File:
     def __str__(self):
         return self.cdn_url
 
-    def _build_effects(self, effects=""):
+    def set_effects(self, effects: Union[str, ImageTransformation]) -> None:
+        if isinstance(effects, ImageTransformation):
+            effects = str(effects)
+        self.default_effects = effects
+
+    def _build_effects(
+        self, effects: Optional[Union[str, ImageTransformation]] = None
+    ):
+        if isinstance(effects, ImageTransformation):
+            effects = str(effects)
+
         if self.default_effects is not None:
             effects = (
                 f"{self.default_effects}-/{effects}"
@@ -108,7 +119,9 @@ class File:
 
         self._uuid = match.group(0)
 
-    def cdn_path(self, effects=None):
+    def cdn_path(
+        self, effects: Optional[Union[str, ImageTransformation]] = None
+    ):
         """Returns CDN path with applied effects.
 
         Usage example::
@@ -118,9 +131,20 @@ class File:
             a771f854-c2cb-408a-8c36-71af77811f3b/
             >>> file.cdn_path('effect/flip/-/effect/mirror/')
             a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
+            >>> image_transforamtion = (
+            ...     ImageTransformation()
+            ...     .smart_resize(440, 600)
+            ...     .quality(ImageQuality.smart)
+            ... )
+            >>> file.cdn_path(image_transforamtion)
+            a771f854-c2cb-408a-8c36-71af77811f3b/-/smart_resize/440x600/-/quality/smart/
 
         """
-        return f"{self.uuid}/-/{effects}" if effects else f"{self.uuid}/"
+        if isinstance(effects, ImageTransformation):
+            path = effects.path(self.uuid)
+        else:
+            path = f"{self.uuid}/-/{effects}" if effects else f"{self.uuid}/"
+        return path
 
     @property
     def cdn_url(self):
@@ -132,12 +156,17 @@ class File:
             >>> file_.cdn_url
             https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
 
-        You can set default effects::
+        You can set default effects by string::
 
-            >>> file_.default_effects = 'effect/flip/-/effect/mirror/'
+            >>> file_.set_effects('effect/flip/-/effect/mirror/')
             >>> file_.cdn_url
             https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
 
+        or by image transformation builder::
+
+            >>> file_.set_effects(ImageTransformation().grayscale().flip())
+            >>> file_.cdn_url
+            https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/grayscale/-/flip/
         """
         return f"{self._client.cdn_base}{self.cdn_path(self.default_effects)}"
 
@@ -263,7 +292,11 @@ class File:
         """
         self._info_cache = self._client.files_api.store(self.uuid).dict()
 
-    def copy(self, effects=None, target=None):
+    def copy(
+        self,
+        effects: Optional[Union[str, ImageTransformation]] = None,
+        target=None,
+    ):
         """Creates a File Copy on Uploadcare or Custom Storage.
 
         File.copy method is deprecated and will be removed in 4.0.0.
@@ -290,7 +323,11 @@ class File:
         else:
             return self.create_local_copy(effects)
 
-    def create_local_copy(self, effects=None, store=False) -> "File":
+    def create_local_copy(
+        self,
+        effects: Optional[Union[str, ImageTransformation]] = None,
+        store=False,
+    ) -> "File":
         """Creates a Local File Copy on Uploadcare Storage.
 
         Args:
@@ -310,7 +347,11 @@ class File:
         return self._client.file(response.result.uuid)
 
     def create_remote_copy(
-        self, target, effects=None, make_public=None, pattern=None
+        self,
+        target,
+        effects: Optional[Union[str, ImageTransformation]] = None,
+        make_public=None,
+        pattern=None,
     ) -> str:
         """Creates file copy in remote storage.
 
