@@ -31,6 +31,7 @@ from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.helpers import extracts_uuids, get_file_size
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
+from pyuploadcare.secure_url import SecureUrlBuilder
 
 
 class Uploadcare:
@@ -59,6 +60,10 @@ class Uploadcare:
         - multipart_min_file_size: Mininum file size to use multipart uploading.
         - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         - auth_class: Authentication class to use for API.
+        - secure_delivery_cdn: Custom CDN domain for secure delivery.
+        - secure_delivery_secret: Secure delivery secret for token generation.
+        - secure_delivery_window: Sdcure delivery token expiration window.
+
     """
 
     def __init__(
@@ -80,6 +85,9 @@ class Uploadcare:
         multipart_min_file_size=conf.multipart_min_file_size,
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: Type[UploadcareAuth] = UploadcareAuth,
+        secure_delivery_cdn: Optional[str] = None,
+        secure_delivery_secret: Optional[str] = None,
+        secure_delivery_window: int = 300,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -99,6 +107,9 @@ class Uploadcare:
         self.batch_chunk_size = batch_chunk_size
         self.multipart_min_file_size = multipart_min_file_size
         self.multipart_chunk_size = multipart_chunk_size
+        self.secure_delivery_cdn = secure_delivery_cdn
+        self.secure_delivery_secret = secure_delivery_secret
+        self.secure_delivery_window = secure_delivery_window
 
         if timeout is conf.DEFAULT:
             timeout = socket.getdefaulttimeout()
@@ -728,3 +739,23 @@ class Uploadcare:
         """Get info about account project."""
 
         return self.project_api.retrieve()
+
+    def generate_secure_url(
+        self, uuid: Union[str, UUID], acl: Optional[str] = None
+    ) -> str:
+        """Generate authenticated URL."""
+        if isinstance(uuid, UUID):
+            uuid = str(uuid)
+
+        if not (self.secure_delivery_cdn and self.secure_delivery_secret):
+            raise ValueError(
+                "secure_delivery_cdn and secure_delivery_secret must be set"
+            )
+
+        secure_url_builder = SecureUrlBuilder(
+            self.secure_delivery_cdn,
+            self.secure_delivery_secret,
+            window=self.secure_delivery_window,
+        )
+
+        return secure_url_builder.generate_secure_url(uuid, acl=acl)
