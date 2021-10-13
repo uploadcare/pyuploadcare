@@ -31,4 +31,4 @@ def convert_video(arg_namespace, client: Uploadcare) -> None:
 
     info = converted_file.info
     info["thumbnails_group_uuid"] = converted_file.thumbnails_group_uuid
-    pprint(converted_file.info)
+    pprint(info)
