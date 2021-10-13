@@ -1,10 +1,14 @@
 import hashlib
 import hmac
 import time
-from typing import Optional
 
 
-class SecureUrlBuilder:
+class BaseSecureUrlBuilder:
+    def generate_secure_url(self, uuid: str) -> str:
+        raise NotImplementedError
+
+
+class SecureUrlBuilder(BaseSecureUrlBuilder):
     template = "https://{cdn}/{uuid}/?token=exp={exp}~acl={acl}~hmac={token}"
     field_delimeter = "~"
 
@@ -20,13 +24,12 @@ class SecureUrlBuilder:
         self.window = window
         self.hash_algo = hash_algo
 
-    def generate_secure_url(self, uuid: str, acl: Optional[str] = None) -> str:
+    def generate_secure_url(self, uuid: str) -> str:
         uuid = uuid.lstrip("/").rstrip("/")
 
         expire = self.build_expire_time()
 
-        if acl is None:
-            acl = self._format_acl(uuid)
+        acl = self._format_acl(uuid)
 
         token = self.build_token(acl, expire)
 
