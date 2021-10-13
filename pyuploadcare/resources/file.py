@@ -403,19 +403,29 @@ class File:
         raise ValueError(f"Unsupported transformation: {transformation}")
 
     def convert_video(
-        self, transformation: VideoTransformation, store: Optional[bool] = None
+        self,
+        transformation: Union[str, VideoTransformation],
+        store: Optional[bool] = None,
     ) -> "File":
         """Convert video and return converted file instance.
 
         Arguments:
-            - transformation (VideoTransformation): transformation path builder
-                with configured parameters.
+            - transformation (Union[str, VideoTransformation]): transformation path builder
+                with configured parameters or string with effects.
             - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
                 - False - do not store file
                 - True - store file
                 - None - use project settings
         """
-        path = transformation.path(self.uuid)
+        if isinstance(transformation, VideoTransformation):
+            path = transformation.path(self.uuid)
+        else:
+            if transformation:
+                transformation = transformation.lstrip("-/").rstrip("/")
+                path = f"{self.uuid}/video/-/{transformation}/"
+            else:
+                path = f"{self.uuid}/video/"
+
         response = self._client.video_convert_api.convert(
             paths=[path], store=store
         )
