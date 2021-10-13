@@ -1,5 +1,6 @@
 import pytest
 
+from pyuploadcare import Uploadcare
 from pyuploadcare.secure_url import SecureUrlBuilder
 
 
@@ -43,4 +44,24 @@ def test_generate_secure_url_custom_acl():
         "exp=1633997100~"
         "acl=/*/~"
         "hmac=722f6beb935d35b62427329dd591049afb498f77"
+    )
+
+
+@pytest.mark.freeze_time("2021-10-12")
+def test_client_generate_secure_url():
+    uploadcare = Uploadcare(
+        public_key='public',
+        secret_key='secret',
+        secure_delivery_secret='secret',
+        secure_delivery_cdn='cdn.yourdomain.com',
+
+    )
+    secure_url = uploadcare.generate_secure_url(
+        "52da3bfc-7cd8-4861-8b05-126fef7a6994"
+    )
+    assert secure_url == (
+        "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/?token="
+        "exp=1633997100~"
+        "acl=/52da3bfc-7cd8-4861-8b05-126fef7a6994/~"
+        "hmac=a33cfc66c3e3592e712cdd1f82bd79d51df93b06"
     )
