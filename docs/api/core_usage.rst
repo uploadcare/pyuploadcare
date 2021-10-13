@@ -259,3 +259,29 @@ Get project info
 Get project info::
 
     project_info: ProjectInfo = uploadcare.get_project_info()
+
+
+Secure delivery
+^^^^^^^^^^^^^^^
+
+You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see original documentation).
+
+Generate secure for file::
+
+    from pyuploadcare import Uploadcare
+
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        secret_key='<your private key>',
+        secure_delivery_cdn='<your cdn>',
+        secure_delivery_secret='<your secret for token generation>',
+    )
+
+    secure_url = uploadcare.generate_secure_url('52da3bfc-7cd8-4861-8b05-126fef7a6994')
+
+Generate secure for file with transformations::
+
+    secure_url = uploadcare.generate_secure_url(
+        '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
+    )
+
