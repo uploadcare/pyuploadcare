@@ -27,41 +27,36 @@ class AkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         secret_key: str,
         window: int = 300,
         hash_algo=hashlib.sha1,
-        use_acl=True,
     ):
         self.secret_key = secret_key
         self.cdn_url = cdn_url
         self.window = window
         self.hash_algo = hash_algo
-        self.use_acl = use_acl
 
     def build(self, uuid: str) -> str:
         uuid = uuid.lstrip("/").rstrip("/")
 
         expire = self._build_expire_time()
 
-        acl = None
-        if self.use_acl:
-            acl = self._format_acl(uuid)
+        acl = self._format_acl(uuid)
 
-        hmac_signature = self._build_hmac(expire, acl)
+        signature = self._build_signature(expire, acl)
 
-        secure_url = self._build_url(uuid, hmac_signature, expire, acl)
+        secure_url = self._build_url(uuid, expire, acl, signature)
         return secure_url
 
     def _build_url(
         self,
         uuid: str,
-        hmac_signature: str,
         expire: int,
-        acl: Optional[str] = None,
+        acl: str,
+        signature: str,
     ) -> str:
-        req_parameters = [f"exp={expire}"]
-
-        if acl:
-            req_parameters.append(f"acl={acl}")
-
-        req_parameters.append(f"hmac={hmac_signature}")
+        req_parameters = [
+            f"exp={expire}",
+            f"acl={acl}",
+            f"hmac={signature}",
+        ]
 
         token = self.field_delimeter.join(req_parameters)
 
@@ -71,16 +66,12 @@ class AkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
             token=token,
         )
 
-    def _build_token(
-        self, expire: int, hmac_signature: str, acl: Optional[str] = None
-    ):
-        token_parts = [f"exp={expire}"]
-
-        if acl:
-            token_parts.append(f"acl={acl}")
-
-        token_parts.append(f"hmac={hmac_signature}")
-
+    def _build_token(self, expire: int, acl: Optional[str], signature: str):
+        token_parts = [
+            f"exp={expire}",
+            f"acl={acl}",
+            f"hmac={signature}",
+        ]
         return self.field_delimeter.join(token_parts)
 
     def _format_acl(self, uuid: str) -> str:
@@ -89,17 +80,16 @@ class AkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     def _build_expire_time(self) -> int:
         return int(time.time()) + self.window
 
-    def _build_hmac(self, expire: int, acl: Optional[str] = None) -> str:
+    def _build_signature(self, expire: int, acl: str) -> str:
         hash_source = [
             f"exp={expire}",
+            f"acl={acl}",
         ]
-        if acl:
-            hash_source.append(f"acl={acl}")
 
-        hmac_signature = hmac.new(
+        signature = hmac.new(
             self.secret_key.encode(),
             self.field_delimeter.join(hash_source).encode(),
             self.hash_algo,
         ).hexdigest()
 
-        return hmac_signature
+        return signature
