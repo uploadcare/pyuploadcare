@@ -269,12 +269,14 @@ You can use your own custom domain and CDN provider for deliver files with authe
 Generate secure for file::
 
     from pyuploadcare import Uploadcare
+    from pyuploadcare.secure_url import AkamaiSecureUrlBuilder
+
+    secure_url_bulder = AkamaiSecureUrlBuilder("your cdn>", "<your secret for token generation>")
 
     uploadcare = Uploadcare(
         public_key='<your public key>',
         secret_key='<your private key>',
-        secure_delivery_cdn='<your cdn>',
-        secure_delivery_secret='<your secret for token generation>',
+        secure_url_builder=secure_url_bulder,
     )
 
     secure_url = uploadcare.generate_secure_url('52da3bfc-7cd8-4861-8b05-126fef7a6994')
