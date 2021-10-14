@@ -104,6 +104,11 @@ or, if you prefer it the old way:
 
     $ easy_install pyuploadcare
 
+To use in Django project install with extra dependencies::
+
+.. code-block:: console
+
+    $ pip install pyuploadcare[django]
 
 Usage
 =====
