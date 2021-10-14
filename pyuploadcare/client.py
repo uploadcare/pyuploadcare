@@ -31,7 +31,7 @@ from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.helpers import extracts_uuids, get_file_size
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
-from pyuploadcare.secure_url import BaseSecureUrlBuilder, SecureUrlBuilder
+from pyuploadcare.secure_url import BaseSecureUrlBuilder
 
 
 class Uploadcare:
@@ -742,4 +742,4 @@ class Uploadcare:
         if not self.secure_url_builder:
             raise ValueError("secure_url_builder must be set")
 
-        return self.secure_url_builder.generate_secure_url(uuid)
+        return self.secure_url_builder.build(uuid)
