@@ -1,4 +1,3 @@
-import mimetypes
 import os
 import socket
 from itertools import islice
@@ -29,7 +28,7 @@ from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
-from pyuploadcare.helpers import extracts_uuids, get_file_size
+from pyuploadcare.helpers import extracts_uuids, get_file_size, guess_mime_type
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
 from pyuploadcare.secure_url import BaseSecureUrlBuilder
 
@@ -335,9 +334,16 @@ class Uploadcare:
             ``File`` instance
 
         """
+
+        def _file_name(file_object, index):
+            return os.path.basename(file_object.name or "") or f"file{index}"
+
         files = {
-            os.path.basename(file_object.name or "")
-            or f"file{index}": file_object
+            _file_name(file_object, index): (
+                _file_name(file_object, index),
+                file_object,
+                guess_mime_type(file_object),
+            )
             for index, file_object in enumerate(file_objects)
         }
 
@@ -386,12 +392,7 @@ class Uploadcare:
             size = get_file_size(file_obj)
 
         if not mime_type:
-            mime_type, _encoding = mimetypes.guess_type(file_obj.name)
-
-        if not mime_type:
-            raise ValueError(
-                "Unable to determine file mime type, please set manually"
-            )
+            mime_type = guess_mime_type(file_obj)
 
         complete_response = self.upload_api.start_multipart_upload(
             file_name=file_obj.name,
