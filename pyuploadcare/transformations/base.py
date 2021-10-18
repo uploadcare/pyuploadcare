@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Optional, Union
 
 
 class StrEnum(str, Enum):
@@ -9,9 +9,15 @@ class StrEnum(str, Enum):
 
 class BaseTransformation:
     def __init__(
-        self,
+        self, transformation: Optional[Union[str, "BaseTransformation"]] = None
     ):
+        if isinstance(transformation, BaseTransformation):
+            transformation = transformation.effects
+
         self._effects = []
+        if transformation:
+            transformation = transformation.rstrip("/")  # type: ignore
+            self._effects.append(transformation)
 
     def set(
         self, transformation_name: str, parameters: List[str]
