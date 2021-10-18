@@ -1,0 +1,56 @@
+interactions:
+- request:
+    body: '{"source": "463c38f7-8a27-46bb-bebc-2e0617d159a4/-/grayscale/-/flip/",
+      "store": true}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '85'
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: POST
+    uri: https://api.uploadcare.com/files/local_copy/
+  response:
+    content: '{"type":"file","result":{"datetime_removed":null,"datetime_stored":"2021-10-12T08:25:23.431203Z","datetime_uploaded":"2021-10-12T08:25:23.431203Z","image_info":null,"is_image":null,"is_ready":true,"mime_type":"application/octet-stream","original_file_url":"https://ucarecdn.com/bd65d41c-46dc-4212-b4fb-93264290dc4c/Octocat.png","original_filename":"Octocat.png","size":0,"url":"https://api.uploadcare.com/files/bd65d41c-46dc-4212-b4fb-93264290dc4c/","uuid":"bd65d41c-46dc-4212-b4fb-93264290dc4c","variations":null,"video_info":null}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - OPTIONS, POST
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '533'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Tue, 12 Oct 2021 08:25:23 GMT
+      Location:
+      - https://api.uploadcare.com/files/bd65d41c-46dc-4212-b4fb-93264290dc4c/
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 201
+version: 1

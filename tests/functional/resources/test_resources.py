@@ -8,6 +8,7 @@ from pyuploadcare.transformations.document import (
     DocumentFormat,
     DocumentTransformation,
 )
+from pyuploadcare.transformations.image import ImageTransformation
 from pyuploadcare.transformations.video import VideoFormat, VideoTransformation
 
 
@@ -164,3 +165,29 @@ def test_file_convert_document_page(uploadcare):
     )
     converted_file = file.convert(transformation)
     assert not converted_file.is_ready
+
+
+@pytest.fixture
+def image_transformation():
+    return ImageTransformation().grayscale().flip()
+
+
+def test_cdn_url_default_effects(uploadcare, image_transformation):
+    file = uploadcare.file("5dddafa0-a742-4a51-ac40-ae491201ff97")
+    file.set_effects(image_transformation)
+
+    assert file.cdn_url == (
+        "https://ucarecdn.com/5dddafa0-a742-4a51-ac40-ae491201ff97/"
+        "-/grayscale/-/flip/"
+    )
+
+
+@pytest.mark.vcr
+def test_create_local_copy_with_transformation(
+    uploadcare, image_transformation
+):
+    file = uploadcare.file("463c38f7-8a27-46bb-bebc-2e0617d159a4")
+    copied_file = file.create_local_copy(
+        effects=image_transformation, store=True
+    )
+    assert copied_file
