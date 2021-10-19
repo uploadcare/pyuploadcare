@@ -1,0 +1,50 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/groups/d496a4df-0b36-4281-8156-268ae9524d4a~1/
+  response:
+    content: '{"id":"d496a4df-0b36-4281-8156-268ae9524d4a~1","datetime_created":"2021-10-19T08:36:22.326641Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/d496a4df-0b36-4281-8156-268ae9524d4a~1/","url":"https://api.uploadcare.com/groups/d496a4df-0b36-4281-8156-268ae9524d4a~1/","files":[{"datetime_removed":null,"datetime_stored":"2021-10-12T03:45:57.590598Z","datetime_uploaded":"2021-10-12T03:45:57.489664Z","image_info":{"width":134,"height":60,"format":"PNG","color_mode":"P","geo_location":null,"orientation":null,"dpi":[72,72],"datetime_original":null,"sequence":false},"is_image":true,"is_ready":true,"mime_type":"image/png","original_file_url":"https://ucarecdn.com/94a2218e-3526-428a-945e-65fbc06e7b35/instellar_logo_main1.png","original_filename":"instellar_logo_main
+      (1).png","size":3303,"url":"https://api.uploadcare.com/files/94a2218e-3526-428a-945e-65fbc06e7b35/","uuid":"94a2218e-3526-428a-945e-65fbc06e7b35","variations":null,"video_info":null,"default_effects":""}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '995'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Tue, 19 Oct 2021 08:38:06 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
