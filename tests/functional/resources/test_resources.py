@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pyuploadcare import File
+from pyuploadcare import File, FileGroup, FileList, GroupList
 from pyuploadcare.resources.file import UploadProgress
 from pyuploadcare.transformations.document import (
     DocumentFormat,
@@ -214,3 +214,29 @@ def test_get_group_with_deleted_files(uploadcare):
     assert group[0] is None
     for file in group:
         assert file is None
+
+
+@pytest.mark.vcr
+def test_list_file_groups(uploadcare):
+    groups_list = uploadcare.list_file_groups(limit=5)
+    assert isinstance(groups_list, GroupList)
+
+    with pytest.raises(IndexError):
+        groups_list[10]
+
+    groups = groups_list[0:2]
+    assert len(groups) == 2
+    assert isinstance(groups[0], FileGroup)
+
+
+@pytest.mark.vcr
+def test_list_files(uploadcare):
+    file_list = uploadcare.list_files(limit=5)
+    assert isinstance(file_list, FileList)
+
+    with pytest.raises(IndexError):
+        file_list[10]
+
+    files = file_list[0:2]
+    assert len(files) == 2
+    assert isinstance(files[0], File)
