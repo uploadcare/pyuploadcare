@@ -4,8 +4,9 @@ from __future__ import unicode_literals
 from django.core.exceptions import ValidationError
 from django.forms import Field, TextInput
 
-from pyuploadcare import File, FileGroup, conf
+from pyuploadcare.client import Uploadcare
 from pyuploadcare.dj import conf as dj_conf
+from pyuploadcare.dj.client import get_uploadcare_client
 from pyuploadcare.exceptions import InvalidRequestError
 
 
@@ -26,11 +27,11 @@ class FileWidget(TextInput):
     def __init__(self, attrs=None):
         default_attrs = {
             "role": "uploadcare-uploader",
-            "data-public-key": conf.pub_key,
+            "data-public-key": dj_conf.pub_key,
         }
 
-        if conf.user_agent_extension is not None:
-            default_attrs["data-integration"] = conf.user_agent_extension
+        if dj_conf.user_agent_extension is not None:
+            default_attrs["data-integration"] = dj_conf.user_agent_extension
 
         if dj_conf.upload_base_url is not None:
             default_attrs["data-url-base"] = dj_conf.upload_base_url
@@ -52,13 +53,19 @@ class FileField(Field):
     """
 
     widget = FileWidget
+    _client: Uploadcare
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._client = get_uploadcare_client()
 
     def to_python(self, value):
         if value is None or value == "":
             return value
 
         try:
-            return File(value).cdn_url
+            return self._client.file(value).cdn_url
         except InvalidRequestError as exc:
             raise ValidationError(f"Invalid value for a field: {exc}")
 
@@ -89,12 +96,19 @@ class FileGroupField(Field):
 
     widget = FileWidget
 
+    _client: Uploadcare
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._client = get_uploadcare_client()
+
     def to_python(self, value):
         if value is None or value == "":
             return value
 
         try:
-            return FileGroup(value).cdn_url
+            return self._client.file_group(value).cdn_url
         except InvalidRequestError as exc:
             raise ValidationError(f"Invalid value for a field: {exc}")
 
