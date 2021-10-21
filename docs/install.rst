@@ -71,3 +71,25 @@ A version 3.0 contains the next breaking changes:
 
 * Resource attributes can be accessed now as properies, not methods.
   In 2.x version use ``file.is_stored()``, in 3.x verisons use ``file.is_stored``.
+
+* ``Uploadcare`` client should be initialized to access API.
+  Refer to the documentation to see examples of using ``Uploadcare`` client::
+
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        secret_key='<your private key>',
+    )
+
+
+* ``File``, ``FileGroup``, ``FileList`` and ``GroupList`` resources cannot be initialized directly.
+  ``uploadcare.file``, ``uploadcare.file_group``, ``uploadcare.list_files``, ``uploadcare.list_file_groups``
+  client methods should be used instead::
+
+    file: File = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
+    file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+    file_groups: GroupList = uploadcare.list_file_groups()
+    files: FileList = uploadcare.list_files(stored=True)
+
+* ``pyuploadcare.conf`` package still can be used for configuration, but it is more preferable to pass
+  configuration options to ``Uploadcare`` client on initialization. ``pyuploadcare.conf`` provides
+  default values for the client.

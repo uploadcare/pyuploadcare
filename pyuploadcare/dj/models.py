@@ -7,13 +7,22 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from pyuploadcare import File, FileGroup
+from pyuploadcare.client import Uploadcare
 from pyuploadcare.dj import forms
+from pyuploadcare.dj.client import get_uploadcare_client
 from pyuploadcare.dj.subclassing import SubfieldBase
 from pyuploadcare.exceptions import InvalidRequestError
 
 
 class FileField(models.Field, metaclass=SubfieldBase):
     """Django model field that stores uploaded file as Uploadcare CDN url."""
+
+    _client: Uploadcare
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._client = get_uploadcare_client()
 
     def get_internal_type(self):
         return "TextField"
@@ -31,7 +40,7 @@ class FileField(models.Field, metaclass=SubfieldBase):
             )
 
         try:
-            return File(value)
+            return self._client.file(value)
         except InvalidRequestError as exc:
             raise ValidationError(
                 "Invalid value for a field: {exc}".format(exc=exc)
@@ -132,6 +141,13 @@ class FileGroupField(models.Field, metaclass=SubfieldBase):
 
     """
 
+    _client: Uploadcare
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._client = get_uploadcare_client()
+
     def get_internal_type(self):
         return "TextField"
 
@@ -148,7 +164,7 @@ class FileGroupField(models.Field, metaclass=SubfieldBase):
             )
 
         try:
-            return FileGroup(value)
+            return self._client.file_group(value)
         except InvalidRequestError as exc:
             raise ValidationError(
                 "Invalid value for a field: {exc}".format(exc=exc)
