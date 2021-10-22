@@ -78,7 +78,6 @@ A version 3.0 contains the next breaking changes:
     uploadcare = Uploadcare(
         public_key='<your public key>',
         secret_key='<your private key>',
-        upload_base='https://path/to/upload/api',
     )
 
 
