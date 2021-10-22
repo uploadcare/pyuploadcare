@@ -163,7 +163,7 @@ class APIProtocol(Protocol):
 class RetrieveMixin(APIProtocol):
     def retrieve(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity],
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
     ):
         response_class = self._get_response_class("retrieve")
 

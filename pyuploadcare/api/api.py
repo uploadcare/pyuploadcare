@@ -110,6 +110,9 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin):
 class ProjectAPI(API, RetrieveMixin):
     resource_type = "project"
     entity_class = entities.ProjectInfo
+    response_classes = {
+        "retrieve": entities.ProjectInfo,
+    }
 
 
 class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
