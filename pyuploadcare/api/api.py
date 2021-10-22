@@ -4,9 +4,8 @@ from time import time
 from typing import Any, Dict, Iterable, List, Optional, Union, cast
 from uuid import UUID
 
-from httpx._types import RequestFiles, URLTypes
+from httpx._types import RequestFiles
 
-from pyuploadcare import conf
 from pyuploadcare.api import entities, responses
 from pyuploadcare.api.base import (
     API,
@@ -14,14 +13,12 @@ from pyuploadcare.api.base import (
     DeleteMixin,
     ListCountMixin,
     ListMixin,
-    RestAPI,
     RetrieveMixin,
 )
-from pyuploadcare.api.client import Client, get_timeout
 from pyuploadcare.exceptions import APIError
 
 
-class FilesAPI(RestAPI, ListCountMixin, RetrieveMixin, DeleteMixin):
+class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
     resource_type = "files"
     response_classes = {
         "retrieve": entities.FileInfo,
@@ -92,7 +89,7 @@ class FilesAPI(RestAPI, ListCountMixin, RetrieveMixin, DeleteMixin):
         return cast(responses.CreateRemoteCopyResponse, response)
 
 
-class GroupsAPI(RestAPI, ListCountMixin, RetrieveMixin):
+class GroupsAPI(API, ListCountMixin, RetrieveMixin):
     resource_type = "groups"
     entity_class = entities.GroupInfo
 
@@ -107,17 +104,17 @@ class GroupsAPI(RestAPI, ListCountMixin, RetrieveMixin):
         return self._client.put(url).json()
 
 
-class ProjectAPI(RestAPI, RetrieveMixin):
+class ProjectAPI(API, RetrieveMixin):
     resource_type = "project"
     entity_class = entities.ProjectInfo
 
 
-class WebhooksAPI(RestAPI, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
+class WebhooksAPI(API, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
     resource_type = "webhooks"
     entity_class = entities.WebhookInfo
 
 
-class DocumentConvertAPI(RestAPI):
+class DocumentConvertAPI(API):
     resource_type = "convert/document"
     entity_class = entities.DocumentConvertInfo
 
@@ -152,7 +149,7 @@ class DocumentConvertAPI(RestAPI):
         return cast(entities.DocumentConvertStatus, response)
 
 
-class VideoConvertAPI(RestAPI):
+class VideoConvertAPI(API):
     resource_type = "convert/video"
     entity_class = entities.VideoConvertInfo
 
@@ -190,19 +187,6 @@ class VideoConvertAPI(RestAPI):
 class UploadAPI(API):
     resource_type = "base"
 
-    def __init__(
-        self,
-        base_url: URLTypes = conf.upload_base,
-        client: Optional[Client] = None,
-    ) -> None:
-        if client is None:
-            client = Client(
-                base_url=base_url,
-                verify=conf.verify_upload_ssl,
-                timeout=get_timeout(conf.timeout),
-            )
-        self._client = client
-
     @staticmethod
     def _generate_secure_signature(secret: str, expire: int):
         return hmac.new(
@@ -223,16 +207,16 @@ class UploadAPI(API):
         data["UPLOADCARE_STORE"] = store
 
         if public_key is None:
-            public_key = conf.pub_key
+            public_key = self.public_key
 
         data["UPLOADCARE_PUB_KEY"] = public_key
 
         if secure_upload:
             if secret_key is None:
-                secret_key = conf.secret
+                secret_key = self.secret_key
 
             if expire is None:
-                expire = int(time()) + conf.signed_uploads_ttl
+                expire = int(time()) + self.signed_uploads_ttl
             data["expire"] = str(expire)
 
             signature = self._generate_secure_signature(secret_key, expire)  # type: ignore
@@ -255,7 +239,7 @@ class UploadAPI(API):
             "filename": file_name,
             "size": str(file_size),
             "content_type": content_type,
-            "UPLOADCARE_PUB_KEY": conf.pub_key,
+            "UPLOADCARE_PUB_KEY": self.public_key,
         }
 
         if store is not None:
@@ -263,14 +247,14 @@ class UploadAPI(API):
 
         if secure_upload:
             expire = (
-                (int(time()) + conf.signed_uploads_ttl)
+                (int(time()) + self.signed_uploads_ttl)
                 if expire is None
                 else expire
             )
 
             data["expire"] = str(expire)
             data["signature"] = self._generate_secure_signature(
-                conf.secret, expire  # type: ignore
+                self.secret_key, expire  # type: ignore
             )
 
         url = self._build_url(base="multipart/start")
@@ -288,7 +272,7 @@ class UploadAPI(API):
     def multipart_complete(self, uuid: UUID):
         data = {
             "uuid": str(uuid),
-            "UPLOADCARE_PUB_KEY": conf.pub_key,
+            "UPLOADCARE_PUB_KEY": self.public_key,
         }
         url = self._build_url(base="multipart/complete")
         document = self._client.post(url, data=data)
@@ -305,21 +289,21 @@ class UploadAPI(API):
         data = {
             "source_url": source_url,
             "store": store,
-            "pub_key": conf.pub_key,
+            "pub_key": self.public_key,
         }
         if filename:
             data["filename"] = filename
 
         if secure_upload:
             expire = (
-                (int(time()) + conf.signed_uploads_ttl)
+                (int(time()) + self.signed_uploads_ttl)
                 if expire is None
                 else expire
             )
 
             data["expire"] = str(expire)
             data["signature"] = self._generate_secure_signature(
-                conf.secret, expire  # type: ignore
+                self.secret_key, expire  # type: ignore
             )
 
         url = self._build_url(base="/from_url")
@@ -344,12 +328,12 @@ class UploadAPI(API):
 
     def create_group(
         self,
-        files: List[Union[str, UUID]],
+        files: Iterable[Union[str, UUID]],
         secure_upload: bool = False,
         expire: Optional[int] = None,
     ):
         data = {
-            "pub_key": conf.pub_key,
+            "pub_key": self.public_key,
         }
 
         for index, file in enumerate(files):
@@ -357,14 +341,14 @@ class UploadAPI(API):
 
         if secure_upload:
             expire = (
-                (int(time()) + conf.signed_uploads_ttl)
+                (int(time()) + self.signed_uploads_ttl)
                 if expire is None
                 else expire
             )
 
             data["expire"] = str(expire)
             data["signature"] = self._generate_secure_signature(
-                conf.secret, expire  # type: ignore
+                self.secret_key, expire  # type: ignore
             )
 
         url = self._build_url(base="/group/")

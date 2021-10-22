@@ -1,12 +1,10 @@
 # coding: utf-8
-from __future__ import unicode_literals
 
 from django import get_version as django_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from pyuploadcare import __version__ as library_version
-from pyuploadcare import conf
 
 
 if not hasattr(settings, "UPLOADCARE"):
@@ -18,14 +16,13 @@ if "secret" not in settings.UPLOADCARE:
     raise ImproperlyConfigured("UPLOADCARE setting must have secret")
 
 
-conf.pub_key = settings.UPLOADCARE["pub_key"]
-conf.secret = settings.UPLOADCARE["secret"]
-conf.user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
+pub_key = settings.UPLOADCARE["pub_key"]
+secret = settings.UPLOADCARE["secret"]
+user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
     django_version(), library_version
 )
 
-if "cdn_base" in settings.UPLOADCARE:
-    conf.cdn_base = settings.UPLOADCARE["cdn_base"]
+cdn_base = settings.UPLOADCARE.get("cdn_base")
 
 
 widget_version = settings.UPLOADCARE.get("widget_version", "3.x")

@@ -1,19 +1,18 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import hashlib
 import os
 import pickle
 import re
+import socket
 import time
 from math import ceil
 
 from dateutil import parser
-from httpx._exceptions import HTTPError
+from httpx import HTTPError
 
-from pyuploadcare import File, FileList, conf
-from pyuploadcare.api.client import Client, get_timeout
-from pyuploadcare.ucare_cli.utils import (
+from pyuploadcare import FileList, conf
+from pyuploadcare.api.client import Client
+from pyuploadcare.client import Uploadcare
+from pyuploadcare.ucare_cli.commands.helpers import (
     bar,
     bool_or_none,
     int_or_none,
@@ -22,7 +21,84 @@ from pyuploadcare.ucare_cli.utils import (
 )
 
 
-def sync_files(arg_namespace):  # noqa: C901
+def register_arguments(subparsers):
+    subparser = subparsers.add_parser("sync", help="sync files")
+    subparser.set_defaults(func=sync_files)
+    subparser.add_argument(
+        "path",
+        nargs="?",
+        help=(
+            "Local path. It can contains special patterns like: {0} "
+            "Default is {1}".format(
+                " ".join(PATTERNS_MAPPING.keys()), DEFAULT_PATTERN_FILENAME
+            )
+        ),
+        default=".",
+    )
+    subparser.add_argument(
+        "--starting_point",
+        help="a starting point for filtering files",
+        action="store",
+    )
+    subparser.add_argument(
+        "--ordering",
+        help="specify the way the files should be sorted",
+        action="store",
+    )
+    subparser.add_argument(
+        "--limit", help="files to show", default=100, type=int_or_none
+    )
+    subparser.add_argument(
+        "--request_limit",
+        help="files per request",
+        default=100,
+        type=int_or_none,
+    )
+    subparser.add_argument(
+        "--stored",
+        help="filter stored files",
+        choices=[True, False, None],
+        type=bool_or_none,
+        default=None,
+    )
+    subparser.add_argument(
+        "--removed",
+        help="filter removed files",
+        choices=[True, False, None],
+        type=bool_or_none,
+        default=False,
+    )
+    subparser.add_argument(
+        "--replace",
+        help="replace exists files",
+        default=False,
+        action="store_true",
+    )
+    subparser.add_argument(
+        "--uuids",
+        nargs="+",
+        help="list of file's uuids for sync",
+    )
+    subparser.add_argument(
+        "--effects",
+        help=(
+            "apply effects for synced images."
+            "Note that effects will apply to images only."
+            "For more information look at: "
+            "https://uploadcare.com/docs/processing/image/  "
+            "Example: --effects=resize/200x/-/rotate/90/"
+        ),
+    )
+    subparser.add_argument(
+        "--no-input",
+        help="do not ask for user input",
+        default=False,
+        action="store_true",
+    )
+    return subparser
+
+
+def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
         if ordering_field in ("", "datetime_uploaded"):
@@ -44,7 +120,8 @@ def sync_files(arg_namespace):  # noqa: C901
         )
 
     with SyncSession(
-        TrackedFileList(**kwargs), no_input=arg_namespace.no_input
+        TrackedFileList(client=client, **kwargs),
+        no_input=arg_namespace.no_input,
     ) as files:
         for f in files:
             if f.is_image and arg_namespace.effects:
@@ -151,7 +228,9 @@ class SyncSession:
         if os.path.exists(self.session_filepath):
             if not self.no_input and promt("Continue last sync?"):
                 with open(self.session_filepath, "rb") as f:
+                    client = self.session._client
                     self.session = pickle.load(f)
+                    self.session._client = client
                     return
 
     def __enter__(self):
@@ -160,7 +239,10 @@ class SyncSession:
     def __exit__(self, *args):
         if all(args):
             with open(self.session_filepath, "wb") as f:
+                client = self.session._client
+                self.session._client = None
                 pickle.dump(self.session, f)
+                self.session._client = client
             return False
 
         # Iteration is complete without errors.
@@ -198,82 +280,13 @@ class TrackedFileList(FileList):
         for uuid in self.uuids:
             if uuid in self.handled_uuids:
                 continue
-            yield File(uuid)
+            yield self._client.file(uuid)
             self.handled_uuids.append(uuid)
 
 
-def add_sync_files_parser(subparsers):
-    subparser = subparsers.add_parser("sync", help="sync files")
-    subparser.set_defaults(func=sync_files)
-    subparser.add_argument(
-        "path",
-        nargs="?",
-        help=(
-            "Local path. It can contains special patterns like: {0} "
-            "Default is {1}".format(
-                " ".join(PATTERNS_MAPPING.keys()), DEFAULT_PATTERN_FILENAME
-            )
-        ),
-        default=".",
-    )
-    subparser.add_argument(
-        "--starting_point",
-        help="a starting point for filtering files",
-        action="store",
-    )
-    subparser.add_argument(
-        "--ordering",
-        help="specify the way the files should be sorted",
-        action="store",
-    )
-    subparser.add_argument(
-        "--limit", help="files to show", default=100, type=int_or_none
-    )
-    subparser.add_argument(
-        "--request_limit",
-        help="files per request",
-        default=100,
-        type=int_or_none,
-    )
-    subparser.add_argument(
-        "--stored",
-        help="filter stored files",
-        choices=[True, False, None],
-        type=bool_or_none,
-        default=None,
-    )
-    subparser.add_argument(
-        "--removed",
-        help="filter removed files",
-        choices=[True, False, None],
-        type=bool_or_none,
-        default=False,
-    )
-    subparser.add_argument(
-        "--replace",
-        help="replace exists files",
-        default=False,
-        action="store_true",
-    )
-    subparser.add_argument(
-        "--uuids",
-        nargs="+",
-        help="list of file's uuids for sync",
-    )
-    subparser.add_argument(
-        "--effects",
-        help=(
-            "apply effects for synced images."
-            "Note that effects will apply to images only."
-            "For more information look at: "
-            "https://uploadcare.com/docs/processing/image/  "
-            "Example: --effects=resize/200x/-/rotate/90/"
-        ),
-    )
-    subparser.add_argument(
-        "--no-input",
-        help="do not ask for user input",
-        default=False,
-        action="store_true",
-    )
-    return subparser
+def get_timeout(timeout):
+    if timeout is not conf.DEFAULT:
+        return timeout
+    if conf.timeout is not conf.DEFAULT:
+        return conf.timeout
+    return socket.getdefaulttimeout()
