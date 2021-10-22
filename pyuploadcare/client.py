@@ -31,6 +31,7 @@ from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.helpers import extracts_uuids, get_file_size
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
+from pyuploadcare.secure_url import BaseSecureUrlBuilder
 
 
 class Uploadcare:
@@ -58,6 +59,8 @@ class Uploadcare:
         - multipart_min_file_size: Mininum file size to use multipart uploading.
         - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         - auth_class: Authentication class to use for API.
+        - secure_url_builder: URL builder for secure delivery.
+
     """
 
     def __init__(
@@ -78,6 +81,7 @@ class Uploadcare:
         multipart_min_file_size=conf.multipart_min_file_size,
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: Type[UploadcareAuth] = UploadcareAuth,
+        secure_url_builder: Optional[BaseSecureUrlBuilder] = None,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -97,6 +101,7 @@ class Uploadcare:
         self.batch_chunk_size = batch_chunk_size
         self.multipart_min_file_size = multipart_min_file_size
         self.multipart_chunk_size = multipart_chunk_size
+        self.secure_url_builder = secure_url_builder
 
         if timeout is conf.DEFAULT:
             timeout = socket.getdefaulttimeout()
@@ -726,3 +731,13 @@ class Uploadcare:
         """Get info about account project."""
 
         return self.project_api.retrieve()
+
+    def generate_secure_url(self, uuid: Union[str, UUID]) -> str:
+        """Generate authenticated URL."""
+        if isinstance(uuid, UUID):
+            uuid = str(uuid)
+
+        if not self.secure_url_builder:
+            raise ValueError("secure_url_builder must be set")
+
+        return self.secure_url_builder.build(uuid)
