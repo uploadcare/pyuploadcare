@@ -167,6 +167,28 @@ or you can use API directly to convert single or multiple files::
 
     document_convert_status = uploadcare.document_convert_api.status(document_convert_info.token)
 
+
+Image transformations
+^^^^^^^^^^^^^^^^^^^^^
+
+Uploadcare allows to apply image transformations to files. ``File.cdn_url`` attribute returns CDN url::
+
+    >>> file_ = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+    >>> file_.cdn_url
+    https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
+
+You can set default effects by string::
+
+    >>> file_.set_effects('effect/flip/-/effect/mirror/')
+    >>> file_.cdn_url
+    https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
+
+or by image transformation builder::
+
+    >>> file_.set_effects(ImageTransformation().grayscale().flip())
+    >>> file_.cdn_url
+    https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/grayscale/-/flip/
+
 Create file group
 ^^^^^^^^^^^^^^^^^
 
