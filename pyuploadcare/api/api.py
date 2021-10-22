@@ -11,14 +11,16 @@ from pyuploadcare.api.base import (
     API,
     CreateMixin,
     DeleteMixin,
+    DeleteWithResponseMixin,
     ListCountMixin,
     ListMixin,
     RetrieveMixin,
+    UpdateMixin,
 )
 from pyuploadcare.exceptions import APIError
 
 
-class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
+class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
     resource_type = "files"
     response_classes = {
         "retrieve": entities.FileInfo,
@@ -26,6 +28,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
         "count": responses.FileListResponse,
         "store": entities.FileInfo,
         "update": entities.FileInfo,
+        "delete": entities.FileInfo,
         "batch_store": responses.BatchFileOperationResponse,
         "batch_delete": responses.BatchFileOperationResponse,
         "local_copy": responses.CreateLocalCopyResponse,
@@ -109,9 +112,14 @@ class ProjectAPI(API, RetrieveMixin):
     entity_class = entities.ProjectInfo
 
 
-class WebhooksAPI(API, CreateMixin, ListMixin, RetrieveMixin, DeleteMixin):
+class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
     resource_type = "webhooks"
-    entity_class = entities.WebhookInfo
+    entity_class = entities.Webhook
+    response_classes = {
+        "create": entities.Webhook,
+        "list": List[entities.Webhook],  # type: ignore
+        "update": entities.Webhook,
+    }
 
 
 class DocumentConvertAPI(API):
