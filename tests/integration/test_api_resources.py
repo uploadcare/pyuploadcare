@@ -1,8 +1,8 @@
 # coding: utf-8
-from __future__ import unicode_literals
 
 import time
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 
@@ -17,6 +17,9 @@ conf.retry_throttled = 10
 IMAGE_URL = (
     "https://github.githubassets.com/images/modules/logos_page/Octocat.png"
 )
+
+ASSETS_PATH = Path(__file__).parent / "assets"
+IMAGE_PATH = ASSETS_PATH / "img.png"
 
 
 @pytest.fixture
@@ -322,3 +325,13 @@ def test_iteration_over_not_removed_files(uploadcare):
 def test_iteration_over_stored_removed_files(uploadcare):
     files = list(uploadcare.list_files(stored=True, removed=True, limit=10))
     assert not files
+
+
+def test_uploaded_image_mime_type_determined(uploadcare):
+    with open(IMAGE_PATH, "rb") as fh:
+        file = uploadcare.upload(fh)
+
+    mime_type = file.mime_type
+    file.delete()
+
+    assert mime_type == "image/png"
