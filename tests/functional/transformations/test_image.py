@@ -298,3 +298,21 @@ def test_image_flip():
 def test_image_mirror():
     transformation = ImageTransformation().preview().mirror()
     assert str(transformation) == "preview/-/mirror/"
+
+
+def test_transformation_create_from_another():
+    transformation = ImageTransformation().preview().mirror()
+    assert str(transformation) == "preview/-/mirror/"
+
+    new_transformation = ImageTransformation(transformation)
+    assert str(new_transformation) == transformation.effects
+
+
+def test_transformation_create_from_str():
+    transformation = "preview/-/mirror/"
+
+    new_transformation = ImageTransformation(transformation)
+    assert new_transformation.effects == transformation
+
+    new_transformation = new_transformation.flip()
+    assert str(new_transformation) == "preview/-/mirror/-/flip/"
