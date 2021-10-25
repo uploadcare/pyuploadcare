@@ -31,6 +31,7 @@ from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.helpers import extracts_uuids, get_file_size
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
+from pyuploadcare.secure_url import BaseSecureUrlBuilder
 
 
 class Uploadcare:
@@ -43,7 +44,6 @@ class Uploadcare:
     Args:
         - public_key: Public key to access Uploadcare API.
         - secret_key: Secret ket to access Uploadcare API.
-        - api_version: Uploadcare Rest API version.
         - api_base: Rest API base url.
         - upload_base: Upload API base url.
         - cdn_base: CDN base url.
@@ -59,13 +59,14 @@ class Uploadcare:
         - multipart_min_file_size: Mininum file size to use multipart uploading.
         - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         - auth_class: Authentication class to use for API.
+        - secure_url_builder: URL builder for secure delivery.
+
     """
 
     def __init__(
         self,
         public_key: Optional[str] = conf.pub_key,
         secret_key: Optional[str] = conf.secret,
-        api_version=conf.api_version,
         api_base=conf.api_base,
         upload_base=conf.upload_base,
         cdn_base=conf.cdn_base,
@@ -80,13 +81,14 @@ class Uploadcare:
         multipart_min_file_size=conf.multipart_min_file_size,
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: Type[UploadcareAuth] = UploadcareAuth,
+        secure_url_builder: Optional[BaseSecureUrlBuilder] = None,
     ):
         if not public_key:
             raise ValueError("public_key is required")
 
         self.public_key = public_key
         self.secret_key = secret_key
-        self.api_version = api_version
+        self.api_version = conf.api_version
         self.api_base = api_base
         self.upload_base = upload_base
         self.cdn_base = cdn_base
@@ -99,13 +101,14 @@ class Uploadcare:
         self.batch_chunk_size = batch_chunk_size
         self.multipart_min_file_size = multipart_min_file_size
         self.multipart_chunk_size = multipart_chunk_size
+        self.secure_url_builder = secure_url_builder
 
         if timeout is conf.DEFAULT:
             timeout = socket.getdefaulttimeout()
 
         self.timeout = timeout
 
-        auth = auth_class(public_key, secret_key, api_version)  # type: ignore
+        auth = auth_class(public_key, secret_key, self.api_version)  # type: ignore
 
         self.rest_client = Client(
             base_url=api_base,
@@ -205,7 +208,7 @@ class Uploadcare:
 
     def upload(  # noqa: C901
         self,
-        file_obj_or_url: Union[IO, str],
+        file_handle: Union[IO, str],
         store=None,
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
@@ -243,7 +246,7 @@ class Uploadcare:
             11000000/11000000 B
 
         Args:
-            - file_obj_or_url: file object or url to upload to. If file object
+            - file_handle: file object or url to upload to. If file object
                 is passed, ``File.upload_files`` (direct upload) or
                 ``File.multipart_upload`` (multipart upload) will be used.
                 If file URL is passed, ``File.upload_from_url_sync`` will be
@@ -266,15 +269,15 @@ class Uploadcare:
         """
 
         # assume url is passed if str
-        if isinstance(file_obj_or_url, str):
-            file_url: str = file_obj_or_url
+        if isinstance(file_handle, str):
+            file_url: str = file_handle
             return self.upload_from_url_sync(
                 file_url,
                 store=self._format_store(store),
                 callback=callback,
             )
 
-        file_obj: IO = file_obj_or_url
+        file_obj: IO = file_handle
 
         if size is None:
             size = os.fstat(file_obj.fileno()).st_size
@@ -728,3 +731,13 @@ class Uploadcare:
         """Get info about account project."""
 
         return self.project_api.retrieve()
+
+    def generate_secure_url(self, uuid: Union[str, UUID]) -> str:
+        """Generate authenticated URL."""
+        if isinstance(uuid, UUID):
+            uuid = str(uuid)
+
+        if not self.secure_url_builder:
+            raise ValueError("secure_url_builder must be set")
+
+        return self.secure_url_builder.build(uuid)
