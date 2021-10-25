@@ -88,15 +88,12 @@ class File:
         return self.cdn_url
 
     def set_effects(self, effects: Union[str, ImageTransformation]) -> None:
-        if isinstance(effects, ImageTransformation):
-            effects = str(effects)
-        self.default_effects = effects
+        self.default_effects = str(effects)
 
     def _build_effects(
         self, effects: Optional[Union[str, ImageTransformation]] = None
     ):
-        if isinstance(effects, ImageTransformation):
-            effects = str(effects)
+        effects = str(effects)
 
         if self.default_effects is not None:
             effects = (
@@ -140,10 +137,8 @@ class File:
             a771f854-c2cb-408a-8c36-71af77811f3b/-/smart_resize/440x600/-/quality/smart/
 
         """
-        if isinstance(effects, ImageTransformation):
-            path = effects.path(self.uuid)
-        else:
-            path = f"{self.uuid}/-/{effects}" if effects else f"{self.uuid}/"
+        transformation = ImageTransformation(effects)
+        path = transformation.path(self.uuid)
         return path
 
     @property
@@ -444,7 +439,9 @@ class File:
         raise ValueError(f"Unsupported transformation: {transformation}")
 
     def convert_video(
-        self, transformation: VideoTransformation, store: Optional[bool] = None
+        self,
+        transformation: Union[str, VideoTransformation],
+        store: Optional[bool] = None,
     ) -> "File":
         """Convert video and return converted file instance.
 
@@ -456,6 +453,7 @@ class File:
                 - True - store file
                 - None - use project settings
         """
+        transformation = VideoTransformation(transformation)
         path = transformation.path(self.uuid)
         response = self._client.video_convert_api.convert(
             paths=[path], store=store
@@ -472,7 +470,7 @@ class File:
 
     def convert_document(
         self,
-        transformation: DocumentTransformation,
+        transformation: Union[str, DocumentTransformation],
         store: Optional[bool] = None,
     ) -> "File":
         """Convert document and return converted file instance.
@@ -485,6 +483,7 @@ class File:
                 - True - store file
                 - None - use project settings
         """
+        transformation = DocumentTransformation(transformation)
         path = transformation.path(self.uuid)
         response = self._client.document_convert_api.convert(
             paths=[path], store=store
