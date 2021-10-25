@@ -10,6 +10,7 @@ from pyuploadcare import __version__, conf
 from pyuploadcare.client import Uploadcare
 from pyuploadcare.exceptions import UploadcareException
 from pyuploadcare.ucare_cli.commands import (
+    convert_document,
     convert_video,
     create_group,
     delete_files,
@@ -46,6 +47,7 @@ def ucare_argparser():
     sync.register_arguments(subparsers)
     create_group.register_arguments(subparsers)
     convert_video.register_arguments(subparsers)
+    convert_document.register_arguments(subparsers)
 
     # common arguments
     parser.add_argument(
