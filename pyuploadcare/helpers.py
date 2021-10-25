@@ -1,3 +1,4 @@
+import mimetypes
 import os
 from typing import IO, Iterable, List, Union
 
@@ -22,3 +23,11 @@ def extracts_uuids(files: Iterable[Union[str, File]]) -> List[str]:
             )
 
     return uuids
+
+
+def guess_mime_type(file_object: IO) -> str:
+    """Guess mime type from file extension."""
+    mime_type, _encoding = mimetypes.guess_type(file_object.name)
+    if not mime_type:
+        mime_type = "application/octet-stream"
+    return mime_type

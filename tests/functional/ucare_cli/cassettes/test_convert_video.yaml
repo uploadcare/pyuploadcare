@@ -1,0 +1,104 @@
+interactions:
+- request:
+    body: '{"paths": ["72967d89-18bd-4906-a675-762ae721ccb5/video/-/size/640x480/add_padding/-/quality/lighter/"],
+      "store": "true"}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '120'
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/5d5bb5639e3f2df33674 (CPython/3.9.6)
+    method: POST
+    uri: https://api.uploadcare.com/convert/video/
+  response:
+    content: '{"result": [{"original_source": "72967d89-18bd-4906-a675-762ae721ccb5/video/-/size/640x480/add_padding/-/quality/lighter/",
+      "token": 949951680, "uuid": "db5c0182-4601-432e-84ed-e6fffff38b26", "thumbnails_group_uuid":
+      "b126946f-1ead-4309-8b7e-c62b0f9b823c~1"}], "problems": {}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - OPTIONS, POST
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 13 Oct 2021 13:33:43 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: Please use API version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/5d5bb5639e3f2df33674 (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/files/db5c0182-4601-432e-84ed-e6fffff38b26/
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2021-10-13T13:33:42.882092Z","datetime_uploaded":"2021-10-13T13:33:42.882092Z","image_info":null,"is_image":null,"is_ready":false,"mime_type":"","original_file_url":null,"original_filename":"video.mp4","size":0,"url":"https://api.uploadcare.com/files/db5c0182-4601-432e-84ed-e6fffff38b26/","uuid":"db5c0182-4601-432e-84ed-e6fffff38b26","variations":null,"video_info":null}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '416'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Wed, 13 Oct 2021 13:33:43 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: Please use API version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
