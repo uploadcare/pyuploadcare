@@ -167,6 +167,28 @@ or you can use API directly to convert single or multiple files::
 
     document_convert_status = uploadcare.document_convert_api.status(document_convert_info.token)
 
+
+Image transformations
+^^^^^^^^^^^^^^^^^^^^^
+
+Uploadcare allows to apply image transformations to files. ``File.cdn_url`` attribute returns CDN url::
+
+    >>> file_ = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+    >>> file_.cdn_url
+    https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
+
+You can set default effects by string::
+
+    >>> file_.set_effects('effect/flip/-/effect/mirror/')
+    >>> file_.cdn_url
+    https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/-/effect/mirror/
+
+or by image transformation builder::
+
+    >>> file_.set_effects(ImageTransformation().grayscale().flip())
+    >>> file_.cdn_url
+    https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/grayscale/-/flip/
+
 Create file group
 ^^^^^^^^^^^^^^^^^
 
@@ -201,4 +223,68 @@ List file groups::
     file_groups: List[FileGroup] = uploadcare.list_file_groups(limit=10)
     for file_group in file_groups:
         print(file_group.info)
+
+
+Create webhook
+^^^^^^^^^^^^^^
+
+Create webhook::
+
+    webhook: Webhook = uploadcare.create_webhook("https://path/to/webhook")
+
+List webhooks
+^^^^^^^^^^^^^
+
+List webhooks::
+
+    webhooks: List[Webhook] = list(uploadcare.list_webhooks(limit=10))
+
+Update webhook
+^^^^^^^^^^^^^^
+
+Update webhook::
+
+    webhook: Webhook = uploadcare.update_webhook(webhook_id, is_active=False)
+
+Delete webhook
+^^^^^^^^^^^^^^
+
+Delete webhook::
+
+    uploadcare.delete_webhook(webhook_id)
+
+
+Get project info
+^^^^^^^^^^^^^^^^
+
+Get project info::
+
+    project_info: ProjectInfo = uploadcare.get_project_info()
+
+
+Secure delivery
+^^^^^^^^^^^^^^^
+
+You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see original documentation).
+
+Generate secure for file::
+
+    from pyuploadcare import Uploadcare
+    from pyuploadcare.secure_url import AkamaiSecureUrlBuilder
+
+    secure_url_bulder = AkamaiSecureUrlBuilder("your cdn>", "<your secret for token generation>")
+
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        secret_key='<your private key>',
+        secure_url_builder=secure_url_bulder,
+    )
+
+    secure_url = uploadcare.generate_secure_url('52da3bfc-7cd8-4861-8b05-126fef7a6994')
+
+Generate secure for file with transformations::
+
+    secure_url = uploadcare.generate_secure_url(
+        '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
+    )
 

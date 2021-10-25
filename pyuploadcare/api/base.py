@@ -3,15 +3,12 @@ from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
 from httpx._types import RequestFiles
+from pydantic import parse_obj_as
 from typing_extensions import Protocol
 
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
-from pyuploadcare.api.responses import (
-    EntityListResponse,
-    PaginatedResponse,
-    Response,
-)
+from pyuploadcare.api.responses import PaginatedResponse, Response
 from pyuploadcare.exceptions import DefaultResponseClassNotDefined
 
 
@@ -37,8 +34,7 @@ class API:
         raw_resource: Dict[str, Any],
         response_class: Union[Type[Response], Type[Entity]],
     ) -> Union[Response, Entity]:
-        response = response_class.parse_obj(raw_resource)
-        return response
+        return parse_obj_as(response_class, raw_resource)  # type: ignore
 
     def _build_url(  # noqa: C901
         self,
@@ -98,6 +94,12 @@ class API:
 
     def _delete(
         self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+    ) -> None:
+        url = self._build_url(resource_uuid)
+        self._client.delete(url)
+
+    def _delete_with_response(
+        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
     ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid)
         document = self._client.delete(url)
@@ -149,6 +151,11 @@ class APIProtocol(Protocol):
 
     def _delete(
         self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+    ) -> None:
+        ...
+
+    def _delete_with_response(
+        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
     ) -> Dict[str, Any]:
         ...
 
@@ -156,7 +163,7 @@ class APIProtocol(Protocol):
 class RetrieveMixin(APIProtocol):
     def retrieve(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity],
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
     ):
         response_class = self._get_response_class("retrieve")
 
@@ -185,8 +192,13 @@ class ListMixin(APIProtocol):
             document = self._client.get(next_)
             json_response = document.json()
             response = self._parse_response(json_response, response_class)
-            response = cast(EntityListResponse, response)
-            for item in response.results:
+
+            if hasattr(response, "results"):
+                results = response.results
+            else:
+                results = response
+
+            for item in results:
                 if limit is not None and limit <= 0:
                     break
 
@@ -198,6 +210,7 @@ class ListMixin(APIProtocol):
             if limit is not None and limit <= 0:
                 break
 
+            next_ = None
             if hasattr(response, "next"):
                 next_ = response.next
 
@@ -243,9 +256,14 @@ class UpdateMixin(APIProtocol):
 
 class DeleteMixin(APIProtocol):
     def delete(self, resource_uuid: Union[UUID, str, UUIDEntity]):
-        response_class = self._get_response_class("update")
+        self._delete(resource_uuid)
 
-        json_response = self._delete(resource_uuid)
+
+class DeleteWithResponseMixin(APIProtocol):
+    def delete(self, resource_uuid: Union[UUID, str, UUIDEntity]):
+        response_class = self._get_response_class("delete")
+
+        json_response = self._delete_with_response(resource_uuid)
         return self._parse_response(json_response, response_class)
 
 

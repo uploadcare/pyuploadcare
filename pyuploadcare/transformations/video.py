@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Optional, Union
 
 from pyuploadcare.transformations.base import BaseTransformation, StrEnum
@@ -60,19 +59,6 @@ class VideoTransformation(BaseTransformation):
         return f"{file_id}/video/"
 
     def path(self, file_id: str) -> str:
-        path_ = self._prefix(file_id)
-
-        parameters = OrderedDict(**self._transformation_parameters)
-        thumbnails = parameters.pop("thumbs", None)
-
-        for (
-            transformation_name,
-            transformation_parameters,
-        ) in parameters.items():
-            path_ += f"-/{transformation_name}/"
-            if transformation_parameters:
-                path_ += f"{transformation_parameters}/"
-
-        if thumbnails:
-            path_ += f"-/thumbs~{thumbnails}/"
+        path_ = super().path(file_id)
+        path_ = path_.replace("thumbs/", "thumbs~")
         return path_
