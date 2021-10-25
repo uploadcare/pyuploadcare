@@ -90,7 +90,7 @@ jobs:
         poetry install
     - name: Install specific Django version
       run: |
-        pip install django~=${{ matrix.django-version }}.0
+        poetry run pip install django~=${{ matrix.django-version }}.0
     - name: Test with pytest
       run: |
         make test-django

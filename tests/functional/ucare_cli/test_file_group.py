@@ -24,18 +24,7 @@ def test_group_create_by_uuid_and_cdn_url(capsys, uploadcare):
 def test_groups_list_without_params(capsys, uploadcare):
     list_groups(arg_namespace("list_groups"), uploadcare)
     captured = capsys.readouterr()
-    assert (
-        """{
-    "id": "8b1362ed-b477-4a15-819a-2c6bb497d8bd~3",
-    "datetime_created": "2013-04-16T14:13:42.600051+00:00",
-    "datetime_stored": "2015-02-03T11:23:47.824683+00:00",
-    "files_count": 3,
-    "cdn_url": "https://ucarecdn.com/8b1362ed-b477-4a15-819a-2c6bb497d8bd~3/",
-    "url": "https://api.uploadcare.com/groups/8b1362ed-b477-4a15-819a-2c6bb497d8bd~3/"
-  },"""
-        in captured.out
-    )
-    assert captured.out.count("{") == 100
+    assert '"files_count": 3' in captured.out
 
 
 @pytest.mark.vcr
@@ -51,17 +40,7 @@ def test_groups_list_with_params(capsys, uploadcare):
         uploadcare,
     )
     captured = capsys.readouterr()
-    assert (
-        """{
-    "id": "5873ad80-9959-44e8-8eb5-783bad67e3a0~1",
-    "datetime_created": "2015-10-20T14:41:41.891200+00:00",
-    "datetime_stored": null,
-    "files_count": 1,
-    "cdn_url": "https://ucarecdn.com/5873ad80-9959-44e8-8eb5-783bad67e3a0~1/",
-    "url": "https://api.uploadcare.com/groups/5873ad80-9959-44e8-8eb5-783bad67e3a0~1/"
-  },"""
-        in captured.out
-    )
+    assert '"files_count": 1' in captured.out
     assert captured.out.count("{") == 10
 
 

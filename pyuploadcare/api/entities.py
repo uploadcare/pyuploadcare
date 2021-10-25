@@ -110,6 +110,7 @@ class GroupInfo(Entity):
     files_count: Optional[int]
     cdn_url: Optional[str]
     url: Optional[str]
+    files: Optional[List[Optional[FileInfo]]]
 
 
 class ColaboratorInfo(Entity):

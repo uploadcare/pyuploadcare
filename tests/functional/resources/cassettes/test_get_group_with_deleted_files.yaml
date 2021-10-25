@@ -1,0 +1,49 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+    method: GET
+    uri: https://api.uploadcare.com/groups/8b1362ed-b477-4a15-819a-2c6bb497d8bd~3/
+  response:
+    content: '{"id":"8b1362ed-b477-4a15-819a-2c6bb497d8bd~3","datetime_created":"2013-04-16T14:13:42.600051Z","datetime_stored":"2015-02-03T11:23:47.824683Z","files_count":3,"cdn_url":"https://ucarecdn.com/8b1362ed-b477-4a15-819a-2c6bb497d8bd~3/","url":"https://api.uploadcare.com/groups/8b1362ed-b477-4a15-819a-2c6bb497d8bd~3/","files":[null,null,null]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '340'
+      Content-Type:
+      - application/vnd.uploadcare-v0.6+json
+      Date:
+      - Tue, 19 Oct 2021 08:40:57 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.6'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
