@@ -1,3 +1,4 @@
+import itertools
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
@@ -69,6 +70,16 @@ class BaseApiList:
             resource_id = resource_info.get(self.resource_id_field)
             constructor = getattr(self._client, self.constructor_name)
             yield constructor(resource_id, resource_info)
+
+    def __getitem__(self, item):
+        if isinstance(item, slice):
+            return list(
+                itertools.islice(self, item.start, item.stop, item.step)
+            )
+        try:
+            return next(itertools.islice(self, item, None))
+        except StopIteration:
+            raise IndexError("index out of range")
 
     def count(self):
         if self.starting_point:

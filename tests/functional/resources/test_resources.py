@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from pyuploadcare import File
+from pyuploadcare import File, FileGroup, FileList, GroupList
 from pyuploadcare.resources.file import UploadProgress
 from pyuploadcare.transformations.document import (
     DocumentFormat,
@@ -191,3 +191,52 @@ def test_create_local_copy_with_transformation(
         effects=image_transformation, store=True
     )
     assert copied_file
+
+
+@pytest.mark.vcr
+def test_create_file_group(uploadcare):
+    file = uploadcare.file("94a2218e-3526-428a-945e-65fbc06e7b35")
+    group = uploadcare.create_file_group([file])
+    assert "files" in group.info
+
+
+@pytest.mark.vcr
+def test_get_file_group(uploadcare):
+    group = uploadcare.file_group("d496a4df-0b36-4281-8156-268ae9524d4a~1")
+    assert group.info
+    assert isinstance(group[0], File)
+
+
+@pytest.mark.vcr
+def test_get_group_with_deleted_files(uploadcare):
+    group = uploadcare.file_group("8b1362ed-b477-4a15-819a-2c6bb497d8bd~3")
+    assert group.info
+    assert group[0] is None
+    for file in group:
+        assert file is None
+
+
+@pytest.mark.vcr
+def test_list_file_groups(uploadcare):
+    groups_list = uploadcare.list_file_groups(limit=5)
+    assert isinstance(groups_list, GroupList)
+
+    with pytest.raises(IndexError):
+        groups_list[10]
+
+    groups = groups_list[0:2]
+    assert len(groups) == 2
+    assert isinstance(groups[0], FileGroup)
+
+
+@pytest.mark.vcr
+def test_list_files(uploadcare):
+    file_list = uploadcare.list_files(limit=5)
+    assert isinstance(file_list, FileList)
+
+    with pytest.raises(IndexError):
+        file_list[10]
+
+    files = file_list[0:2]
+    assert len(files) == 2
+    assert isinstance(files[0], File)
