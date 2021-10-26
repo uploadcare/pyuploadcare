@@ -205,16 +205,16 @@ Delete multiple files::
     ]
     uploadcare.delete_files(files)
 
-
-Copy file to local storage::
+Copy file to the local storage::
 
     file: File = uploadcare.file("740e1b8c-1ad8-4324-b7ec-112c79d8eac2")
     copied_file: File = file.create_local_copy(store=True)
 
-Copy file to remote storage::
+Copy file to the remote storage::
 
     file = uploadcare.file("740e1b8c-1ad8-4324-b7ec-112c79d8eac2")
     copied_file: File = file.create_remote_copy(target='mytarget', make_public=True)
+
 
 File groups
 ^^^^^^^^^^^
