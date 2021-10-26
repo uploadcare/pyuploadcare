@@ -8,8 +8,6 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
-
-
 `Unreleased`_ - TBA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -29,12 +27,12 @@ Changed
 - Moved from Travis to Github Actions
 - Dropped support for Python 3.5.
 - Dropped support for Python 2.7.
-- Allow uploading by url in``File.upload`` method.
+- Allow uploading by url in ``File.upload`` method.
 - Resource attributes can be accessed now as properies, not methods.
 - ``Uploadcare`` client should be initialized to access API.
 
 `2.7.0`_ - 2020-05-03
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 Added
 +++++
@@ -48,7 +46,6 @@ Changed
 Fixed
 +++++
 - Tests.
-
 
 `2.6.0`_ - 2018-11-29
 ~~~~~~~~~~~~~~~~~~~~~
@@ -64,7 +61,6 @@ Fixed
 
 - `FileWidget.render()` now works in Django 2.1.
 - Obsolete widget setting `data-upload-base-url` replaced with `data-url-base`
-
 
 2.5.0
 ~~~~~
@@ -176,12 +172,10 @@ Fixed
 
 - update widget to 2.3.1 (see `widget changelog`_)
 
-
 1.2.14
 ~~~~~~
 
 - update widget to 1.5.5 (see `widget changelog`_)
-
 
 1.2.13
 ~~~~~~
@@ -191,7 +185,6 @@ Fixed
 - update widget to 1.5.4 (see `widget changelog`_)
 - add AUTHORS.txt
 
-
 1.2.12
 ~~~~~~
 
@@ -199,13 +192,11 @@ Fixed
 - UploadcareExceptions are `__repr__`'ed properly
 - update widget to 1.5.3 (see `widget changelog`_)
 
-
 1.2.11
 ~~~~~~
 
 - fix "source" composition for copy requests
 - let configure default throttle retry count via `conf.retry_throttled`
-
 
 1.2.10
 ~~~~~~
@@ -213,24 +204,20 @@ Fixed
 - handle responses for HEAD and OPTION requests
 - update widget to 1.4.6
 
-
 1.2.9
 ~~~~~
 
 - compatibility with Django 1.7
-
 
 1.2.8
 ~~~~~
 
 - update widget to 1.4.0
 
-
 1.2.7
 ~~~~~
 
 - handle rest api throttling
-
 
 1.2.6
 ~~~~~
@@ -238,12 +225,10 @@ Fixed
 - update widget to 1.2.3
 - fixed compatibility with six library version 1.7.0 and above
 
-
 1.2.5
 ~~~~~
 
 - fixed setup script
-
 
 1.2.4
 ~~~~~
@@ -256,7 +241,6 @@ Fixed
 ~~~~~
 
 - update widget to 0.17.1
-
 
 1.2.2
 ~~~~~
@@ -271,7 +255,6 @@ Fixed
 ~~~~~
 
 ``https://ucarecdn.com/`` URL was returned to serve widget's assets.
-
 
 1.2
 ~~~
@@ -436,6 +419,7 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
 .. _Keep a Changelog: https://keepachangelog.com/en/1.0.0/
 .. _Semantic Versioning: https://semver.org/spec/v2.0.0.html
 
-.. _Unreleased: https://github.com/uploadcare/pyuploadcare/compare/v2.7.0...HEAD
-.. _2.6.0: https://github.com/uploadcare/pyuploadcare/compare/v2.5.0...v2.6.0
+.. _Unreleased: https://github.com/uploadcare/pyuploadcare/compare/v3.0.0...HEAD
+.. _3.0.0: https://github.com/uploadcare/pyuploadcare/compare/v2.7.0...v3.0.0
 .. _2.7.0: https://github.com/uploadcare/pyuploadcare/compare/v2.6.0...v2.7.0
+.. _2.6.0: https://github.com/uploadcare/pyuploadcare/compare/v2.5.0...v2.6.0
