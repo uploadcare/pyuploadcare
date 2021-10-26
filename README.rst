@@ -102,6 +102,8 @@ To use in Django project install with extra dependencies::
 Usage
 =====
 
+You can find an example project `here`_.
+
 Core API
 --------
 
@@ -401,5 +403,6 @@ request at `hello@uploadcare.com`_.
 .. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
 .. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
 .. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
+.. _here: https://github.com/uploadcare/pyuploadcare-example
 .. _bugbounty@uploadcare.com: mailto:bugbounty@uploadcare.com
 .. _hello@uploadcare.com: mailto:hello@uploadcare.com
