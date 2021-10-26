@@ -133,6 +133,7 @@ class Webhook(Entity):
     target_url: Optional[str]
     project: Optional[str]
     is_active: Optional[bool]
+    signing_secret: Optional[str]
 
 
 class DocumentConvertShortInfo(Entity):
