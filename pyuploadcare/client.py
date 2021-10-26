@@ -272,7 +272,7 @@ class Uploadcare:
             file_url: str = file_handle
             return self.upload_from_url_sync(
                 file_url,
-                store=self._format_store(store),
+                store=store,
                 callback=callback,
             )
 
