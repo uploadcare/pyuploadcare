@@ -29,3 +29,13 @@ def test_update_webhook(uploadcare):
 def test_delete_webhook(uploadcare):
     webhook_id = 848006
     uploadcare.delete_webhook(webhook_id)
+
+
+@pytest.mark.vcr
+def test_create_webhook_signed_secret(uploadcare):
+    webhook = uploadcare.create_webhook(
+        target_url="https://webhook.site/699ba5a4-b178-41c7-b416-5d1b6739d052",
+        signing_secret="7kMVZivndx0ErgvhRKAr",
+    )
+    assert isinstance(webhook, Webhook)
+    assert webhook.signing_secret
