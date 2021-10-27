@@ -25,6 +25,7 @@ from pyuploadcare.ucare_cli.commands import (
     sync,
     upload,
     upload_from_url,
+update_webhook,
 )
 from pyuploadcare.ucare_cli.commands.helpers import pprint
 from pyuploadcare.ucare_cli.settings import load_config
@@ -56,6 +57,7 @@ def ucare_argparser():
     list_webhooks.register_arguments(subparsers)
     delete_webhook.register_arguments(subparsers)
     create_webhook.register_arguments(subparsers)
+    update_webhook.register_arguments(subparsers)
 
     # common arguments
     parser.add_argument(
