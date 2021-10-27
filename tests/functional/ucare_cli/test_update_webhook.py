@@ -8,7 +8,7 @@ from pyuploadcare.ucare_cli.commands.update_webhook import update_webhook
 def test_update_webhooks(capsys, uploadcare):
     update_webhook(
         arg_namespace(
-            "update_webhook 865715 --deactivate"
+            "update_webhook 865715 --deactivate "
             "--target_url=https://webhook.site/updated"
         ),
         uploadcare,
