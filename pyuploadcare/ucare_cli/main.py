@@ -15,6 +15,7 @@ from pyuploadcare.ucare_cli.commands import (
     create_group,
     delete_files,
     get_file,
+    get_project,
     list_files,
     list_groups,
     store_files,
@@ -47,6 +48,7 @@ def ucare_argparser():
     sync.register_arguments(subparsers)
     create_group.register_arguments(subparsers)
     convert_video.register_arguments(subparsers)
+    get_project.register_arguments(subparsers)
     convert_document.register_arguments(subparsers)
 
     # common arguments
