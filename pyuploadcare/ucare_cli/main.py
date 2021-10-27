@@ -23,9 +23,9 @@ from pyuploadcare.ucare_cli.commands import (
     list_webhooks,
     store_files,
     sync,
+    update_webhook,
     upload,
     upload_from_url,
-update_webhook,
 )
 from pyuploadcare.ucare_cli.commands.helpers import pprint
 from pyuploadcare.ucare_cli.settings import load_config

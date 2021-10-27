@@ -13,8 +13,8 @@ def register_arguments(subparsers):
     subparser.add_argument(
         "--signing_secret",
         help=(
-            'Optional secret that, if set, will be used to calculate '
-            'signatures for the webhook payloads sent to the target_url.'
+            "Optional secret that, if set, will be used to calculate "
+            "signatures for the webhook payloads sent to the target_url."
         ),
     )
     return subparser
@@ -25,6 +25,6 @@ def create_webhook(arg_namespace, client: Uploadcare):
         target_url=arg_namespace.target_url,
         is_active=arg_namespace.active,
         event=arg_namespace.event,
-        signing_secret=arg_namespace.signing_secret
+        signing_secret=arg_namespace.signing_secret,
     )
     pprint(webhook.dict())
