@@ -682,7 +682,11 @@ class Uploadcare:
         )
 
     def create_webhook(
-        self, target_url: str, event="file.uploaded", is_active=True
+        self,
+        target_url: str,
+        event="file.uploaded",
+        is_active=True,
+        signing_secret=None,
     ) -> Webhook:
         """Create and subscribe to a webhook."""
 
@@ -691,6 +695,10 @@ class Uploadcare:
             "event": event,
             "is_active": is_active,
         }
+
+        if signing_secret:
+            data["signing_secret"] = signing_secret
+
         return self.webhooks_api.create(data)
 
     def list_webhooks(self, limit=None) -> Iterable[Webhook]:

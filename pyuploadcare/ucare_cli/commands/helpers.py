@@ -2,6 +2,7 @@ import json
 import sys
 import time
 from datetime import datetime
+from decimal import Decimal
 from uuid import UUID
 
 from dateutil import parser
@@ -74,6 +75,8 @@ class Encoder(json.JSONEncoder):
             return str(obj)
         if isinstance(obj, datetime):
             return obj.isoformat()
+        if isinstance(obj, Decimal):
+            return str(obj)
         return json.JSONEncoder.default(self, obj)
 
 
