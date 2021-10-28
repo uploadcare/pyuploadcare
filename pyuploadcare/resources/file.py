@@ -87,7 +87,9 @@ class File:
     def __str__(self):
         return self.cdn_url
 
-    def set_effects(self, effects: Union[str, ImageTransformation]) -> None:
+    def set_effects(
+        self, effects: Optional[Union[str, ImageTransformation]] = None
+    ) -> None:
         effects = str(effects) if effects else ""
         self.default_effects = effects
 
