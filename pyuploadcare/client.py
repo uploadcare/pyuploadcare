@@ -46,6 +46,7 @@ class Uploadcare:
         - api_base: Rest API base url.
         - upload_base: Upload API base url.
         - cdn_base: CDN base url.
+        - api_version: API version.
         - signed_uploads: Enable signed uploads.
         - signed_uploads_ttl: Signed uploads signature timeout in seconds.
         - verify_api_ssl: Verify Rest API SSL certificate.
@@ -69,6 +70,7 @@ class Uploadcare:
         api_base=conf.api_base,
         upload_base=conf.upload_base,
         cdn_base=conf.cdn_base,
+        api_version=conf.api_version,
         signed_uploads=conf.signed_uploads,
         signed_uploads_ttl=conf.signed_uploads_ttl,
         verify_api_ssl=conf.verify_api_ssl,
@@ -87,7 +89,7 @@ class Uploadcare:
 
         self.public_key = public_key
         self.secret_key = secret_key
-        self.api_version = conf.api_version
+        self.api_version = api_version
         self.api_base = api_base
         self.upload_base = upload_base
         self.cdn_base = cdn_base
