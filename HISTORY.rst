@@ -8,28 +8,28 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
-`Unreleased`_ - TBA
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+`3.0.0`_ - 2021-11-01
+~~~~~~~~~~~~~~~~~~~~~
 
 Added
 +++++
-- Implemented low-level API.
-- Added ``Uploadcare`` client.
-- Support multipart uploads.
-- Support document and video conversions.
-- Authenticated url generation.
+- Multipart uploads.
+- Document and video conversions.
+- Authenticated URL generator.
 - Image transformation path builder.
-- Support webhooks operations.
-- Support getting project information.
+- Webhook operations.
+- Getting project information.
+- Low-level API.
+- ``Uploadcare`` client.
 
 Changed
 +++++++
-- Moved from Travis to Github Actions
 - Dropped support for Python 3.5.
-- Dropped support for Python 2.7.
-- Allow uploading by url in ``File.upload`` method.
-- Resource attributes can be accessed now as properies, not methods.
+- Dropped support for Python 2.*.
+- Allowed uploading from URL in ``File.upload`` method.
+- Resource attributes can be accessed now as properties, not methods.
 - ``Uploadcare`` client should be initialized to access API.
+- Moved from Travis to Github Actions.
 
 `2.7.0`_ - 2020-05-03
 ~~~~~~~~~~~~~~~~~~~~~
