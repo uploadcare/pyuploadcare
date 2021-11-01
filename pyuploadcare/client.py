@@ -706,12 +706,13 @@ class Uploadcare:
 
         return self.webhooks_api.list(limit=limit)
 
-    def update_webhook(
+    def update_webhook(  # noqa: C901
         self,
         webhook_id: Union[Webhook, int],
         target_url=None,
         event=None,
         is_active=None,
+        signing_secret=None,
     ) -> Webhook:
         """Update webhook attributes."""
 
@@ -725,6 +726,8 @@ class Uploadcare:
             data["event"] = event
         if is_active is not None:
             data["is_active"] = is_active
+        if signing_secret is not None:
+            data["signing_secret"] = signing_secret
 
         return self.webhooks_api.update(webhook_id, data)  # type: ignore
 
