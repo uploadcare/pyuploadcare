@@ -253,6 +253,10 @@ Update webhook::
 
     webhook: Webhook = uploadcare.update_webhook(webhook_id, is_active=False)
 
+Update webhook's signing secret::
+
+    webhook: Webhook = uploadcare.update_webhook(webhook_id, signing_secret="7kMVZivndx0ErgvhRKAr")
+
 Delete webhook
 ^^^^^^^^^^^^^^
 
