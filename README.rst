@@ -309,6 +309,13 @@ Create webhook::
 
     webhook: Webhook = uploadcare.create_webhook("https://path/to/webhook")
 
+Create webhook with signing secret::
+
+    webhook = uploadcare.create_webhook(
+        target_url="https://path/to/webhook",
+        signing_secret="7kMVZivndx0ErgvhRKAr",
+    )
+
 List webhooks::
 
     webhooks: List[Webhook] = list(uploadcare.list_webhooks(limit=10))
