@@ -93,7 +93,7 @@ or, if you prefer it the old way:
 
     $ easy_install pyuploadcare
 
-To use in Django project install with extra dependencies::
+To use in Django project install with extra dependencies:
 
 .. code-block:: console
 
@@ -305,11 +305,11 @@ or you can use API directly to convert single or multiple files::
 Webhooks
 ^^^^^^^^
 
-Create webhook::
+Create a webhook::
 
     webhook: Webhook = uploadcare.create_webhook("https://path/to/webhook")
 
-Create webhook with signing secret::
+Create a webhook with a signing secret::
 
     webhook = uploadcare.create_webhook(
         target_url="https://path/to/webhook",
@@ -320,15 +320,15 @@ List webhooks::
 
     webhooks: List[Webhook] = list(uploadcare.list_webhooks(limit=10))
 
-Update webhook::
+Update a webhook::
 
     webhook: Webhook = uploadcare.update_webhook(webhook_id, is_active=False)
 
-Update webhook's signing secret::
+Update a webhook's signing secret::
 
     webhook: Webhook = uploadcare.update_webhook(webhook_id, signing_secret="7kMVZivndx0ErgvhRKAr")
 
-Delete webhook::
+Delete a webhook::
 
     uploadcare.delete_webhook(webhook_id)
 

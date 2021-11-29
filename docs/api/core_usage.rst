@@ -228,11 +228,11 @@ List file groups::
 Create webhook
 ^^^^^^^^^^^^^^
 
-Create webhook::
+Create a webhook::
 
     webhook: Webhook = uploadcare.create_webhook("https://path/to/webhook")
 
-Create webhook with signing secret::
+Create a webhook with a signing secret::
 
     webhook = uploadcare.create_webhook(
         target_url="https://path/to/webhook",
@@ -249,18 +249,18 @@ List webhooks::
 Update webhook
 ^^^^^^^^^^^^^^
 
-Update webhook::
+Update a webhook::
 
     webhook: Webhook = uploadcare.update_webhook(webhook_id, is_active=False)
 
-Update webhook's signing secret::
+Update a webhook's signing secret::
 
     webhook: Webhook = uploadcare.update_webhook(webhook_id, signing_secret="7kMVZivndx0ErgvhRKAr")
 
 Delete webhook
 ^^^^^^^^^^^^^^
 
-Delete webhook::
+Delete a webhook::
 
     uploadcare.delete_webhook(webhook_id)
 
