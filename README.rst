@@ -133,6 +133,7 @@ Example project
 ===============
 
 You can find an example project `here`_. It features:
+
 - Project section
 - Files section
 - File Groups section
@@ -456,13 +457,13 @@ Besides the Github Actions we use tox. In order to run tests just:
 Useful links
 ============
 
-`Uploadcare documentation`_
-`Upload`_ API reference
-`REST`_ API reference
-`Contributing guide`_
-`Security policy`_
-`Support`_
-`Django app example`_
+- `Uploadcare documentation`_
+- `Upload`_ API reference
+- `REST`_ API reference
+- `Contributing guide`_
+- `Security policy`_
+- `Support`_
+- `Django app example`_
 
 .. _Uploadcare documentation: https://uploadcare.com/docs/?utm_source=github&utm_campaign=pyuploadcare
 .. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
