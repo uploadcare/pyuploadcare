@@ -23,21 +23,20 @@ PyUploadcare: a Python library for Uploadcare
    :target: https://stackshare.io/uploadcare/stacks/
    :alt: Uploadcare tech stack
 
+Uploadcare Python & Django integrations handle uploads and further operations
+with files by wrapping Upload and REST APIs.
 
-Simple file uploads for the web are of most importance
-for us at `Uploadcare`_. Today, everyone is used to the routine of
-allowing users to upload their pics or attach resumes. The routine
-covers it all: installing image processing libraries, adjusting permissions,
-ensuring servers never go down, and enabling CDN.
+Simple file uploads for the web are of most importance for us. Today, everyone
+is used to the routine of allowing users to upload their pics or attach resumes.
+The routine covers it all: installing image processing libraries, adjusting
+permissions, ensuring servers never go down, and enabling CDN.
 
-This library consists of the `Uploadcare`_ API interface and a couple
-of Django goodies.
+This library consists of the Uploadcare API interface and a couple of Django goodies.
 
-Simple as that, Uploadcare ``ImageField`` can be added to an
-existing Django project in just a couple of `simple steps`_.
-This will enable your users to see the upload progress, pick files
-from Google Drive or Instagram, and edit a form while files are
-being uploaded asynchronously.
+Simple as that, Uploadcare ``ImageField`` can be added to an existing Django
+project in just a couple of `simple steps`_. This will enable your users to see
+the upload progress, pick files from Google Drive or Instagram, and edit a form
+while files are being uploaded asynchronously.
 
 .. code-block:: python
 
@@ -65,7 +64,7 @@ Features
 ========
 
 - Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
-- Django widget with useful manual crop and multi-upload.
+- Django widget with our `file uploader`_.
 - *ucare* console utility.
 
 Requirements
@@ -99,10 +98,52 @@ To use in Django project install with extra dependencies:
 
     $ pip install pyuploadcare[django]
 
+Update to version 3.0
+---------------------
+
+Some caveats about migration process from version 2.x to 3.x.
+
+A version 3.0 contains the next breaking changes:
+
+* Resource attributes can be accessed now as properies, not methods.
+  In 2.x version use ``file.is_stored()``, in 3.x verisons use ``file.is_stored``.
+
+* ``Uploadcare`` client should be initialized to access API.
+  Refer to the documentation to see examples of using ``Uploadcare`` client::
+
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        secret_key='<your private key>',
+    )
+
+* ``File``, ``FileGroup``, ``FileList`` and ``GroupList`` resources cannot be initialized directly.
+  ``uploadcare.file``, ``uploadcare.file_group``, ``uploadcare.list_files``, ``uploadcare.list_file_groups``
+  client methods should be used instead::
+
+    file: File = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
+    file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+    file_groups: GroupList = uploadcare.list_file_groups()
+    files: FileList = uploadcare.list_files(stored=True)
+
+* ``pyuploadcare.conf`` package still can be used for configuration, but it is more preferable to pass
+  configuration options to ``Uploadcare`` client on initialization. ``pyuploadcare.conf`` provides
+  default values for the client.
+
+Example project
+===============
+
+You can find an example project `here`_. It features:
+- Project section
+- Files section
+- File Groups section
+- Files uploading
+- Documents conversion
+- Video conversion
+- Webhooks
+- Posts section
+
 Usage
 =====
-
-You can find an example project `here`_.
 
 Core API
 --------
@@ -245,7 +286,12 @@ List file groups::
 Video conversion
 ^^^^^^^^^^^^^^^^
 
-After each video file upload you obtain a file identifier in UUID format. Then you can use this file identifier to convert your video in multiple ways::
+Uploadcare can encode video files from all popular formats, adjust their
+quality, format and dimensions, cut out a video fragment, and generate
+thumbnails via REST API.
+
+After each video file upload you obtain a file identifier in UUID format.
+Then you can use this file identifier to convert your video in multiple ways::
 
     file = uploadcare.file('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
     transformation = (
@@ -275,7 +321,12 @@ or you can use API directly to convert single or multiple files::
 Document Conversion
 ^^^^^^^^^^^^^^^^^^^
 
-After each document file upload you obtain a file identifier in UUID format. Then you can use this file identifier to convert your document to a new format::
+Uploadcare allows converting documents to the following target formats:
+doc, docx, xls, xlsx, odt, ods, rtf, txt, pdf, jpg, png.
+Document Conversion works via our REST API.
+
+After each document file upload you obtain a file identifier in UUID format.
+Then you can use this file identifier to convert your document to a new format::
 
     file = uploadcare.file('0e1cac48-1296-417f-9e7f-9bf13e330dcf')
     transformation = DocumentTransformation().format(DocumentFormat.pdf)
@@ -366,7 +417,8 @@ or by image transformation builder::
 Secure delivery
 ^^^^^^^^^^^^^^^
 
-You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_).
+You can use your own custom domain and CDN provider for deliver files with
+authenticated URLs (see `original documentation`_).
 
 Generate secure for file::
 
@@ -393,7 +445,7 @@ Generate secure for file with transformations::
 Testing
 =======
 
-Besides the `Github Actions`_ we use tox. In order to run tests just:
+Besides the Github Actions we use tox. In order to run tests just:
 
 .. code-block:: console
 
@@ -401,29 +453,25 @@ Besides the `Github Actions`_ we use tox. In order to run tests just:
     $ tox
 
 
-Security issues
-===============
+Useful links
+============
 
-If you think you ran into something in Uploadcare libraries which might have
-security implications, please hit us up at `bugbounty@uploadcare.com`_
-or Hackerone.
+`Uploadcare documentation`_
+`Upload`_ API reference
+`REST`_ API reference
+`Contributing guide`_
+`Security policy`_
+`Support`_
+`Django app example`_
 
-We'll contact you personally in a short time to fix an issue through co-op and
-prior to any public disclosure.
-
-
-Feedback
-========
-
-Issues and PRs are welcome. You can provide your feedback or drop us a support
-request at `hello@uploadcare.com`_.
-
-.. _Uploadcare: https://uploadcare.com/?utm_source=github&utm_campaign=pyuploadcare
-.. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
-.. _Github Actions: https://github.com/uploadcare/pyuploadcare/actions
-.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _Uploadcare documentation: https://uploadcare.com/docs/?utm_source=github&utm_campaign=pyuploadcare
 .. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
-.. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
+.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
 .. _here: https://github.com/uploadcare/pyuploadcare-example
-.. _bugbounty@uploadcare.com: mailto:bugbounty@uploadcare.com
-.. _hello@uploadcare.com: mailto:hello@uploadcare.com
+.. _Django app example: https://github.com/uploadcare/pyuploadcare-example
+.. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
+.. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
+.. _file uploader: https://uploadcare.com/products/file-uploader/?utm_source=github&utm_campaign=pyuploadcare
+.. _Contributing guide: https://github.com/uploadcare/.github/blob/master/CONTRIBUTING.md
+.. _Security policy: https://github.com/uploadcare/pyuploadcare/security/policy
+.. _Support: https://github.com/uploadcare/.github/blob/master/SUPPORT.md
