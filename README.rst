@@ -39,7 +39,7 @@ This will enable your users to see the upload progress, pick files
 from Google Drive or Instagram, and edit a form while files are
 being uploaded asynchronously.
 
-You can find an example project `here`_.
+You can find an example project `here <https://github.com/uploadcare/pyuploadcare-example>`_.
 
 .. code-block:: python
 
@@ -87,5 +87,4 @@ request at `hello@uploadcare.com`_.
 .. _hello@uploadcare.com: mailto:hello@uploadcare.com
 .. _Uploadcare: https://uploadcare.com/?utm_source=github&utm_campaign=pyuploadcare
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
-.. _here: https://github.com/uploadcare/pyuploadcare-example
 .. _bugbounty@uploadcare.com: mailto:bugbounty@uploadcare.com
