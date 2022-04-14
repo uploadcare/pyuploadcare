@@ -70,7 +70,6 @@ Contents
    django-widget
    cli
    core_usage
-   deprecated
    testing
    security_issues
    feedback
