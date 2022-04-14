@@ -11,17 +11,23 @@ This part of the documentation covers the installation of PyUploadcare.
 Pip
 ---
 
-Installing pyuploadcare is simple with pip:
+In order to install ``pyuploadcare``, simply run:
 
 .. code-block:: console
 
     $ pip install pyuploadcare
 
-or, if you're into vintage:
+or, if you prefer it the old way:
 
 .. code-block:: console
 
     $ easy_install pyuploadcare
+
+To use in Django project install with extra dependencies:
+
+.. code-block:: console
+
+    $ pip install pyuploadcare[django]
 
 .. _install-get-the-code-ref:
 

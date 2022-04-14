@@ -2,24 +2,65 @@
 PyUploadcare: a Python library for Uploadcare
 =============================================
 
-The most important thing for us at `Uploadcare`_ is to make file uploading on
-the web really easy. Everyone is used to the routine work, related to allowing
-users upload their userpics or attach resumes: from installing image processing
-libraries to creating folder with right permissions to ensuring the server
-never goes down or out of space to enabling CDN. Feature like ability to simply
-use a picture from Facebook or manual cropping are much more burdensome,
-hence rare. Uploadcare's goal is to change the status quo.
+Simple file uploads for the web are of most importance
+for us at `Uploadcare`_. Today, everyone is used to the routine of
+allowing users to upload their pics or attach resumes. The routine
+covers it all: installing image processing libraries, adjusting permissions,
+ensuring servers never go down, and enabling CDN.
 
-This library consists of an API interface for `Uploadcare`_ and a couple
+This library consists of the `Uploadcare`_ API interface and a couple
 of Django goodies.
 
-A simple Uploadcare ``FileField`` can be added to an existing Django project
-in just a couple of :ref:`simple steps <quickstart>`. As a result, your users
-are going to be able to see the progress of the upload, choose files from
-Google Drive or Instagram, and edit form while files are uploading
-asynchornously.
+Simple as that, Uploadcare ``ImageField`` can be added to an
+existing Django project in just a couple of `simple steps`_.
+This will enable your users to see the upload progress, pick files
+from Google Drive or Instagram, and edit a form while files are
+being uploaded asynchronously.
 
-Contents:
+You can find an example project `here`_.
+
+.. code-block:: python
+
+    from django import forms
+    from django.db import models
+
+    from pyuploadcare.dj.models import ImageField
+    from pyuploadcare.dj.forms import FileWidget
+
+
+    class Candidate(models.Model):
+        photo = ImageField(blank=True, manual_crop="")
+
+
+    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
+    class CandidateForm(forms.Form):
+        photo = ImageField(widget=FileWidget(attrs={
+            'data-cdn-base': 'https://cdn.super-candidates.com',
+            'data-image-shrink': '1024x1024',
+        }))
+
+.. image:: https://ucarecdn.com/dbb4021e-b20e-40fa-907b-3da0a4f8ed70/-/resize/800/manual_crop.png
+
+Features
+========
+
+- Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
+- Django widget with useful manual crop and multi-upload.
+- *ucare* console utility.
+
+Requirements
+============
+
+``pyuploadcare`` requires Python 3.6, 3.7, 3.8, 3.9.
+
+To use ``pyuploadcare`` with Python 2.7 please install ``pyuploadcare < 3.0``.
+
+If you're using ``pyuploadcare`` with Django, check ``tox.ini`` or
+``.github/workflows`` for supported Python-Django combinations.
+
+
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
@@ -28,10 +69,14 @@ Contents:
    quickstart
    django-widget
    cli
+   core_usage
    deprecated
+   testing
+   security_issues
+   feedback
 
 API Reference
--------------
+=============
 
 .. toctree::
    :maxdepth: 2
@@ -41,10 +86,14 @@ API Reference
    api/cli
 
 Indices and tables
-------------------
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
 .. _Uploadcare: https://uploadcare.com
+.. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
+.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _here: https://github.com/uploadcare/pyuploadcare-example

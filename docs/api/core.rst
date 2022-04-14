@@ -4,8 +4,6 @@
 Core API
 ========
 
-.. include:: core_usage.rst
-
 Uploadcare client
 =================
 
