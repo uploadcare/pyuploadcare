@@ -2,14 +2,16 @@
 PyUploadcare: a Python library for Uploadcare
 =============================================
 
-Simple file uploads for the web are of most importance
-for us at `Uploadcare`_. Today, everyone is used to the routine of
-allowing users to upload their pics or attach resumes. The routine
-covers it all: installing image processing libraries, adjusting permissions,
-ensuring servers never go down, and enabling CDN.
+Uploadcare Python & Django integrations handle uploads and further operations
+with files by wrapping Upload and REST APIs.
 
-This library consists of the `Uploadcare`_ API interface and a couple
-of Django goodies.
+Simple file uploads for the web are of most importance for us. Today, everyone
+is used to the routine of allowing users to upload their pics or attach resumes.
+The routine covers it all: installing image processing libraries, adjusting
+permissions, ensuring servers never go down, and enabling CDN.
+
+This library consists of the Uploadcare API interface and a couple of Django
+goodies.
 
 Simple as that, Uploadcare ``ImageField`` can be added to an
 existing Django project in just a couple of `simple steps`_.
