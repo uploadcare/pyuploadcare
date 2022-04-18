@@ -280,7 +280,7 @@ Get project info::
 Secure delivery
 ---------------
 
-You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see original documentation).
+You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_`).
 
 Generate secure for file::
 
@@ -303,3 +303,17 @@ Generate secure for file with transformations::
         '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
     )
 
+Useful links
+------------
+
+- `Uploadcare documentation`_
+- `Upload`_ API reference
+- `REST`_ API reference
+- `Django app example`_
+
+.. _Uploadcare documentation: https://uploadcare.com/docs/?utm_source=github&utm_campaign=pyuploadcare
+.. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _Django app example: https://github.com/uploadcare/pyuploadcare-example
+.. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
+.. _file uploader: https://uploadcare.com/products/file-uploader/?utm_source=github&utm_campaign=pyuploadcare
