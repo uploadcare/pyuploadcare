@@ -76,16 +76,6 @@ Contents
    security_issues
    feedback
 
-API Reference
-=============
-
-.. toctree::
-   :maxdepth: 2
-
-   api/core
-   api/django-widget
-   api/cli
-
 Indices and tables
 ==================
 
