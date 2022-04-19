@@ -280,7 +280,7 @@ Get project info::
 Secure delivery
 ---------------
 
-You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_`).
+You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_).
 
 Generate secure for file::
 
