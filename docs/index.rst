@@ -47,7 +47,7 @@ Features
 ========
 
 - Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
-- Django widget with useful manual crop and multi-upload.
+- Django `widget`_` with useful manual crop and multi-upload.
 - *ucare* console utility.
 
 Requirements
@@ -87,4 +87,5 @@ Indices and tables
 .. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
 .. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
 .. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _widget: https://uploadcare.com/docs/uploads/file-uploader/
 .. _here: https://github.com/uploadcare/pyuploadcare-example
