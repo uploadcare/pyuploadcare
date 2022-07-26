@@ -29,7 +29,10 @@ from pyuploadcare import __version__  # noqa: E402
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["sphinx.ext.autodoc", "sphinxarg.ext"]
+extensions = [
+    "sphinx.ext.autodoc",
+    # "sphinxarg.ext"
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -45,7 +48,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "PyUploadcare"
-copyright = "2011-2015, Uploadcare LLC"
+copyright = "2011-2022, Uploadcare Inc"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -192,7 +195,7 @@ latex_documents = [
         "index",
         "PyUploadcare.tex",
         "PyUploadcare Documentation",
-        "Uploadcare LLC",
+        "Uploadcare Inc",
         "manual",
     ),
 ]
@@ -227,7 +230,7 @@ man_pages = [
         "index",
         "pyuploadcare",
         "PyUploadcare Documentation",
-        ["Uploadcare LLC"],
+        ["Uploadcare Inc"],
         1,
     )
 ]
@@ -246,7 +249,7 @@ texinfo_documents = [
         "index",
         "PyUploadcare",
         "PyUploadcare Documentation",
-        "Uploadcare LLC",
+        "Uploadcare Inc",
         "PyUploadcare",
         "Python library for Uploadcare.",
         "Miscellaneous",
