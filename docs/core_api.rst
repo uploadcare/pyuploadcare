@@ -1,5 +1,9 @@
+========
+Core API
+========
+
 Initialization
-^^^^^^^^^^^^^^
+--------------
 
 You can use pyuploadcare in any Python project. You need to pass
 your project keys to ``Uploadcare`` client::
@@ -8,7 +12,7 @@ your project keys to ``Uploadcare`` client::
     uploadcare = Uploadcare(public_key='<your public key>', secret_key='<your private key>')
 
 Uploading files
-^^^^^^^^^^^^^^^
+---------------
 
 Upload single file. ``File.upload`` method can accept file object or URL. Depending of file object size
 direct or multipart upload method will be chosen::
@@ -57,7 +61,7 @@ Example of using callback function for printing progress::
 
 
 List files
-^^^^^^^^^^
+----------
 
 Get list of files::
 
@@ -66,7 +70,7 @@ Get list of files::
         print(file.info)
 
 Retrieve files
-^^^^^^^^^^^^^^
+--------------
 
 Get existing file::
 
@@ -74,7 +78,7 @@ Get existing file::
     print(file.info)
 
 Store files
-^^^^^^^^^^^
+-----------
 
 Store single file::
 
@@ -90,7 +94,7 @@ Store multiple files::
     uploadcare.store_files(files)
 
 Delete files
-^^^^^^^^^^^^
+------------
 
 Delete single file::
 
@@ -106,7 +110,7 @@ Delete multiple files::
     uploadcare.delete_files(files)
 
 Video conversion
-^^^^^^^^^^^^^^^^
+----------------
 
 Uploadcare can encode video files from all popular formats, adjust their quality, format and dimensions, cut out a video fragment, and generate thumbnails via REST API.
 
@@ -137,7 +141,7 @@ or you can use API directly to convert single or multiple files::
     video_convert_status = uploadcare.video_convert_api.status(video_convert_info.token)
 
 Document Conversion
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 Uploadcare allows converting documents to the following target formats: doc, docx, xls, xlsx, odt, ods, rtf, txt, pdf, jpg, png. Document Conversion works via our REST API.
 
@@ -169,7 +173,7 @@ or you can use API directly to convert single or multiple files::
 
 
 Image transformations
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 Uploadcare allows to apply image transformations to files. ``File.cdn_url`` attribute returns CDN url::
 
@@ -190,7 +194,7 @@ or by image transformation builder::
     https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/grayscale/-/flip/
 
 Create file group
-^^^^^^^^^^^^^^^^^
+-----------------
 
 Create file group::
 
@@ -200,7 +204,7 @@ Create file group::
 
 
 Retreive file group
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 Get file group::
 
@@ -208,7 +212,7 @@ Get file group::
     print(file_group.info())
 
 Store file group
-^^^^^^^^^^^^^^^^
+----------------
 
 Stores all group's files::
 
@@ -216,7 +220,7 @@ Stores all group's files::
     file_group.store()
 
 List file groups
-^^^^^^^^^^^^^^^^
+----------------
 
 List file groups::
 
@@ -226,7 +230,7 @@ List file groups::
 
 
 Create webhook
-^^^^^^^^^^^^^^
+--------------
 
 Create a webhook::
 
@@ -240,14 +244,14 @@ Create a webhook with a signing secret::
     )
 
 List webhooks
-^^^^^^^^^^^^^
+-------------
 
 List webhooks::
 
     webhooks: List[Webhook] = list(uploadcare.list_webhooks(limit=10))
 
 Update webhook
-^^^^^^^^^^^^^^
+--------------
 
 Update a webhook::
 
@@ -258,7 +262,7 @@ Update a webhook's signing secret::
     webhook: Webhook = uploadcare.update_webhook(webhook_id, signing_secret="7kMVZivndx0ErgvhRKAr")
 
 Delete webhook
-^^^^^^^^^^^^^^
+--------------
 
 Delete a webhook::
 
@@ -266,7 +270,7 @@ Delete a webhook::
 
 
 Get project info
-^^^^^^^^^^^^^^^^
+----------------
 
 Get project info::
 
@@ -274,9 +278,9 @@ Get project info::
 
 
 Secure delivery
-^^^^^^^^^^^^^^^
+---------------
 
-You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see original documentation).
+You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_).
 
 Generate secure for file::
 
@@ -299,3 +303,17 @@ Generate secure for file with transformations::
         '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
     )
 
+Useful links
+------------
+
+- `Uploadcare documentation`_
+- `Upload`_ API reference
+- `REST`_ API reference
+- `Django app example`_
+
+.. _Uploadcare documentation: https://uploadcare.com/docs/?utm_source=github&utm_campaign=pyuploadcare
+.. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _Django app example: https://github.com/uploadcare/pyuploadcare-example
+.. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
+.. _file uploader: https://uploadcare.com/products/file-uploader/?utm_source=github&utm_campaign=pyuploadcare
