@@ -47,12 +47,12 @@ You can find an example project `here <https://github.com/uploadcare/pyuploadcar
     from django import forms
     from django.db import models
 
-    from pyuploadcare.dj.models import ImageField as ImageModelField
+    from pyuploadcare.dj.models import ImageField
     from pyuploadcare.dj.forms import FileWidget, ImageField as ImageFormField
 
 
     class Candidate(models.Model):
-        photo = ImageModelField(blank=True, manual_crop="")
+        photo = ImageField(blank=True, manual_crop="")
 
 
     # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
