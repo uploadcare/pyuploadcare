@@ -48,7 +48,7 @@ You can find an example project `here <https://github.com/uploadcare/pyuploadcar
     from django.db import models
 
     from pyuploadcare.dj.models import ImageField
-    from pyuploadcare.dj.forms import FileWidget
+    from pyuploadcare.dj.forms import FileWidget, ImageField as ImageFormField
 
 
     class Candidate(models.Model):
@@ -57,7 +57,7 @@ You can find an example project `here <https://github.com/uploadcare/pyuploadcar
 
     # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
     class CandidateForm(forms.Form):
-        photo = ImageField(widget=FileWidget(attrs={
+        photo = ImageFormField(widget=FileWidget(attrs={
             'data-cdn-base': 'https://cdn.super-candidates.com',
             'data-image-shrink': '1024x1024',
         }))
