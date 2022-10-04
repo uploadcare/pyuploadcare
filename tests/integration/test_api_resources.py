@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from exceptions import DeprecatedError
 from pyuploadcare import File, FileGroup, conf
 
 from .utils import create_file_group, upload_tmp_txt_file
@@ -23,11 +24,11 @@ IMAGE_PATH = ASSETS_PATH / "img.png"
 
 
 @pytest.fixture
-def group(uploadcare):
+def group(uploadcare) -> FileGroup:
     group = create_file_group(uploadcare, files_qty=1)
     yield group
     for file in group:
-        file.delete()
+        file.delete()  # TODO: DELETE not allowed in 0.7
 
 
 def test_successful_upload_when_file_is_opened_in_txt_mode(
@@ -237,9 +238,10 @@ def test_group_is_not_stored(group):
 def test_successful_group_store(group):
     assert not group.is_stored
 
-    group.store()
-
-    assert group.is_stored
+    with pytest.raises(DeprecatedError):
+        group.store()
+        assert group.is_stored
+    # TODO: update after bulk file storage operation will be implemented
 
 
 @pytest.fixture

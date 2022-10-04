@@ -59,3 +59,9 @@ class UploadError(UploadcareException):
 class DefaultResponseClassNotDefined(Exception):
     def __init__(self) -> None:
         super().__init__("Need define default response class for API.")
+
+
+class DeprecatedError(UploadcareException):
+    """Raised when some API methods were broken with new version published
+    but we put the information about it in the code explicitly
+    """

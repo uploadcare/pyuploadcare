@@ -148,7 +148,7 @@ class FileGroup:
 
     @property
     def is_stored(self):
-        """Returns ``True`` if file is stored.
+        """Returns ``True`` if file_group is stored.
 
         It might do API request once because it depends on ``info``.
 
@@ -163,5 +163,8 @@ class FileGroup:
         """
         if self.is_stored:
             return
+
+        # TODO: here we can inject working with files API to be complaint with
+        # existed code
 
         self._info_cache = self._client.groups_api.store(self.id)

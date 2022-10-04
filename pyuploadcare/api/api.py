@@ -6,6 +6,7 @@ from uuid import UUID
 
 from httpx._types import RequestFiles
 
+from exceptions import DeprecatedError
 from pyuploadcare.api import entities, responses
 from pyuploadcare.api.base import (
     API,
@@ -103,8 +104,11 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin):
     }
 
     def store(self, file_uuid: Union[UUID, str]) -> Dict[str, Any]:
+        """
+        It is deprecated since REST API v.0.7
+        """
         url = self._build_url(file_uuid, suffix="storage")
-        return self._client.put(url).json()
+        raise DeprecatedError(f'Use batch method for files storing instead of {url}')
 
 
 class ProjectAPI(API, RetrieveMixin):
