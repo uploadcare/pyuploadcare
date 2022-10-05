@@ -1,10 +1,14 @@
+import re
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 from uuid import UUID
 
+import pydantic
 from pydantic import BaseModel, EmailStr, PrivateAttr
+
+from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
 
 class Entity(BaseModel):
@@ -84,11 +88,24 @@ class VideoInfo(Entity):
     video: VideoStreamInfo
 
 
+class MetadataKeyConStrType(pydantic.ConstrainedStr):
+    regex = re.compile(META_KEY_PATTERN)
+    max_length = META_KEY_MAX_LEN
+
+
+class MetadataValueConStrType(pydantic.ConstrainedStr):
+    max_length = META_VALUE_MAX_LEN
+
+
+MetadataDict = Dict[MetadataKeyConStrType, MetadataValueConStrType]
+
+
 class FileInfo(UUIDEntity):
     datetime_removed: Optional[datetime]
     datetime_stored: Optional[datetime]
     datetime_uploaded: Optional[datetime]
     image_info: Optional[ImageInfo]
+    metadata: Optional[MetadataDict]
     is_image: Optional[bool]
     is_ready: Optional[bool]
     mime_type: Optional[str]

@@ -19,6 +19,7 @@ from pyuploadcare.api import (
     DocumentConvertAPI,
     FilesAPI,
     GroupsAPI,
+    MetadataAPI,
     ProjectAPI,
     UploadAPI,
     VideoConvertAPI,
@@ -146,6 +147,7 @@ class Uploadcare:
         )
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.metadata_api = MetadataAPI(client=self.rest_client, **api_config)  # type: ignore
 
     def file(
         self,
@@ -213,6 +215,7 @@ class Uploadcare:
         store=None,
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
+        metadata: Optional[Dict] = None,
     ) -> "File":
         """Uploads a file and returns ``File`` instance.
 
@@ -276,6 +279,7 @@ class Uploadcare:
                 file_url,
                 store=store,
                 callback=callback,
+                metadata=metadata,
             )
 
         file_obj: IO = file_handle
@@ -285,7 +289,9 @@ class Uploadcare:
 
         # use direct upload for files less then multipart_min_file_size
         if size < self.multipart_min_file_size:
-            files = self.upload_files([file_obj], store=store)
+            files = self.upload_files(
+                [file_obj], store=store, common_metadata=metadata
+            )
             if not files:
                 raise ValueError("Failed to get uploaded file from response")
             file: "File" = files[0]
@@ -296,7 +302,11 @@ class Uploadcare:
             return file
 
         file = self.multipart_upload(
-            file_obj, store=store, size=size, callback=callback
+            file_obj,
+            store=store,
+            size=size,
+            callback=callback,
+            metadata=metadata,
         )
         return file
 
@@ -314,7 +324,10 @@ class Uploadcare:
         return values_map[store]
 
     def upload_files(
-        self, file_objects: List[IO], store: Optional[bool] = None
+        self,
+        file_objects: List[IO],
+        store: Optional[bool] = None,
+        common_metadata: Optional[Dict] = None,
     ) -> List["File"]:
         """Upload multiple files using direct upload.
 
@@ -329,6 +342,9 @@ class Uploadcare:
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
+            - common_metadata:
+                Dict with keys and values are all strings with constraints
+                If presented it is set for each file from ``files`` collection
 
         Returns:
             ``File`` instance
@@ -352,6 +368,7 @@ class Uploadcare:
             store=self._format_store(store),
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
+            common_metadata=common_metadata,
         )
         ucare_files = [self.file(response[file_name]) for file_name in files]
         return ucare_files
@@ -363,6 +380,7 @@ class Uploadcare:
         size: Optional[int] = None,
         mime_type: Optional[str] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
+        metadata: Optional[Dict] = None,
     ) -> "File":
         """Upload file straight to s3 by chunks.
 
@@ -383,6 +401,7 @@ class Uploadcare:
                 If not set, it is guessed from filename extension.
             - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
+            - metadata (Optional[Dict]): Optional metadata
 
         Returns:
             ``File`` instance
@@ -401,6 +420,7 @@ class Uploadcare:
             store=self._format_store(store),
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
+            metadata=metadata,
         )
 
         multipart_uuid = complete_response["uuid"]
@@ -424,7 +444,9 @@ class Uploadcare:
         file_info: Dict = self.upload_api.multipart_complete(multipart_uuid)
         return self.file(file_info["uuid"], file_info)
 
-    def upload_from_url(self, url, store=None, filename=None) -> FileFromUrl:
+    def upload_from_url(
+        self, url, store=None, filename=None, metadata=None
+    ) -> FileFromUrl:
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
         Args:
@@ -454,6 +476,7 @@ class Uploadcare:
             source_url=url,
             store=store,
             filename=filename,
+            metadata=metadata,
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
         )
@@ -465,6 +488,7 @@ class Uploadcare:
         url,
         timeout=30,
         interval=0.3,
+        metadata=None,
         until_ready=False,
         store=None,
         filename=None,
@@ -499,7 +523,7 @@ class Uploadcare:
             ``TimeoutError`` if file wasn't uploaded in time
 
         """
-        ffu = self.upload_from_url(url, store, filename)
+        ffu = self.upload_from_url(url, store, filename, metadata=metadata)
         return ffu.wait(
             timeout=timeout,
             interval=interval,

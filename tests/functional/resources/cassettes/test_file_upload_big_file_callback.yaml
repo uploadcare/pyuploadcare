@@ -1,0 +1,56 @@
+interactions:
+- request:
+    body: filename=%2Fvar%2Ffolders%2Ftf%2Fdcd02ss53y9fmflr_qg_p3hw0000gn%2FT%2Ftmp5i0pei8m%2Fbig_file.txt&size=11000000&content_type=text%2Fplain&UPLOADCARE_PUB_KEY=demopublickey&UPLOADCARE_STORE=1&expire=60&signature=7d2e71d1843788a02d0c7fe6f5d71edf657363a369112e78d4f37ace3f884b00
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '273'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - upload.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: POST
+    uri: https://upload.uploadcare.com/multipart/start/
+  response:
+    content: File size exceeds project limit.
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - DNT, X-UC-User-Agent, X-PINGOTHER
+      Access-Control-Allow-Methods:
+      - POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Warning, Retry-After
+      Access-Control-Max-Age:
+      - '1'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '32'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Mon, 24 Oct 2022 21:54:42 GMT
+      Server:
+      - nginx
+      Vary:
+      - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Uploadcare-Request-Id:
+      - 50a9f24d-6b34-45e0-93f4-d0b047110795
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 400
+version: 1

@@ -1,0 +1,102 @@
+interactions:
+- request:
+    body: '"any string up to 512"'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '22'
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: PUT
+    uri: https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/metadata/-:45az_/
+  response:
+    content: '"any string up to 512"'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS, PUT
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '22'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Thu, 06 Oct 2022 07:01:52 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.7'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 62a3ef45-88e4-4771-82ae-28d9d9cb6b89
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: DELETE
+    uri: https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/metadata/-:45az_/
+  response:
+    content: ''
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS, PUT
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Date:
+      - Thu, 06 Oct 2022 07:01:52 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.7'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 0f82f3b6-c22e-4c23-8d67-03db171ad4dc
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 204
+version: 1
