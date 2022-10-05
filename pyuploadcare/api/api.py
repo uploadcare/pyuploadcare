@@ -108,7 +108,9 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin):
         It is deprecated since REST API v.0.7
         """
         url = self._build_url(file_uuid, suffix="storage")
-        raise DeprecatedError(f'Use batch method for files storing instead of {url}')
+        raise DeprecatedError(
+            f"Use batch method for files storing instead of {url}"
+        )
 
 
 class ProjectAPI(API, RetrieveMixin):
