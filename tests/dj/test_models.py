@@ -49,39 +49,45 @@ class FileFieldTest(unittest.TestCase):
         class Meta:
             app_label = "tests"
 
-        bases = (models.Model, )
-        attributes = {
-            'Meta': Meta,
-            'cv': cv_field,
-            '__module__': __name__
-        }
-        return type(f'Employee_{label}', bases, attributes)
+        bases = (models.Model,)
+        attributes = {"Meta": Meta, "cv": cv_field, "__module__": __name__}
+        return type(f"Employee_{label}", bases, attributes)
 
     def test_empty_str_is_allowed(self):
-        Employee = self._construct_Employee_class_with_variations('blank', FileField(blank=True))
+        Employee = self._construct_Employee_class_with_variations(
+            "blank", FileField(blank=True)
+        )
         emp = Employee()
         self.assertEqual(emp.cv, "")
 
     def test_null_is_allowed(self):
-        Employee = self._construct_Employee_class_with_variations('null', FileField(null=True))
+        Employee = self._construct_Employee_class_with_variations(
+            "null", FileField(null=True)
+        )
 
         emp = Employee(cv=None)
         self.assertEqual(emp.cv, None)
 
     def test_validation_error_if_value_is_int(self):
-        Employee = self._construct_Employee_class_with_variations('int', FileField())
+        Employee = self._construct_Employee_class_with_variations(
+            "int", FileField()
+        )
 
         with self.assertRaises(ValidationError):
             Employee(cv=123)
 
     def test_validation_error_if_uuid_is_invalid_str(self):
-        Employee = self._construct_Employee_class_with_variations('invalid_str', FileField())
+        Employee = self._construct_Employee_class_with_variations(
+            "invalid_str", FileField()
+        )
 
         with self.assertRaises(ValidationError):
             Employee(cv="123")
 
     def test_file_instance_if_uuid_is_valid(self):
-        Employee = self._construct_Employee_class_with_variations('valid_uuid_str', FileField())
+        Employee = self._construct_Employee_class_with_variations(
+            "valid_uuid_str", FileField()
+        )
 
         emp = Employee(cv="3addab78-6368-4c55-ac08-22412b6a2a4c")
         self.assertIsInstance(emp.cv, File)
@@ -92,40 +98,50 @@ class FileGroupFieldTest(unittest.TestCase):
         class Meta:
             app_label = "tests"
 
-        bases = (models.Model, )
+        bases = (models.Model,)
         attributes = {
-            'Meta': Meta,
-            'pages': pages_field,
-            '__module__': __name__
+            "Meta": Meta,
+            "pages": pages_field,
+            "__module__": __name__,
         }
-        return type(f'Book_{label}', bases, attributes)
+        return type(f"Book_{label}", bases, attributes)
 
     def test_empty_str_is_allowed(self):
-        Book = self._construct_Book_class_with_variations('empty', FileGroupField(blank=True))
+        Book = self._construct_Book_class_with_variations(
+            "empty", FileGroupField(blank=True)
+        )
 
         book = Book()
         self.assertEqual(book.pages, "")
 
     def test_null_is_allowed(self):
-        Book = self._construct_Book_class_with_variations('null', FileGroupField(null=True))
+        Book = self._construct_Book_class_with_variations(
+            "null", FileGroupField(null=True)
+        )
 
         book = Book(pages=None)
         self.assertEqual(book.pages, None)
 
     def test_validation_error_if_value_is_int(self):
-        Book = self._construct_Book_class_with_variations('int', FileGroupField())
+        Book = self._construct_Book_class_with_variations(
+            "int", FileGroupField()
+        )
 
         with self.assertRaises(ValidationError):
             Book(pages=123)
 
     def test_validation_error_if_group_id_is_invalid_str(self):
-        Book = self._construct_Book_class_with_variations('invalid_str', FileGroupField())
+        Book = self._construct_Book_class_with_variations(
+            "invalid_str", FileGroupField()
+        )
 
         with self.assertRaises(ValidationError):
             Book(pages="123")
 
     def test_file_group_instance_if_group_id_is_valid(self):
-        Book = self._construct_Book_class_with_variations('valid_str', FileGroupField())
+        Book = self._construct_Book_class_with_variations(
+            "valid_str", FileGroupField()
+        )
 
         book = Book(pages="0513dda0-582f-447d-846f-096e5df9e2bb~2")
         self.assertIsInstance(book.pages, FileGroup)
