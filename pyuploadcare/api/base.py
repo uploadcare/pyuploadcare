@@ -101,7 +101,7 @@ class API:
     def _delete_with_response(
         self, resource_uuid: Union[UUID, str, UUIDEntity] = None
     ) -> Dict[str, Any]:
-        url = self._build_url(resource_uuid, suffix='storage')
+        url = self._build_url(resource_uuid, suffix="storage")
         document = self._client.delete(url)
         return document.json()
 

@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Dict, List, Optional, Tuple
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, PrivateAttr
+from pydantic import BaseModel, EmailStr, PrivateAttr, constr
 
 
 class Entity(BaseModel):
@@ -84,11 +84,17 @@ class VideoInfo(Entity):
     video: VideoStreamInfo
 
 
+MetadataKeyConStrType = constr(regex=r"[-_.:A-Za-z0-9]", max_length=64)
+MetadataValueConStrType = constr(max_length=512)
+MetadataDict = Dict[MetadataKeyConStrType, MetadataValueConStrType]
+
+
 class FileInfo(UUIDEntity):
     datetime_removed: Optional[datetime]
     datetime_stored: Optional[datetime]
     datetime_uploaded: Optional[datetime]
     image_info: Optional[ImageInfo]
+    metadata: Optional[MetadataDict]
     is_image: Optional[bool]
     is_ready: Optional[bool]
     mime_type: Optional[str]

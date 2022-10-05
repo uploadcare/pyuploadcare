@@ -20,6 +20,8 @@ from pyuploadcare.api.base import (
 )
 from pyuploadcare.exceptions import APIError
 
+from .utils import flatten_dict
+
 
 class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
     resource_type = "files"
@@ -108,7 +110,9 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin):
         It is deprecated since REST API v.0.7
         """
         url = self._build_url(file_uuid, suffix="storage")
-        raise DeprecatedError(f'Use batch method for files storing instead of {url}')
+        raise DeprecatedError(
+            f"Use batch method for files storing instead of {url}"
+        )
 
 
 class ProjectAPI(API, RetrieveMixin):
@@ -208,10 +212,11 @@ class UploadAPI(API):
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
-    def upload(
+    def upload(  # noqa: C901
         self,
         files: RequestFiles,
         secure_upload: bool = False,
+        common_metadata: Optional[dict] = None,
         public_key: Optional[str] = None,
         secret_key: Optional[str] = None,
         store: Optional[str] = "auto",
@@ -223,6 +228,9 @@ class UploadAPI(API):
 
         if public_key is None:
             public_key = self.public_key
+
+        if common_metadata is not None:
+            data.update(flatten_dict(common_metadata))
 
         data["UPLOADCARE_PUB_KEY"] = public_key
 
@@ -246,6 +254,7 @@ class UploadAPI(API):
         file_name: str,
         file_size: int,
         content_type: str,
+        metadata: Optional[dict] = None,
         store: Optional[str] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
@@ -259,6 +268,9 @@ class UploadAPI(API):
 
         if store is not None:
             data["UPLOADCARE_STORE"] = store
+
+        if metadata is not None:
+            data.update(flatten_dict(metadata))
 
         if secure_upload:
             expire = (
@@ -298,6 +310,7 @@ class UploadAPI(API):
         source_url,
         store="auto",
         filename=None,
+        metadata: Optional[Dict] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
     ) -> str:
@@ -308,6 +321,9 @@ class UploadAPI(API):
         }
         if filename:
             data["filename"] = filename
+
+        if metadata is not None:
+            data.update(flatten_dict(metadata))
 
         if secure_upload:
             expire = (
