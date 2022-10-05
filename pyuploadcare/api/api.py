@@ -6,7 +6,6 @@ from uuid import UUID
 
 from httpx._types import RequestFiles
 
-from exceptions import DeprecatedError
 from pyuploadcare.api import entities, responses
 from pyuploadcare.api.base import (
     API,
@@ -18,7 +17,7 @@ from pyuploadcare.api.base import (
     RetrieveMixin,
     UpdateMixin,
 )
-from pyuploadcare.exceptions import APIError
+from pyuploadcare.exceptions import APIError, DeprecatedError
 
 from .utils import flatten_dict
 

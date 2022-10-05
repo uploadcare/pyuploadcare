@@ -3,7 +3,7 @@ interactions:
     body: '["23762be6-cfe3-4d27-86be-9ed7d403dd43"]'
     headers:
       accept:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
       - gzip, deflate
       connection:
@@ -30,7 +30,7 @@ interactions:
       Content-Length:
       - '633'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Mon, 27 Sep 2021 08:43:46 GMT
       Server:
@@ -54,7 +54,7 @@ interactions:
     body: ''
     headers:
       accept:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
       - gzip, deflate
       connection:
@@ -79,7 +79,7 @@ interactions:
       Content-Length:
       - '592'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Mon, 27 Sep 2021 08:43:52 GMT
       Server:

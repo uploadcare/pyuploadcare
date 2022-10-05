@@ -3,7 +3,7 @@ interactions:
     body: pub_key=demopublickey&files%5B0%5D=https%3A%2F%2Fucarecdn.com%2Fa42464a4-b57a-458e-8b9d-3e6d72db9d60%2F&files%5B1%5D=https%3A%2F%2Fucarecdn.com%2F7ac0a1c3-5476-4d6a-b03d-0acf7ae6d4ae%2F
     headers:
       accept:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
       - gzip, deflate
       connection:
