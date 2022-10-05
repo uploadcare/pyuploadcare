@@ -14,6 +14,7 @@ and this project adheres to `Semantic Versioning`_.
 Changed
 +++++++
 - Bumped `pytz` dependency
+- Bumped `typing-extensions` for py37+
 
 
 `3.0.0`_ - 2021-11-01
