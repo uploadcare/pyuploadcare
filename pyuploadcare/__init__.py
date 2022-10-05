@@ -1,5 +1,5 @@
 # isort: skip_file
-__version__ = "3.0.0"
+__version__ = "3.0.1"
 
 from pyuploadcare.resources.file import File  # noqa: F401
 from pyuploadcare.resources.file_group import FileGroup  # noqa: F401

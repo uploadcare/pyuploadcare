@@ -8,6 +8,14 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
+`3.0.1`_ - unreleased
+~~~~~~~~~~~~~~~~~~~~~
+
+Changed
++++++++
+- Bumped `pytz` dependency
+
+
 `3.0.0`_ - 2021-11-01
 ~~~~~~~~~~~~~~~~~~~~~
 
