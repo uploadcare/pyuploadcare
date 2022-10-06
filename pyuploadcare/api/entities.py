@@ -6,6 +6,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, PrivateAttr, constr
 
+from .metadata import META_VALUE_MAX_LEN, META_KEY_MAX_LEN, META_KEY_PATTERN
+
 
 class Entity(BaseModel):
     ...
@@ -84,8 +86,8 @@ class VideoInfo(Entity):
     video: VideoStreamInfo
 
 
-MetadataKeyConStrType = constr(regex=r"[-_.:A-Za-z0-9]", max_length=64)
-MetadataValueConStrType = constr(max_length=512)
+MetadataKeyConStrType = constr(regex=META_KEY_PATTERN, max_length=META_KEY_MAX_LEN)
+MetadataValueConStrType = constr(max_length=META_VALUE_MAX_LEN)
 MetadataDict = Dict[MetadataKeyConStrType, MetadataValueConStrType]
 
 

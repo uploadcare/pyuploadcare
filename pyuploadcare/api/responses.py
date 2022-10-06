@@ -63,3 +63,15 @@ class DocumentConvertResponse(Entity):
 class VideoConvertResponse(Entity):
     problems: typing.Optional[typing.Dict[str, typing.Any]]
     result: typing.Optional[typing.List[VideoConvertInfo]]
+
+
+class UpdateMetadataKeyResponse(Entity):
+    __root__: str
+
+
+class DeleteMetadataKeyResponse(Entity):
+    pass
+
+
+class GetAllMetadataResponse(Entity):
+    pass

@@ -18,6 +18,7 @@ from pyuploadcare.api.base import (
     UpdateMixin,
 )
 from pyuploadcare.exceptions import APIError, DeprecatedError
+from .metadata import validate_metadata, validate_meta_key, validate_meta_value
 
 from .utils import flatten_dict
 
@@ -229,6 +230,7 @@ class UploadAPI(API):
             public_key = self.public_key
 
         if common_metadata is not None:
+            validate_metadata(common_metadata)
             data.update(flatten_dict(common_metadata))
 
         data["UPLOADCARE_PUB_KEY"] = public_key
@@ -269,6 +271,7 @@ class UploadAPI(API):
             data["UPLOADCARE_STORE"] = store
 
         if metadata is not None:
+            validate_metadata(metadata)
             data.update(flatten_dict(metadata))
 
         if secure_upload:
@@ -322,6 +325,7 @@ class UploadAPI(API):
             data["filename"] = filename
 
         if metadata is not None:
+            validate_metadata(metadata)
             data.update(flatten_dict(metadata))
 
         if secure_upload:
@@ -384,3 +388,45 @@ class UploadAPI(API):
         url = self._build_url(base="/group/")
         document = self._client.post(url, data=data)
         return document.json()
+
+
+
+class MetadataAPI(API):
+    resource_type = "files"
+    response_classes = {
+        "update": str,
+        "get_all": entities.MetadataDict,
+        "get_key": str,
+    }
+
+    def update_or_create_key(self, file_uuid: Union[UUID, str], mkey: str, mvalue: str) -> str:
+        validate_meta_key(mkey)
+        validate_meta_value(mvalue)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        response_class = self._get_response_class("update")
+        json_response = self._client.put(url, json=mvalue).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.UpdateMetadataKeyResponse, response)
+
+    def get_all_metadata(self, file_uuid: Union[UUID, str]) -> entities.MetadataDict:
+        url = self._build_url(file_uuid, suffix="metadata")
+        response_class = self._get_response_class("get_all")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(entities.MetadataDict, response)
+
+    def delete_key(self, file_uuid: Union[UUID, str], mkey: str) -> None:
+        validate_meta_key(mkey)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        self._client.delete(url)
+
+    def get_key(self, file_uuid: Union[UUID, str], mkey: str) -> str:
+        validate_meta_key(mkey)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        response_class = self._get_response_class("get_key")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(str, response)
