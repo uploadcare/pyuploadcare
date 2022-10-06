@@ -67,7 +67,7 @@ You can find an example project `here <https://github.com/uploadcare/pyuploadcar
 Documentation
 =============
 
-Detailed documentation is available `here <https://pyuploadcare.readthedocs.io/en/latest/>`_.
+Detailed documentation is available `on RTD <https://pyuploadcare.readthedocs.io/en/latest/>`_.
 
 Feedback
 ========
