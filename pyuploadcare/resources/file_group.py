@@ -62,6 +62,7 @@ class FileGroup:
 
         self.id = matches.groupdict()["group_id"]
 
+        self._is_deleted = False
         self._files_qty = files_qty
         self._info_cache: Optional[Dict[str, Any]] = None
 
@@ -168,3 +169,23 @@ class FileGroup:
         # existed code
 
         self._info_cache = self._client.groups_api.store(self.id)
+
+    @property
+    def is_deleted(self):
+        """Returns ``True`` if group is deleted.
+
+        It makes no API call
+
+        """
+        return self._is_deleted
+
+    def delete(self):
+        """Delete group itseelf, left files unchanged
+
+        Added in API v. 0.7.0
+        """
+        if self._is_deleted:
+            return
+
+        self._client.groups_api.delete(self.id)
+        self._is_deleted = True
