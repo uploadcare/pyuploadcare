@@ -6,13 +6,19 @@ def test_get_all_metadata(uploadcare):
     stored_metadata = uploadcare.metadata_api.get_all_metadata(
         "a55d6b25-d03c-4038-9838-6e06bb7df598"
     )
-    
-    assert stored_metadata == {"first_key": "first_value", "second_key": "any_others"}
+
+    assert stored_metadata == {
+        "first_key": "first_value",
+        "second_key": "any_others",
+    }
 
 
 @pytest.mark.vcr
 def test_create_key_and_delete(uploadcare, vcr):
-    base_expected_metadata = {"first_key": "first_value", "second_key": "any_others"}
+    base_expected_metadata = {
+        "first_key": "first_value",
+        "second_key": "any_others",
+    }
     new_key, new_value = "-:45az_", "any string up to 512"
 
     created_value = uploadcare.metadata_api.update_or_create_key(

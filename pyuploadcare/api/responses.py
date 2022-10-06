@@ -7,6 +7,7 @@ from pyuploadcare.api.entities import (
     Entity,
     FileInfo,
     GroupInfo,
+    MetadataDict,
     VideoConvertInfo,
 )
 
@@ -74,4 +75,4 @@ class DeleteMetadataKeyResponse(Entity):
 
 
 class GetAllMetadataResponse(Entity):
-    pass
+    __root__: MetadataDict

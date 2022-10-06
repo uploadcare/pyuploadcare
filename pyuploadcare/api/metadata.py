@@ -2,6 +2,7 @@ import re
 
 from pyuploadcare.exceptions import MetadataValidationError
 
+
 META_KEY_PATTERN = r"[-_.:A-Za-z0-9]"
 META_KEY_MAX_LEN = 64
 

@@ -14,12 +14,12 @@ from typing import (
 )
 from uuid import UUID
 
-from api.api import MetadataAPI
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
     DocumentConvertAPI,
     FilesAPI,
     GroupsAPI,
+    MetadataAPI,
     ProjectAPI,
     UploadAPI,
     VideoConvertAPI,
