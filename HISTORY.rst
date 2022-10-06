@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
-`3.0.1`_ - unreleased
+`3.0.1`_ - 2022-10-06
 ~~~~~~~~~~~~~~~~~~~~~
 
 Changed
@@ -428,7 +428,8 @@ param is unicode and ``requests.request()`` got ``files`` argument, e.g.:
 .. _Keep a Changelog: https://keepachangelog.com/en/1.0.0/
 .. _Semantic Versioning: https://semver.org/spec/v2.0.0.html
 
-.. _Unreleased: https://github.com/uploadcare/pyuploadcare/compare/v3.0.0...HEAD
+.. _Unreleased: https://github.com/uploadcare/pyuploadcare/compare/v3.0.1...HEAD
+.. _3.0.1: https://github.com/uploadcare/pyuploadcare/compare/v3.0.0...v3.0.1
 .. _3.0.0: https://github.com/uploadcare/pyuploadcare/compare/v2.7.0...v3.0.0
 .. _2.7.0: https://github.com/uploadcare/pyuploadcare/compare/v2.6.0...v2.7.0
 .. _2.6.0: https://github.com/uploadcare/pyuploadcare/compare/v2.5.0...v2.6.0
