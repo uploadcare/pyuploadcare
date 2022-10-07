@@ -38,9 +38,7 @@ class ThrottledRequestError(UploadcareException):
 
     def __init__(self, response):
         try:
-            self.wait = int(
-                response.headers.get("retry-after", 15)
-            )
+            self.wait = int(response.headers.get("retry-after", 15))
         except ValueError:
             self.wait = 15
         self.wait += 1
