@@ -1,11 +1,232 @@
 __all__ = ["Client"]
 
+import logging
 import sys
+import time
+import typing
+from platform import python_implementation, python_version
+from typing import Optional
+
+from httpx import USE_CLIENT_DEFAULT, HTTPStatusError, Response
+from httpx._client import Client as HTTPXClient
+from httpx._client import UseClientDefault
+from httpx._types import (
+    AuthTypes,
+    CookieTypes,
+    HeaderTypes,
+    QueryParamTypes,
+    RequestContent,
+    RequestData,
+    RequestFiles,
+    TimeoutTypes,
+    URLTypes,
+)
+
+from pyuploadcare import __version__
+from pyuploadcare.exceptions import (
+    APIError,
+    AuthenticationError,
+    InvalidRequestError,
+    ThrottledRequestError,
+)
+
+
+logger = logging.getLogger("pyuploadcare")
 
 
 version_vector = sys.version_info
 
-if version_vector[:2] > (3, 6):
-    from ._new_client import Client
-else:
-    from ._old_client import Client
+PY37_AND_HIGHER = version_vector[:2] > (3, 6)
+PY36 = not PY37_AND_HIGHER
+
+
+class Client(HTTPXClient):
+    def __init__(self, *args, **kwargs):
+        self.user_agent_extension = kwargs.pop("user_agent_extension", None)
+        self.retry_throttled = kwargs.pop("retry_throttled", None)
+        self.public_key = kwargs.pop("public_key", None)
+
+        super().__init__(*args, **kwargs)
+
+    def delete_with_payload(
+        self,
+        url: URLTypes,
+        *,
+        content: RequestContent = None,
+        data: RequestData = None,
+        json: typing.Any = None,
+        params: QueryParamTypes = None,
+        headers: HeaderTypes = None,
+        cookies: CookieTypes = None,
+        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
+        follow_redirects: Optional[bool] = None,
+        allow_redirects: Optional[bool] = True,
+        timeout: typing.Union[
+            TimeoutTypes, UseClientDefault
+        ] = USE_CLIENT_DEFAULT,
+    ) -> Response:
+        """
+        Send a `DELETE` request with payload.
+
+        **Parameters**: See `httpx.request`.
+        """
+        return self.request(
+            "DELETE",
+            url,
+            content=content,
+            data=data,
+            json=json,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            auth=auth,
+            follow_redirects=follow_redirects,
+            allow_redirects=allow_redirects,
+            timeout=timeout,
+        )
+
+    def request(  # type: ignore # noqa: C901
+        self,
+        method: str,
+        url: URLTypes,
+        *,
+        content: RequestContent = None,
+        data: RequestData = None,
+        files: RequestFiles = None,
+        json: typing.Any = None,
+        params: QueryParamTypes = None,
+        headers: HeaderTypes = None,
+        cookies: CookieTypes = None,
+        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
+        follow_redirects: Optional[bool] = None,
+        allow_redirects: Optional[bool] = True,
+        timeout: typing.Union[
+            TimeoutTypes, UseClientDefault
+        ] = USE_CLIENT_DEFAULT,
+        extensions: Optional[dict] = None,
+    ) -> Response:
+        """
+        `allow_redirects` is for compatibility with versions for Python 3.6 only
+         should use `follow_redirects` instead
+
+        `redirecting` is `True` by default
+        if `allow_redirects` is set - its value is used
+        if `follow_redirects` is also set - it controls the behavior for real
+
+        arguments are passed by into `_perform_request`,
+        result value of `redirecting` computes there
+        """
+
+        if not headers:
+            headers = {}  # type: ignore
+
+        headers["User-Agent"] = self._build_user_agent()  # type: ignore
+
+        retry_throttled = self.retry_throttled
+
+        while True:
+            try:
+                return self._perform_request(
+                    method,
+                    url,
+                    content=content,
+                    data=data,
+                    files=files,
+                    json=json,
+                    params=params,
+                    headers=headers,
+                    cookies=cookies,
+                    auth=auth,
+                    follow_redirects=follow_redirects,
+                    allow_redirects=allow_redirects,
+                    timeout=timeout,
+                )
+            except ThrottledRequestError as e:
+                if retry_throttled > 0:
+                    logger.debug(f"Throttled, retry in {e.wait} seconds")
+                    time.sleep(e.wait)
+                    retry_throttled -= 1
+                    continue
+                else:
+                    raise
+
+    def _perform_request(  # noqa: C901
+        self,
+        method: str,
+        url: URLTypes,
+        content: RequestContent = None,
+        data: RequestData = None,
+        files: RequestFiles = None,
+        json: typing.Any = None,
+        params: QueryParamTypes = None,
+        headers: HeaderTypes = None,
+        cookies: CookieTypes = None,
+        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
+        follow_redirects: Optional[bool] = None,
+        allow_redirects: Optional[bool] = None,
+        timeout: typing.Union[
+            TimeoutTypes, UseClientDefault
+        ] = USE_CLIENT_DEFAULT,
+    ):
+        logger.debug(
+            f"sent: method: {method}; path: {url}; headers: {headers}; "
+            f"json: {json}; data: {data}; content: {str(content)}"
+        )
+
+        redirecting = True
+        if allow_redirects is not None:
+            redirecting = allow_redirects
+        if follow_redirects is not None:
+            redirecting = follow_redirects
+
+        kwargs = dict(
+            content=content,
+            data=data,
+            files=files,
+            json=json,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            auth=auth,
+            timeout=timeout,
+        )
+
+        if PY36:
+            kwargs["allow_redirects"] = redirecting
+        else:
+            kwargs["follow_redirects"] = redirecting
+
+        response = super().request(method, url, **kwargs)  # type: ignore
+
+        logger.debug(
+            f"got: status_code: {response.status_code}; "
+            f"content: {str(response.content)}; headers: {response.headers}"
+        )
+
+        if response.status_code in (401, 403):
+            raise AuthenticationError(response.content.decode())
+
+        if response.status_code in (400, 404):
+            raise InvalidRequestError(response.content.decode())
+
+        if response.status_code == 429:
+            raise ThrottledRequestError(response)
+
+        try:
+            response.raise_for_status()
+        except HTTPStatusError:
+            raise APIError(response.content.decode())
+
+        return response
+
+    def _build_user_agent(self):
+        extension_info = ""
+        if self.user_agent_extension:
+            extension_info = f"; {self.user_agent_extension}"
+        return "PyUploadcare/{0}/{1} ({2}/{3}{4})".format(
+            __version__,
+            self.public_key,
+            python_implementation(),
+            python_version(),
+            extension_info,
+        )
