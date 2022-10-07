@@ -1,10 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Generic, List, Optional, Tuple, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, PrivateAttr
+from pydantic import BaseModel, EmailStr, Field, PrivateAttr
+from pydantic.generics import GenericModel
 
 
 class Entity(BaseModel):
@@ -80,15 +81,88 @@ class VideoInfo(Entity):
     duration: Decimal
     format: str
     bitrate: Decimal
-    audio: Optional[AudioStreamInfo]
-    video: VideoStreamInfo
+    audio: List[AudioStreamInfo]
+    video: List[VideoStreamInfo]
+
+
+class MIMEInfo(Entity):
+    mime: str
+    type: str
+    subtype: str
+
+
+class ContentInfo(Entity):
+    mime: MIMEInfo
+    image: Optional[ImageInfo]
+    video: Optional[VideoInfo]
+
+
+class ApllicationDataDetails(Entity):
+    pass
+
+
+DetailsType = TypeVar("DetailsType", bound=ApllicationDataDetails)
+
+
+class ApplicationData(GenericModel, Generic[DetailsType]):
+    data: DetailsType
+    version: str
+    datetime_created: datetime
+    datetime_updated: datetime
+
+
+class AWSRecognitionLabel(Entity):
+    confidence: Decimal = Field(alias="Confidence")
+    instances: List[Dict] = Field(alias="Instances")
+    name: str = Field(alias="Name")
+    parents: List[Dict] = Field(alias="Parents")
+
+
+class AWSRecognitionDetectLabelsDetails(ApllicationDataDetails):
+    label_model_version: str = Field(alias="LabelModelVersion")
+    labels: List[AWSRecognitionLabel] = Field(alias="Labels")
+
+
+AWSRecognitionDetectLabelsApplicationData = ApplicationData[
+    AWSRecognitionDetectLabelsDetails
+]
+
+
+class RemoveBackgroundDetails(ApllicationDataDetails):
+    foreground_type: str
+
+
+RemoveBackgroundApplicationData = ApplicationData[RemoveBackgroundDetails]
+
+
+class UCClamAVDetails(ApllicationDataDetails):
+    infected: bool
+    infected_with: str
+
+
+UCClamAVApplicationData = ApplicationData[UCClamAVDetails]
+
+
+class ApplicationDataSet(Entity):
+    aws_rekognition_detect_labels: Optional[
+        AWSRecognitionDetectLabelsApplicationData
+    ]
+    remove_bg: Optional[RemoveBackgroundApplicationData]
+    uc_clamav_virus_scan: Optional[UCClamAVApplicationData]
 
 
 class FileInfo(UUIDEntity):
+    """
+    video_info, image_info and rekognition_info were suppressed in API v0.7.0
+
+    video_info, image_info moved to content_info
+    rekognition_info moved to app_data
+
+    """
+
     datetime_removed: Optional[datetime]
     datetime_stored: Optional[datetime]
     datetime_uploaded: Optional[datetime]
-    image_info: Optional[ImageInfo]
     is_image: Optional[bool]
     is_ready: Optional[bool]
     mime_type: Optional[str]
@@ -97,9 +171,9 @@ class FileInfo(UUIDEntity):
     size: Optional[int]
     url: Optional[str]
     variations: Optional[Dict[str, UUID]]
-    video_info: Optional[VideoInfo]
     source: Optional[str]
-    rekognition_info: Optional[Dict[str, Decimal]]
+    content_info: Optional[ContentInfo]
+    appdata: Optional[ApplicationDataSet]
 
 
 class GroupInfo(Entity):

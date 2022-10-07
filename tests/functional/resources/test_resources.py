@@ -157,6 +157,28 @@ def test_file_convert_document(uploadcare):
     assert not converted_file.is_ready
 
 
+def test_file_info_has_new_structure(uploadcare):
+    """
+    Test new structure of response since API v0.7.0
+
+    """
+    (file,) = list(
+        uploadcare.list_files(limit=1)
+    )  # uploadcare.file("35ea470d-216c-4752-91d2-5176b34c1225")
+    info = file.info
+
+    assert "rekognition_info" not in info
+    assert "image_info" not in info
+    assert "video_info" not in info
+
+    assert "content_info" in info
+
+    content_info = info.get("content_info")
+    assert "mime" in content_info
+
+    assert "appdata" in info
+
+
 @pytest.mark.vcr
 def test_file_convert_document_page(uploadcare):
     file = uploadcare.file("5dddafa0-a742-4a51-ac40-ae491201ff97")

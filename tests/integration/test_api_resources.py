@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from exceptions import DeprecatedError
 from pyuploadcare import File, FileGroup, conf
+from pyuploadcare.exceptions import DeprecatedError
 
 from .utils import create_file_group, upload_tmp_txt_file
 
