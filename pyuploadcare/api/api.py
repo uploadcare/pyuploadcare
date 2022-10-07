@@ -6,7 +6,7 @@ from uuid import UUID
 
 from httpx._types import RequestFiles
 
-from exceptions import DeprecatedError
+from pyuploadcare.exceptions import DeprecatedError
 from pyuploadcare.api import entities, responses
 from pyuploadcare.api.base import (
     API,
