@@ -8,6 +8,16 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_,
 and this project adheres to `Semantic Versioning`_.
 
+`3.1.0`_ - 2022-10-14
+~~~~~~~~~~~~~~~~~~~~~
+
+Changed
++++++++
+- Bumped `httpx` dependency for py37+
+- Renamed `allow_redirects` into `follow_redirects` as in updated `httpx` dep
+- Bumped `black` dependency
+
+
 `3.0.1`_ - 2022-10-06
 ~~~~~~~~~~~~~~~~~~~~~
 
