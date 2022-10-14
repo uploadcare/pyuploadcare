@@ -110,7 +110,7 @@ class Client(HTTPXClient):
          should use `follow_redirects` instead
 
         `redirecting` is `True` by default
-        if `allow_redirects` is set - its value is used
+        if `allow_redirects` is set - its value is used (deprecated for Python 3.7 and newer)
         if `follow_redirects` is also set - it controls the behavior for real
 
         arguments are passed by into `_perform_request`,
@@ -175,6 +175,12 @@ class Client(HTTPXClient):
 
         redirecting = True
         if allow_redirects is not None:
+            if PY37_AND_HIGHER:
+                raise DeprecationWarning(
+                    "Argument `allow_redirects` is deprecated."
+                    "Use `follow_redirects` instead"
+                )
+
             redirecting = allow_redirects
         if follow_redirects is not None:
             redirecting = follow_redirects
@@ -193,8 +199,12 @@ class Client(HTTPXClient):
 
         if PY36:
             kwargs["allow_redirects"] = redirecting
-        else:
+        elif PY37_AND_HIGHER:
             kwargs["follow_redirects"] = redirecting
+        else:
+            raise ValueError(
+                "Unexpected set of Python version. Check the setup"
+            )
 
         response = super().request(method, url, **kwargs)  # type: ignore
 
