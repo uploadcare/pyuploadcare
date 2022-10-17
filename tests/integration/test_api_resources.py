@@ -3,11 +3,13 @@
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Iterable, List, Union
+from uuid import UUID, uuid4
 
 import pytest
 
-from exceptions import DeprecatedError
 from pyuploadcare import File, FileGroup, conf
+from pyuploadcare.exceptions import DeprecatedError, InvalidParamError
 
 from .utils import create_file_group, upload_tmp_txt_file
 
@@ -24,11 +26,28 @@ IMAGE_PATH = ASSETS_PATH / "img.png"
 
 
 @pytest.fixture
-def group(uploadcare) -> FileGroup:
+def group(uploadcare) -> Iterable[FileGroup]:
     group = create_file_group(uploadcare, files_qty=1)
     yield group
     for file in group:
         file.delete()  # TODO: DELETE not allowed in 0.7
+
+
+@pytest.fixture()
+def input_collection(uploadcare) -> Iterable[List[Union[str, File, UUID]]]:
+    u = uuid4()
+    yield [str(u), uploadcare.file(u), u]
+
+
+@pytest.fixture()
+def expected_uuids(
+    input_collection: List[Union[str, File, UUID]]
+) -> Iterable[str]:
+    yield [
+        input_collection[0],
+        input_collection[1].uuid,  # type: ignore
+        str(input_collection[2]),  # type: ignore
+    ]
 
 
 def test_successful_upload_when_file_is_opened_in_txt_mode(
@@ -337,3 +356,14 @@ def test_uploaded_image_mime_type_determined(uploadcare):
     file.delete()
 
     assert mime_type == "image/png"
+
+
+def test_uuid_extraction(uploadcare, input_collection, expected_uuids):
+    extracted_uuids = uploadcare._extract_uuids(input_collection)
+    assert extracted_uuids == expected_uuids
+    assert all(isinstance(item, str) for item in extracted_uuids)
+
+
+def test_corrupted_uuid_extraction(uploadcare):
+    with pytest.raises(InvalidParamError, match="Couldn't find UUID"):
+        uploadcare._extract_uuids(["456"])
