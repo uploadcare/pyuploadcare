@@ -150,6 +150,30 @@ class Client(HTTPXClient):
                 else:
                     raise
 
+    def _perform_response(  # noqa: max-complexity: 6
+        self, response: Response
+    ) -> Response:
+        logger.debug(
+            f"got: status_code: {response.status_code}; "
+            f"content: {str(response.content)}; headers: {response.headers}"
+        )
+
+        if response.status_code in (401, 403):
+            raise AuthenticationError(response.content.decode())
+
+        if response.status_code in (400, 404):
+            raise InvalidRequestError(response.content.decode())
+
+        if response.status_code == 429:
+            raise ThrottledRequestError(response)
+
+        try:
+            response.raise_for_status()
+        except HTTPStatusError:
+            raise APIError(response.content.decode())
+
+        return response
+
     def _perform_request(  # noqa: C901
         self,
         method: str,
@@ -207,27 +231,9 @@ class Client(HTTPXClient):
             )
 
         response = super().request(method, url, **kwargs)  # type: ignore
+        performed_response = self._perform_response(response)
 
-        logger.debug(
-            f"got: status_code: {response.status_code}; "
-            f"content: {str(response.content)}; headers: {response.headers}"
-        )
-
-        if response.status_code in (401, 403):
-            raise AuthenticationError(response.content.decode())
-
-        if response.status_code in (400, 404):
-            raise InvalidRequestError(response.content.decode())
-
-        if response.status_code == 429:
-            raise ThrottledRequestError(response)
-
-        try:
-            response.raise_for_status()
-        except HTTPStatusError:
-            raise APIError(response.content.decode())
-
-        return response
+        return performed_response
 
     def _build_user_agent(self):
         extension_info = ""
