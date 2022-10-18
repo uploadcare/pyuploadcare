@@ -1,4 +1,7 @@
 import typing
+from enum import Enum
+from typing import Any, Dict, Optional, TypeVar
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -63,3 +66,26 @@ class DocumentConvertResponse(Entity):
 class VideoConvertResponse(Entity):
     problems: typing.Optional[typing.Dict[str, typing.Any]]
     result: typing.Optional[typing.List[VideoConvertInfo]]
+
+
+class AddonResponseResult(Entity):
+    pass
+
+
+class AddonStatus(str, Enum):
+    IN_PROGRESS = "in_progress"
+    ERROR = "error"
+    DONE = "done"
+    UNKNOWN = "unknown"
+
+
+class AddonExecuteResponse(Response):
+    request_id: UUID
+
+
+AddonResultType = TypeVar("AddonResultType", bound=AddonResponseResult)
+
+
+class AddonResponse(Response):
+    status: AddonStatus
+    result: Optional[Dict[str, Any]]

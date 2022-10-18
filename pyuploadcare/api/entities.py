@@ -1,11 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, Generic, List, Optional, Tuple, TypeVar
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, PrivateAttr
-from pydantic.generics import GenericModel
 
 
 class Entity(BaseModel):
@@ -101,11 +100,15 @@ class ApllicationDataDetails(Entity):
     pass
 
 
-DetailsType = TypeVar("DetailsType", bound=ApllicationDataDetails)
+DetailsType = TypeVar(
+    "DetailsType", bound=ApllicationDataDetails, covariant=True
+)
 
 
-class ApplicationData(GenericModel, Generic[DetailsType]):
-    data: DetailsType
+class ApplicationDataBase(Entity):
+    data: Optional[Union[Dict[str, Any], ApllicationDataDetails]] = Field(
+        default_factory=dict
+    )
     version: str
     datetime_created: datetime
     datetime_updated: datetime
@@ -125,16 +128,16 @@ class AWSRecognitionDetectLabelsDetails(ApllicationDataDetails):
     )
 
 
-AWSRecognitionDetectLabelsApplicationData = ApplicationData[
-    AWSRecognitionDetectLabelsDetails
-]
+class AWSRecognitionDetectLabelsApplicationData(ApplicationDataBase):
+    data: AWSRecognitionDetectLabelsDetails
 
 
 class RemoveBackgroundDetails(ApllicationDataDetails):
     foreground_type: Optional[str]
 
 
-RemoveBackgroundApplicationData = ApplicationData[RemoveBackgroundDetails]
+class RemoveBackgroundApplicationData(ApplicationDataBase):
+    data: RemoveBackgroundDetails
 
 
 class UCClamAVDetails(ApllicationDataDetails):
@@ -142,7 +145,8 @@ class UCClamAVDetails(ApllicationDataDetails):
     infected_with: Optional[str]
 
 
-UCClamAVApplicationData = ApplicationData[UCClamAVDetails]
+class UCClamAVApplicationData(ApplicationDataBase):
+    data: UCClamAVDetails
 
 
 class ApplicationDataSet(Entity):
@@ -155,7 +159,7 @@ class ApplicationDataSet(Entity):
 
 class FileInfo(UUIDEntity):
     """
-    video_info, image_info and rekognition_info were deprecated in API v0.7
+    video_info, image_info and rekognition_info were deprecated in REST API v0.7
 
     video_info, image_info moved to content_info
     rekognition_info moved to app_data
