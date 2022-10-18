@@ -69,3 +69,12 @@ def uploadcare():
         public_key="demopublickey",
         secret_key="demosecretkey",
     )
+
+
+@pytest.fixture(scope="module")
+def secret_uploadcare():
+    """ """
+    return Uploadcare(
+        public_key="-",
+        secret_key="-",
+    )

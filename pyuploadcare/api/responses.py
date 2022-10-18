@@ -1,6 +1,10 @@
 import typing
+from enum import Enum
+from typing import Generic, Optional, TypeVar
+from uuid import UUID
 
 from pydantic import BaseModel
+from pydantic.generics import GenericModel
 
 from pyuploadcare.api.entities import (
     DocumentConvertInfo,
@@ -63,3 +67,26 @@ class DocumentConvertResponse(Entity):
 class VideoConvertResponse(Entity):
     problems: typing.Optional[typing.Dict[str, typing.Any]]
     result: typing.Optional[typing.List[VideoConvertInfo]]
+
+
+class AddonResponseResult(Entity):
+    pass
+
+
+class AddonStatus(str, Enum):
+    IN_PROGRESS = "in_progress"
+    ERROR = "error"
+    DONE = "done"
+    UNKNOWN = "unknown"
+
+
+class AddonExecuteResponse(Response):
+    request_id: UUID
+
+
+AddonResultType = TypeVar("AddonResultType", bound=AddonResponseResult)
+
+
+class AddonResponse(GenericModel, Generic[AddonResultType]):
+    status: AddonStatus
+    result: Optional[AddonResultType]

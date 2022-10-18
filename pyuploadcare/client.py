@@ -14,6 +14,7 @@ from typing import (
 )
 from uuid import UUID
 
+from api import AddonAPI
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
     DocumentConvertAPI,
@@ -146,6 +147,7 @@ class Uploadcare:
         )
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.addons_api = AddonAPI(client=self.rest_client, **api_config)  # type: ignore
 
     def file(
         self,
