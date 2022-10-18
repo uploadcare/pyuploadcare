@@ -150,6 +150,42 @@ class Client(HTTPXClient):
                 else:
                     raise
 
+    def _handle_httpx_arguments(  # noqa: max-complexity: 6
+        self,
+        follow_redirects: Optional[bool] = None,
+        allow_redirects: Optional[bool] = None,
+    ) -> bool:
+        redirecting = True
+
+        allow_redirects_is_set = allow_redirects is not None
+        follow_redirects_is_set = follow_redirects is not None
+
+        if allow_redirects_is_set and follow_redirects_is_set:
+            raise ValueError(
+                "You cannot use these arguments together:"
+                "`allow_redirects` and `follow_redirects`"
+            )
+
+        if allow_redirects is not None:
+            if PY37_AND_HIGHER:
+                logger.warning(
+                    "Argument `allow_redirects` is deprecated."
+                    "Use `follow_redirects` instead"
+                )
+
+            redirecting = allow_redirects
+
+        if follow_redirects is not None:
+            if PY36:
+                raise ValueError(
+                    "Use `allow_redirects`, not `follow_redirects`"
+                    " for your version of CPython"
+                )
+
+            redirecting = follow_redirects
+
+        return redirecting
+
     def _perform_response(  # noqa: max-complexity: 6
         self, response: Response
     ) -> Response:
@@ -197,17 +233,10 @@ class Client(HTTPXClient):
             f"json: {json}; data: {data}; content: {str(content)}"
         )
 
-        redirecting = True
-        if allow_redirects is not None:
-            if PY37_AND_HIGHER:
-                raise DeprecationWarning(
-                    "Argument `allow_redirects` is deprecated."
-                    "Use `follow_redirects` instead"
-                )
-
-            redirecting = allow_redirects
-        if follow_redirects is not None:
-            redirecting = follow_redirects
+        redirecting = self._handle_httpx_arguments(
+            allow_redirects=allow_redirects,
+            follow_redirects=follow_redirects,
+        )
 
         kwargs = dict(
             content=content,

@@ -14,23 +14,30 @@ def test_client():
 
 @mock.patch("pyuploadcare.api.client.PY36", False)
 @mock.patch("pyuploadcare.api.client.PY37_AND_HIGHER", True)
-def test_deprecated_argument_for_PY37_if_allow_is_set(test_client):
+def test_deprecated_argument_for_PY37_if_allow_is_set(test_client, caplog):
     """
     Test that for installed Python 3.7.* or newer
-    using `allow_redirects` will cause `DeprecationWarning`
-
+    using together `allow_redirects` and `follow_redirects`
+    will cause warning about argument deprecation
     """
     assert not pyuploadcare.api.client.PY36
     assert pyuploadcare.api.client.PY37_AND_HIGHER
 
-    with pytest.raises(DeprecationWarning):
+    with pytest.raises(httpx.UnsupportedProtocol):
         test_client.request(
             method="any",
             url="yandex.ru",
             allow_redirects=True,
         )
 
-    with pytest.raises(DeprecationWarning):
+    # `allow_redirects` is valid argument for a while but we aware about deprecation
+    assert (
+        caplog.records[0].message
+        == "Argument `allow_redirects` is deprecated.Use `follow_redirects` instead"
+    )
+
+    with pytest.raises(ValueError):
+        # both arguments are not allowed to be set together
         test_client.request(
             method="any",
             url="yandex.ru",
