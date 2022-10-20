@@ -44,3 +44,12 @@ def test_get_metadata_value_for_specific_key(uploadcare):
         "a55d6b25-d03c-4038-9838-6e06bb7df598", "second_key"
     )
     assert value_for_second_key == "any_others"
+
+
+@pytest.mark.vcr
+def test_get_empty_metadata(uploadcare):
+    stored_metadata = uploadcare.metadata_api.get_all_metadata(
+        "1a9c5240-7d9b-4473-851b-45fa4b0bed64"
+    )
+
+    assert stored_metadata == {}

@@ -1,5 +1,7 @@
 import hashlib
 import hmac
+import logging
+from json import JSONDecodeError
 from time import time
 from typing import Any, Dict, Iterable, List, Optional, Union, cast
 from uuid import UUID
@@ -21,6 +23,9 @@ from pyuploadcare.exceptions import APIError, DeprecatedError
 
 from .metadata import validate_meta_key, validate_meta_value, validate_metadata
 from .utils import flatten_dict
+
+
+logger = logging.getLogger("pyuploadcare")
 
 
 class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
@@ -413,7 +418,14 @@ class MetadataAPI(API):
     def get_all_metadata(self, file_uuid: Union[UUID, str]) -> dict:
         url = self._build_url(file_uuid, suffix="metadata")
         response_class = self._get_response_class("get_all")
-        json_response = self._client.get(url).json()
+
+        try:
+            json_response = self._client.get(url).json()
+        except JSONDecodeError as jerr:
+            # assume that there is "empty response" bug (Expecting value: line 1 column 1 (char 0))
+            logging.warning(f"For file `{file_uuid}` there is empty metadata response")
+            json_response = {}
+
         response = self._parse_response(json_response, response_class).__root__  # type: ignore
         return cast(dict, response)
 
