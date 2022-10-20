@@ -10,18 +10,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-  - Bumped <span class="title-ref">httpx</span> dependency for py37+
-  - Renamed <span class="title-ref">allow\_redirects</span> into
-    <span class="title-ref">follow\_redirects</span> as in updated
-    <span class="title-ref">httpx</span> dep
-  - Bumped <span class="title-ref">black</span> dependency
+  - Bumped `httpx` dependency for py37+
+  - Use `allow_redirects` or `follow_redirects` as `httpx` dep was updated
+  - Bumped `black` dependency
 
 ## [3.0.1](https://github.com/uploadcare/pyuploadcare/compare/v3.0.0...v3.0.1) - 2022-10-06
 
 ### Changed
 
-  - Bumped <span class="title-ref">pytz</span> dependency
-  - Bumped <span class="title-ref">typing-extensions</span> for py37+
+  - Bumped `pytz` dependency
+  - Bumped `typing-extensions` for py37+
 
 ## [3.0.0](https://github.com/uploadcare/pyuploadcare/compare/v2.7.0...v3.0.0) - 2021-11-01
 
@@ -69,11 +67,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-  - <span class="title-ref">FileWidget.render()</span> now works in
+  - `FileWidget.render()` now works in
     Django 2.1.
   - Obsolete widget setting
-    <span class="title-ref">data-upload-base-url</span> replaced with
-    <span class="title-ref">data-url-base</span>
+    `data-upload-base-url` replaced with
+    `data-url-base`
 
 ## 2.5.0
 
@@ -97,7 +95,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     configuration and etc.)
   - Drop official support for obsolete Python and Django versions.
     Chances are that everything still works. If you have to use those,
-    modify <span class="title-ref">tox.ini</span>, run tests and use at
+    modify `tox.ini`, run tests and use at
     your own risk ;) Or, you may use older versions of the library.
 
 ## 2.2.1
@@ -139,12 +137,9 @@ information about the upgrade process see [update to version 2.0](https://pyuplo
 ## 1.3.5
 
   - Added support of Django 1.9
-  - Removed indication of Unicode strings from output of
-    <span class="title-ref">ucare</span>
-  - Fixed a group representation for <span class="title-ref">ucare
-    create\_group</span> command
-  - Fixed error with <span class="title-ref">ucare sync</span> when
-    trying to processing of not image files
+  - Removed indication of Unicode strings from output of `ucare`
+  - Fixed a group representation for `ucare create_group` command
+  - Fixed error with `ucare sync` when trying to processing of not image files
 
 ## 1.3.4
 
@@ -189,17 +184,14 @@ information about the upgrade process see [update to version 2.0](https://pyuplo
 
 ## 1.2.12
 
-  - add synchronous upload from URL method to
-    <span class="title-ref">File</span>
-  - UploadcareExceptions are
-    <span class="title-ref">\_\_repr\_\_</span>'ed properly
+  - add synchronous upload from URL method to `File`
+  - UploadcareExceptions are `__repr__`'ed properly
   - update widget to 1.5.3 (see [widget changelog](https://github.com/uploadcare/uploadcare-widget/blob/master/HISTORY.markdown))
 
 ## 1.2.11
 
   - fix "source" composition for copy requests
-  - let configure default throttle retry count via
-    <span class="title-ref">conf.retry\_throttled</span>
+  - let configure default throttle retry count via `conf.retry_throttled`
 
 ## 1.2.10
 
@@ -249,8 +241,7 @@ information about the upgrade process see [update to version 2.0](https://pyuplo
 
 ## 1.2
 
-  - CDN URL has been changed to `http://www.ucarecdn.com/`. Previous URL
-    `https://ucarecdn.com/` is depricated.
+  - CDN URL has been changed to `http://www.ucarecdn.com/`. Previous URL `https://ucarecdn.com/` is depricated.
   - Widget was updated up to *0.10.1*.
 
 ## 1.1
@@ -276,8 +267,7 @@ UnicodeDecodeError: 'ascii' codec can't decode byte 0xc5 ...
 
   - Widget was updated up to *0.8.1.2*.
 
-  - It was invoking `File.store()`, `FileGroup.store()` methods on every
-    model instance saving, e.g.:
+  - It was invoking `File.store()`, `FileGroup.store()` methods on every model instance saving, e.g.:
     
     ``` python
     photo.title = 'new title'
