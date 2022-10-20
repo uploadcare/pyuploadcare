@@ -60,7 +60,7 @@ class Client(HTTPXClient):
         cookies: CookieTypes = None,
         auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
         follow_redirects: Optional[bool] = None,
-        allow_redirects: Optional[bool] = True,
+        allow_redirects: Optional[bool] = None,
         timeout: typing.Union[
             TimeoutTypes, UseClientDefault
         ] = USE_CLIENT_DEFAULT,
@@ -99,7 +99,7 @@ class Client(HTTPXClient):
         cookies: CookieTypes = None,
         auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
         follow_redirects: Optional[bool] = None,
-        allow_redirects: Optional[bool] = True,
+        allow_redirects: Optional[bool] = None,
         timeout: typing.Union[
             TimeoutTypes, UseClientDefault
         ] = USE_CLIENT_DEFAULT,
@@ -109,9 +109,9 @@ class Client(HTTPXClient):
         `allow_redirects` is for compatibility with versions for Python 3.6 only
          should use `follow_redirects` instead
 
-        `redirecting` is `True` by default
+        `redirecting` is `True` by default (look at `_handle_httpx_arguments` method)
         if `allow_redirects` is set - its value is used (deprecated for Python 3.7 and newer)
-        if `follow_redirects` is also set - it controls the behavior for real
+        if `follow_redirects` is also set - ValueError will be rised
 
         arguments are passed by into `_perform_request`,
         result value of `redirecting` computes there
@@ -155,6 +155,11 @@ class Client(HTTPXClient):
         follow_redirects: Optional[bool] = None,
         allow_redirects: Optional[bool] = None,
     ) -> bool:
+        """
+        Encapsulate smooth updating for httpx dependency:
+         - use `allow_redirects` for Python 3.6 case
+         - use `follow_redirects` for Python 3.7+ cases
+        """
         redirecting = True
 
         allow_redirects_is_set = allow_redirects is not None
