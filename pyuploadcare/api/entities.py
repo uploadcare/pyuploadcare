@@ -92,7 +92,7 @@ class MIMEInfo(Entity):
 
 
 class ContentInfo(Entity):
-    mime: MIMEInfo
+    mime: Optional[MIMEInfo]
     image: Optional[ImageInfo]
     video: Optional[VideoInfo]
 
@@ -174,6 +174,7 @@ class FileInfo(UUIDEntity):
     source: Optional[str]
     content_info: Optional[ContentInfo]
     appdata: Optional[ApplicationDataSet]
+    metadata: Optional[MetadataDict]
 
 
 class GroupInfo(Entity):
