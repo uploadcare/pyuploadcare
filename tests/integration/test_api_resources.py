@@ -269,13 +269,12 @@ def test_group_is_not_stored(group):
     assert not group.is_stored
 
 
-def test_successful_group_store(group):
+def test_successful_group_store(group: FileGroup):
     assert not group.is_stored
 
-    with pytest.raises(DeprecatedError):
-        group.store()
-        assert group.is_stored
-    # TODO: update after bulk file storage operation will be implemented
+    group.store()
+
+    assert group.is_stored
 
 
 def test_group_successfully_deleted(group_to_delete):
