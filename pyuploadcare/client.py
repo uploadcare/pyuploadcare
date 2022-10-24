@@ -14,9 +14,9 @@ from typing import (
 )
 from uuid import UUID
 
-from api import AddonAPI
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
+    AddonAPI,
     DocumentConvertAPI,
     FilesAPI,
     GroupsAPI,
@@ -29,7 +29,11 @@ from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
-from pyuploadcare.helpers import extracts_uuids, get_file_size, guess_mime_type
+from pyuploadcare.helpers import (
+    extracts_uuids,
+    get_file_size,
+    guess_mime_type,
+)
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
 from pyuploadcare.secure_url import BaseSecureUrlBuilder
 
