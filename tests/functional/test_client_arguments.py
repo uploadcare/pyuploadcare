@@ -23,7 +23,7 @@ def test_deprecated_argument_for_PY37_if_allow_is_set(test_client, caplog):
     assert not pyuploadcare.api.client.PY36
     assert pyuploadcare.api.client.PY37_AND_HIGHER
 
-    with pytest.raises(httpx.UnsupportedProtocol):
+    with pytest.raises(TypeError, match="got an unexpected keyword argument 'follow_redirects'"):
         test_client.request(
             method="any",
             url="yandex.ru",
