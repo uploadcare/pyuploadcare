@@ -18,6 +18,7 @@ from pyuploadcare.api import (
     DocumentConvertAPI,
     FilesAPI,
     GroupsAPI,
+    MetadataAPI,
     ProjectAPI,
     UploadAPI,
     VideoConvertAPI,
@@ -150,6 +151,7 @@ class Uploadcare:
         )
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.metadata_api = MetadataAPI(client=self.rest_client, **api_config)  # type: ignore
 
     def file(
         self,
@@ -217,6 +219,7 @@ class Uploadcare:
         store=None,
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
+        metadata: Optional[Dict] = None,
     ) -> "File":
         """Uploads a file and returns ``File`` instance.
 
@@ -280,6 +283,7 @@ class Uploadcare:
                 file_url,
                 store=store,
                 callback=callback,
+                metadata=metadata,
             )
 
         file_obj: IO = file_handle
@@ -428,7 +432,9 @@ class Uploadcare:
         file_info: Dict = self.upload_api.multipart_complete(multipart_uuid)
         return self.file(file_info["uuid"], file_info)
 
-    def upload_from_url(self, url, store=None, filename=None) -> FileFromUrl:
+    def upload_from_url(
+        self, url, store=None, filename=None, metadata=None
+    ) -> FileFromUrl:
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
         Args:
@@ -458,6 +464,7 @@ class Uploadcare:
             source_url=url,
             store=store,
             filename=filename,
+            metadata=metadata,
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
         )
@@ -469,6 +476,7 @@ class Uploadcare:
         url,
         timeout=30,
         interval=0.3,
+        metadata=None,
         until_ready=False,
         store=None,
         filename=None,
@@ -503,7 +511,7 @@ class Uploadcare:
             ``TimeoutError`` if file wasn't uploaded in time
 
         """
-        ffu = self.upload_from_url(url, store, filename)
+        ffu = self.upload_from_url(url, store, filename, metadata=metadata)
         return ffu.wait(
             timeout=timeout,
             interval=interval,

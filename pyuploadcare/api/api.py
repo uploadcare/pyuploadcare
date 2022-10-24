@@ -1,5 +1,7 @@
 import hashlib
 import hmac
+import logging
+from json import JSONDecodeError
 from time import time
 from typing import Any, Dict, Iterable, List, Optional, Union, cast
 from uuid import UUID
@@ -18,6 +20,12 @@ from pyuploadcare.api.base import (
     UpdateMixin,
 )
 from pyuploadcare.exceptions import APIError, DeprecatedError
+
+from .metadata import validate_meta_key, validate_meta_value, validate_metadata
+from .utils import flatten_dict
+
+
+logger = logging.getLogger("pyuploadcare")
 
 
 class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
@@ -209,10 +217,11 @@ class UploadAPI(API):
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
-    def upload(
+    def upload(  # noqa: C901
         self,
         files: RequestFiles,
         secure_upload: bool = False,
+        common_metadata: Optional[dict] = None,
         public_key: Optional[str] = None,
         secret_key: Optional[str] = None,
         store: Optional[str] = "auto",
@@ -224,6 +233,10 @@ class UploadAPI(API):
 
         if public_key is None:
             public_key = self.public_key
+
+        if common_metadata is not None:
+            validate_metadata(common_metadata)
+            data.update(flatten_dict(common_metadata))
 
         data["UPLOADCARE_PUB_KEY"] = public_key
 
@@ -247,6 +260,7 @@ class UploadAPI(API):
         file_name: str,
         file_size: int,
         content_type: str,
+        metadata: Optional[dict] = None,
         store: Optional[str] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
@@ -260,6 +274,10 @@ class UploadAPI(API):
 
         if store is not None:
             data["UPLOADCARE_STORE"] = store
+
+        if metadata is not None:
+            validate_metadata(metadata)
+            data.update(flatten_dict(metadata))
 
         if secure_upload:
             expire = (
@@ -299,6 +317,7 @@ class UploadAPI(API):
         source_url,
         store="auto",
         filename=None,
+        metadata: Optional[Dict] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
     ) -> str:
@@ -309,6 +328,10 @@ class UploadAPI(API):
         }
         if filename:
             data["filename"] = filename
+
+        if metadata is not None:
+            validate_metadata(metadata)
+            data.update(flatten_dict(metadata))
 
         if secure_upload:
             expire = (
@@ -370,3 +393,55 @@ class UploadAPI(API):
         url = self._build_url(base="/group/")
         document = self._client.post(url, data=data)
         return document.json()
+
+
+class MetadataAPI(API):
+    resource_type = "files"
+    response_classes = {
+        "update": responses.UpdateMetadataKeyResponse,
+        "get_all": responses.GetAllMetadataResponse,
+        "get_key": responses.UpdateMetadataKeyResponse,
+    }
+
+    def update_or_create_key(
+        self, file_uuid: Union[UUID, str], mkey: str, mvalue: str
+    ) -> str:
+        validate_meta_key(mkey)
+        validate_meta_value(mvalue)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        response_class = self._get_response_class("update")
+        json_response = self._client.put(url, json=mvalue).json()
+        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        return cast(str, response)
+
+    def get_all_metadata(self, file_uuid: Union[UUID, str]) -> dict:
+        url = self._build_url(file_uuid, suffix="metadata")
+        response_class = self._get_response_class("get_all")
+
+        try:
+            json_response = self._client.get(url).json()
+        except JSONDecodeError as jerr:  # noqa
+            # assume that there is "empty response" bug (Expecting value: line 1 column 1 (char 0))
+            logging.warning(
+                f"For file `{file_uuid}` there is empty metadata response"
+            )
+            json_response = {}
+
+        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        return cast(dict, response)
+
+    def delete_key(self, file_uuid: Union[UUID, str], mkey: str) -> None:
+        validate_meta_key(mkey)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        self._client.delete(url)
+
+    def get_key(self, file_uuid: Union[UUID, str], mkey: str) -> str:
+        validate_meta_key(mkey)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        response_class = self._get_response_class("get_key")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        return cast(str, response)

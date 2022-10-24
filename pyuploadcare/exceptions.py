@@ -65,3 +65,9 @@ class DeprecatedError(UploadcareException):
     """Raised when some API methods were broken with new version published
     but we put the information about it in the code explicitly
     """
+
+
+class MetadataValidationError(UploadcareException):
+    """
+    Raised when a 'key' or 'value' of metadata did not satisfy the constraints
+    """

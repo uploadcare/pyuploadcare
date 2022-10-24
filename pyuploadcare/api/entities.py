@@ -1,11 +1,15 @@
+import re
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Dict, Generic, List, Optional, Tuple, TypeVar
 from uuid import UUID
 
+import pydantic
 from pydantic import BaseModel, EmailStr, Field, PrivateAttr
 from pydantic.generics import GenericModel
+
+from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
 
 class Entity(BaseModel):
@@ -151,6 +155,18 @@ class ApplicationDataSet(Entity):
     uc_clamav_virus_scan: Optional[UCClamAVApplicationData]
 
 
+class MetadataKeyConStrType(pydantic.ConstrainedStr):
+    regex = re.compile(META_KEY_PATTERN)
+    max_length = META_KEY_MAX_LEN
+
+
+class MetadataValueConStrType(pydantic.ConstrainedStr):
+    max_length = META_VALUE_MAX_LEN
+
+
+MetadataDict = Dict[MetadataKeyConStrType, MetadataValueConStrType]
+
+
 class FileInfo(UUIDEntity):
     """
     video_info, image_info and rekognition_info were suppressed in API v0.7.0
@@ -163,6 +179,7 @@ class FileInfo(UUIDEntity):
     datetime_removed: Optional[datetime]
     datetime_stored: Optional[datetime]
     datetime_uploaded: Optional[datetime]
+    metadata: Optional[MetadataDict]
     is_image: Optional[bool]
     is_ready: Optional[bool]
     mime_type: Optional[str]
@@ -174,7 +191,6 @@ class FileInfo(UUIDEntity):
     source: Optional[str]
     content_info: Optional[ContentInfo]
     appdata: Optional[ApplicationDataSet]
-    metadata: Optional[Dict]
 
 
 class GroupInfo(Entity):

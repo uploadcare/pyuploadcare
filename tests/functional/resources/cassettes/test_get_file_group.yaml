@@ -27,7 +27,7 @@ interactions:
       Content-Length:
       - '995'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Tue, 19 Oct 2021 08:38:06 GMT
       Server:

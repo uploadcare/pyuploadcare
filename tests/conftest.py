@@ -40,7 +40,7 @@ def big_file(temp_directory):
 def setup_settings():
     conf.pub_key = "demopublickey"
     conf.secret = "demosecretkey"
-    conf.api_version = "0.6"
+    conf.api_version = "0.7"
     conf.api_base = "https://api.uploadcare.com/"
     conf.upload_base = "https://upload.uploadcare.com/"
 

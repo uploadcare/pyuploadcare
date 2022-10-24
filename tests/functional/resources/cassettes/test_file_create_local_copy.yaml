@@ -31,7 +31,7 @@ interactions:
       Content-Length:
       - '531'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Fri, 24 Sep 2021 08:20:49 GMT
       Location:
@@ -80,7 +80,7 @@ interactions:
       Content-Length:
       - '647'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Fri, 24 Sep 2021 08:20:49 GMT
       Server:
@@ -132,7 +132,7 @@ interactions:
       Content-Length:
       - '506'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Fri, 24 Sep 2021 08:20:50 GMT
       Location:
@@ -181,7 +181,7 @@ interactions:
       Content-Length:
       - '622'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Fri, 24 Sep 2021 08:20:51 GMT
       Server:

@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"paths": ["0e1cac48-1296-417f-9e7f-9bf13e330dcf/document/-/format/pdf/"]}'
+    body: '"any string up to 512"'
     headers:
       accept:
       - '*/*'
@@ -9,47 +9,45 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '74'
+      - '22'
       content-type:
       - application/json
       host:
       - api.uploadcare.com
       user-agent:
-      - PyUploadcare/3.0.0/5d5bb5639e3f2df33674 (CPython/3.9.6)
-    method: POST
-    uri: https://api.uploadcare.com/convert/document/
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: PUT
+    uri: https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/metadata/-:45az_/
   response:
-    content: '{"result": [{"original_source": "0e1cac48-1296-417f-9e7f-9bf13e330dcf/document/-/format/pdf/",
-      "token": 22450034, "uuid": "90a65f54-1ff7-4b35-8f5d-7fa359d4950f"}], "problems":
-      {}}'
+    content: '"any string up to 512"'
     headers:
       Access-Control-Allow-Origin:
       - https://uploadcare.com
       Allow:
-      - OPTIONS, POST
+      - DELETE, GET, HEAD, OPTIONS, PUT
       Connection:
       - keep-alive
-      Content-Encoding:
-      - gzip
+      Content-Length:
+      - '22'
       Content-Type:
-      - application/json
+      - application/vnd.uploadcare-v0.7+json
       Date:
-      - Fri, 01 Oct 2021 08:50:20 GMT
+      - Thu, 06 Oct 2022 07:01:52 GMT
       Server:
       - nginx
-      Transfer-Encoding:
-      - chunked
       Vary:
-      - Accept-Encoding
       - Accept
       Warning:
-      - '199 Miscellaneous warning: Please use API version 0.5, not 0.6'
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.7'
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
       X-Robots-Tag:
       - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 62a3ef45-88e4-4771-82ae-28d9d9cb6b89
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
@@ -66,38 +64,39 @@ interactions:
       host:
       - api.uploadcare.com
       user-agent:
-      - PyUploadcare/3.0.0/5d5bb5639e3f2df33674 (CPython/3.9.6)
-    method: GET
-    uri: https://api.uploadcare.com/convert/document/status/22450034/
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: DELETE
+    uri: https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/metadata/-:45az_/
   response:
-    content: '{"status":"pending","error":null,"result":{"uuid":"90a65f54-1ff7-4b35-8f5d-7fa359d4950f"}}'
+    content: ''
     headers:
       Access-Control-Allow-Origin:
       - https://uploadcare.com
       Allow:
-      - GET, HEAD, OPTIONS
+      - DELETE, GET, HEAD, OPTIONS, PUT
       Connection:
       - keep-alive
       Content-Length:
-      - '90'
-      Content-Type:
-      - application/vnd.uploadcare-v0.7+json
+      - '0'
       Date:
-      - Fri, 01 Oct 2021 08:50:21 GMT
+      - Thu, 06 Oct 2022 07:01:52 GMT
       Server:
       - nginx
       Vary:
       - Accept
       Warning:
-      - '199 Miscellaneous warning: Please use API version 0.5, not 0.6'
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.7'
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
       X-Robots-Tag:
       - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 0f82f3b6-c22e-4c23-8d67-03db171ad4dc
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
-    status_code: 200
+    status_code: 204
 version: 1
