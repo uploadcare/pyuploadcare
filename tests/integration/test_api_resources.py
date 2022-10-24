@@ -9,7 +9,11 @@ from uuid import UUID, uuid4
 import pytest
 
 from pyuploadcare import File, FileGroup, conf
-from pyuploadcare.exceptions import DeprecatedError, InvalidRequestError
+from pyuploadcare.exceptions import (
+    DeprecatedError,
+    InvalidParamError,
+    InvalidRequestError,
+)
 
 from .utils import create_file_group, upload_tmp_txt_file
 
@@ -45,7 +49,7 @@ def group_to_delete(uploadcare) -> Iterator[FileGroup]:
 
 
 @pytest.fixture()
-def input_collection(uploadcare) -> Iterable[List[Union[str, File, UUID]]]:
+def input_collection(uploadcare) -> Iterator[List[Union[str, File, UUID]]]:
     u = uuid4()
     yield [str(u), uploadcare.file(u), u]
 
