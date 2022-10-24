@@ -421,9 +421,11 @@ class MetadataAPI(API):
 
         try:
             json_response = self._client.get(url).json()
-        except JSONDecodeError as jerr:
+        except JSONDecodeError as jerr:  # noqa
             # assume that there is "empty response" bug (Expecting value: line 1 column 1 (char 0))
-            logging.warning(f"For file `{file_uuid}` there is empty metadata response")
+            logging.warning(
+                f"For file `{file_uuid}` there is empty metadata response"
+            )
             json_response = {}
 
         response = self._parse_response(json_response, response_class).__root__  # type: ignore
