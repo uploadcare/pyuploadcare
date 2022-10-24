@@ -1,10 +1,9 @@
 import typing
 from enum import Enum
-from typing import Generic, Optional, TypeVar
+from typing import Any, Dict, Optional, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 
 from pyuploadcare.api.entities import (
     DocumentConvertInfo,
@@ -87,6 +86,6 @@ class AddonExecuteResponse(Response):
 AddonResultType = TypeVar("AddonResultType", bound=AddonResponseResult)
 
 
-class AddonResponse(GenericModel, Generic[AddonResultType]):
+class AddonResponse(Response):
     status: AddonStatus
-    result: Optional[AddonResultType]
+    result: Optional[Dict[str, Any]]

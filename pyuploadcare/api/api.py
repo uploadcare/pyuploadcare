@@ -214,7 +214,7 @@ class UploadAPI(API):
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
-    def upload(
+    def upload(  # noqa: C901
         self,
         files: RequestFiles,
         secure_upload: bool = False,
@@ -391,7 +391,7 @@ class AddonAPI(API):
         params: Optional[AddonExecutionParams] = None,
     ) -> dict:
         execution_request_data = self.request_type.parse_obj(
-            dict(target=file_uuid, params=params)
+            dict(target=str(file_uuid), params=params)
         )
         return execution_request_data.dict(
             exclude_unset=True, exclude_none=True
@@ -411,7 +411,9 @@ class AddonAPI(API):
         response = self._parse_response(json_response, response_class)
         return cast(responses.AddonExecuteResponse, response)
 
-    def status(self, request_id: Union[UUID, str], addon_name: AddonLabels):
+    def status(
+        self, request_id: Union[UUID, str], addon_name: AddonLabels
+    ) -> responses.AddonResponse:
         suffix = f"{addon_name}/execute/status"
         query = dict(request_id=str(request_id))
         url = self._build_url(suffix=suffix, query_parameters=query)
@@ -419,4 +421,4 @@ class AddonAPI(API):
 
         json_response = self._client.get(url).json()
         response = self._parse_response(json_response, response_class)
-        return cast(responses.AddonExecuteResponse, response)
+        return cast(responses.AddonResponse, response)
