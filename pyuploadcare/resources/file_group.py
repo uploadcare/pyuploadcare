@@ -165,10 +165,9 @@ class FileGroup:
         if self.is_stored:
             return
 
-        # TODO: here we can inject working with files API to be complaint with
-        # existed code
+        self._client.store_files(file_ for file_ in self)
 
-        self._info_cache = self._client.groups_api.store(self.id)
+        self.update_info()
 
     @property
     def is_deleted(self):
