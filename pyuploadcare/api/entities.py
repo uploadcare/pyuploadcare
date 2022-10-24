@@ -123,8 +123,10 @@ class AWSRecognitionLabel(Entity):
 
 
 class AWSRecognitionDetectLabelsDetails(ApllicationDataDetails):
-    label_model_version: str = Field(alias="LabelModelVersion")
-    labels: List[AWSRecognitionLabel] = Field(alias="Labels")
+    label_model_version: Optional[str] = Field(alias="LabelModelVersion")
+    labels: List[AWSRecognitionLabel] = Field(
+        alias="Labels", default_factory=list
+    )
 
 
 AWSRecognitionDetectLabelsApplicationData = ApplicationData[
@@ -133,15 +135,15 @@ AWSRecognitionDetectLabelsApplicationData = ApplicationData[
 
 
 class RemoveBackgroundDetails(ApllicationDataDetails):
-    foreground_type: str
+    foreground_type: Optional[str]
 
 
 RemoveBackgroundApplicationData = ApplicationData[RemoveBackgroundDetails]
 
 
 class UCClamAVDetails(ApllicationDataDetails):
-    infected: bool
-    infected_with: str
+    infected: Optional[bool]
+    infected_with: Optional[str]
 
 
 UCClamAVApplicationData = ApplicationData[UCClamAVDetails]
