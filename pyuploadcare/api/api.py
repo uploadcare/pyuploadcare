@@ -92,7 +92,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         return cast(responses.CreateRemoteCopyResponse, response)
 
 
-class GroupsAPI(API, ListCountMixin, RetrieveMixin):
+class GroupsAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
     resource_type = "groups"
     entity_class = entities.GroupInfo
 

@@ -8,7 +8,7 @@ from typing import Iterator
 import pytest
 
 from pyuploadcare import File, FileGroup, conf
-from pyuploadcare.exceptions import DeprecatedError
+from pyuploadcare.exceptions import DeprecatedError, InvalidRequestError
 
 from .utils import create_file_group, upload_tmp_txt_file
 
@@ -29,7 +29,18 @@ def group(uploadcare) -> Iterator[FileGroup]:
     group = create_file_group(uploadcare, files_qty=1)
     yield group
     for file in group:
-        file.delete()  # TODO: DELETE not allowed in 0.7
+        file.delete()
+
+
+@pytest.fixture
+def group_to_delete(uploadcare) -> Iterator[FileGroup]:
+    group = create_file_group(uploadcare, files_qty=1)
+    files = [file for file in group]
+
+    yield group
+
+    for file in files:
+        file.delete()
 
 
 def test_successful_upload_when_file_is_opened_in_txt_mode(
@@ -243,6 +254,20 @@ def test_successful_group_store(group):
         group.store()
         assert group.is_stored
     # TODO: update after bulk file storage operation will be implemented
+
+
+def test_group_successfully_deleted(group_to_delete):
+    file_from_group = next(iter(group_to_delete))
+    assert not group_to_delete.is_deleted
+
+    group_to_delete.delete()
+
+    with pytest.raises(InvalidRequestError, match="Not found"):
+        group_to_delete.update_info()
+
+    assert group_to_delete.is_deleted
+    file_from_group.update_info()
+    assert not file_from_group.is_removed
 
 
 @pytest.fixture
