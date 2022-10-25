@@ -87,3 +87,12 @@ def memo_file(temp_directory) -> Tuple[BytesIO, int]:
     mem_file.name = "_mem.exe"  # type: ignore
 
     return mem_file, ENOUGH_MILLIONS
+
+
+@pytest.fixture(scope="module")
+def secret_uploadcare():
+    """ """
+    return Uploadcare(
+        public_key="-",
+        secret_key="-",
+    )
