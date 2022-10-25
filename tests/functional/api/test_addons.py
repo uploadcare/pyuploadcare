@@ -19,13 +19,3 @@ def test_request_payload(addon_api: AddonAPI):
     assert request_data == {
         "target": str(file_uuid),
     }
-
-
-def test_status(secret_uploadcare):
-    result: AddonResponse = secret_uploadcare.addons_api.status(
-        request_id="ecd8f64a-d3d2-4d3a-89f7-b996c4992225",
-        addon_name="aws_rekognition_detect_labels",
-    )
-
-    assert result.status == "done"
-    assert result.result is None
