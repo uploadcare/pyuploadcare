@@ -3,8 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from api.api import AddonAPI
-from api.responses import AddonResponse
+from pyuploadcare.api.api import AddonAPI
 
 
 @pytest.fixture()
