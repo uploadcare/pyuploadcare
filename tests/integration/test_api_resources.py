@@ -10,7 +10,6 @@ import pytest
 
 from pyuploadcare import File, FileGroup, conf
 from pyuploadcare.exceptions import (
-    DeprecatedError,
     InvalidParamError,
     InvalidRequestError,
 )
