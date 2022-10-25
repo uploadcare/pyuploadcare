@@ -1,0 +1,121 @@
+interactions:
+- request:
+    body: "--42b8e53759cde7763949395c4f664ff8\r\nContent-Disposition: form-data; name=\"\
+      UPLOADCARE_STORE\"\r\n\r\n1\r\n--42b8e53759cde7763949395c4f664ff8\r\nContent-Disposition:\
+      \ form-data; name=\"metadata[one_key]\"\r\n\r\nhas rather string, but the neighbour\
+      \ has almost number\r\n--42b8e53759cde7763949395c4f664ff8\r\nContent-Disposition:\
+      \ form-data; name=\"metadata[score]\"\r\n\r\n56\r\n--42b8e53759cde7763949395c4f664ff8\r\
+      \nContent-Disposition: form-data; name=\"UPLOADCARE_PUB_KEY\"\r\n\r\ndemopublickey\r\
+      \n--42b8e53759cde7763949395c4f664ff8\r\nContent-Disposition: form-data; name=\"\
+      expire\"\r\n\r\n60\r\n--42b8e53759cde7763949395c4f664ff8\r\nContent-Disposition:\
+      \ form-data; name=\"signature\"\r\n\r\n7d2e71d1843788a02d0c7fe6f5d71edf657363a369112e78d4f37ace3f884b00\r\
+      \n--42b8e53759cde7763949395c4f664ff8\r\nContent-Disposition: form-data; name=\"\
+      _mem.exe\"; filename=\"_mem.exe\"\r\nContent-Type: application/x-msdownload\r\
+      \n\r\n0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\r\
+      \n--42b8e53759cde7763949395c4f664ff8--\r\n"
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '1891'
+      content-type:
+      - multipart/form-data; boundary=42b8e53759cde7763949395c4f664ff8
+      host:
+      - upload.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: POST
+    uri: https://upload.uploadcare.com/base/
+  response:
+    content: '{"_mem.exe":"7809bb4d-f1f3-4494-83c1-086968e50f10"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - DNT, X-UC-User-Agent, X-PINGOTHER
+      Access-Control-Allow-Methods:
+      - POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Warning, Retry-After
+      Access-Control-Max-Age:
+      - '1'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 25 Oct 2022 09:48:06 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Uploadcare-Request-Id:
+      - 103d9826-8b79-4f23-97a0-b6ccb0a61506
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: GET
+    uri: https://api.uploadcare.com/files/7809bb4d-f1f3-4494-83c1-086968e50f10/
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2022-10-25T09:48:06.690422Z","datetime_uploaded":"2022-10-25T09:48:06.638586Z","is_image":false,"is_ready":true,"mime_type":"application/x-msdownload","original_file_url":"https://ucarecdn.com/7809bb4d-f1f3-4494-83c1-086968e50f10/_mem.exe","original_filename":"_mem.exe","size":1000,"url":"https://api.uploadcare.com/files/7809bb4d-f1f3-4494-83c1-086968e50f10/","uuid":"7809bb4d-f1f3-4494-83c1-086968e50f10","variations":null,"content_info":{"mime":{"mime":"text/plain","type":"text","subtype":"plain"}},"metadata":{"score":"56","one_key":"has
+      rather string, but the neighbour has almost number"}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '641'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Tue, 25 Oct 2022 09:48:07 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      Warning:
+      - '199 Miscellaneous warning: You are using the demo project; Please use API
+        version 0.5, not 0.7'
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - fc2993e0-260a-4dcf-a4e6-b21076eb3f37
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

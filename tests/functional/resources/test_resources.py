@@ -52,13 +52,17 @@ def test_file_upload_big_file(big_file, uploadcare):
 
 
 @pytest.mark.vcr
-def test_file_upload_big_file_with_metadata(big_file, uploadcare):
-    with open(big_file.name, "rb") as fh:
-        file = uploadcare.upload(
-            fh, store=False, metadata=TEST_RESOURCE_METADATA
-        )
+def test_file_upload_with_metadata(memo_file, uploadcare, vcr):
+    stream, size = memo_file
+
+    file = uploadcare.upload(
+        stream, store=True, metadata=TEST_RESOURCE_METADATA, size=size
+    )
 
     assert isinstance(file, File)
+
+    file.update_info()
+
     assert file.is_ready
     assert file.info["metadata"] == TEST_RESOURCE_METADATA
 

@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: filename=%2Fvar%2Ffolders%2Ftf%2Fdcd02ss53y9fmflr_qg_p3hw0000gn%2FT%2Ftmpwp_k64uy%2Fbig_file.txt&size=11000000&content_type=text%2Fplain&UPLOADCARE_PUB_KEY=demopublickey&UPLOADCARE_STORE=0&expire=60&signature=7d2e71d1843788a02d0c7fe6f5d71edf657363a369112e78d4f37ace3f884b00
+    body: filename=%2Fvar%2Ffolders%2Ftf%2Fdcd02ss53y9fmflr_qg_p3hw0000gn%2FT%2Ftmp5i0pei8m%2Fbig_file.txt&size=11000000&content_type=text%2Fplain&UPLOADCARE_PUB_KEY=demopublickey&UPLOADCARE_STORE=1&expire=60&signature=7d2e71d1843788a02d0c7fe6f5d71edf657363a369112e78d4f37ace3f884b00
     headers:
       accept:
       - '*/*'
@@ -24,13 +24,13 @@ interactions:
       Access-Control-Allow-Credentials:
       - 'true'
       Access-Control-Allow-Headers:
-      - X-UC-User-Agent, X-PINGOTHER, DNT
+      - DNT, X-UC-User-Agent, X-PINGOTHER
       Access-Control-Allow-Methods:
       - POST, OPTIONS
       Access-Control-Allow-Origin:
       - '*'
       Access-Control-Expose-Headers:
-      - Warning
+      - Warning, Retry-After
       Access-Control-Max-Age:
       - '1'
       Connection:
@@ -40,7 +40,7 @@ interactions:
       Content-Type:
       - text/plain; charset=utf-8
       Date:
-      - Wed, 05 Oct 2022 00:57:34 GMT
+      - Mon, 24 Oct 2022 21:54:42 GMT
       Server:
       - nginx
       Vary:
@@ -48,7 +48,7 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       X-Uploadcare-Request-Id:
-      - 81040e31-6fcf-49c2-abbb-57da045b786d
+      - 50a9f24d-6b34-45e0-93f4-d0b047110795
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
