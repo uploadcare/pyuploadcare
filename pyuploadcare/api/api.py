@@ -3,15 +3,15 @@ import hmac
 import logging
 from json import JSONDecodeError
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 from uuid import UUID
 
 from httpx._types import RequestFiles
 
 from pyuploadcare.api import entities, responses
 from pyuploadcare.api.addon_entities import (
+    AddonExecutionGeneralRequestData,
     AddonExecutionParams,
-    AddonExecutionRequestData,
     AddonLabels,
 )
 from pyuploadcare.api.base import (
@@ -454,7 +454,9 @@ class MetadataAPI(API):
 
 class AddonAPI(API):
     resource_type = "addons"
-    request_type = AddonExecutionRequestData
+    request_type: Type[
+        AddonExecutionGeneralRequestData
+    ] = AddonExecutionGeneralRequestData
     response_classes = {
         "execute": responses.AddonExecuteResponse,
         "status": responses.AddonResponse,

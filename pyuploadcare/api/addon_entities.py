@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Generic, Optional, TypeVar
+from typing import Any, Dict, Generic, Optional, TypeVar
 from uuid import UUID
 
 from pydantic import Field, validator
@@ -19,6 +19,15 @@ class AddonExecutionParams(Entity):
 
 
 AddonParamsType = TypeVar("AddonParamsType", bound=AddonExecutionParams)
+
+
+class AddonExecutionGeneralRequestData(Entity):
+    target: UUID
+    params: Optional[Dict[str, Any]]
+
+    @validator("target")
+    def coerce_target_to_str(cls, v):
+        return str(v)
 
 
 class AddonExecutionRequestData(GenericModel, Generic[AddonParamsType]):
