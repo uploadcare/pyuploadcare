@@ -164,7 +164,4 @@ class FileGroup:
         if self.is_stored:
             return
 
-        # TODO: here we can inject working with files API to be complaint with
-        # existed code
-
         self._info_cache = self._client.groups_api.store(self.id)
