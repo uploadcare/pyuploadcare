@@ -8,7 +8,7 @@ from typing import Iterator
 import pytest
 
 from pyuploadcare import File, FileGroup, conf
-from pyuploadcare.exceptions import DeprecatedError, InvalidRequestError
+from pyuploadcare.exceptions import InvalidRequestError
 
 from .utils import create_file_group, upload_tmp_txt_file
 
