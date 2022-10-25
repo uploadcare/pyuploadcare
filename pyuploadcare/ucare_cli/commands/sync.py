@@ -168,7 +168,7 @@ def _download_file(url: str, local_filepath: str, file_size: int, max_retry=3):
         except HTTPError as e:
             pprint("Connection Error: {0}".format(e))
             pprint("Retry..")
-            time.sleep(i ** 2)
+            time.sleep(i**2)
             continue
         else:
             break
