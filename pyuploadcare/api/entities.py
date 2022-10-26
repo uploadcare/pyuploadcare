@@ -1,11 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, Generic, List, Optional, Tuple, TypeVar, Any
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, PrivateAttr
-from pydantic.generics import GenericModel
 
 
 class Entity(BaseModel):
@@ -101,11 +100,15 @@ class ApllicationDataDetails(Entity):
     pass
 
 
-DetailsType = TypeVar("DetailsType", bound=ApllicationDataDetails, covariant=True)
+DetailsType = TypeVar(
+    "DetailsType", bound=ApllicationDataDetails, covariant=True
+)
 
 
 class ApplicationDataBase(Entity):
-    data: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    data: Optional[Union[Dict[str, Any], ApllicationDataDetails]] = Field(
+        default_factory=dict
+    )
     version: str
     datetime_created: datetime
     datetime_updated: datetime
