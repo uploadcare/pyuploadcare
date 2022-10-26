@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, Generic, List, Optional, Tuple, TypeVar
+from typing import Dict, Generic, List, Optional, Tuple, TypeVar, Any
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, PrivateAttr
@@ -101,11 +101,11 @@ class ApllicationDataDetails(Entity):
     pass
 
 
-DetailsType = TypeVar("DetailsType", bound=ApllicationDataDetails)
+DetailsType = TypeVar("DetailsType", bound=ApllicationDataDetails, covariant=True)
 
 
-class ApplicationData(GenericModel, Generic[DetailsType]):
-    data: DetailsType
+class ApplicationDataBase(Entity):
+    data: Optional[Dict[str, Any]] = Field(default_factory=dict)
     version: str
     datetime_created: datetime
     datetime_updated: datetime
@@ -125,16 +125,16 @@ class AWSRecognitionDetectLabelsDetails(ApllicationDataDetails):
     )
 
 
-AWSRecognitionDetectLabelsApplicationData = ApplicationData[
-    AWSRecognitionDetectLabelsDetails
-]
+class AWSRecognitionDetectLabelsApplicationData(ApplicationDataBase):
+    data: AWSRecognitionDetectLabelsDetails
 
 
 class RemoveBackgroundDetails(ApllicationDataDetails):
     foreground_type: Optional[str]
 
 
-RemoveBackgroundApplicationData = ApplicationData[RemoveBackgroundDetails]
+class RemoveBackgroundApplicationData(ApplicationDataBase):
+    data: RemoveBackgroundDetails
 
 
 class UCClamAVDetails(ApllicationDataDetails):
@@ -142,7 +142,8 @@ class UCClamAVDetails(ApllicationDataDetails):
     infected_with: Optional[str]
 
 
-UCClamAVApplicationData = ApplicationData[UCClamAVDetails]
+class UCClamAVApplicationData(ApplicationDataBase):
+    data: UCClamAVDetails
 
 
 class ApplicationDataSet(Entity):

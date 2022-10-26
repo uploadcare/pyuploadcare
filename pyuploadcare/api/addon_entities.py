@@ -30,22 +30,21 @@ class AddonExecutionGeneralRequestData(Entity):
         return str(v)
 
 
-class AddonExecutionRequestData(GenericModel, Generic[AddonParamsType]):
-    target: UUID
-    params: Optional[AddonParamsType]
-
-    @validator("target")
-    def coerce_target_to_str(cls, v):
-        return str(v)
+# class AddonExecutionRequestData(GenericModel, Generic[AddonParamsType]):
+#     target: UUID
+#     params: Optional[AddonParamsType]
+#
+#     @validator("target")
+#     def coerce_target_to_str(cls, v):
+#         return str(v)
 
 
 class AddonClamAVExecutionParams(AddonExecutionParams):
     purge_infected: bool
 
 
-AddonClamAVExecutionRequestData = AddonExecutionRequestData[
-    AddonClamAVExecutionParams
-]
+class AddonClamAVExecutionRequestData(AddonExecutionGeneralRequestData):
+    params: Optional[AddonClamAVExecutionParams]
 
 
 class AddonRemoveBGExecutionParams(AddonExecutionParams):
@@ -106,6 +105,5 @@ class AddonRemoveBGExecutionParams(AddonExecutionParams):
     )
 
 
-AddonRemoveBGExecutionRequestData = AddonExecutionRequestData[
-    AddonRemoveBGExecutionParams
-]
+class AddonRemoveBGExecutionRequestData(AddonExecutionGeneralRequestData):
+    params: Optional[AddonRemoveBGExecutionParams]
