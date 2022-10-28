@@ -5,7 +5,6 @@ import sys
 import time
 import typing
 from platform import python_implementation, python_version
-from typing import Optional
 
 from httpx import USE_CLIENT_DEFAULT, HTTPStatusError, Response
 from httpx._client import Client as HTTPXClient
@@ -59,8 +58,8 @@ class Client(HTTPXClient):
         headers: HeaderTypes = None,
         cookies: CookieTypes = None,
         auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: Optional[bool] = None,
-        allow_redirects: Optional[bool] = None,
+        follow_redirects: typing.Optional[bool] = None,
+        allow_redirects: typing.Optional[bool] = None,
         timeout: typing.Union[
             TimeoutTypes, UseClientDefault
         ] = USE_CLIENT_DEFAULT,
@@ -98,12 +97,12 @@ class Client(HTTPXClient):
         headers: HeaderTypes = None,
         cookies: CookieTypes = None,
         auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: Optional[bool] = None,
-        allow_redirects: Optional[bool] = None,
+        follow_redirects: typing.Optional[bool] = None,
+        allow_redirects: typing.Optional[bool] = None,
         timeout: typing.Union[
             TimeoutTypes, UseClientDefault
         ] = USE_CLIENT_DEFAULT,
-        extensions: Optional[dict] = None,
+        extensions: typing.Optional[dict] = None,
     ) -> Response:
         """
         `allow_redirects` is for compatibility with versions for Python 3.6 only
@@ -152,8 +151,8 @@ class Client(HTTPXClient):
 
     def _handle_httpx_arguments(  # noqa: max-complexity: 6
         self,
-        follow_redirects: Optional[bool] = None,
-        allow_redirects: Optional[bool] = None,
+        follow_redirects: typing.Optional[bool] = None,
+        allow_redirects: typing.Optional[bool] = None,
     ) -> bool:
         """
         Encapsulate smooth updating for httpx dependency:
@@ -222,8 +221,8 @@ class Client(HTTPXClient):
         headers: HeaderTypes = None,
         cookies: CookieTypes = None,
         auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: Optional[bool] = None,
-        allow_redirects: Optional[bool] = None,
+        follow_redirects: typing.Optional[bool] = None,
+        allow_redirects: typing.Optional[bool] = None,
         timeout: typing.Union[
             TimeoutTypes, UseClientDefault
         ] = USE_CLIENT_DEFAULT,

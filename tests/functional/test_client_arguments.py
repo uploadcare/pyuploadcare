@@ -43,8 +43,8 @@ def test_deprecated_argument_for_PY37_if_allow_is_set(test_client, caplog):
                 )
 
     # `allow_redirects` is valid argument for a while but we aware about deprecation
-    assert (
-        caplog.records[0].message.startswith("Argument `allow_redirects` is deprecated")
+    assert caplog.records[0].message.startswith(
+        "Argument `allow_redirects` is deprecated"
     )
 
 
