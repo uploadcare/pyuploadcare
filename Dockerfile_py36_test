@@ -14,4 +14,4 @@ RUN poetry install
 COPY tests /app/tests
 COPY pyuploadcare /app/pyuploadcare
 
-CMD ["poetry", "run", "pytest", "-v", "tests/", "-k", "deprecated"]
+CMD ["poetry", "run", "pytest", "-v", "tests/"]
