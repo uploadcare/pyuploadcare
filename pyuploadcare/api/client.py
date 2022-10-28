@@ -157,8 +157,10 @@ class Client(HTTPXClient):
     ) -> bool:
         """
         Encapsulate smooth updating for httpx dependency:
-         - use `allow_redirects` for Python 3.6 case
-         - use `follow_redirects` for Python 3.7+ cases
+         - using of `allow_redirects` is allowed,
+           but that argument will be deleted in the next major version
+         - using of `follow_redirects` is allowed when
+           `allow_redirects` is not set
         """
         redirecting = True
 
@@ -167,26 +169,19 @@ class Client(HTTPXClient):
 
         if allow_redirects_is_set and follow_redirects_is_set:
             raise ValueError(
-                "You cannot use these arguments together:"
+                "You must not use these arguments together:"
                 "`allow_redirects` and `follow_redirects`"
             )
 
         if allow_redirects is not None:
-            if PY37_AND_HIGHER:
-                logger.warning(
-                    "Argument `allow_redirects` is deprecated."
-                    "Use `follow_redirects` instead"
-                )
-
+            logger.warning(
+                "Argument `allow_redirects` is deprecated "
+                "and will be removed with next major update."
+                "It's better to use `follow_redirects` instead"
+            )
             redirecting = allow_redirects
 
         if follow_redirects is not None:
-            if PY36:
-                raise ValueError(
-                    "Use `allow_redirects`, not `follow_redirects`"
-                    " for your version of CPython"
-                )
-
             redirecting = follow_redirects
 
         return redirecting
