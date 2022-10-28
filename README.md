@@ -5,7 +5,7 @@
             <img src="https://ucarecdn.com/2f4864b7-ed0e-4411-965b-8148623aa680/-/inline/yes/uploadcare-logo-mark.svg" target="" width="64" height="64">
         </td>
         <th style="vertical-align: center; border: none;">
-            <p style="font-size: 2em">PyUploadcare: a Python library for Uploadcare</p>
+            <h1>PyUploadcare: a Python library for Uploadcare</h1>
         </th>
     </tr>
 </table>
