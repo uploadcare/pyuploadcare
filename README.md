@@ -10,12 +10,13 @@
     </tr>
 </table>
 
-<img src="https://badge.fury.io/py/pyuploadcare.svg" height="25" />
-<img src="https://github.com/uploadcare/pyuploadcare/actions/workflows/test.yml/badge.svg" height="25" /> 
-<img src="https://readthedocs.org/projects/pyuploadcare/badge/?version=latest" height="25" />
-<img src="https://coveralls.io/repos/github/uploadcare/pyuploadcare/badge.svg?branch=master" height="25" />
-<img src="https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" height="25" />
-
+<p float="left">
+  <img src="https://badge.fury.io/py/pyuploadcare.svg" height="25" />
+  <img src="https://github.com/uploadcare/pyuploadcare/actions/workflows/test.yml/badge.svg" height="25" /> 
+  <img src="https://readthedocs.org/projects/pyuploadcare/badge/?version=latest" height="25" />
+  <img src="https://coveralls.io/repos/github/uploadcare/pyuploadcare/badge.svg?branch=master" height="25" />
+  <img src="https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" height="25" />
+</p>
 
 Uploadcare Python & Django integrations handle uploads and further operations
 with files by wrapping Upload and REST APIs.
