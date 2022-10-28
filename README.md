@@ -10,7 +10,7 @@
     </tr>
 </table>
 
-<p float="left">
+<p>
   <img src="https://badge.fury.io/py/pyuploadcare.svg" height="25" />
   <img src="https://github.com/uploadcare/pyuploadcare/actions/workflows/test.yml/badge.svg" height="25" /> 
   <img src="https://readthedocs.org/projects/pyuploadcare/badge/?version=latest" height="25" />
