@@ -15,7 +15,7 @@ interactions:
       host:
       - api.uploadcare.com
       user-agent:
-      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+      - PyUploadcare/3.1.0/demopublickey (CPython/3.9.6)
     method: POST
     uri: https://api.uploadcare.com/webhooks/
   response:
