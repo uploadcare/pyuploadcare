@@ -11,7 +11,7 @@ def test_client():
     yield pyuploadcare.api.client.Client()
 
 
-@mock.patch("pyuploadcare.api.client.PY37_AND_HIGHER", True)
+@mock.patch("pyuploadcare.api.client.PY37_PLUS", True)
 def test_deprecated_argument_for_PY37_if_allow_is_set(test_client, caplog):
     """
     Test that for installed Python 3.7.* or newer
@@ -59,7 +59,7 @@ def test_deprecated_both_arguments_ar_not_allowed(test_client):
         )
 
 
-@mock.patch("pyuploadcare.api.client.PY37_AND_HIGHER", False)
+@mock.patch("pyuploadcare.api.client.PY37_PLUS", False)
 def test_deprecated_argument_is_OK_for_PY36_if_allow_is_set(test_client):
     real_PY36 = pyuploadcare.api.client.PY36
 

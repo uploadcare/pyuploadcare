@@ -33,8 +33,8 @@ from pyuploadcare.exceptions import (
 logger = logging.getLogger("pyuploadcare")
 
 
-PY37_AND_HIGHER = sys.version_info[:2] > (3, 6)
-PY36 = not PY37_AND_HIGHER
+PY37_PLUS = sys.version_info[:2] > (3, 6)
+PY36 = not PY37_PLUS
 
 
 class Client(HTTPXClient):
@@ -246,7 +246,7 @@ class Client(HTTPXClient):
 
         if PY36:
             kwargs["allow_redirects"] = redirecting
-        elif PY37_AND_HIGHER:
+        elif PY37_PLUS:
             kwargs["follow_redirects"] = redirecting
         else:
             raise ValueError(
