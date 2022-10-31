@@ -33,9 +33,7 @@ from pyuploadcare.exceptions import (
 logger = logging.getLogger("pyuploadcare")
 
 
-version_vector = sys.version_info
-
-PY37_AND_HIGHER = version_vector[:2] > (3, 6)
+PY37_AND_HIGHER = sys.version_info[:2] > (3, 6)
 PY36 = not PY37_AND_HIGHER
 
 
@@ -113,7 +111,7 @@ class Client(HTTPXClient):
         if `follow_redirects` is also set - ValueError will be rised
 
         arguments are passed by into `_perform_request`,
-        result value of `redirecting` computes there
+        result value of `redirecting` is computed there
         """
 
         if not headers:
@@ -163,10 +161,7 @@ class Client(HTTPXClient):
         """
         redirecting = True
 
-        allow_redirects_is_set = allow_redirects is not None
-        follow_redirects_is_set = follow_redirects is not None
-
-        if allow_redirects_is_set and follow_redirects_is_set:
+        if allow_redirects is not None and follow_redirects is not None:
             raise ValueError(
                 "You must not use these arguments together:"
                 "`allow_redirects` and `follow_redirects`"
@@ -175,8 +170,8 @@ class Client(HTTPXClient):
         if allow_redirects is not None:
             logger.warning(
                 "Argument `allow_redirects` is deprecated "
-                "and will be removed with next major update."
-                "It's better to use `follow_redirects` instead"
+                "and will be removed in version 4.x."
+                "Use `follow_redirects` instead"
             )
             redirecting = allow_redirects
 
