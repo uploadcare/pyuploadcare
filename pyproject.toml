@@ -3,7 +3,7 @@ name = "pyuploadcare"
 version = "4.0.0"
 description = "Python library for Uploadcare.com"
 authors = ["Uploadcare Inc <hello@uploadcare.com>"]
-readme = "README.rst"
+readme = "README.md"
 homepage = "https://uploadcare.com"
 repository = "https://github.com/uploadcare/pyuploadcare"
 classifiers = [
@@ -26,11 +26,17 @@ ucare = 'pyuploadcare.ucare_cli.main:main'
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
-httpx = "^0.18.2"
+httpx = [
+  {version = "^0.18.2", python = ">=3.6,<3.7"},
+  {version = "^0.23.0", python = "^3.7"}
+]
 pydantic = {extras = ["email"], version = "^1.8.2"}
 python-dateutil = "^2.8.2"
-pytz = "^2021.1"
-typing-extensions = "^3.10.0"
+pytz = "^2022.4"
+typing-extensions = [
+    {version = "^3.10.0", python = ">=3.6,<3.7"},
+    {version = "^4.3.0", python = "^3.7"}
+]
 Django = {version = ">=1.11", optional = true}
 
 [tool.poetry.extras]
