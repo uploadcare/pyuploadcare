@@ -1,0 +1,69 @@
+interactions:
+- request:
+    body: "--d6a5c240d4771cd9841a241a1e347639\r\nContent-Disposition: form-data; name=\"\
+      UPLOADCARE_STORE\"\r\n\r\nauto\r\n--d6a5c240d4771cd9841a241a1e347639\r\nContent-Disposition:\
+      \ form-data; name=\"metadata[first_key]\"\r\n\r\nfirst_value\r\n--d6a5c240d4771cd9841a241a1e347639\r\
+      \nContent-Disposition: form-data; name=\"metadata[second_key]\"\r\n\r\nany_others\r\
+      \n--d6a5c240d4771cd9841a241a1e347639\r\nContent-Disposition: form-data; name=\"\
+      UPLOADCARE_PUB_KEY\"\r\n\r\ndemopublickey\r\n--d6a5c240d4771cd9841a241a1e347639\r\
+      \nContent-Disposition: form-data; name=\"expire\"\r\n\r\n1664928854\r\n--d6a5c240d4771cd9841a241a1e347639\r\
+      \nContent-Disposition: form-data; name=\"signature\"\r\n\r\n10fadd69d3a3609ec0bc9c97325b4855543068ee5f3857138ac107283f20cc10\r\
+      \n--d6a5c240d4771cd9841a241a1e347639\r\nContent-Disposition: form-data; name=\"\
+      file851.txt\"; filename=\"sample1.txt\"\r\nContent-Type: text/plain\r\n\r\n\
+      test1\r\n--d6a5c240d4771cd9841a241a1e347639--\r\n"
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '871'
+      content-type:
+      - multipart/form-data; boundary=d6a5c240d4771cd9841a241a1e347639
+      host:
+      - upload.uploadcare.com
+      user-agent:
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: POST
+    uri: https://upload.uploadcare.com/base/
+  response:
+    content: '{"file851.txt":"a55d6b25-d03c-4038-9838-6e06bb7df598"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - X-UC-User-Agent, X-PINGOTHER, DNT
+      Access-Control-Allow-Methods:
+      - POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Warning
+      Access-Control-Max-Age:
+      - '1'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 05 Oct 2022 00:13:16 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Uploadcare-Request-Id:
+      - 0da9736c-a593-4ff7-a371-1cf60f210962
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

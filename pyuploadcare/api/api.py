@@ -1,12 +1,19 @@
 import hashlib
 import hmac
+import logging
+from json import JSONDecodeError
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 from uuid import UUID
 
 from httpx._types import RequestFiles
 
 from pyuploadcare.api import entities, responses
+from pyuploadcare.api.addon_entities import (
+    AddonExecutionGeneralRequestData,
+    AddonExecutionParams,
+    AddonLabels,
+)
 from pyuploadcare.api.base import (
     API,
     CreateMixin,
@@ -17,7 +24,13 @@ from pyuploadcare.api.base import (
     RetrieveMixin,
     UpdateMixin,
 )
-from pyuploadcare.exceptions import APIError
+from pyuploadcare.exceptions import APIError, DeprecatedError
+
+from .metadata import validate_meta_key, validate_meta_value, validate_metadata
+from .utils import flatten_dict
+
+
+logger = logging.getLogger("pyuploadcare")
 
 
 class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
@@ -92,7 +105,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         return cast(responses.CreateRemoteCopyResponse, response)
 
 
-class GroupsAPI(API, ListCountMixin, RetrieveMixin):
+class GroupsAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
     resource_type = "groups"
     entity_class = entities.GroupInfo
 
@@ -103,8 +116,13 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin):
     }
 
     def store(self, file_uuid: Union[UUID, str]) -> Dict[str, Any]:
+        """
+        It is deprecated since REST API v.0.7
+        """
         url = self._build_url(file_uuid, suffix="storage")
-        return self._client.put(url).json()
+        raise DeprecatedError(
+            f"Use batch method for files storing instead of {url}"
+        )
 
 
 class ProjectAPI(API, RetrieveMixin):
@@ -204,10 +222,11 @@ class UploadAPI(API):
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
-    def upload(
+    def upload(  # noqa: C901
         self,
         files: RequestFiles,
         secure_upload: bool = False,
+        common_metadata: Optional[dict] = None,
         public_key: Optional[str] = None,
         secret_key: Optional[str] = None,
         store: Optional[str] = "auto",
@@ -219,6 +238,10 @@ class UploadAPI(API):
 
         if public_key is None:
             public_key = self.public_key
+
+        if common_metadata is not None:
+            validate_metadata(common_metadata)
+            data.update(flatten_dict(common_metadata))
 
         data["UPLOADCARE_PUB_KEY"] = public_key
 
@@ -242,6 +265,7 @@ class UploadAPI(API):
         file_name: str,
         file_size: int,
         content_type: str,
+        metadata: Optional[dict] = None,
         store: Optional[str] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
@@ -255,6 +279,10 @@ class UploadAPI(API):
 
         if store is not None:
             data["UPLOADCARE_STORE"] = store
+
+        if metadata is not None:
+            validate_metadata(metadata)
+            data.update(flatten_dict(metadata))
 
         if secure_upload:
             expire = (
@@ -294,6 +322,7 @@ class UploadAPI(API):
         source_url,
         store="auto",
         filename=None,
+        metadata: Optional[Dict] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
     ) -> str:
@@ -304,6 +333,10 @@ class UploadAPI(API):
         }
         if filename:
             data["filename"] = filename
+
+        if metadata is not None:
+            validate_metadata(metadata)
+            data.update(flatten_dict(metadata))
 
         if secure_upload:
             expire = (
@@ -365,3 +398,104 @@ class UploadAPI(API):
         url = self._build_url(base="/group/")
         document = self._client.post(url, data=data)
         return document.json()
+
+
+class MetadataAPI(API):
+    resource_type = "files"
+    response_classes = {
+        "update": responses.UpdateMetadataKeyResponse,
+        "get_all": responses.GetAllMetadataResponse,
+        "get_key": responses.UpdateMetadataKeyResponse,
+    }
+
+    def update_or_create_key(
+        self, file_uuid: Union[UUID, str], mkey: str, mvalue: str
+    ) -> str:
+        validate_meta_key(mkey)
+        validate_meta_value(mvalue)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        response_class = self._get_response_class("update")
+        json_response = self._client.put(url, json=mvalue).json()
+        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        return cast(str, response)
+
+    def get_all_metadata(self, file_uuid: Union[UUID, str]) -> dict:
+        url = self._build_url(file_uuid, suffix="metadata")
+        response_class = self._get_response_class("get_all")
+
+        try:
+            json_response = self._client.get(url).json()
+        except JSONDecodeError as jerr:  # noqa
+            # assume that there is "empty response" bug (Expecting value: line 1 column 1 (char 0))
+            logging.warning(
+                f"For file `{file_uuid}` there is empty metadata response"
+            )
+            json_response = {}
+
+        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        return cast(dict, response)
+
+    def delete_key(self, file_uuid: Union[UUID, str], mkey: str) -> None:
+        validate_meta_key(mkey)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        self._client.delete(url)
+
+    def get_key(self, file_uuid: Union[UUID, str], mkey: str) -> str:
+        validate_meta_key(mkey)
+        suffix = f"metadata/{mkey}"
+        url = self._build_url(file_uuid, suffix=suffix)
+        response_class = self._get_response_class("get_key")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        return cast(str, response)
+
+
+class AddonAPI(API):
+    resource_type = "addons"
+    request_type: Type[
+        AddonExecutionGeneralRequestData
+    ] = AddonExecutionGeneralRequestData
+    response_classes = {
+        "execute": responses.AddonExecuteResponse,
+        "status": responses.AddonResponse,
+    }
+
+    def _get_request_data(
+        self,
+        file_uuid: Union[UUID, str],
+        params: Optional[AddonExecutionParams] = None,
+    ) -> dict:
+        execution_request_data = self.request_type.parse_obj(
+            dict(target=str(file_uuid), params=params)
+        )
+        return execution_request_data.dict(
+            exclude_unset=True, exclude_none=True
+        )
+
+    def execute(
+        self,
+        file_uuid: Union[UUID, str],
+        addon_name: AddonLabels,
+        params: Optional[AddonExecutionParams] = None,
+    ) -> responses.AddonExecuteResponse:
+        suffix = f"{addon_name}/execute"
+        url = self._build_url(suffix=suffix)
+        response_class = self._get_response_class("execute")
+        request_payload = self._get_request_data(file_uuid, params)
+        json_response = self._client.post(url, json=request_payload).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.AddonExecuteResponse, response)
+
+    def status(
+        self, request_id: Union[UUID, str], addon_name: AddonLabels
+    ) -> responses.AddonResponse:
+        suffix = f"{addon_name}/execute/status"
+        query = dict(request_id=str(request_id))
+        url = self._build_url(suffix=suffix, query_parameters=query)
+        response_class = self._get_response_class("status")
+
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.AddonResponse, response)

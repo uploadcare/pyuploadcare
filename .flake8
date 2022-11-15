@@ -1,4 +1,5 @@
 [flake8]
+extend-ignore = E203
 max-line-length = 100
 max-complexity = 5
 exclude = .venv,venv,**/migrations/*,snapshots

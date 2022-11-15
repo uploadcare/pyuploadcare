@@ -16,7 +16,7 @@ DEFAULT = object()
 pub_key = os.getenv("UPLOADCARE_PUBLIC_KEY")
 secret = os.getenv("UPLOADCARE_SECRET_KEY")
 
-api_version = "0.6"
+api_version = "0.7"
 api_base = os.getenv("UPLOADCARE_API_BASE", "https://api.uploadcare.com/")
 upload_base = os.getenv(
     "UPLOADCARE_UPLOAD_BASE", "https://upload.uploadcare.com/"
@@ -35,6 +35,8 @@ retry_throttled = 1
 
 user_agent_extension = None
 
-batch_chunk_size = 500
+batch_chunk_size = 100
+# because of API docs: https://uploadcare.com/api-refs/rest-api/v0.7.0/#operation/filesStoring
+
 multipart_min_file_size = 10485760
 multipart_chunk_size = 5 * 1024 * 1024

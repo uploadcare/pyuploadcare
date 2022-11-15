@@ -11,39 +11,39 @@ interactions:
       host:
       - api.uploadcare.com
       user-agent:
-      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
     method: GET
-    uri: https://api.uploadcare.com/project/
+    uri: https://api.uploadcare.com/files/35ea470d-216c-4752-91d2-5176b34c1225/
   response:
-    content: '{"collaborators":[{"name":"os@uploadcare.com","email":"os@uploadcare.com"}],"name":"demo","pub_key":"demopublickey","autostore_enabled":true}'
+    content: '{"detail":"Not found."}'
     headers:
       Access-Control-Allow-Origin:
       - https://uploadcare.com
       Allow:
-      - GET, HEAD, OPTIONS
+      - DELETE, GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '307'
+      - '23'
       Content-Type:
       - application/vnd.uploadcare-v0.7+json
       Date:
-      - Thu, 07 Oct 2021 09:21:16 GMT
+      - Thu, 06 Oct 2022 20:50:34 GMT
       Server:
       - nginx
       Vary:
       - Accept
       Warning:
       - '199 Miscellaneous warning: You are using the demo project; Please use API
-        version 0.5, not 0.6'
+        version 0.5, not 0.7'
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
-      X-Robots-Tag:
-      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 607377ce-8d12-4ee8-b8b1-9dd7c8919bb2
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
-    status_code: 200
+    status_code: 404
 version: 1

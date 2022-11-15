@@ -1,4 +1,7 @@
 import typing
+from enum import Enum
+from typing import Any, Dict, Optional, TypeVar
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -7,6 +10,7 @@ from pyuploadcare.api.entities import (
     Entity,
     FileInfo,
     GroupInfo,
+    MetadataDict,
     VideoConvertInfo,
 )
 
@@ -63,3 +67,38 @@ class DocumentConvertResponse(Entity):
 class VideoConvertResponse(Entity):
     problems: typing.Optional[typing.Dict[str, typing.Any]]
     result: typing.Optional[typing.List[VideoConvertInfo]]
+
+
+class UpdateMetadataKeyResponse(Entity):
+    __root__: str
+
+
+class DeleteMetadataKeyResponse(Entity):
+    pass
+
+
+class GetAllMetadataResponse(Entity):
+    __root__: MetadataDict
+
+
+class AddonResponseResult(Entity):
+    pass
+
+
+class AddonStatus(str, Enum):
+    IN_PROGRESS = "in_progress"
+    ERROR = "error"
+    DONE = "done"
+    UNKNOWN = "unknown"
+
+
+class AddonExecuteResponse(Response):
+    request_id: UUID
+
+
+AddonResultType = TypeVar("AddonResultType", bound=AddonResponseResult)
+
+
+class AddonResponse(Response):
+    status: AddonStatus
+    result: Optional[Dict[str, Any]]

@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: event=file.uploaded&target_url=https%3A%2F%2Fwebhook.site%2F699ba5a4-b178-41c7-b416-5d1b6739d052&is_active=true
+    body: ''
     headers:
       accept:
       - '*/*'
@@ -8,46 +8,44 @@ interactions:
       - gzip, deflate
       connection:
       - keep-alive
-      content-length:
-      - '111'
-      content-type:
-      - application/x-www-form-urlencoded
       host:
       - api.uploadcare.com
       user-agent:
-      - PyUploadcare/3.1.0/demopublickey (CPython/3.9.6)
-    method: POST
-    uri: https://api.uploadcare.com/webhooks/
+      - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
+    method: GET
+    uri: https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/metadata/
   response:
-    content: '{"id":847096,"created":"2021-10-06T14:34:59.112764Z","updated":"2021-10-06T14:34:59.112787Z","event":"file.uploaded","target_url":"https://webhook.site/699ba5a4-b178-41c7-b416-5d1b6739d052","project":159,"is_active":true,"signing_secret":null}'
+    content: '{"first_key":"first_value","second_key":"any_others"}'
     headers:
       Access-Control-Allow-Origin:
       - https://uploadcare.com
       Allow:
-      - GET, HEAD, OPTIONS, POST
+      - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '243'
+      - '53'
       Content-Type:
       - application/vnd.uploadcare-v0.7+json
       Date:
-      - Wed, 06 Oct 2021 14:34:59 GMT
+      - Thu, 06 Oct 2022 07:06:45 GMT
       Server:
       - nginx
       Vary:
       - Accept
       Warning:
       - '199 Miscellaneous warning: You are using the demo project; Please use API
-        version 0.5, not 0.6'
+        version 0.5, not 0.7'
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
       X-Robots-Tag:
       - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - e7d994d4-a5cb-420a-8b90-c85d27059f7d
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
-    status_code: 201
+    status_code: 200
 version: 1
