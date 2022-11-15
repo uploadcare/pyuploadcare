@@ -6,6 +6,20 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0]() - 2022-11-14
+
+### Changed
+
+  - Use [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog)
+  - `video_info` and `audio_info` moved into corresponding 
+sections of `content_info` inside file info object
+
+### Added
+  - metadata for files with API to setup and modify
+  - `appdata` inside `file_info`
+  - `addons` are introduced
+  - possibility to delete a Group
+
 ## [3.1.0]() - 2022-10-24
 
 ### Changed
