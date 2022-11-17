@@ -27,7 +27,7 @@ class FormFieldsAttributesTest(unittest.TestCase):
             ff = uc_forms.FileField()
 
         f = SomeForm(label_suffix="")
-        self.assertRegexpMatches(
+        self.assertRegex(
             str(f.media),
             r"https://ucarecdn\.com/libs/widget/[\d\.x]+/uploadcare\.full.min\.js",
         )
@@ -43,7 +43,7 @@ class FormFieldsAttributesTest(unittest.TestCase):
             )
 
         f = SomeForm(label_suffix="")
-        self.assertRegexpMatches(
+        self.assertRegex(
             str(f.media),
             r"https://ucarecdn\.com/libs/widget/[\d\.x]+/uploadcare\.full\.min\.js",
         )
