@@ -6,13 +6,20 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0]() - TBD
+
+### Fixed
+
+  - Akamai signed URL generation
+
+
 ## [3.1.0]() - 2022-10-24
 
 ### Changed
 
   - Bumped `httpx` dependency for py37+
   - Add `follow_redirects` argument for Client request method
-  - Using `allow_redirects` argument is allowed, but will cause a deprecating warning 
+  - Using `allow_redirects` argument is allowed, but will cause a deprecating warning
   - Bumped `black` dependency
 
 ## [3.0.1](https://github.com/uploadcare/pyuploadcare/compare/v3.0.0...v3.0.1) - 2022-10-06
@@ -269,12 +276,12 @@ UnicodeDecodeError: 'ascii' codec can't decode byte 0xc5 ...
   - Widget was updated up to *0.8.1.2*.
 
   - It was invoking `File.store()`, `FileGroup.store()` methods on every model instance saving, e.g.:
-    
+
     ``` python
     photo.title = 'new title'
     photo.save()
     ```
-    
+
     Now it happens while saving by form, namely by calling
     `your_model_form.is_valid()`. There is other thing that can trigger
     storing -- calling `photo.full_clean()` directly.
