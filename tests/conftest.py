@@ -1,5 +1,7 @@
 import os
+from io import BytesIO
 from tempfile import TemporaryDirectory
+from typing import Tuple
 
 import pytest
 
@@ -36,13 +38,15 @@ def big_file(temp_directory):
     return fh
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session")
 def setup_settings():
     conf.pub_key = "demopublickey"
     conf.secret = "demosecretkey"
-    conf.api_version = "0.6"
+    conf.api_version = "0.7"
     conf.api_base = "https://api.uploadcare.com/"
     conf.upload_base = "https://upload.uploadcare.com/"
+
+    yield conf
 
 
 @pytest.fixture
@@ -64,8 +68,22 @@ def vcr_config():
 
 
 @pytest.fixture(scope="module")
-def uploadcare():
-    return Uploadcare(
+def uploadcare(setup_settings):
+    uc = Uploadcare(
         public_key="demopublickey",
         secret_key="demosecretkey",
+        api_version=conf.api_version,
+        multipart_min_file_size=setup_settings.multipart_min_file_size,
+        multipart_chunk_size=setup_settings.multipart_chunk_size,
     )
+    return uc
+
+
+@pytest.fixture()
+def memo_file(temp_directory) -> Tuple[BytesIO, int]:
+    ENOUGH_MILLIONS = 1_000
+    mem_file = BytesIO(b"0" * ENOUGH_MILLIONS)
+    mem_file.size = ENOUGH_MILLIONS  # type: ignore
+    mem_file.name = "_mem.exe"  # type: ignore
+
+    return mem_file, ENOUGH_MILLIONS
