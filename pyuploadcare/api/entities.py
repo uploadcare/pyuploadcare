@@ -155,7 +155,7 @@ class ApplicationDataSet(Entity):
 
 class FileInfo(UUIDEntity):
     """
-    video_info, image_info and rekognition_info were suppressed in API v0.7.0
+    video_info, image_info and rekognition_info were deprecated in API v0.7.0
 
     video_info, image_info moved to content_info
     rekognition_info moved to app_data
