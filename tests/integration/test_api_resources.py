@@ -3,6 +3,7 @@
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
@@ -23,7 +24,7 @@ IMAGE_PATH = ASSETS_PATH / "img.png"
 
 
 @pytest.fixture
-def group(uploadcare):
+def group(uploadcare) -> Iterator[FileGroup]:
     group = create_file_group(uploadcare, files_qty=1)
     yield group
     for file in group:
