@@ -3,7 +3,7 @@ interactions:
     body: '["630a1322-a3b4-4873-a0a0-0ba6d6668eb5", "dda35f47-3add-4736-b406-f48af2548c5b"]'
     headers:
       accept:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
       - gzip, deflate
       connection:
@@ -31,7 +31,7 @@ interactions:
       Content-Length:
       - '1095'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Mon, 27 Sep 2021 08:43:53 GMT
       Server:
@@ -55,7 +55,7 @@ interactions:
     body: ''
     headers:
       accept:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
       - gzip, deflate
       connection:
@@ -80,7 +80,7 @@ interactions:
       Content-Length:
       - '447'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Mon, 27 Sep 2021 08:43:58 GMT
       Server:
@@ -104,7 +104,7 @@ interactions:
     body: ''
     headers:
       accept:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
       - gzip, deflate
       connection:
@@ -130,7 +130,7 @@ interactions:
       Content-Length:
       - '606'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Mon, 27 Sep 2021 08:43:59 GMT
       Server:
