@@ -5,8 +5,7 @@ from enum import Enum
 from typing import Dict, List, Optional, Tuple
 from uuid import UUID
 
-import pydantic
-from pydantic import BaseModel, EmailStr, PrivateAttr
+from pydantic import BaseModel, ConstrainedStr, EmailStr, PrivateAttr
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
@@ -88,12 +87,12 @@ class VideoInfo(Entity):
     video: VideoStreamInfo
 
 
-class MetadataKeyConStrType(pydantic.ConstrainedStr):
+class MetadataKeyConStrType(ConstrainedStr):
     regex = re.compile(META_KEY_PATTERN)
     max_length = META_KEY_MAX_LEN
 
 
-class MetadataValueConStrType(pydantic.ConstrainedStr):
+class MetadataValueConStrType(ConstrainedStr):
     max_length = META_VALUE_MAX_LEN
 
 
