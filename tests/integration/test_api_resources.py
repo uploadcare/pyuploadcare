@@ -235,6 +235,7 @@ def test_group_is_not_stored(group):
     assert not group.is_stored
 
 
+@pytest.mark.skip(reason="until group storing is reimplementing")
 def test_successful_group_store(group):
     assert not group.is_stored
 
