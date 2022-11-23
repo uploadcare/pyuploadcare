@@ -1,3 +1,4 @@
+import binascii
 import hashlib
 import hmac
 import time
@@ -26,7 +27,7 @@ class AkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         cdn_url: str,
         secret_key: str,
         window: int = 300,
-        hash_algo=hashlib.sha1,
+        hash_algo=hashlib.sha256,
     ):
         self.secret_key = secret_key
         self.cdn_url = cdn_url
@@ -87,7 +88,7 @@ class AkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         ]
 
         signature = hmac.new(
-            self.secret_key.encode(),
+            binascii.a2b_hex(self.secret_key.encode()),
             self.field_delimeter.join(hash_source).encode(),
             self.hash_algo,
         ).hexdigest()
