@@ -7,8 +7,8 @@ from pyuploadcare.api.api import AddonsAPI
 
 
 @pytest.fixture()
-def addons_api(uploadcare) -> Iterable[AddonsAPI]:
-    yield uploadcare.addons_api
+def addons_api(uploadcare) -> AddonsAPI:
+    return uploadcare.addons_api
 
 
 def test_request_payload(addons_api):
