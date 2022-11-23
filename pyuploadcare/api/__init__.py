@@ -1,5 +1,5 @@
 from pyuploadcare.api.api import (  # noqa: F401
-    AddonAPI,
+    AddonsAPI,
     DocumentConvertAPI,
     FilesAPI,
     GroupsAPI,

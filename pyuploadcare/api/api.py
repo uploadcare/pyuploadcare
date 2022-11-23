@@ -372,7 +372,7 @@ class UploadAPI(API):
         return document.json()
 
 
-class AddonAPI(API):
+class AddonsAPI(API):
     resource_type = "addons"
     request_type: Type[
         AddonExecutionGeneralRequestData
