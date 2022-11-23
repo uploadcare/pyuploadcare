@@ -87,8 +87,8 @@ def test_file_upload_by_url_callback(vcr, uploadcare):
 
 @pytest.mark.vcr
 def test_file_upload_multiple(small_file, small_file2, uploadcare):
-    file1 = open(small_file.name)
-    file2 = open(small_file2.name)
+    file1 = open(small_file.name, mode='rb')
+    file2 = open(small_file2.name, mode='rb')
 
     files = uploadcare.upload_files([file1, file2])
     created_filenames = [file.filename for file in files]
@@ -98,6 +98,8 @@ def test_file_upload_multiple(small_file, small_file2, uploadcare):
             for input_file in [small_file, small_file2]
         ]
     )
+    file1.close()
+    file2.close()
 
 
 @pytest.mark.vcr
