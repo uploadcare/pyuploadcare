@@ -159,7 +159,7 @@ def test_file_convert_document(uploadcare):
 
 def test_file_info_has_new_structure(uploadcare):
     """
-    Test new structure of response since API v0.7.0
+    Test new structure of response since API v0.7
 
     """
     (file,) = list(
