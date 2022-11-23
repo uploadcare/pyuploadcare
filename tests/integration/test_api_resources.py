@@ -31,13 +31,12 @@ def group(uploadcare) -> Iterator[FileGroup]:
         file.delete()
 
 
-def test_successful_upload_when_file_is_opened_in_txt_mode(
-    small_file, uploadcare
-):
-    with open(small_file.name, "rt") as fh:
-        file = uploadcare.upload(fh)
-
-    assert isinstance(file, File)
+def test_failed_upload_when_file_is_opened_in_txt_mode(small_file, uploadcare):
+    with pytest.raises(
+        TypeError, match="Multipart file uploads must be opened in binary mode"
+    ):
+        with open(small_file.name, "rt") as fh:
+            uploadcare.upload(fh)
 
 
 def test_successful_upload_when_file_is_opened_in_binary_mode(

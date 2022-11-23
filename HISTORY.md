@@ -13,6 +13,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Use [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog)
   - `video_info` and `audio_info` moved into corresponding 
 sections of `content_info` inside file info object
+  - files to upload must be opened in binary mode
 
 ### Added
   - metadata for files with API to setup and modify
