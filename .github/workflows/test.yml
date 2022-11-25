@@ -8,8 +8,9 @@ on:
     - main
   pull_request:
     branches:
-    - main
-    - feature/**
+    - 'main'
+    - 'feature/**'
+    - 'version-3.x/**'
 
 jobs:
   lint:
