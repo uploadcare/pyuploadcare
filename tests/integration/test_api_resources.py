@@ -3,12 +3,13 @@
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Iterator
+from typing import Iterable, Iterator, List, Union
+from uuid import UUID, uuid4
 
 import pytest
 
 from pyuploadcare import File, FileGroup, conf
-from pyuploadcare.exceptions import InvalidRequestError
+from pyuploadcare.exceptions import InvalidRequestError, InvalidParamError
 
 from .utils import create_file_group, upload_tmp_txt_file
 
@@ -41,6 +42,23 @@ def group_to_delete(uploadcare) -> Iterator[FileGroup]:
 
     for file in files:
         file.delete()
+
+
+@pytest.fixture()
+def input_collection(uploadcare) -> Iterable[List[Union[str, File, UUID]]]:
+    u = uuid4()
+    yield [str(u), uploadcare.file(u), u]
+
+
+@pytest.fixture()
+def expected_uuids(
+    input_collection: List[Union[str, File, UUID]]
+) -> Iterable[str]:
+    yield [
+        input_collection[0],
+        input_collection[1].uuid,  # type: ignore
+        str(input_collection[2]),  # type: ignore
+    ]
 
 
 def test_failed_upload_when_file_is_opened_in_txt_mode(small_file, uploadcare):
@@ -361,3 +379,14 @@ def test_uploaded_image_mime_type_determined(uploadcare):
     file.delete()
 
     assert mime_type == "image/png"
+
+
+def test_uuid_extraction(uploadcare, input_collection, expected_uuids):
+    extracted_uuids = uploadcare._extract_uuids(input_collection)
+    assert extracted_uuids == expected_uuids
+    assert all(isinstance(item, str) for item in extracted_uuids)
+
+
+def test_corrupted_uuid_extraction(uploadcare):
+    with pytest.raises(InvalidParamError, match="Couldn't find UUID"):
+        uploadcare._extract_uuids(["456"])

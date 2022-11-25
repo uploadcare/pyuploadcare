@@ -22,7 +22,8 @@ sections of `content_info` inside file info object
   - possibility to delete a Group
 
 ### Fixed
-
+  - limit for batch operation set to 100 [(doc)](https://uploadcare.com/api-refs/rest-api/v0.7.0/#operation/filesStoring)
+  - iterating over long collections in batch operation
   - Akamai signed URL generation
 
 ## [3.1.0](https://github.com/uploadcare/pyuploadcare/compare/v3.0.1...v3.1.0) - 2022-10-24

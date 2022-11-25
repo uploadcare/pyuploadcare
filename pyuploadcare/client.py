@@ -1,6 +1,5 @@
 import os
 import socket
-from itertools import islice
 from typing import (
     IO,
     Any,
@@ -30,7 +29,12 @@ from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
-from pyuploadcare.helpers import extracts_uuids, get_file_size, guess_mime_type
+from pyuploadcare.helpers import (
+    extracts_uuids,
+    get_file_size,
+    guess_mime_type,
+    iterate_over_batches,
+)
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
 from pyuploadcare.secure_url import BaseSecureUrlBuilder
 
@@ -533,7 +537,19 @@ class Uploadcare:
             callback=callback,
         )
 
-    def store_files(self, files: Iterable[Union[str, "File"]]) -> None:
+    def _extract_uuids(
+        self, files: Iterable[Union[str, File, UUID]]
+    ) -> List[str]:
+        """Convert various resource representation into string-based."""
+        file_generator = (
+            file_ if isinstance(file_, File) else File(file_, self)
+            for file_ in files
+        )
+        uuids: List[str] = extracts_uuids(file_generator)
+
+        return uuids
+
+    def store_files(self, files: Iterable[Union[str, UUID, "File"]]) -> None:
         """Stores multiple files by requesting Uploadcare API.
 
         Usage example::
@@ -549,13 +565,10 @@ class Uploadcare:
             - files:
                 List of file UUIDs, CND urls or ``File`` instances.
         """
-        uuids = extracts_uuids(files)
-        start = 0
-        chunk = list(islice(uuids, start, self.batch_chunk_size))
-        while chunk:
-            self.files_api.batch_store(uuids)
-            start += self.batch_chunk_size
-            chunk = list(islice(uuids, start, self.batch_chunk_size))
+        uuids = self._extract_uuids(files)
+
+        for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
+            self.files_api.batch_store(chunk)
 
     def delete_files(self, files: Iterable[Union[str, "File"]]) -> None:
         """Deletes multiple files by requesting Uploadcare API.
@@ -573,13 +586,10 @@ class Uploadcare:
             - files:
                 List of file UUIDs, CND urls or ``File`` instances.
         """
-        uuids = extracts_uuids(files)
-        start = 0
-        chunk = list(islice(uuids, start, self.batch_chunk_size))
-        while chunk:
-            self.files_api.batch_delete(uuids)
-            start += self.batch_chunk_size
-            chunk = list(islice(uuids, start, self.batch_chunk_size))
+        uuids = self._extract_uuids(files)
+
+        for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
+            self.files_api.batch_delete(chunk)
 
     def create_file_group(self, files: List[File]) -> FileGroup:
         """Creates file group and returns ``FileGroup`` instance.

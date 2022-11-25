@@ -1,6 +1,6 @@
 import mimetypes
 import os
-from typing import IO, Iterable, List, Union
+from typing import IO, Iterable, List, TypeVar, Union
 
 from pyuploadcare import File
 
@@ -23,6 +23,23 @@ def extracts_uuids(files: Iterable[Union[str, File]]) -> List[str]:
             )
 
     return uuids
+
+
+T = TypeVar("T")
+
+
+def iterate_over_batches(
+    collection: List[T], batch_size: int
+) -> Iterable[List[T]]:
+    """Generate consequent slices of size `batch_size`."""
+    if batch_size < 1:
+        raise ValueError("Wrong batch size: must be positive number")
+
+    start, total = 0, len(collection)
+
+    while start < total:
+        yield collection[start : start + batch_size]  # noqa
+        start += batch_size
 
 
 def guess_mime_type(file_object: IO) -> str:
