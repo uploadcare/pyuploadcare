@@ -12,6 +12,12 @@ from pyuploadcare.transformations.image import ImageTransformation
 from pyuploadcare.transformations.video import VideoFormat, VideoTransformation
 
 
+TEST_RESOURCE_METADATA = {
+    "one_key": "has rather string, but the neighbour has almost number",
+    "score": "56",
+}
+
+
 @pytest.mark.vcr
 def test_file_upload(small_file, uploadcare):
     with open(small_file.name, "rb") as fh:
@@ -46,6 +52,22 @@ def test_file_upload_big_file(big_file, uploadcare):
 
 
 @pytest.mark.vcr
+def test_file_upload_with_metadata(memo_file, uploadcare, vcr):
+    stream, size = memo_file
+
+    file = uploadcare.upload(
+        stream, store=True, metadata=TEST_RESOURCE_METADATA, size=size
+    )
+
+    assert isinstance(file, File)
+
+    file.update_info()
+
+    assert file.is_ready
+    assert file.info["metadata"] == TEST_RESOURCE_METADATA
+
+
+@pytest.mark.vcr
 def test_file_upload_big_file_callback(big_file, vcr, uploadcare):
     progresses = []
 
@@ -68,6 +90,18 @@ def test_file_upload_by_url(uploadcare):
     )
     assert isinstance(file, File)
     assert file.is_ready
+
+
+@pytest.mark.vcr
+def test_file_upload_by_url_with_metadata(uploadcare):
+    file = uploadcare.upload(
+        "https://github.githubassets.com/images/modules/logos_page/Octocat.png",
+        metadata=TEST_RESOURCE_METADATA,
+        store=False,
+    )
+    assert isinstance(file, File)
+    assert file.is_ready
+    assert file.info["metadata"] == TEST_RESOURCE_METADATA
 
 
 @pytest.mark.vcr
@@ -240,3 +274,12 @@ def test_list_files(uploadcare):
     files = file_list[0:2]
     assert len(files) == 2
     assert isinstance(files[0], File)
+
+
+@pytest.mark.vcr
+def test_retrieve_fileinfo_with_metadata(uploadcare):
+    file_ = uploadcare.file("a55d6b25-d03c-4038-9838-6e06bb7df598")
+    assert isinstance(file_, File)
+
+    metadata_dict = file_.info["metadata"]
+    assert len(metadata_dict) == 2
