@@ -179,9 +179,11 @@ class File:
             self.update_info()
         return self._info_cache
 
-    def update_info(self):
+    def update_info(self, include_appdata=False):
         """Updates and returns file information by requesting Uploadcare API."""
-        self._info_cache = self._client.files_api.retrieve(self.uuid).dict()
+        self._info_cache = self._client.files_api.retrieve(
+            self.uuid, include_appdata=include_appdata
+        ).dict()
         return self._info_cache
 
     @property
