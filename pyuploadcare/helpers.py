@@ -38,7 +38,7 @@ def iterate_over_batches(
     start, total = 0, len(collection)
 
     while start < total:
-        yield collection[start : start + batch_size]
+        yield collection[start : start + batch_size]  # noqa
         start += batch_size
 
 
