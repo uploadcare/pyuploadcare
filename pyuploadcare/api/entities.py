@@ -184,7 +184,6 @@ class FileInfo(UUIDEntity):
     datetime_removed: Optional[datetime]
     datetime_stored: Optional[datetime]
     datetime_uploaded: Optional[datetime]
-    image_info: Optional[ImageInfo]
     metadata: Optional[MetadataDict]
     is_image: Optional[bool]
     is_ready: Optional[bool]
