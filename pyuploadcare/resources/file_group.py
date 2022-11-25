@@ -62,6 +62,7 @@ class FileGroup:
 
         self.id = matches.groupdict()["group_id"]
 
+        self._is_deleted = False
         self._files_qty = files_qty
         self._info_cache: Optional[Dict[str, Any]] = None
 
@@ -153,15 +154,46 @@ class FileGroup:
         It might do API request once because it depends on ``info``.
 
         """
-        return self.info.get("datetime_stored") is not None
+        for _file in self:
+            if not _file.is_stored:
+                return False
+
+        return True
 
     def store(self):
         """Stores all group's files by requesting Uploadcare API.
 
         Uploaded files do not immediately appear on Uploadcare CDN.
 
+        Since pyuploadcare v.4.0. started to use REST API v.0.7
+        this method performs multiple API calls
+        using batch method for file storing
+        and API call for updating collection of files belonging to the group
+
         """
         if self.is_stored:
             return
 
-        self._info_cache = self._client.groups_api.store(self.id)
+        self._client.store_files(file_ for file_ in self)
+        self.update_info()
+        return self.is_stored
+
+    @property
+    def is_deleted(self):
+        """Returns ``True`` if group is deleted.
+
+        It makes no API call
+
+        """
+        return self._is_deleted
+
+    def delete(self):
+        """Delete group itself, left files unchanged
+
+        Added in API v. 0.7.0
+        """
+        if self._is_deleted:
+            return
+
+        self._client.groups_api.delete(self.id)
+        self._is_deleted = True

@@ -46,7 +46,7 @@ def setup_settings():
     conf.api_base = "https://api.uploadcare.com/"
     conf.upload_base = "https://upload.uploadcare.com/"
 
-    yield conf
+    return conf
 
 
 @pytest.fixture

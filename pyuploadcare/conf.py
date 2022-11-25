@@ -16,7 +16,7 @@ DEFAULT = object()
 pub_key = os.getenv("UPLOADCARE_PUBLIC_KEY")
 secret = os.getenv("UPLOADCARE_SECRET_KEY")
 
-api_version = "0.6"
+api_version = "0.7"
 api_base = os.getenv("UPLOADCARE_API_BASE", "https://api.uploadcare.com/")
 upload_base = os.getenv(
     "UPLOADCARE_UPLOAD_BASE", "https://upload.uploadcare.com/"

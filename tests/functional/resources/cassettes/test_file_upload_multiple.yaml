@@ -1,15 +1,15 @@
 interactions:
 - request:
-    body: "--fcc0f4ac09d7d39519a8894737625b6c\r\nContent-Disposition: form-data; name=\"\
-      UPLOADCARE_STORE\"\r\n\r\nauto\r\n--fcc0f4ac09d7d39519a8894737625b6c\r\nContent-Disposition:\
-      \ form-data; name=\"UPLOADCARE_PUB_KEY\"\r\n\r\ndemopublickey\r\n--fcc0f4ac09d7d39519a8894737625b6c\r\
-      \nContent-Disposition: form-data; name=\"expire\"\r\n\r\n60\r\n--fcc0f4ac09d7d39519a8894737625b6c\r\
+    body: "--646efeb57a4a2a598bd992325aa88890\r\nContent-Disposition: form-data; name=\"\
+      UPLOADCARE_STORE\"\r\n\r\nauto\r\n--646efeb57a4a2a598bd992325aa88890\r\nContent-Disposition:\
+      \ form-data; name=\"UPLOADCARE_PUB_KEY\"\r\n\r\ndemopublickey\r\n--646efeb57a4a2a598bd992325aa88890\r\
+      \nContent-Disposition: form-data; name=\"expire\"\r\n\r\n60\r\n--646efeb57a4a2a598bd992325aa88890\r\
       \nContent-Disposition: form-data; name=\"signature\"\r\n\r\n7d2e71d1843788a02d0c7fe6f5d71edf657363a369112e78d4f37ace3f884b00\r\
-      \n--fcc0f4ac09d7d39519a8894737625b6c\r\nContent-Disposition: form-data; name=\"\
+      \n--646efeb57a4a2a598bd992325aa88890\r\nContent-Disposition: form-data; name=\"\
       sample1.txt\"; filename=\"sample1.txt\"\r\nContent-Type: text/plain\r\n\r\n\
-      test1\r\n--fcc0f4ac09d7d39519a8894737625b6c\r\nContent-Disposition: form-data;\
+      test1\r\n--646efeb57a4a2a598bd992325aa88890\r\nContent-Disposition: form-data;\
       \ name=\"sample2.txt\"; filename=\"sample2.txt\"\r\nContent-Type: text/plain\r\
-      \n\r\ntest2\r\n--fcc0f4ac09d7d39519a8894737625b6c--\r\n"
+      \n\r\ntest2\r\n--646efeb57a4a2a598bd992325aa88890--\r\n"
     headers:
       accept:
       - '*/*'
@@ -20,24 +20,26 @@ interactions:
       content-length:
       - '788'
       content-type:
-      - multipart/form-data; boundary=fcc0f4ac09d7d39519a8894737625b6c
+      - multipart/form-data; boundary=646efeb57a4a2a598bd992325aa88890
       host:
       - upload.uploadcare.com
       user-agent:
-      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+      - PyUploadcare/3.0.1/demopublickey (CPython/3.8.9)
     method: POST
     uri: https://upload.uploadcare.com/base/
   response:
-    content: '{"sample1.txt":"c648a91d-08f2-4baa-9822-eb6e08456a24","sample2.txt":"5627e9f3-bdd4-402d-80a8-1f24e12dca6e"}'
+    content: '{"sample1.txt":"e514d570-23aa-4378-aa9e-6489b21e329d","sample2.txt":"0b7cdf7c-a134-4349-adb4-28caa38ca76b"}'
     headers:
       Access-Control-Allow-Credentials:
       - 'true'
       Access-Control-Allow-Headers:
-      - X-PINGOTHER, X-UC-User-Agent, DNT
+      - X-PINGOTHER, DNT, X-UC-User-Agent
       Access-Control-Allow-Methods:
       - POST, OPTIONS
       Access-Control-Allow-Origin:
       - '*'
+      Access-Control-Expose-Headers:
+      - Warning, Retry-After
       Access-Control-Max-Age:
       - '1'
       Connection:
@@ -47,7 +49,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 29 Sep 2021 13:22:39 GMT
+      - Wed, 23 Nov 2022 12:32:57 GMT
       Server:
       - nginx
       Transfer-Encoding:
@@ -57,6 +59,8 @@ interactions:
       - Origin
       X-Content-Type-Options:
       - nosniff
+      X-Uploadcare-Request-Id:
+      - c2f3f8a9-205e-459c-95e2-11a9413a2bba
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
@@ -73,11 +77,11 @@ interactions:
       host:
       - api.uploadcare.com
       user-agent:
-      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+      - PyUploadcare/3.0.1/demopublickey (CPython/3.8.9)
     method: GET
-    uri: https://api.uploadcare.com/files/c648a91d-08f2-4baa-9822-eb6e08456a24/
+    uri: https://api.uploadcare.com/files/e514d570-23aa-4378-aa9e-6489b21e329d/
   response:
-    content: '{"datetime_removed":null,"datetime_stored":"2021-09-29T13:22:39.534337Z","datetime_uploaded":"2021-09-29T13:22:39.407733Z","image_info":null,"is_image":false,"is_ready":true,"mime_type":"text/plain","original_file_url":"https://ucarecdn.com/c648a91d-08f2-4baa-9822-eb6e08456a24/sample1.txt","original_filename":"sample1.txt","size":5,"url":"https://api.uploadcare.com/files/c648a91d-08f2-4baa-9822-eb6e08456a24/","uuid":"c648a91d-08f2-4baa-9822-eb6e08456a24","variations":null,"video_info":null}'
+    content: '{"datetime_removed":null,"datetime_stored":"2022-11-23T12:32:57.215395Z","datetime_uploaded":"2022-11-23T12:32:57.162320Z","is_image":false,"is_ready":true,"mime_type":"text/plain","original_file_url":"https://ucarecdn.com/e514d570-23aa-4378-aa9e-6489b21e329d/sample1.txt","original_filename":"sample1.txt","size":5,"url":"https://api.uploadcare.com/files/e514d570-23aa-4378-aa9e-6489b21e329d/","uuid":"e514d570-23aa-4378-aa9e-6489b21e329d","variations":null,"content_info":{"mime":{"mime":"text/plain","type":"text","subtype":"plain"}},"metadata":{}}'
     headers:
       Access-Control-Allow-Origin:
       - https://uploadcare.com
@@ -86,24 +90,25 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '495'
+      - '551'
       Content-Type:
       - application/vnd.uploadcare-v0.7+json
       Date:
-      - Wed, 29 Sep 2021 13:22:40 GMT
+      - Wed, 23 Nov 2022 12:32:58 GMT
       Server:
       - nginx
       Vary:
       - Accept
       Warning:
-      - '199 Miscellaneous warning: You are using the demo project; Please use API
-        version 0.5, not 0.6'
+      - '199 Miscellaneous warning: You are using the demo project'
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
       X-Robots-Tag:
       - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - d3221db1-0155-445b-96a8-420ea8f8db12
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
@@ -120,11 +125,11 @@ interactions:
       host:
       - api.uploadcare.com
       user-agent:
-      - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
+      - PyUploadcare/3.0.1/demopublickey (CPython/3.8.9)
     method: GET
-    uri: https://api.uploadcare.com/files/5627e9f3-bdd4-402d-80a8-1f24e12dca6e/
+    uri: https://api.uploadcare.com/files/0b7cdf7c-a134-4349-adb4-28caa38ca76b/
   response:
-    content: '{"datetime_removed":null,"datetime_stored":"2021-09-29T13:22:39.558917Z","datetime_uploaded":"2021-09-29T13:22:39.447007Z","image_info":null,"is_image":false,"is_ready":true,"mime_type":"text/plain","original_file_url":"https://ucarecdn.com/5627e9f3-bdd4-402d-80a8-1f24e12dca6e/sample2.txt","original_filename":"sample2.txt","size":5,"url":"https://api.uploadcare.com/files/5627e9f3-bdd4-402d-80a8-1f24e12dca6e/","uuid":"5627e9f3-bdd4-402d-80a8-1f24e12dca6e","variations":null,"video_info":null}'
+    content: '{"datetime_removed":null,"datetime_stored":"2022-11-23T12:32:57.290346Z","datetime_uploaded":"2022-11-23T12:32:57.191341Z","is_image":false,"is_ready":true,"mime_type":"text/plain","original_file_url":"https://ucarecdn.com/0b7cdf7c-a134-4349-adb4-28caa38ca76b/sample2.txt","original_filename":"sample2.txt","size":5,"url":"https://api.uploadcare.com/files/0b7cdf7c-a134-4349-adb4-28caa38ca76b/","uuid":"0b7cdf7c-a134-4349-adb4-28caa38ca76b","variations":null,"content_info":{"mime":{"mime":"text/plain","type":"text","subtype":"plain"}},"metadata":{}}'
     headers:
       Access-Control-Allow-Origin:
       - https://uploadcare.com
@@ -133,24 +138,25 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '495'
+      - '551'
       Content-Type:
       - application/vnd.uploadcare-v0.7+json
       Date:
-      - Wed, 29 Sep 2021 13:22:40 GMT
+      - Wed, 23 Nov 2022 12:32:58 GMT
       Server:
       - nginx
       Vary:
       - Accept
       Warning:
-      - '199 Miscellaneous warning: You are using the demo project; Please use API
-        version 0.5, not 0.6'
+      - '199 Miscellaneous warning: You are using the demo project'
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
       - SAMEORIGIN
       X-Robots-Tag:
       - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 6722411a-a1f0-4975-8216-9b1530f230ac
       X-XSS-Protection:
       - 1; mode=block
     http_version: HTTP/1.1
