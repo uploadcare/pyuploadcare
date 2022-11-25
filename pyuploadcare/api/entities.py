@@ -196,7 +196,6 @@ class FileInfo(UUIDEntity):
     source: Optional[str]
     content_info: Optional[ContentInfo]
     appdata: Optional[ApplicationDataSet]
-    metadata: Optional[Dict]
 
 
 class GroupInfo(Entity):
