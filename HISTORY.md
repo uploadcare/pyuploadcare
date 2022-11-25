@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.1.0...v4.0.0) - TBD
+## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.2.0...v4.0.0) - TBD
 
 ### Changed
 
@@ -26,6 +26,18 @@ sections of `content_info` inside file info object
   - iterating over long collections in batch operation
   - Akamai signed URL generation
 
+
+## [3.2.0](https://github.com/uploadcare/pyuploadcare/compare/v3.1.0...v3.2.0) - TBD
+
+
+### Changed
+
+  - freeze `httpx` dependency for py37+ (`=0.23.0`) to prevent breaking changes in processing files opened in text mode
+
+### Fixed
+
+  - Akamai signed URL generation
+  
 ## [3.1.0](https://github.com/uploadcare/pyuploadcare/compare/v3.0.1...v3.1.0) - 2022-10-24
 
 ### Changed
