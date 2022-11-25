@@ -1,5 +1,7 @@
 import os
+from io import BytesIO
 from tempfile import TemporaryDirectory
+from typing import Tuple
 
 import pytest
 
@@ -75,3 +77,13 @@ def uploadcare(setup_settings):
         multipart_chunk_size=setup_settings.multipart_chunk_size,
     )
     return uc
+
+
+@pytest.fixture()
+def memo_file(temp_directory) -> Tuple[BytesIO, int]:
+    ENOUGH_MILLIONS = 1_000
+    mem_file = BytesIO(b"0" * ENOUGH_MILLIONS)
+    mem_file.size = ENOUGH_MILLIONS  # type: ignore
+    mem_file.name = "_mem.exe"  # type: ignore
+
+    return mem_file, ENOUGH_MILLIONS
