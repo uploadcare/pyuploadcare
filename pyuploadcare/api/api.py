@@ -1,12 +1,17 @@
 import hashlib
 import hmac
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 from uuid import UUID
 
 from httpx._types import RequestFiles
 
 from pyuploadcare.api import entities, responses
+from pyuploadcare.api.addon_entities import (
+    AddonExecutionGeneralRequestData,
+    AddonExecutionParams,
+    AddonLabels,
+)
 from pyuploadcare.api.base import (
     API,
     CreateMixin,
@@ -204,7 +209,7 @@ class UploadAPI(API):
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
-    def upload(
+    def upload(  # noqa: C901
         self,
         files: RequestFiles,
         secure_upload: bool = False,
@@ -365,3 +370,52 @@ class UploadAPI(API):
         url = self._build_url(base="/group/")
         document = self._client.post(url, data=data)
         return document.json()
+
+
+class AddonsAPI(API):
+    resource_type = "addons"
+    request_type: Type[
+        AddonExecutionGeneralRequestData
+    ] = AddonExecutionGeneralRequestData
+    response_classes = {
+        "execute": responses.AddonExecuteResponse,
+        "status": responses.AddonResponse,
+    }
+
+    def _get_request_data(
+        self,
+        file_uuid: Union[UUID, str],
+        params: Optional[AddonExecutionParams] = None,
+    ) -> dict:
+        execution_request_data = self.request_type.parse_obj(
+            dict(target=str(file_uuid), params=params)
+        )
+        return execution_request_data.dict(
+            exclude_unset=True, exclude_none=True
+        )
+
+    def execute(
+        self,
+        file_uuid: Union[UUID, str],
+        addon_name: AddonLabels,
+        params: Optional[AddonExecutionParams] = None,
+    ) -> responses.AddonExecuteResponse:
+        suffix = f"{addon_name}/execute"
+        url = self._build_url(suffix=suffix)
+        response_class = self._get_response_class("execute")
+        request_payload = self._get_request_data(file_uuid, params)
+        json_response = self._client.post(url, json=request_payload).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.AddonExecuteResponse, response)
+
+    def status(
+        self, request_id: Union[UUID, str], addon_name: AddonLabels
+    ) -> responses.AddonResponse:
+        suffix = f"{addon_name}/execute/status"
+        query = dict(request_id=str(request_id))
+        url = self._build_url(suffix=suffix, query_parameters=query)
+        response_class = self._get_response_class("status")
+
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.AddonResponse, response)

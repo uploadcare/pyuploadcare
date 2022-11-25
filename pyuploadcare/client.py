@@ -16,6 +16,7 @@ from uuid import UUID
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
+    AddonsAPI,
     DocumentConvertAPI,
     FilesAPI,
     GroupsAPI,
@@ -146,6 +147,7 @@ class Uploadcare:
         )
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.addons_api = AddonsAPI(client=self.rest_client, **api_config)  # type: ignore
 
     def file(
         self,
