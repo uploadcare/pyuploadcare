@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 import pytest
 
 from pyuploadcare import File, FileGroup, conf
-from pyuploadcare.exceptions import InvalidRequestError, InvalidParamError
+from pyuploadcare.exceptions import InvalidParamError, InvalidRequestError
 
 from .utils import create_file_group, upload_tmp_txt_file
 
