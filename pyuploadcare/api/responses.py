@@ -1,6 +1,5 @@
-import typing
 from enum import Enum
-from typing import Any, Dict, Optional, TypeVar
+from typing import Any, Dict, List, Optional, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -20,31 +19,31 @@ class Response(BaseModel):
 
 
 class EntityListResponse(Response):
-    results: typing.List[Entity]
+    results: List[Entity]
 
 
 class PaginatedResponse(EntityListResponse):
-    next: typing.Optional[str]
-    previous: typing.Optional[str]
+    next: Optional[str]
+    previous: Optional[str]
     total: int
     per_page: int
 
 
 class FileListResponse(PaginatedResponse):
     # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesList
-    results: typing.List[FileInfo]  # type: ignore
+    results: List[FileInfo]  # type: ignore
 
 
 class GroupListResponse(PaginatedResponse):
     # https://uploadcare.com/api-refs/rest-api/v0.5.0/#operation/groupsList
-    results: typing.List[GroupInfo]  # type: ignore
+    results: List[GroupInfo]  # type: ignore
 
 
 class BatchFileOperationResponse(Response):
     # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesStoring
     status: str
-    problems: typing.Optional[typing.Dict[str, typing.Any]]
-    result: typing.Optional[typing.List[FileInfo]]
+    problems: Optional[Dict[str, Any]]
+    result: Optional[List[FileInfo]]
 
 
 class CreateLocalCopyResponse(Response):
@@ -60,13 +59,13 @@ class CreateRemoteCopyResponse(Response):
 
 
 class DocumentConvertResponse(Entity):
-    problems: typing.Optional[typing.Dict[str, typing.Any]]
-    result: typing.Optional[typing.List[DocumentConvertInfo]]
+    problems: Optional[Dict[str, Any]]
+    result: Optional[List[DocumentConvertInfo]]
 
 
 class VideoConvertResponse(Entity):
-    problems: typing.Optional[typing.Dict[str, typing.Any]]
-    result: typing.Optional[typing.List[VideoConvertInfo]]
+    problems: Optional[Dict[str, Any]]
+    result: Optional[List[VideoConvertInfo]]
 
 
 class UpdateMetadataKeyResponse(Entity):
