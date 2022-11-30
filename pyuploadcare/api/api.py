@@ -24,8 +24,13 @@ from pyuploadcare.api.base import (
     RetrieveMixin,
     UpdateMixin,
 )
-from pyuploadcare.exceptions import APIError
+from pyuploadcare.exceptions import (
+    APIError,
+    InvalidRequestError,
+    WebhookIsNotUnique,
+)
 
+from .entities import UUIDEntity
 from .metadata import validate_meta_key, validate_meta_value, validate_metadata
 from .utils import flatten_dict
 
@@ -136,6 +141,34 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
         "list": List[entities.Webhook],  # type: ignore
         "update": entities.Webhook,
     }
+    _NON_FIELD = "non_field_errors"
+    _ALREADY = "project is already subscribed on this event"
+
+    def _process_exceptions(self, raised):
+        _text = str(raised)
+        if self._NON_FIELD in _text and self._ALREADY in _text:
+            raise WebhookIsNotUnique(_text)
+
+        raise
+
+    def update(
+        self,
+        resource_uuid: Union[UUID, str, UUIDEntity],
+        data: Optional[Dict] = None,
+    ):
+        try:
+            return super(WebhooksAPI, self).update(resource_uuid, data)
+        except InvalidRequestError as request_error:
+            self._process_exceptions(request_error)
+
+    def create(
+        self,
+        data: Optional[Dict] = None,
+    ):
+        try:
+            return super(WebhooksAPI, self).create(data)
+        except InvalidRequestError as request_error:
+            self._process_exceptions(request_error)
 
 
 class DocumentConvertAPI(API):
