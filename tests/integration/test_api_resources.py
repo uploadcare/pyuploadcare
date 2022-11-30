@@ -103,6 +103,7 @@ def test_successful_upload_from_url_sync_autostore(uploadcare):
     assert isinstance(file, File)
     assert file.filename == "Octocat.png"
     assert file.datetime_stored is not None
+    assert isinstance(file.datetime_stored, datetime)
 
 
 def test_successful_upload_by_url(uploadcare):
@@ -131,6 +132,7 @@ def test_successful_upload_from_url_sync_autostore_signed(uploadcare):
     assert isinstance(file, File)
     assert file.filename == "Octocat.png"
     assert file.datetime_stored is not None
+    assert isinstance(file.datetime_stored, datetime)
 
 
 def test_successful_upload_from_url_sync_dont_store(uploadcare):
@@ -144,6 +146,7 @@ def test_successful_upload_from_url_sync_store(uploadcare):
     file = uploadcare.upload_from_url_sync(IMAGE_URL, store=True, interval=1)
     assert isinstance(file, File)
     assert file.datetime_stored is not None
+    assert isinstance(file.datetime_stored, datetime)
 
 
 def test_successful_upload_from_url_sync_with_filename(uploadcare):
@@ -269,6 +272,7 @@ def test_successful_group_store(group: FileGroup):
 
     group.store()
 
+    assert group.datetime_stored is not None
     assert group.is_stored
 
 

@@ -1,9 +1,14 @@
 import re
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import dateutil.parser
 
 from pyuploadcare.exceptions import InvalidParamError
+from pyuploadcare.resources.utils import (
+    coerce_to_optional_datetime,
+    max_for_optional_datetimes,
+)
 
 
 if TYPE_CHECKING:
@@ -63,6 +68,7 @@ class FileGroup:
         self.id = matches.groupdict()["group_id"]
 
         self._is_deleted = False
+        self._stored_at: Optional[datetime] = None
         self._files_qty = files_qty
         self._info_cache: Optional[Dict[str, Any]] = None
 
@@ -131,6 +137,9 @@ class FileGroup:
     def update_info(self):
         """Updates and returns group information by requesting Uploadcare API."""
         self._info_cache = self._client.groups_api.retrieve(self.id).dict()
+        if self.is_stored and self._stored_at:
+            self._info_cache["datetime_stored"] = self._stored_at.isoformat()
+
         return self._info_cache
 
     @property
@@ -149,16 +158,33 @@ class FileGroup:
 
     @property
     def is_stored(self):
-        """Returns ``True`` if file is stored.
+        """Returns ``True`` if group is stored.
 
-        It might do API request once because it depends on ``info``.
+        It might do several API request
+        because it iterates over all files gathered in group.
 
         """
-        for _file in self:
-            if not _file.is_stored:
-                return False
+        is_stored = False
+        most_fresh_date: Optional[datetime] = None
 
-        return True
+        for _file in self:
+            if not _file:
+                """Due to type of source as Optional[List[Optional[FileInfo]]]"""
+                continue
+
+            if not _file.is_stored:
+                most_fresh_date = None
+                break
+
+            most_fresh_date = max_for_optional_datetimes(
+                most_fresh_date,
+                coerce_to_optional_datetime(_file.datetime_stored),
+            )
+        else:
+            is_stored = True
+
+        self._stored_at = most_fresh_date
+        return is_stored
 
     def store(self):
         """Stores all group's files by requesting Uploadcare API.
