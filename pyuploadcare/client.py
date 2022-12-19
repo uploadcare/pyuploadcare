@@ -1,6 +1,5 @@
 import os
 import socket
-from itertools import islice
 from typing import (
     IO,
     Any,
@@ -16,9 +15,11 @@ from uuid import UUID
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
+    AddonsAPI,
     DocumentConvertAPI,
     FilesAPI,
     GroupsAPI,
+    MetadataAPI,
     ProjectAPI,
     UploadAPI,
     VideoConvertAPI,
@@ -28,7 +29,12 @@ from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook
 from pyuploadcare.exceptions import InvalidParamError
-from pyuploadcare.helpers import extracts_uuids, get_file_size, guess_mime_type
+from pyuploadcare.helpers import (
+    extracts_uuids,
+    get_file_size,
+    guess_mime_type,
+    iterate_over_batches,
+)
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
 from pyuploadcare.secure_url import BaseSecureUrlBuilder
 
@@ -146,6 +152,8 @@ class Uploadcare:
         )
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.metadata_api = MetadataAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.addons_api = AddonsAPI(client=self.rest_client, **api_config)  # type: ignore
 
     def file(
         self,
@@ -213,6 +221,7 @@ class Uploadcare:
         store=None,
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
+        metadata: Optional[Dict] = None,
     ) -> "File":
         """Uploads a file and returns ``File`` instance.
 
@@ -276,6 +285,7 @@ class Uploadcare:
                 file_url,
                 store=store,
                 callback=callback,
+                metadata=metadata,
             )
 
         file_obj: IO = file_handle
@@ -285,7 +295,9 @@ class Uploadcare:
 
         # use direct upload for files less then multipart_min_file_size
         if size < self.multipart_min_file_size:
-            files = self.upload_files([file_obj], store=store)
+            files = self.upload_files(
+                [file_obj], store=store, common_metadata=metadata
+            )
             if not files:
                 raise ValueError("Failed to get uploaded file from response")
             file: "File" = files[0]
@@ -296,7 +308,11 @@ class Uploadcare:
             return file
 
         file = self.multipart_upload(
-            file_obj, store=store, size=size, callback=callback
+            file_obj,
+            store=store,
+            size=size,
+            callback=callback,
+            metadata=metadata,
         )
         return file
 
@@ -314,7 +330,10 @@ class Uploadcare:
         return values_map[store]
 
     def upload_files(
-        self, file_objects: List[IO], store: Optional[bool] = None
+        self,
+        file_objects: List[IO],
+        store: Optional[bool] = None,
+        common_metadata: Optional[Dict] = None,
     ) -> List["File"]:
         """Upload multiple files using direct upload.
 
@@ -329,6 +348,9 @@ class Uploadcare:
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
+            - common_metadata:
+                Dict with keys and values are all strings with constraints
+                If presented it is set for each file from ``files`` collection
 
         Returns:
             ``File`` instance
@@ -352,6 +374,7 @@ class Uploadcare:
             store=self._format_store(store),
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
+            common_metadata=common_metadata,
         )
         ucare_files = [self.file(response[file_name]) for file_name in files]
         return ucare_files
@@ -363,6 +386,7 @@ class Uploadcare:
         size: Optional[int] = None,
         mime_type: Optional[str] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
+        metadata: Optional[Dict] = None,
     ) -> "File":
         """Upload file straight to s3 by chunks.
 
@@ -383,6 +407,7 @@ class Uploadcare:
                 If not set, it is guessed from filename extension.
             - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
+            - metadata (Optional[Dict]): Optional metadata
 
         Returns:
             ``File`` instance
@@ -401,6 +426,7 @@ class Uploadcare:
             store=self._format_store(store),
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
+            metadata=metadata,
         )
 
         multipart_uuid = complete_response["uuid"]
@@ -424,7 +450,9 @@ class Uploadcare:
         file_info: Dict = self.upload_api.multipart_complete(multipart_uuid)
         return self.file(file_info["uuid"], file_info)
 
-    def upload_from_url(self, url, store=None, filename=None) -> FileFromUrl:
+    def upload_from_url(
+        self, url, store=None, filename=None, metadata=None
+    ) -> FileFromUrl:
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
         Args:
@@ -454,6 +482,7 @@ class Uploadcare:
             source_url=url,
             store=store,
             filename=filename,
+            metadata=metadata,
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
         )
@@ -465,6 +494,7 @@ class Uploadcare:
         url,
         timeout=30,
         interval=0.3,
+        metadata=None,
         until_ready=False,
         store=None,
         filename=None,
@@ -499,7 +529,7 @@ class Uploadcare:
             ``TimeoutError`` if file wasn't uploaded in time
 
         """
-        ffu = self.upload_from_url(url, store, filename)
+        ffu = self.upload_from_url(url, store, filename, metadata=metadata)
         return ffu.wait(
             timeout=timeout,
             interval=interval,
@@ -507,7 +537,19 @@ class Uploadcare:
             callback=callback,
         )
 
-    def store_files(self, files: Iterable[Union[str, "File"]]) -> None:
+    def _extract_uuids(
+        self, files: Iterable[Union[str, File, UUID]]
+    ) -> List[str]:
+        """Convert various resource representation into string-based."""
+        file_generator = (
+            file_ if isinstance(file_, File) else File(file_, self)
+            for file_ in files
+        )
+        uuids: List[str] = extracts_uuids(file_generator)
+
+        return uuids
+
+    def store_files(self, files: Iterable[Union[str, UUID, "File"]]) -> None:
         """Stores multiple files by requesting Uploadcare API.
 
         Usage example::
@@ -523,13 +565,10 @@ class Uploadcare:
             - files:
                 List of file UUIDs, CND urls or ``File`` instances.
         """
-        uuids = extracts_uuids(files)
-        start = 0
-        chunk = list(islice(uuids, start, self.batch_chunk_size))
-        while chunk:
-            self.files_api.batch_store(uuids)
-            start += self.batch_chunk_size
-            chunk = list(islice(uuids, start, self.batch_chunk_size))
+        uuids = self._extract_uuids(files)
+
+        for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
+            self.files_api.batch_store(chunk)
 
     def delete_files(self, files: Iterable[Union[str, "File"]]) -> None:
         """Deletes multiple files by requesting Uploadcare API.
@@ -547,13 +586,10 @@ class Uploadcare:
             - files:
                 List of file UUIDs, CND urls or ``File`` instances.
         """
-        uuids = extracts_uuids(files)
-        start = 0
-        chunk = list(islice(uuids, start, self.batch_chunk_size))
-        while chunk:
-            self.files_api.batch_delete(uuids)
-            start += self.batch_chunk_size
-            chunk = list(islice(uuids, start, self.batch_chunk_size))
+        uuids = self._extract_uuids(files)
+
+        for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
+            self.files_api.batch_delete(chunk)
 
     def create_file_group(self, files: List[File]) -> FileGroup:
         """Creates file group and returns ``FileGroup`` instance.

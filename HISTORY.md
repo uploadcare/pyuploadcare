@@ -6,6 +6,27 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.2.0...v4.0.0) - TBD
+
+### Changed
+
+  - Use [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog)
+  - `video_info` and `audio_info` moved into corresponding 
+sections of `content_info` inside file info object
+  - files to upload must be opened in binary mode
+
+### Added
+  - metadata for files with API to setup and modify
+  - `appdata` inside `file_info`
+  - `addons` are introduced
+  - possibility to delete a Group
+
+### Fixed
+  - limit for batch operation set to 100 [(doc)](https://uploadcare.com/api-refs/rest-api/v0.7.0/#operation/filesStoring)
+  - iterating over long collections in batch operation
+  - Akamai signed URL generation
+
+
 ## [3.2.0](https://github.com/uploadcare/pyuploadcare/compare/v3.1.0...v3.2.0) - TBD
 
 
@@ -16,7 +37,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
   - Akamai signed URL generation
-
+  
 ## [3.1.0](https://github.com/uploadcare/pyuploadcare/compare/v3.0.1...v3.1.0) - 2022-10-24
 
 ### Changed

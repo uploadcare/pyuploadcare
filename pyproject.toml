@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyuploadcare"
-version = "3.2.0"
+version = "4.0.0"
 description = "Python library for Uploadcare.com"
 authors = ["Uploadcare Inc <hello@uploadcare.com>"]
 readme = "README.md"
@@ -28,7 +28,7 @@ ucare = 'pyuploadcare.ucare_cli.main:main'
 python = "^3.6.2"
 httpx = [
   {version = "^0.18.2", python = ">=3.6,<3.7"},
-  {version = "0.23.0", python = "^3.7"}
+  {version = "^0.23.0", python = "^3.7"}
 ]
 pydantic = {extras = ["email"], version = "^1.8.2"}
 python-dateutil = "^2.8.2"

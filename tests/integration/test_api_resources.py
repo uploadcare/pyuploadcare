@@ -3,10 +3,13 @@
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Iterable, Iterator, List, Union
+from uuid import UUID, uuid4
 
 import pytest
 
 from pyuploadcare import File, FileGroup, conf
+from pyuploadcare.exceptions import InvalidParamError, InvalidRequestError
 
 from .utils import create_file_group, upload_tmp_txt_file
 
@@ -23,20 +26,47 @@ IMAGE_PATH = ASSETS_PATH / "img.png"
 
 
 @pytest.fixture
-def group(uploadcare):
+def group(uploadcare) -> Iterator[FileGroup]:
     group = create_file_group(uploadcare, files_qty=1)
     yield group
     for file in group:
         file.delete()
 
 
-def test_successful_upload_when_file_is_opened_in_txt_mode(
-    small_file, uploadcare
-):
-    with open(small_file.name, "rt") as fh:
-        file = uploadcare.upload(fh)
+@pytest.fixture
+def group_to_delete(uploadcare) -> Iterator[FileGroup]:
+    group = create_file_group(uploadcare, files_qty=1)
+    files = [file for file in group]
 
-    assert isinstance(file, File)
+    yield group
+
+    for file in files:
+        file.delete()
+
+
+@pytest.fixture()
+def input_collection(uploadcare) -> Iterable[List[Union[str, File, UUID]]]:
+    u = uuid4()
+    yield [str(u), uploadcare.file(u), u]
+
+
+@pytest.fixture()
+def expected_uuids(
+    input_collection: List[Union[str, File, UUID]]
+) -> Iterable[str]:
+    yield [
+        input_collection[0],
+        input_collection[1].uuid,  # type: ignore
+        str(input_collection[2]),  # type: ignore
+    ]
+
+
+def test_failed_upload_when_file_is_opened_in_txt_mode(small_file, uploadcare):
+    with pytest.raises(
+        TypeError, match="Multipart file uploads must be opened in binary mode"
+    ):
+        with open(small_file.name, "rt") as fh:
+            uploadcare.upload(fh)
 
 
 def test_successful_upload_when_file_is_opened_in_binary_mode(
@@ -73,6 +103,7 @@ def test_successful_upload_from_url_sync_autostore(uploadcare):
     assert isinstance(file, File)
     assert file.filename == "Octocat.png"
     assert file.datetime_stored is not None
+    assert isinstance(file.datetime_stored, datetime)
 
 
 def test_successful_upload_by_url(uploadcare):
@@ -101,6 +132,7 @@ def test_successful_upload_from_url_sync_autostore_signed(uploadcare):
     assert isinstance(file, File)
     assert file.filename == "Octocat.png"
     assert file.datetime_stored is not None
+    assert isinstance(file.datetime_stored, datetime)
 
 
 def test_successful_upload_from_url_sync_dont_store(uploadcare):
@@ -114,6 +146,7 @@ def test_successful_upload_from_url_sync_store(uploadcare):
     file = uploadcare.upload_from_url_sync(IMAGE_URL, store=True, interval=1)
     assert isinstance(file, File)
     assert file.datetime_stored is not None
+    assert isinstance(file.datetime_stored, datetime)
 
 
 def test_successful_upload_from_url_sync_with_filename(uploadcare):
@@ -234,12 +267,27 @@ def test_group_is_not_stored(group):
     assert not group.is_stored
 
 
-def test_successful_group_store(group):
+def test_successful_group_store(group: FileGroup):
     assert not group.is_stored
 
     group.store()
 
+    assert group.datetime_stored is not None
     assert group.is_stored
+
+
+def test_group_successfully_deleted(group_to_delete):
+    file_from_group = next(iter(group_to_delete))
+    assert not group_to_delete.is_deleted
+
+    group_to_delete.delete()
+
+    with pytest.raises(InvalidRequestError, match="Not found"):
+        group_to_delete.update_info()
+
+    assert group_to_delete.is_deleted
+    file_from_group.update_info()
+    assert not file_from_group.is_removed
 
 
 @pytest.fixture
@@ -335,3 +383,14 @@ def test_uploaded_image_mime_type_determined(uploadcare):
     file.delete()
 
     assert mime_type == "image/png"
+
+
+def test_uuid_extraction(uploadcare, input_collection, expected_uuids):
+    extracted_uuids = uploadcare._extract_uuids(input_collection)
+    assert extracted_uuids == expected_uuids
+    assert all(isinstance(item, str) for item in extracted_uuids)
+
+
+def test_corrupted_uuid_extraction(uploadcare):
+    with pytest.raises(InvalidParamError, match="Couldn't find UUID"):
+        uploadcare._extract_uuids(["456"])

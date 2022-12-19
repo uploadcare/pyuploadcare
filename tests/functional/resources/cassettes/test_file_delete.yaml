@@ -31,7 +31,7 @@ interactions:
       Content-Length:
       - '531'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Fri, 24 Sep 2021 08:50:47 GMT
       Location:
@@ -80,7 +80,7 @@ interactions:
       Content-Length:
       - '647'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Fri, 24 Sep 2021 08:50:48 GMT
       Server:
@@ -114,7 +114,7 @@ interactions:
       user-agent:
       - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
     method: DELETE
-    uri: https://api.uploadcare.com/files/b3e96adb-74c3-4319-9f6e-526d10845329/
+    uri: https://api.uploadcare.com/files/b3e96adb-74c3-4319-9f6e-526d10845329/storage/
   response:
     content: '{"datetime_removed":"2021-09-24T08:50:48.737881Z","datetime_stored":null,"datetime_uploaded":"2021-09-24T08:50:47.117629Z","image_info":{"width":1280,"height":720,"format":"JPEG","color_mode":"RGB","geo_location":null,"orientation":null,"dpi":null,"datetime_original":null,"sequence":false},"is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":null,"original_filename":"camera.jpg","size":145711,"url":"https://api.uploadcare.com/files/b3e96adb-74c3-4319-9f6e-526d10845329/","uuid":"b3e96adb-74c3-4319-9f6e-526d10845329","variations":null,"video_info":null}'
     headers:
@@ -127,7 +127,7 @@ interactions:
       Content-Length:
       - '581'
       Content-Type:
-      - application/vnd.uploadcare-v0.6+json
+      - application/vnd.uploadcare-v0.7+json
       Date:
       - Fri, 24 Sep 2021 08:50:48 GMT
       Server:

@@ -62,3 +62,16 @@ class UploadError(UploadcareException):
 class DefaultResponseClassNotDefined(Exception):
     def __init__(self) -> None:
         super().__init__("Need define default response class for API.")
+
+
+class MetadataValidationError(UploadcareException):
+    """
+    Raised when a 'key' or 'value' of metadata did not satisfy the constraints
+    """
+
+
+class WebhookIsNotUnique(InvalidRequestError):
+    """
+    Raised while creating or updating webhook
+    when pair ('project', 'target_url') is not unique
+    """

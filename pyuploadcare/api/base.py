@@ -101,7 +101,7 @@ class API:
     def _delete_with_response(
         self, resource_uuid: Union[UUID, str, UUIDEntity] = None
     ) -> Dict[str, Any]:
-        url = self._build_url(resource_uuid)
+        url = self._build_url(resource_uuid, suffix="storage")
         document = self._client.delete(url)
         return document.json()
 
@@ -164,13 +164,18 @@ class RetrieveMixin(APIProtocol):
     def retrieve(
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        include_appdata: bool = False,
     ):
         response_class = self._get_response_class("retrieve")
 
         if isinstance(resource_uuid, UUIDEntity):
             resource_uuid = resource_uuid.uuid
 
-        json_response = self._get(resource_uuid)
+        query_params = {}
+        if include_appdata:
+            query_params["include"] = "appdata"
+
+        json_response = self._get(resource_uuid, **query_params)
         return self._parse_response(json_response, response_class)
 
 
