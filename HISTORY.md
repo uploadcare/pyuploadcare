@@ -6,53 +6,53 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.2.0...v4.0.0) - TBD
+## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.2.0...v4.0.0) - 2022-12-19
 
 ### Changed
 
-  - Use [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog)
-  - `video_info` and `audio_info` moved into corresponding 
-sections of `content_info` inside file info object
-  - files to upload must be opened in binary mode
+  - Now supports [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog).
+  - `video_info` and `audio_info` are moved into corresponding 
+sections of `content_info` inside file info object.
+  - Files to upload must be opened in a binary mode.
 
 ### Added
-  - metadata for files with API to setup and modify
-  - `appdata` inside `file_info`
-  - `addons` are introduced
-  - possibility to delete a Group
+
+  - Arbitary metadata creation and edition.
+  - `appdata` inside `file_info`.
+  - `addons` are introduced.
+  - Ability to delete a Group.
 
 ### Fixed
-  - limit for batch operation set to 100 [(doc)](https://uploadcare.com/api-refs/rest-api/v0.7.0/#operation/filesStoring)
-  - iterating over long collections in batch operation
-  - Akamai signed URL generation
 
+  - Limit for batch operation is set to 100 [(doc)](https://uploadcare.com/api-refs/rest-api/v0.7.0/#operation/filesStoring).
+  - Iterating over long collections in batch operation.
+  - Akamai signed URL generation.
 
-## [3.2.0](https://github.com/uploadcare/pyuploadcare/compare/v3.1.0...v3.2.0) - TBD
-
+## [3.2.0](https://github.com/uploadcare/pyuploadcare/compare/v3.1.0...v3.2.0) - 2022-12-19
 
 ### Changed
 
-  - freeze `httpx` dependency for py37+ (`=0.23.0`) to prevent breaking changes in processing files opened in text mode
+  - Freezed `httpx` dependency for py37+ (`=0.23.0`) to prevent breaking changes in processing files opened in the text mode.
 
 ### Fixed
 
-  - Akamai signed URL generation
+  - Akamai signed URL generation.
   
 ## [3.1.0](https://github.com/uploadcare/pyuploadcare/compare/v3.0.1...v3.1.0) - 2022-10-24
 
 ### Changed
 
-  - Bumped `httpx` dependency for py37+
-  - Add `follow_redirects` argument for Client request method
-  - Using `allow_redirects` argument is allowed, but will cause a deprecating warning
-  - Bumped `black` dependency
+  - Bumped `httpx` dependency for py37+.
+  - Add `follow_redirects` argument for Client request method.
+  - Using `allow_redirects` argument is allowed, but will cause a deprecating warning.
+  - Bumped `black` dependency.
 
 ## [3.0.1](https://github.com/uploadcare/pyuploadcare/compare/v3.0.0...v3.0.1) - 2022-10-06
 
 ### Changed
 
-  - Bumped `pytz` dependency
-  - Bumped `typing-extensions` for py37+
+  - Bumped `pytz` dependency.
+  - Bumped `typing-extensions` for py37+.
 
 ## [3.0.0](https://github.com/uploadcare/pyuploadcare/compare/v2.7.0...v3.0.0) - 2021-11-01
 
