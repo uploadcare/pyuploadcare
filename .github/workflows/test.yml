@@ -39,10 +39,14 @@ jobs:
   functional:
     needs: lint
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        os: [ubuntu-latest]
+        python-version: ['3.7', '3.8', '3.9', '3.10']
+        include:
+          - os: ubuntu-20.04
+            python-version: '3.6'
 
     steps:
     - uses: actions/checkout@v2
@@ -65,14 +69,28 @@ jobs:
 
   django:
     needs: functional
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         # https://docs.djangoproject.com/en/3.2/faq/install/#what-python-version-can-i-use-with-django
         # this is a bit excessive, probably should run only before
         #   releasing new version
+        os: [ubuntu-20.04, ubuntu-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
         django-version: [2.2, 3.0, 3.1, 3.2]
+        exclude:
+          # because py3.6 was removed from ubuntu22.04 and higher
+          - python-version: 3.6
+            os: ubuntu-latest
+
+          # still use ubuntu-latest for supported python versions
+          - python-version: 3.7
+            os: ubuntu-20.04
+          - python-version: 3.8
+            os: ubuntu-20.04
+          - python-version: 3.9
+            os: ubuntu-20.04
+
         include:
           # EOL django versions
           - python-version: 3.6
