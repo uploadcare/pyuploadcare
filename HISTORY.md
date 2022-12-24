@@ -8,19 +8,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.2.0...v4.0.0) - 2022-12-19
 
-### Changed
 
-  - Now supports [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog).
-  - `video_info` and `audio_info` are moved into corresponding 
-sections of `content_info` inside file info object.
+
+### Breaking Сhanges
+
+- Now uses [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog).
+- For `File.info`
+  - File information doesn't return `image_info` and `video_info` fields anymore,
+  they were moved into field `content_info` that includes mime-type, image (dimensions, format, etc), video information (duration, format, bitrate, etc), audio information, etc 
+  - Removed `rekognition_info` in favor of `appdata`
+- For `file_list` method of `FileList`
+  - Removed the option of sorting the file list by file size
+- For `File`
+  - Removed method `copy` in favor of `local_copy` and `remote_copy` methods
   - Files to upload must be opened in a binary mode.
 
 ### Added
 
-  - Arbitary metadata creation and edition.
-  - `appdata` inside `file_info`.
-  - `addons` are introduced.
-  - Ability to delete a Group.
+- For `File.info`
+  - Field `metadata` that includes arbitrary metadata associated with a file
+  - Field `appdata` that includes dictionary of application names and data associated with these applications
+- Add Uploadcare API interfaces for `Uploadcare`:
+    - `MetadataAPI`
+    - `AddonsAPI`
+- Added an option to delete a Group
 
 ### Fixed
 

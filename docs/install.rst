@@ -99,3 +99,11 @@ A version 3.0 contains the next breaking changes:
 * ``pyuploadcare.conf`` package still can be used for configuration, but it is more preferable to pass
   configuration options to ``Uploadcare`` client on initialization. ``pyuploadcare.conf`` provides
   default values for the client.
+
+
+Update to version 4.0
+---------------------
+
+A version 4.0 contains the next breaking changes:
+
+*
