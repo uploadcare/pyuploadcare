@@ -104,6 +104,14 @@ A version 3.0 contains the next breaking changes:
 Update to version 4.0
 ---------------------
 
-A version 4.0 contains the next breaking changes:
+A version 4.0 uses REST API 0.7 and contains the next breaking changes:
 
-*
+* For ``File.info``:
+  * File information doesn't return ``image_info`` and ``video_info`` fields anymore,
+  they were moved into field ``content_info`` that includes mime-type, image (dimensions, format, etc), video information (duration, format, bitrate, etc), audio information, etc.
+  * Removed ``rekognition_info`` in favor of ``appdata``.
+* For ``file_list`` method of ``FileList``:
+  * Removed the option of sorting the file list by file size.
+* For ``File``:
+  * Removed method ``copy`` in favor of ``local_copy`` and ``remote_copy`` methods.
+  * Files to upload must be opened in a binary mode.
