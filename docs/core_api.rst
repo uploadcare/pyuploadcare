@@ -17,7 +17,7 @@ Uploading files
 Upload single file. ``File.upload`` method can accept file object or URL. Depending of file object size
 direct or multipart upload method will be chosen::
 
-    with open('file.txt') as file_object:
+    with open('file.txt', 'rb') as file_object:
         ucare_file: File = uploadcare.upload(file_object)
 
 
@@ -27,13 +27,13 @@ Upload file from url::
 
 Upload multiple files. Direct upload method is used::
 
-    file1 = open('file1.txt')
-    file2 = open('file2.txt')
+    file1 = open('file1.txt', 'rb')
+    file2 = open('file2.txt', 'rb')
     ucare_files: List[File] = uploadcare.upload_files([file1, file2])
 
 Send single file via multipart upload::
 
-    with open('file.txt') as file_object:
+    with open('file.txt', 'rb') as file_object:
         ucare_file: File = uploadcare.upload(file_object)
 
 ``Uploadcare.upload`` method accepts optional callback function to track uploading progress.
@@ -193,6 +193,99 @@ or by image transformation builder::
     >>> file_.cdn_url
     https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/grayscale/-/flip/
 
+Using addons
+---------------------
+
+To perform operation provided by addon you need to select the file and to set parameters of execution.
+Parameters are always specified by particular addon.
+For example, AWS Rekognition addon has no params to setup::
+
+    from pyuploadcare.api.addon_entities import AddonRemoveBGExecutionParams
+    remove_bg_params = AddonRemoveBGExecutionParams(
+        crop=True,
+        crop_margin="20px",
+        scale="15%"
+    )
+
+    from pyuploadcare.api.addon_entities import AddonClamAVExecutionParams
+    clamav_params = AddonClamAVExecutionParams(purge_infected=True)
+
+
+To execute addon call an API `execute` method with the file and parameters::
+
+    target_file = uploadcare.file("59fccca5-3af7-462f-905b-ed7de83b9762")
+    # params - from previous step
+    remove_bg_result = uploadcare.addons_api.execute(
+        target_file,
+        AddonLabels.REMOVE_BG,
+        remove_bg_params,
+    )
+
+    aws_recognition_result = uploadcare.addons_api.execute(
+        target_file,
+        AddonLabels.AWS_LABEL_RECOGNITION,
+    )
+
+    clamav_result = uploadcare.addons_api.execute(
+        target_file,
+        AddonLabels.CLAM_AV,
+        clamav_params,
+    )
+
+Each of these `*_result` objects contains not the result of operation itself, but `request_id` of invoked task, so we can check the state of execution.
+To check status of performed task use `status` method::
+
+    addon_task_status = uploadcare.addons_api.status(request_id, addon)
+
+If addon execution produces new data for file (like an AWS recognition does), this data will be placed at `appdata` complex attribute of `File.info` (see `addons documentation`_)
+
+
+File metadata
+-----------------
+
+You can store some additional information for a file (`metadata documentation`_). Access is organized in key-value manner.
+Metadata may be initially set while uploading::
+
+    custom_metadata = {
+        "specific_key_1": "some_value_1",
+        "specific_key_2": "constant_for_this_planet",
+    }
+    with open('file.txt', 'rb') as file_object:
+        ucare_file: File = uploadcare.upload(file_object, metadata=custom_metadata)
+
+While uploading multiple files at once you can set common metadata that will be applied for every file in collection::
+
+    file1 = open('file1.txt', 'rb')
+    file2 = open('file2.txt', 'rb')
+    ucare_files: List[File] = uploadcare.upload_files(
+        [file1, file2],
+        common_metadata=custom_metadata,
+    )
+    # don't forget to close the files, of course
+
+Value may be set by key::
+
+    md_key, md_value = "new_key_for_filemeta", "obvious_value"
+    uploadcare.metadata_api.update_or_create_key(file_id, md_key, md_value)
+
+
+Value may be deleted by key::
+
+    uploadcare.metadata_api.delete_key(file_id, mkey=md_key)
+
+Value may be retrieved by key::
+
+    meta_value = uploadcare.metadata_api.get_key(file_id, mkey=md_key)
+
+Or the whole metadata may be got at once::
+
+    file_metadata = uploadcare.metadata_api.get_all_metadata(file_id, mkey=md_key)
+
+But you should better use a special attribute of `File.info`::
+
+    file_metadata = file.info.metadata
+
+
 Create file group
 -----------------
 
@@ -203,7 +296,7 @@ Create file group::
     file_group: FileGroup = uploadcare.create_file_group([file_1, file_2])
 
 
-Retreive file group
+Retrieve file group
 -------------------
 
 Get file group::
@@ -227,6 +320,14 @@ List file groups::
     file_groups: List[FileGroup] = uploadcare.list_file_groups(limit=10)
     for file_group in file_groups:
         print(file_group.info)
+
+Delete file groups
+----------------
+
+Delete file groups::
+
+    file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+    file_group.delete()
 
 
 Create webhook
@@ -316,4 +417,6 @@ Useful links
 .. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
 .. _Django app example: https://github.com/uploadcare/pyuploadcare-example
 .. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
+.. _addons documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Add-Ons
+.. _metadata documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-metadata
 .. _file uploader: https://uploadcare.com/products/file-uploader/?utm_source=github&utm_campaign=pyuploadcare

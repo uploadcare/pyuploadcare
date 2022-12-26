@@ -29,15 +29,13 @@ permissions, ensuring servers never go down, and enabling CDN.
 This library consists of the Uploadcare API interface and a couple of Django
 goodies.
 
-Simple as that, Uploadcare ``ImageField`` can be added to an
+Simple as that, Uploadcare `ImageField` can be added to an
 existing Django project in just a couple of [simple steps](https://pyuploadcare.readthedocs.org/en/latest/quickstart.html).
 This will enable your users to see the upload progress, pick files
 from Google Drive or Instagram, and edit a form while files are
 being uploaded asynchronously.
 
-You can find an example project [here](<https://github.com/uploadcare/pyuploadcare-example>)`.
-
-[id]: http://b.org/ "title"
+You can find an example project [here](https://github.com/uploadcare/pyuploadcare-example).
 
 ```python
 
@@ -65,11 +63,9 @@ You can find an example project [here](<https://github.com/uploadcare/pyuploadca
 
 ## Documentation
 
-Detailed documentation is available [on RTD](<https://pyuploadcare.readthedocs.io/en/latest/>).
-
+Detailed documentation is available [on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
 
 ## Feedback
-
 
 Issues and PRs are welcome. You can provide your feedback or drop us a support
 request at [hello@uploadcare.com](hello@uploadcare.com).

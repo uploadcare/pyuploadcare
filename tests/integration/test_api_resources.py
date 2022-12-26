@@ -318,7 +318,7 @@ def image_file(uploadcare):
 
 
 def test_local_copy(image_file):
-    file = image_file.copy(effects="resize/50x/")
+    file = image_file.create_local_copy(effects="resize/50x/")
     assert isinstance(file, File)
 
 

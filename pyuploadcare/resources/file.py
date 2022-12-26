@@ -291,37 +291,6 @@ class File:
         """
         self._info_cache = self._client.files_api.store(self.uuid).dict()
 
-    def copy(
-        self,
-        effects: Optional[Union[str, ImageTransformation]] = None,
-        target=None,
-    ):
-        """Creates a File Copy on Uploadcare or Custom Storage.
-
-        File.copy method is deprecated and will be removed in 4.0.0.
-        Please use `create_local_copy` and `create_remote_copy` instead.
-
-        Args:
-            - effects:
-                Adds CDN image effects. If ``self.default_effects`` property
-                is set effects will be combined with default effects.
-            - target:
-                Name of a custom storage connected to your project.
-                Uploadcare storage is used if target is absent.
-
-        """
-        warning = """File.copy method is deprecated and will be
-            removed in 4.0.0.
-            Please use `create_local_copy`
-            and `create_remote_copy` instead.
-        """
-        logger.warning(f"API Warning: {warning}")
-
-        if target is not None:
-            return self.create_remote_copy(target, effects)
-        else:
-            return self.create_local_copy(effects)
-
     def create_local_copy(
         self,
         effects: Optional[Union[str, ImageTransformation]] = None,
