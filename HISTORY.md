@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Now uses [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog).
 
-### Breaking Сhanges
+### Breaking changes
 
 - For `File.info`:
   - File information doesn't return `image_info` and `video_info` fields anymore,
