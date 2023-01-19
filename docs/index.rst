@@ -47,7 +47,7 @@ Features
 ========
 
 - Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
-- Django `widget`_` with useful manual crop and multi-upload.
+- Django `widget`_ with useful manual crop and multi-upload.
 - *ucare* console utility.
 
 Requirements
@@ -70,8 +70,7 @@ Contents
    install
    quickstart
    django-widget
-   cli
-   core_usage
+   core_api
    testing
    security_issues
    feedback
