@@ -53,7 +53,7 @@ Features
 Requirements
 ============
 
-``pyuploadcare`` requires Python 3.6, 3.7, 3.8, 3.9, 3.10
+``pyuploadcare`` requires Python 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
 
 To use ``pyuploadcare`` with Python 2.7 please install ``pyuploadcare < 3.0``.
 
