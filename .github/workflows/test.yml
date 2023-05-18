@@ -3,14 +3,8 @@
 
 name: Tests
 on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - 'main'
-    - 'feature/**'
-    - 'version-3.x/**'
+  - push
+  - pull_request
 
 jobs:
   lint:
