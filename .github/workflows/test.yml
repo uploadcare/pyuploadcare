@@ -61,6 +61,34 @@ jobs:
       run: |
         make test-functional
 
+  functional-legacy-py:
+    needs: lint
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        python-version: ['3.6']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.1.15
+        virtualenvs-create: true
+        virtualenvs-in-project: false
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Test with pytest
+      run: |
+        make test-functional
+
   django:
     needs: functional
     runs-on: ubuntu-latest
@@ -103,7 +131,7 @@ jobs:
         make test-django
 
   django-legacy-py:
-    needs: functional
+    needs: functional-legacy-py
     runs-on: ubuntu-20.04
     strategy:
       matrix:
