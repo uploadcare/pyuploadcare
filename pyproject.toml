@@ -54,6 +54,10 @@ flake8 = "^3.9.2"
 mypy = "^0.910"
 flake8-print = "^4.0.0"
 pytest-vcr = "^1.0.2"
+yarl = [
+    {version = "^1.7.2", python = ">=3.6,<3.7"},
+    {version = "^1.9.2", python = "^3.7"}
+]
 Django = "^3.2.7"
 pytest-cov = "^2.12.1"
 python-coveralls = "^2.9.3"
