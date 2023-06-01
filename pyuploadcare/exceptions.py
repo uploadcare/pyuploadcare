@@ -59,6 +59,16 @@ class UploadError(UploadcareException):
     """
 
 
+class FileAlreadyUploaded(UploadError):
+    """Raised within UploadAPI.upload_from_url if check_duplicates is True and file was already been uploaded before)"""
+
+    file_id: str
+
+    def __init__(self, message: str, file_id: str) -> None:
+        super().__init__(message)
+        self.file_id = file_id
+
+
 class DefaultResponseClassNotDefined(Exception):
     def __init__(self) -> None:
         super().__init__("Need define default response class for API.")

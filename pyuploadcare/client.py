@@ -28,7 +28,7 @@ from pyuploadcare.api import (
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook
-from pyuploadcare.exceptions import InvalidParamError
+from pyuploadcare.exceptions import FileAlreadyUploaded, InvalidParamError
 from pyuploadcare.helpers import (
     extracts_uuids,
     get_file_size,
@@ -451,7 +451,13 @@ class Uploadcare:
         return self.file(file_info["uuid"], file_info)
 
     def upload_from_url(
-        self, url, store=None, filename=None, metadata=None
+        self,
+        url,
+        store=None,
+        filename=None,
+        metadata=None,
+        check_duplicates: Optional[bool] = None,
+        save_duplicates: Optional[bool] = None,
     ) -> FileFromUrl:
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
@@ -466,6 +472,11 @@ class Uploadcare:
             - filename (Optional[str]): Name of the uploaded file. If this not
                 specified the filename will be obtained from response headers
                 or source URL. Defaults to None.
+            - check_duplicates (Optional[bool]): Enables duplicate uploads
+                prevention. If a file with the same source URL has been
+                previously uploaded this method will raise FileAlreadyUploaded.
+            - save_duplicates (Optional[bool]): Indicates if the URL should be
+                stored by Uploadcare future check_duplicates usages.
 
         Returns:
             ``FileFromUrl`` instance
@@ -485,6 +496,8 @@ class Uploadcare:
             metadata=metadata,
             secure_upload=self.signed_uploads,
             expire=self.signed_uploads_ttl,
+            check_duplicates=check_duplicates,
+            save_duplicates=save_duplicates,
         )
         file_from_url = FileFromUrl(token, self)
         return file_from_url
@@ -499,6 +512,8 @@ class Uploadcare:
         store=None,
         filename=None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
+        check_duplicates: Optional[bool] = None,
+        save_duplicates: Optional[bool] = None,
     ) -> File:
         """Uploads file from given url and returns ``File`` instance.
 
@@ -521,6 +536,12 @@ class Uploadcare:
                 available via CDN. Defaults to False.
             - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
+            - check_duplicates (Optional[bool]): Enables duplicate uploads
+                prevention. If a file with the same source URL has been
+                previously uploaded this method will return the previously
+                uploaded file.
+            - save_duplicates (Optional[bool]): Indicates if the URL should be
+                stored by Uploadcare future check_duplicates usages.
 
         Returns:
             ``File`` instance
@@ -529,13 +550,23 @@ class Uploadcare:
             ``TimeoutError`` if file wasn't uploaded in time
 
         """
-        ffu = self.upload_from_url(url, store, filename, metadata=metadata)
-        return ffu.wait(
-            timeout=timeout,
-            interval=interval,
-            until_ready=until_ready,
-            callback=callback,
-        )
+        try:
+            ffu = self.upload_from_url(
+                url,
+                store,
+                filename,
+                metadata=metadata,
+                check_duplicates=check_duplicates,
+                save_duplicates=save_duplicates,
+            )
+            return ffu.wait(
+                timeout=timeout,
+                interval=interval,
+                until_ready=until_ready,
+                callback=callback,
+            )
+        except FileAlreadyUploaded as e:
+            return self.file(e.file_id)
 
     def _extract_uuids(
         self, files: Iterable[Union[str, File, UUID]]

@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import random
 import time
 from datetime import datetime
 from pathlib import Path
@@ -9,7 +10,11 @@ from uuid import UUID, uuid4
 import pytest
 
 from pyuploadcare import File, FileGroup, conf
-from pyuploadcare.exceptions import InvalidParamError, InvalidRequestError
+from pyuploadcare.exceptions import (
+    FileAlreadyUploaded,
+    InvalidParamError,
+    InvalidRequestError,
+)
 
 from .utils import create_file_group, upload_tmp_txt_file
 
@@ -127,6 +132,19 @@ def test_successful_upload_from_url_signed(uploadcare):
     assert isinstance(file_from_url.get_file(), File)
 
 
+def test_successful_upload_from_url_check_duplicates(uploadcare):
+    unique_suffix = random.randint(0, 1000000000)
+    url = f"{IMAGE_URL}?{unique_suffix}"
+    first_file = uploadcare.upload_from_url_sync(
+        url, check_duplicates=True, store=False, interval=1
+    )
+    assert isinstance(first_file, File)
+    with pytest.raises(FileAlreadyUploaded) as e:
+        uploadcare.upload_from_url(url, check_duplicates=True, store=False)
+        assert isinstance(e, FileAlreadyUploaded)
+        assert first_file.uuid == e.file_id
+
+
 def test_successful_upload_from_url_sync_autostore_signed(uploadcare):
     file = uploadcare.upload_from_url_sync(IMAGE_URL, interval=1)
     assert isinstance(file, File)
@@ -155,6 +173,51 @@ def test_successful_upload_from_url_sync_with_filename(uploadcare):
     )
     assert isinstance(file, File)
     assert file.filename == "meh.png"
+
+
+def test_successful_upload_from_url_sync_check_duplicates(uploadcare):
+    unique_suffix = random.randint(0, 1000000000)
+    url = f"{IMAGE_URL}?{unique_suffix}"
+    first_file = uploadcare.upload_from_url_sync(
+        url, check_duplicates=True, store=False, interval=1
+    )
+    second_file = uploadcare.upload_from_url_sync(
+        url, check_duplicates=True, store=False, interval=1
+    )
+    assert isinstance(first_file, File)
+    assert isinstance(second_file, File)
+    assert first_file.uuid == second_file.uuid
+
+
+def test_successful_upload_from_url_sync_save_duplicates(uploadcare):
+    unique_suffix = random.randint(0, 1000000000)
+    url = f"{IMAGE_URL}?{unique_suffix}"
+    first_file = uploadcare.upload_from_url_sync(
+        url,
+        check_duplicates=True,
+        save_duplicates=False,
+        store=False,
+        interval=1,
+    )
+    second_file = uploadcare.upload_from_url_sync(
+        url,
+        check_duplicates=True,
+        save_duplicates=True,
+        store=False,
+        interval=1,
+    )
+    third_file = uploadcare.upload_from_url_sync(
+        url,
+        check_duplicates=True,
+        save_duplicates=False,
+        store=False,
+        interval=1,
+    )
+    assert isinstance(first_file, File)
+    assert isinstance(second_file, File)
+    assert isinstance(third_file, File)
+    assert first_file.uuid != second_file.uuid
+    assert second_file.uuid == third_file.uuid
 
 
 @pytest.fixture(scope="module")

@@ -26,6 +26,7 @@ from pyuploadcare.api.base import (
 )
 from pyuploadcare.exceptions import (
     APIError,
+    FileAlreadyUploaded,
     InvalidRequestError,
     WebhookIsNotUnique,
 )
@@ -353,6 +354,8 @@ class UploadAPI(API):
         metadata: Optional[Dict] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
+        check_duplicates: Optional[bool] = None,
+        save_duplicates: Optional[bool] = None,
     ) -> str:
         data = {
             "source_url": source_url,
@@ -378,10 +381,22 @@ class UploadAPI(API):
                 self.secret_key, expire  # type: ignore
             )
 
+        if check_duplicates is not None:
+            data["check_URL_duplicates"] = "1" if check_duplicates else "0"
+
+        if save_duplicates is not None:
+            data["save_URL_duplicates"] = "1" if save_duplicates else "0"
+
         url = self._build_url(base="/from_url")
         document = self._client.post(url, data=data)
         response = document.json()
         if "token" not in response:
+            if check_duplicates and response["type"] == "file_info":
+                file_id = response["file_id"]
+                raise FileAlreadyUploaded(
+                    f"The file is a duplicate of a previously uploaded file ({file_id})",
+                    file_id=file_id,
+                )
             raise APIError(f"could not find token in result: {response}")
         return response["token"]
 
