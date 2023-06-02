@@ -28,7 +28,7 @@ from pyuploadcare.api import (
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook
-from pyuploadcare.exceptions import FileAlreadyUploaded, InvalidParamError
+from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
     extracts_uuids,
     get_file_size,
@@ -474,7 +474,7 @@ class Uploadcare:
                 or source URL. Defaults to None.
             - check_duplicates (Optional[bool]): Enables duplicate uploads
                 prevention. If a file with the same source URL has been
-                previously uploaded this method will raise FileAlreadyUploaded.
+                previously uploaded this method will raise DuplicateFileError.
             - save_duplicates (Optional[bool]): Indicates if the URL should be
                 stored by Uploadcare future check_duplicates usages.
 
@@ -565,7 +565,7 @@ class Uploadcare:
                 until_ready=until_ready,
                 callback=callback,
             )
-        except FileAlreadyUploaded as e:
+        except DuplicateFileError as e:
             return self.file(e.file_id)
 
     def _extract_uuids(

@@ -26,7 +26,7 @@ from pyuploadcare.api.base import (
 )
 from pyuploadcare.exceptions import (
     APIError,
-    FileAlreadyUploaded,
+    DuplicateFileError,
     InvalidRequestError,
     WebhookIsNotUnique,
 )
@@ -393,7 +393,7 @@ class UploadAPI(API):
         if "token" not in response:
             if check_duplicates and response["type"] == "file_info":
                 file_id = response["file_id"]
-                raise FileAlreadyUploaded(
+                raise DuplicateFileError(
                     f"The file is a duplicate of a previously uploaded file ({file_id})",
                     file_id=file_id,
                 )

@@ -59,7 +59,7 @@ class UploadError(UploadcareException):
     """
 
 
-class FileAlreadyUploaded(UploadError):
+class DuplicateFileError(UploadError):
     """Raised within UploadAPI.upload_from_url if check_duplicates is True and file was already been uploaded before)"""
 
     file_id: str

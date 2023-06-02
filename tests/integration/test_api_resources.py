@@ -11,7 +11,7 @@ import pytest
 
 from pyuploadcare import File, FileGroup, conf
 from pyuploadcare.exceptions import (
-    FileAlreadyUploaded,
+    DuplicateFileError,
     InvalidParamError,
     InvalidRequestError,
 )
@@ -139,9 +139,9 @@ def test_successful_upload_from_url_check_duplicates(uploadcare):
         url, check_duplicates=True, store=False, interval=1
     )
     assert isinstance(first_file, File)
-    with pytest.raises(FileAlreadyUploaded) as e:
+    with pytest.raises(DuplicateFileError) as e:
         uploadcare.upload_from_url(url, check_duplicates=True, store=False)
-        assert isinstance(e, FileAlreadyUploaded)
+        assert isinstance(e, DuplicateFileError)
         assert first_file.uuid == e.file_id
 
 
