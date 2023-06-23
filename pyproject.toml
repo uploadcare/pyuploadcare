@@ -15,6 +15,7 @@ classifiers = [
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'License :: OSI Approved :: MIT License',
 ]
 
@@ -54,7 +55,15 @@ flake8 = "^3.9.2"
 mypy = "^0.910"
 flake8-print = "^4.0.0"
 pytest-vcr = "^1.0.2"
+yarl = [
+    {version = "^1.7.2", python = ">=3.6,<3.7"},
+    {version = "^1.9.2", python = "^3.7"}
+]
 Django = "^3.2.7"
+coverage = [
+    {version = "^6.2", python = ">=3.6,<3.7"},
+    {version = "^7.2.5", python = "^3.7"}
+]
 pytest-cov = "^2.12.1"
 python-coveralls = "^2.9.3"
 tox-pyenv = "^1.1.0"
