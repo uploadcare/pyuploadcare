@@ -346,7 +346,7 @@ class UploadAPI(API):
         document = self._client.post(url, data=data)
         return document.json()
 
-    def upload_from_url(
+    def upload_from_url(  # noqa: max-complexity: 8
         self,
         source_url,
         store="auto",
