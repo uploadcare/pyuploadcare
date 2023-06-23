@@ -6,6 +6,20 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.x] - unreleased
+
+### Added
+
+- For `Uploadcare` and `UploadAPI`:
+  - `upload_from_url` and `upload_from_url_sync` can now accept two new optional parameters: `check_duplicates` and `save_duplicates`. These correspond to `check_URL_duplicates` and `save_URL_duplicates` for [`/from_url/` upload API endpoint](https://uploadcare.com/api-refs/upload-api/#tag/Upload/operation/fromURLUpload) respectively.
+
+### Changed
+
+- Bumped `yarl` dev dependency for py37+.
+- Bumped `coverage` dev dependency for py37+.
+- Tests are now run against Python 3.11 and 3.12 (alpha) as well. The minimum supported version of Python remains 3.6.
+- Tests are now run against Django 4.0, 4.1 and 4.2 as well. The minimum supported version of Django remains 1.11.
+
 ## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.2.0...v4.0.0) - 2022-12-26
 
 Now uses [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog).
