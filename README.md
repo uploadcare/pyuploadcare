@@ -11,11 +11,21 @@
 </table>
 
 <p>
-  <img src="https://badge.fury.io/py/pyuploadcare.svg" height="25" />
-  <img src="https://github.com/uploadcare/pyuploadcare/actions/workflows/test.yml/badge.svg" height="25" /> 
-  <img src="https://readthedocs.org/projects/pyuploadcare/badge/?version=latest" height="25" />
-  <img src="https://coveralls.io/repos/github/uploadcare/pyuploadcare/badge.svg?branch=master" height="25" />
-  <img src="https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" height="25" />
+  <a href="https://pypi.org/project/pyuploadcare/">
+    <img src="https://badge.fury.io/py/pyuploadcare.svg" height="25" />
+  </a>
+  <a href="https://github.com/uploadcare/pyuploadcare/actions?query=branch%3Amain+workflow%3ATests++">
+    <img src="https://github.com/uploadcare/pyuploadcare/actions/workflows/test.yml/badge.svg" height="25" />
+  </a>
+  <a href="https://pyuploadcare.readthedocs.io/">
+    <img src="https://readthedocs.org/projects/pyuploadcare/badge/?version=latest" height="25" />
+  </a>
+  <a href="https://coveralls.io/github/uploadcare/pyuploadcare">
+    <img src="https://coveralls.io/repos/github/uploadcare/pyuploadcare/badge.svg?branch=master" height="25" />
+  </a>
+  <a href="https://stackshare.io/uploadcare">
+    <img src="https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" height="25" />
+  </a>
 </p>
 
 Uploadcare Python & Django integrations handle uploads and further operations
