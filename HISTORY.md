@@ -15,6 +15,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Bumped `httpx` dependency for py37+.
 - Bumped `yarl` dev dependency for py37+.
 - Bumped `coverage` dev dependency for py37+.
 - Tests are now run against Python 3.11 and 3.12 (alpha) as well. The minimum supported version of Python remains 3.6.
