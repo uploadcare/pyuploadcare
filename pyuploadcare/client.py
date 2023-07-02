@@ -622,6 +622,24 @@ class Uploadcare:
         for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
             self.files_api.batch_delete(chunk)
 
+    def delete_file_group_with_files(
+        self, group: Union[str, "FileGroup"]
+    ) -> None:
+        """Deletes file group and all its contents
+
+        Usage example::
+
+            >>> uploadcare = Uploadcare(public_key='<public-key>', secret_key='<secret-key>')
+            >>> uploadcare.delete_file_group_with_files("0513dda0-6666-447d-846f-096e5df9e2bb~2")
+
+        Args:
+            - group:
+                Group ID, CDN url or ``FileGroup`` instance.
+        """
+        if not isinstance(group, FileGroup):
+            group = self.file_group(group)
+        group.delete_with_files()
+
     def create_file_group(self, files: List[File]) -> FileGroup:
         """Creates file group and returns ``FileGroup`` instance.
 
