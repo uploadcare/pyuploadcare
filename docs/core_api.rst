@@ -329,6 +329,11 @@ Delete file groups::
     file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
     file_group.delete()
 
+Please note that when you delete a file group, it doesn't automatically delete the files within it.
+To delete a file group and all the files it contains, you can use the following method::
+
+    file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+    file_group.delete_with_files()
 
 Create webhook
 --------------
