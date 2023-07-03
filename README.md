@@ -20,6 +20,9 @@
   <a href="https://pyuploadcare.readthedocs.io/">
     <img src="https://readthedocs.org/projects/pyuploadcare/badge/?version=latest" height="25" />
   </a>
+  <a href="https://stackshare.io/uploadcare">
+    <img src="https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" height="25" />
+  </a>
 </p>
 
 Uploadcare Python & Django integrations handle uploads and further operations
