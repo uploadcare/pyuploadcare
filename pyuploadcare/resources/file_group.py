@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional
 
 import dateutil.parser
 
@@ -13,6 +13,7 @@ from pyuploadcare.resources.utils import (
 
 if TYPE_CHECKING:
     from pyuploadcare.client import Uploadcare
+    from pyuploadcare.resources.file import File
 
 
 GROUP_ID_REGEX = re.compile(
@@ -27,7 +28,7 @@ GROUP_ID_REGEX = re.compile(
 )
 
 
-class FileGroup:
+class FileGroup(Iterable):
     """File Group resource for working with user-uploaded group of files.
 
     It can take group id or group CDN url::
@@ -91,6 +92,12 @@ class FileGroup:
             file_info = self.info["files"][key]
             if file_info is not None:
                 return self._client.file(file_info["uuid"], file_info)
+
+    def __iter__(self) -> Iterator["File"]:
+        for i in range(len(self)):
+            file_ = self[i]
+            if file_:
+                yield file_
 
     @property
     def cdn_url(self):
