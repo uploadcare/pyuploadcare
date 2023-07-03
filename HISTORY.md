@@ -12,10 +12,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - For `Uploadcare` and `UploadAPI`:
   - `upload_from_url` and `upload_from_url_sync` can now accept two new optional parameters: `check_duplicates` and `save_duplicates`. These correspond to `check_URL_duplicates` and `save_URL_duplicates` for [`/from_url/` upload API endpoint](https://uploadcare.com/api-refs/upload-api/#tag/Upload/operation/fromURLUpload) respectively.
-- For `Uploadcare`:
-  - `delete_file_group_with_files` method that not only deletes a file group but also deletes all the files within that group.
 - For `FileGroup`:
-  - `delete_with_files` method that not only deletes a file group, but also deletes all files in that group.
+  - The `delete` method now includes an optional `delete_files` argument, which indicates whether the files within the specified group should also be deleted.
 
 ### Changed
 

@@ -213,22 +213,19 @@ class FileGroup:
         """
         return self._is_deleted
 
-    def delete(self):
+    def delete(self, delete_files: bool = False):
         """Delete group itself, left files unchanged
 
         Added in API v. 0.7.0
+
+        Args:
+            - ``delete_files`` -- ``True`` do also delete files in this group.
         """
         if self._is_deleted:
             return
 
+        if delete_files:
+            self._client.delete_files(file_ for file_ in self)
+
         self._client.groups_api.delete(self.id)
         self._is_deleted = True
-
-    def delete_with_files(self):
-        """Delete group with all files in it.
-
-        Helper method, uses delete method added in API v. 0.7.0
-        """
-        self._client.delete_files(file_ for file_ in self)
-        self.update_info()
-        self.delete()

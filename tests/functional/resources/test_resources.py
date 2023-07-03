@@ -264,7 +264,7 @@ def test_delete_file_group_with_files(uploadcare):
         file.update_info()
         assert not file.is_removed
 
-    uploadcare.delete_file_group_with_files(group)
+    group.delete(delete_files=True)
 
     assert group.is_deleted
     for file in group:
