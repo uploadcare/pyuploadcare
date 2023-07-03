@@ -191,6 +191,7 @@ def test_file_convert_document(uploadcare):
     assert not converted_file.is_ready
 
 
+@pytest.mark.vcr
 def test_file_info_has_new_structure(uploadcare):
     """
     Test new structure of response since API v0.7
