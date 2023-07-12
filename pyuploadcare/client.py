@@ -601,7 +601,7 @@ class Uploadcare:
         for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
             self.files_api.batch_store(chunk)
 
-    def delete_files(self, files: Iterable[Union[str, "File"]]) -> None:
+    def delete_files(self, files: Iterable[Union[str, UUID, "File"]]) -> None:
         """Deletes multiple files by requesting Uploadcare API.
 
         Usage example::
@@ -666,7 +666,7 @@ class Uploadcare:
 
         Returns ``FileList`` instance providing iteration over all uploaded files.
 
-        Args:m
+        Args:
             - ``starting_point`` -- a starting point for filtering files.
               It is reflects a ``from`` parameter from REST API.
             - ``ordering`` -- a string with name of the field what must be used

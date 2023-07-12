@@ -1,5 +1,6 @@
 pyuploadcare.egg-info/
 temp.db
+uploadcare.ini
 build/
 dist/
 docs/_build

@@ -258,6 +258,22 @@ def test_create_file_group(uploadcare):
 
 
 @pytest.mark.vcr
+def test_delete_file_group_with_files(uploadcare):
+    group = uploadcare.file_group("2e481e82-2e39-41be-a5a2-23802c6e341c~2")
+    assert not group.is_deleted
+    for file in group:
+        file.update_info()
+        assert not file.is_removed
+
+    group.delete(delete_files=True)
+
+    assert group.is_deleted
+    for file in group:
+        file.update_info()
+        assert file.is_removed
+
+
+@pytest.mark.vcr
 def test_get_file_group(uploadcare):
     group = uploadcare.file_group("d496a4df-0b36-4281-8156-268ae9524d4a~1")
     assert group.info

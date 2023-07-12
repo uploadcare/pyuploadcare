@@ -1,0 +1,372 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: GET
+    uri: https://api.uploadcare.com/groups/2e481e82-2e39-41be-a5a2-23802c6e341c~2/
+  response:
+    content: '{"id":"2e481e82-2e39-41be-a5a2-23802c6e341c~2","datetime_created":"2023-07-02T20:09:42.633709Z","files_count":2,"cdn_url":"https://ucarecdn.com/2e481e82-2e39-41be-a5a2-23802c6e341c~2/","url":"https://api.uploadcare.com/groups/2e481e82-2e39-41be-a5a2-23802c6e341c~2/","files":[{"datetime_removed":null,"datetime_stored":"2023-07-02T19:57:29.447127Z","datetime_uploaded":"2023-07-02T19:57:29.355309Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/twoofthem.jpg","original_filename":"two-of-them.jpg","size":37202,"url":"https://api.uploadcare.com/files/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/","uuid":"b47c1c0d-a47b-44ea-b185-9ca13d5758c1","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":[144,144],"width":640,"format":"JPEG","height":588,"sequence":false,"color_mode":"RGB","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"default_effects":""},{"datetime_removed":null,"datetime_stored":"2023-07-02T19:57:35.164770Z","datetime_uploaded":"2023-07-02T19:57:35.083237Z","is_image":true,"is_ready":true,"mime_type":"image/png","original_file_url":"https://ucarecdn.com/25671714-8642-4b02-9fbe-f5c35848c249/twentytwoofthem.png","original_filename":"twenty-two-of-them.png","size":368339,"url":"https://api.uploadcare.com/files/25671714-8642-4b02-9fbe-f5c35848c249/","uuid":"25671714-8642-4b02-9fbe-f5c35848c249","variations":null,"content_info":{"mime":{"mime":"image/png","type":"image","subtype":"png"},"image":{"dpi":null,"width":800,"format":"PNG","height":788,"sequence":false,"color_mode":"P","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"default_effects":""}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1778'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 02 Jul 2023 20:13:05 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - bd2324d6-08be-4a48-a9d8-8228ba68eca7
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: GET
+    uri: https://api.uploadcare.com/files/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2023-07-02T19:57:29.447127Z","datetime_uploaded":"2023-07-02T19:57:29.355309Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/twoofthem.jpg","original_filename":"two-of-them.jpg","size":37202,"url":"https://api.uploadcare.com/files/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/","uuid":"b47c1c0d-a47b-44ea-b185-9ca13d5758c1","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":[144,144],"width":640,"format":"JPEG","height":588,"sequence":false,"color_mode":"RGB","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '727'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 02 Jul 2023 20:13:05 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - e75e8808-f43d-4e0f-a20e-833278641335
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: GET
+    uri: https://api.uploadcare.com/files/25671714-8642-4b02-9fbe-f5c35848c249/
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2023-07-02T19:57:35.164770Z","datetime_uploaded":"2023-07-02T19:57:35.083237Z","is_image":true,"is_ready":true,"mime_type":"image/png","original_file_url":"https://ucarecdn.com/25671714-8642-4b02-9fbe-f5c35848c249/twentytwoofthem.png","original_filename":"twenty-two-of-them.png","size":368339,"url":"https://api.uploadcare.com/files/25671714-8642-4b02-9fbe-f5c35848c249/","uuid":"25671714-8642-4b02-9fbe-f5c35848c249","variations":null,"content_info":{"mime":{"mime":"image/png","type":"image","subtype":"png"},"image":{"dpi":null,"width":800,"format":"PNG","height":788,"sequence":false,"color_mode":"P","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '730'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 02 Jul 2023 20:13:05 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 3ea25c36-6882-4563-b9e2-0f3898eec7f6
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: '["b47c1c0d-a47b-44ea-b185-9ca13d5758c1", "25671714-8642-4b02-9fbe-f5c35848c249"]'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '80'
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: DELETE
+    uri: https://api.uploadcare.com/files/storage/
+  response:
+    content: '{"status":"ok","result":[{"datetime_removed":"2023-07-02T20:13:05.565949Z","datetime_stored":null,"datetime_uploaded":"2023-07-02T19:57:29.355309Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":null,"original_filename":"two-of-them.jpg","size":37202,"url":"https://api.uploadcare.com/files/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/","uuid":"b47c1c0d-a47b-44ea-b185-9ca13d5758c1","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":[144,144],"width":640,"format":"JPEG","height":588,"sequence":false,"color_mode":"RGB","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{}},{"datetime_removed":"2023-07-02T20:13:05.565949Z","datetime_stored":null,"datetime_uploaded":"2023-07-02T19:57:35.083237Z","is_image":true,"is_ready":true,"mime_type":"image/png","original_file_url":null,"original_filename":"twenty-two-of-them.png","size":368339,"url":"https://api.uploadcare.com/files/25671714-8642-4b02-9fbe-f5c35848c249/","uuid":"25671714-8642-4b02-9fbe-f5c35848c249","variations":null,"content_info":{"mime":{"mime":"image/png","type":"image","subtype":"png"},"image":{"dpi":null,"width":800,"format":"PNG","height":788,"sequence":false,"color_mode":"P","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{}}],"problems":{}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, OPTIONS, PUT
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1355'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 02 Jul 2023 20:13:05 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - a4a16944-ec81-4316-b2b2-0dc456fa7fcb
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: GET
+    uri: https://api.uploadcare.com/groups/2e481e82-2e39-41be-a5a2-23802c6e341c~2/
+  response:
+    content: '{"id":"2e481e82-2e39-41be-a5a2-23802c6e341c~2","datetime_created":"2023-07-02T20:09:42.633709Z","files_count":2,"cdn_url":"https://ucarecdn.com/2e481e82-2e39-41be-a5a2-23802c6e341c~2/","url":"https://api.uploadcare.com/groups/2e481e82-2e39-41be-a5a2-23802c6e341c~2/","files":[{"datetime_removed":"2023-07-02T20:13:05.565949Z","datetime_stored":null,"datetime_uploaded":"2023-07-02T19:57:29.355309Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":null,"original_filename":"two-of-them.jpg","size":37202,"url":"https://api.uploadcare.com/files/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/","uuid":"b47c1c0d-a47b-44ea-b185-9ca13d5758c1","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":[144,144],"width":640,"format":"JPEG","height":588,"sequence":false,"color_mode":"RGB","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"default_effects":""},{"datetime_removed":"2023-07-02T20:13:05.565949Z","datetime_stored":null,"datetime_uploaded":"2023-07-02T19:57:35.083237Z","is_image":true,"is_ready":true,"mime_type":"image/png","original_file_url":null,"original_filename":"twenty-two-of-them.png","size":368339,"url":"https://api.uploadcare.com/files/25671714-8642-4b02-9fbe-f5c35848c249/","uuid":"25671714-8642-4b02-9fbe-f5c35848c249","variations":null,"content_info":{"mime":{"mime":"image/png","type":"image","subtype":"png"},"image":{"dpi":null,"width":800,"format":"PNG","height":788,"sequence":false,"color_mode":"P","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"default_effects":""}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1634'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 02 Jul 2023 20:13:05 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - d763898c-ae27-4941-a3f0-858113f091ef
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: DELETE
+    uri: https://api.uploadcare.com/groups/2e481e82-2e39-41be-a5a2-23802c6e341c~2/
+  response:
+    content: ''
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Date:
+      - Sun, 02 Jul 2023 20:13:06 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 03d24558-a8e4-47ed-b622-768e0c9ae50b
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 204
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: GET
+    uri: https://api.uploadcare.com/files/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/
+  response:
+    content: '{"datetime_removed":"2023-07-02T20:13:05.565949Z","datetime_stored":null,"datetime_uploaded":"2023-07-02T19:57:29.355309Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":null,"original_filename":"two-of-them.jpg","size":37202,"url":"https://api.uploadcare.com/files/b47c1c0d-a47b-44ea-b185-9ca13d5758c1/","uuid":"b47c1c0d-a47b-44ea-b185-9ca13d5758c1","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":[144,144],"width":640,"format":"JPEG","height":588,"sequence":false,"color_mode":"RGB","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '658'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 02 Jul 2023 20:13:06 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - f2068b1f-2fce-48cc-8296-800d1eec7f59
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.0.0/d3d50ff74f71ea573419 (CPython/3.11.3)
+    method: GET
+    uri: https://api.uploadcare.com/files/25671714-8642-4b02-9fbe-f5c35848c249/
+  response:
+    content: '{"datetime_removed":"2023-07-02T20:13:05.565949Z","datetime_stored":null,"datetime_uploaded":"2023-07-02T19:57:35.083237Z","is_image":true,"is_ready":true,"mime_type":"image/png","original_file_url":null,"original_filename":"twenty-two-of-them.png","size":368339,"url":"https://api.uploadcare.com/files/25671714-8642-4b02-9fbe-f5c35848c249/","uuid":"25671714-8642-4b02-9fbe-f5c35848c249","variations":null,"content_info":{"mime":{"mime":"image/png","type":"image","subtype":"png"},"image":{"dpi":null,"width":800,"format":"PNG","height":788,"sequence":false,"color_mode":"P","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '655'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 02 Jul 2023 20:13:06 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 9ce95907-6429-4515-9aeb-cc72355b8f4b
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

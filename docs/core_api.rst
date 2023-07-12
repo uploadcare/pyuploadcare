@@ -329,6 +329,10 @@ Delete file groups::
     file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
     file_group.delete()
 
+To delete a file group and all the files it contains::
+
+    file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
+    file_group.delete(delete_files=True)
 
 Create webhook
 --------------

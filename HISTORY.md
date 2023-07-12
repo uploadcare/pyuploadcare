@@ -6,12 +6,14 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.x] - unreleased
+## Unreleased
 
 ### Added
 
 - For `Uploadcare` and `UploadAPI`:
   - `upload_from_url` and `upload_from_url_sync` can now accept two new optional parameters: `check_duplicates` and `save_duplicates`. These correspond to `check_URL_duplicates` and `save_URL_duplicates` for [`/from_url/` upload API endpoint](https://uploadcare.com/api-refs/upload-api/#tag/Upload/operation/fromURLUpload) respectively.
+- For `FileGroup`:
+  - The `delete` method now includes an optional `delete_files` argument, which indicates whether the files within the specified group should also be deleted.
 
 ### Changed
 
