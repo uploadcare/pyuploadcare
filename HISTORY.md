@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.1.0](https://github.com/uploadcare/pyuploadcare/compare/v4.0.0...v4.1.0) - 2023-07-17
+## [4.1.0](https://github.com/uploadcare/pyuploadcare/compare/v4.0.0...v4.1.0) - 2023-07-18
 
 ### Added
 
@@ -20,7 +20,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Bumped `httpx` dependency for py37+.
 - Bumped `yarl` dev dependency for py37+.
 - Bumped `coverage` dev dependency for py37+.
-- Tests are now run against Python 3.11 and 3.12 (alpha) as well. The minimum supported version of Python remains 3.6.
+- Tests are now run against Python 3.11 as well. The minimum supported version of Python remains 3.6.
 - Tests are now run against Django 4.0, 4.1 and 4.2 as well. The minimum supported version of Django remains 1.11.
 
 ## [4.0.0](https://github.com/uploadcare/pyuploadcare/compare/v3.2.0...v4.0.0) - 2022-12-26
