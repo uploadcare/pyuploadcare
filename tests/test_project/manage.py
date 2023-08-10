@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import os
+import sys
 
 from django.core import management
 
-import sys
+
 sys.path.append("..")
 
 
