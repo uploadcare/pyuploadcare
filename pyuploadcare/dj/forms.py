@@ -1,8 +1,12 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+from urllib.parse import urlparse
+
 from django.core.exceptions import ValidationError
 from django.forms import Field, TextInput
+from django.template.loader import render_to_string
+from django.templatetags.static import static
 
 from pyuploadcare.client import Uploadcare
 from pyuploadcare.dj import conf as dj_conf
@@ -10,7 +14,7 @@ from pyuploadcare.dj.client import get_uploadcare_client
 from pyuploadcare.exceptions import InvalidRequestError
 
 
-class FileWidget(TextInput):
+class LegacyFileWidget(TextInput):
     """Django form widget that sets up Uploadcare Widget.
 
     It adds js and hidden input with basic Widget's params, e.g.
@@ -45,6 +49,36 @@ class FileWidget(TextInput):
         return super(FileWidget, self).render(name, value, attrs, renderer)
 
 
+class FileWidget(TextInput):
+    _client: Uploadcare
+
+    def __init__(self, attrs=None):
+        self._client = get_uploadcare_client()
+        super(FileWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        uploadcare_js = dj_conf.uploadcare_js
+        uploadcare_css = dj_conf.uploadcare_css
+
+        # If assets are locally served, use STATIC_URL to prefix their URLs
+        if not urlparse(uploadcare_js).netloc:
+            uploadcare_js = static(uploadcare_js)
+        if not urlparse(uploadcare_css).netloc:
+            uploadcare_css = static(uploadcare_css)
+
+        return render_to_string(
+            "uploadcare/forms/widgets/file.html",
+            {
+                "name": name,
+                "value": value,
+                "pub_key": dj_conf.pub_key,
+                "variant": dj_conf.widget_build,
+                "uploadcare_js": uploadcare_js,
+                "uploadcare_css": uploadcare_css,
+            },
+        )
+
+
 class FileField(Field):
     """Django form field that uses ``FileWidget`` with default arguments.
 
@@ -52,7 +86,7 @@ class FileField(Field):
 
     """
 
-    widget = FileWidget
+    widget = LegacyFileWidget if dj_conf.legacy_widget else FileWidget
     _client: Uploadcare
 
     def __init__(self, *args, **kwargs):
@@ -71,7 +105,7 @@ class FileField(Field):
 
     def widget_attrs(self, widget):
         attrs = {}
-        if not self.required:
+        if dj_conf.legacy_widget and not self.required:
             attrs["data-clearable"] = ""
         return attrs
 

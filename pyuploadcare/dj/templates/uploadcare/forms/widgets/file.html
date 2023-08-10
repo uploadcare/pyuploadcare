@@ -1,0 +1,40 @@
+{% if value %}
+    <script>
+        window.addEventListener('DOMContentLoaded', (e) => {
+            const uploaderCtx = document.querySelector('#uploaderctx_{{ name }}');
+            uploaderCtx.addFileFromUuid("{{ value.uuid }}")
+        });
+    </script>
+{% endif %}
+
+<script type="module">
+    import * as LR from "{{ uploadcare_js }}";
+    LR.registerBlocks(LR);
+</script>
+
+<lr-config
+    ctx-name="{{ name }}"
+    pubkey="{{ pub_key }}"
+    multiple="false"
+>
+</lr-config>
+
+<lr-upload-ctx-provider
+    id="uploaderctx_{{ name }}"
+    ctx-name="{{ name }}"
+></lr-upload-ctx-provider>
+
+<lr-file-uploader-{{ variant }}
+    css-src="{{ uploadcare_css }}"
+    ctx-name="{{ name }}"
+></lr-file-uploader-{{ variant }}>
+
+<lr-data-output
+    ctx-name="{{ name }}"
+    use-console
+    use-input
+    use-event
+></lr-data-output>
+
+
+
