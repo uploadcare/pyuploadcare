@@ -15,7 +15,9 @@
 <lr-config
     ctx-name="{{ name }}"
     pubkey="{{ pub_key }}"
-    multiple="false"
+    {% for k, v in config.items %}
+        {{ k|escape }}="{{ v|escape }}"
+    {% endfor %}
 >
 </lr-config>
 
@@ -31,9 +33,7 @@
 
 <lr-data-output
     ctx-name="{{ name }}"
-    use-console
     use-input
-    use-event
 ></lr-data-output>
 
 

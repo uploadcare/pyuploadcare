@@ -21,12 +21,13 @@ class FormFieldsAttributesTest(unittest.TestCase):
         dj_conf.pub_key = self._pub_key
         dj_conf.secret = self._secret
 
-    def test_default_form_field(self):
+    def test_legacy_default_form_field(self):
         class SomeForm(forms.Form):
             cf = forms.CharField()
-            ff = uc_forms.FileField()
+            ff = uc_forms.FileField(widget=uc_forms.LegacyFileWidget)
 
         f = SomeForm(label_suffix="")
+        self.assertTrue(f["ff"].field.legacy_widget)
         self.assertRegex(
             str(f.media),
             r"https://ucarecdn\.com/libs/widget/[\d\.x]+/uploadcare\.full.min\.js",
@@ -34,6 +35,19 @@ class FormFieldsAttributesTest(unittest.TestCase):
         self.assertIn('role="uploadcare-uploader"', str(f["ff"]))
         self.assertIn('data-public-key="asdf"', str(f["ff"]))
         self.assertIn('type="hidden"', str(f["ff"]))
+
+    def test_default_form_field(self):
+        class SomeForm(forms.Form):
+            cf = forms.CharField()
+            ff = uc_forms.FileField()
+
+        f = SomeForm(label_suffix="")
+        self.assertFalse(f["ff"].field.legacy_widget)
+        ff_str = str(f["ff"])
+        self.assertIn("LR.registerBlocks(LR);", ff_str)
+        self.assertIn("<lr-config\n", ff_str)
+        self.assertIn('pubkey="asdf"', ff_str)
+        self.assertIn('ctx-name="ff"', ff_str)
 
     def test_form_field_custom_attrs(self):
         class SomeForm(forms.Form):

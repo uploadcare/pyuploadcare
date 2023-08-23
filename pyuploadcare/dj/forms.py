@@ -43,7 +43,7 @@ class LegacyFileWidget(TextInput):
         if attrs is not None:
             default_attrs.update(attrs)
 
-        super(FileWidget, self).__init__(default_attrs)
+        super(LegacyFileWidget, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None, renderer=None):
         return super(FileWidget, self).render(name, value, attrs, renderer)
@@ -57,6 +57,18 @@ class FileWidget(TextInput):
         super(FileWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None, renderer=None):
+        config = {
+            "multiple": False,
+        }
+        if attrs:
+            config.update(attrs)
+
+        # Convert True, False to "true", "false"
+        config = {
+            k: str(v).lower() if isinstance(v, bool) else v
+            for k, v in config.items()
+        }
+
         uploadcare_js = dj_conf.uploadcare_js
         uploadcare_css = dj_conf.uploadcare_css
 
@@ -71,6 +83,7 @@ class FileWidget(TextInput):
             {
                 "name": name,
                 "value": value,
+                "config": config,
                 "pub_key": dj_conf.pub_key,
                 "variant": dj_conf.widget_build,
                 "uploadcare_js": uploadcare_js,
@@ -103,9 +116,13 @@ class FileField(Field):
         except InvalidRequestError as exc:
             raise ValidationError(f"Invalid value for a field: {exc}")
 
+    @property
+    def legacy_widget(self) -> bool:
+        return isinstance(self.widget, LegacyFileWidget)
+
     def widget_attrs(self, widget):
         attrs = {}
-        if dj_conf.legacy_widget and not self.required:
+        if self.legacy_widget and not self.required:
             attrs["data-clearable"] = ""
         return attrs
 
@@ -119,8 +136,11 @@ class ImageField(FileField):
 
     def widget_attrs(self, widget):
         attrs = super(ImageField, self).widget_attrs(widget)
-        attrs["data-images-only"] = ""
-        if self.manual_crop is not None:
+        if self.legacy_widget:
+            attrs["data-images-only"] = ""
+        else:
+            attrs["imgOnly"] = True
+        if self.legacy_widget and self.manual_crop is not None:
             attrs["data-crop"] = self.manual_crop
         return attrs
 
@@ -128,7 +148,7 @@ class ImageField(FileField):
 class FileGroupField(Field):
     """Django form field that sets up ``FileWidget`` in multiupload mode."""
 
-    widget = FileWidget
+    widget = LegacyFileWidget if dj_conf.legacy_widget else FileWidget
 
     _client: Uploadcare
 
@@ -146,8 +166,15 @@ class FileGroupField(Field):
         except InvalidRequestError as exc:
             raise ValidationError(f"Invalid value for a field: {exc}")
 
+    @property
+    def legacy_widget(self) -> bool:
+        return isinstance(self.widget, LegacyFileWidget)
+
     def widget_attrs(self, widget):
-        attrs = {"data-multiple": ""}
+        if self.legacy_widget:
+            attrs = {"data-multiple": ""}
+        else:
+            attrs = {"multiple": True}
         if not self.required:
             attrs["data-clearable"] = ""
         return attrs
@@ -158,5 +185,8 @@ class ImageGroupField(FileGroupField):
 
     def widget_attrs(self, widget):
         attrs = super(ImageGroupField, self).widget_attrs(widget)
-        attrs["data-images-only"] = ""
+        if self.legacy_widget:
+            attrs["data-images-only"] = ""
+        else:
+            attrs["imgOnly"] = True
         return attrs

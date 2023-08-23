@@ -14,6 +14,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `widget_filename` renamed to `widget_filename_js`.
   - `hosted_url` renamed to `hosted_url_js`.
   - `local_url` renamed to `local_url_js`.
+- for `pyuploadcare.dj.forms`:
+  - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
 
 ## [4.1.0](https://github.com/uploadcare/pyuploadcare/compare/v4.0.0...v4.1.0) - 2023-07-18
 
