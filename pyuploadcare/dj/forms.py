@@ -46,7 +46,9 @@ class LegacyFileWidget(TextInput):
         super(LegacyFileWidget, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None, renderer=None):
-        return super(LegacyFileWidget, self).render(name, value, attrs, renderer)
+        return super(LegacyFileWidget, self).render(
+            name, value, attrs, renderer
+        )
 
 
 class FileWidget(TextInput):

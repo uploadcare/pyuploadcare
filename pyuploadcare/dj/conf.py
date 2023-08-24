@@ -32,19 +32,24 @@ use_hosted_assets = settings.UPLOADCARE.get("use_hosted_assets", True)
 
 legacy_widget_version = settings.UPLOADCARE.get("legacy_widget_version", "3.x")
 legacy_widget_build = settings.UPLOADCARE.get(
-    "legacy_widget_build", settings.UPLOADCARE.get("legacy_widget_variant", "full.min")
+    "legacy_widget_build",
+    settings.UPLOADCARE.get("legacy_widget_variant", "full.min"),
 )
-legacy_widget_filename = "uploadcare.{0}.js".format(legacy_widget_build).replace(
-    "..", "."
-)
+legacy_widget_filename = "uploadcare.{0}.js".format(
+    legacy_widget_build
+).replace("..", ".")
 legacy_hosted_url = (
     "https://ucarecdn.com/libs/widget/{version}/{filename}".format(
         version=legacy_widget_version, filename=legacy_widget_filename
     )
 )
 
-legacy_local_url = "uploadcare/{filename}".format(filename=legacy_widget_filename)
-legacy_uploadcare_js = legacy_hosted_url if use_hosted_assets else legacy_local_url  
+legacy_local_url = "uploadcare/{filename}".format(
+    filename=legacy_widget_filename
+)
+legacy_uploadcare_js = (
+    legacy_hosted_url if use_hosted_assets else legacy_local_url
+)
 
 if "legacy_widget_url" in settings.UPLOADCARE:
     legacy_uploadcare_js = settings.UPLOADCARE["legacy_widget_url"]
@@ -57,12 +62,10 @@ widget_build = settings.UPLOADCARE.get(
 )
 widget_filename_js = "blocks.min.js"
 widget_filename_css = "lr-file-uploader-{0}.min.css".format(widget_build)
-hosted_url_js_tpl = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}"
-hosted_url_js = hosted_url_js_tpl.format(
+hosted_url_js = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
     version=widget_version, filename=widget_filename_js
 )
-hosted_url_css_tpl = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}"
-hosted_url_css = hosted_url_css_tpl.format(
+hosted_url_css = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
     version=widget_version, filename=widget_filename_css
 )
 
