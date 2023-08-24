@@ -49,11 +49,11 @@ class FormFieldsAttributesTest(unittest.TestCase):
         self.assertIn('pubkey="asdf"', ff_str)
         self.assertIn('ctx-name="ff"', ff_str)
 
-    def test_form_field_custom_attrs(self):
+    def test_legacy_form_field_custom_attrs(self):
         class SomeForm(forms.Form):
             cf = forms.CharField()
             ff = uc_forms.FileField(
-                widget=uc_forms.FileWidget(attrs={"role": "role"})
+                widget=uc_forms.LegacyFileWidget(attrs={"role": "role"})
             )
 
         f = SomeForm(label_suffix="")

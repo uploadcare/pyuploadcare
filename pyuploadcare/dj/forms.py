@@ -26,7 +26,7 @@ class LegacyFileWidget(TextInput):
     is_hidden = False
 
     class Media:
-        js = (dj_conf.uploadcare_js,)
+        js = (dj_conf.legacy_uploadcare_js,)
 
     def __init__(self, attrs=None):
         default_attrs = {
@@ -46,7 +46,7 @@ class LegacyFileWidget(TextInput):
         super(LegacyFileWidget, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None, renderer=None):
-        return super(FileWidget, self).render(name, value, attrs, renderer)
+        return super(LegacyFileWidget, self).render(name, value, attrs, renderer)
 
 
 class FileWidget(TextInput):

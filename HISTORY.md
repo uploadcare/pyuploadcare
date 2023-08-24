@@ -10,10 +10,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Breaking changes
 
+- for Django settings (`UPLOADCARE = {...}`):
+  - `widget_version` renamed to `legacy_widget_version`
+  - `widget_build` renamed to `legacy_widget_build`
+  - `widget_variant` renamed to `legacy_widget_variant`
+  - `widget_url` renamed to `legacy_widget_url`
+  - `widget_variant` renamed to `legacy_widget_variant`
+  - `widget_variant` renamed to `legacy_widget_variant`
+  - `widget_variant` renamed to `legacy_widget_variant`
+  - `widget_variant` renamed to `legacy_widget_variant`
+  - `widget_variant` renamed to `legacy_widget_variant`
+
 - for `pyuploadcare.dj.conf`:
-  - `widget_filename` renamed to `widget_filename_js`.
-  - `hosted_url` renamed to `hosted_url_js`.
-  - `local_url` renamed to `local_url_js`.
+  - `widget_filename` renamed to `legacy_widget_filename`.
+  - `hosted_url` renamed to `legacy_hosted_url`.
+  - `local_url` renamed to `legacy_local_url`.
+  - `uploadcare_js` renamed to `legacy_uploadcare_js`
 - for `pyuploadcare.dj.forms`:
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
 
