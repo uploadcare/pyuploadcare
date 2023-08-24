@@ -1,7 +1,5 @@
 # coding: utf-8
 
-from typing import TypedDict
-
 from django import get_version as django_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -52,10 +50,12 @@ else:
     )
     widget_filename_js = "blocks.min.js"
     widget_filename_css = "lr-file-uploader-{0}.min.css".format(widget_build)
-    hosted_url_js = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
+    hosted_url_js_tpl = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}"
+    hosted_url_js = hosted_url_js_tpl.format(
         version=widget_version, filename=widget_filename_js
     )
-    hosted_url_css = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
+    hosted_url_css_tpl = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}"
+    hosted_url_css = hosted_url_css_tpl.format(
         version=widget_version, filename=widget_filename_css
     )
 
