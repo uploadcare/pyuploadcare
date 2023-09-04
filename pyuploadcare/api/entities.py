@@ -75,14 +75,14 @@ class VideoStreamInfo(Entity):
     height: Decimal
     width: Decimal
     frame_rate: float
-    bitrate: Decimal
-    codec: str
+    bitrate: Optional[Decimal]
+    codec: Optional[str]
 
 
 class VideoInfo(Entity):
-    duration: Decimal
+    duration: Optional[Decimal]
     format: str
-    bitrate: Decimal
+    bitrate: Optional[Decimal]
     audio: List[AudioStreamInfo]
     video: List[VideoStreamInfo]
 
