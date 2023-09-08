@@ -1,5 +1,6 @@
 import os
 import socket
+from time import time
 from typing import (
     IO,
     Any,
@@ -373,7 +374,7 @@ class Uploadcare:
             files=files,
             store=self._format_store(store),
             secure_upload=self.signed_uploads,
-            expire=self.signed_uploads_ttl,
+            expire=int(time()) + self.signed_uploads_ttl,
             common_metadata=common_metadata,
         )
         ucare_files = [self.file(response[file_name]) for file_name in files]
@@ -425,7 +426,7 @@ class Uploadcare:
             content_type=mime_type,
             store=self._format_store(store),
             secure_upload=self.signed_uploads,
-            expire=self.signed_uploads_ttl,
+            expire=int(time()) + self.signed_uploads_ttl,
             metadata=metadata,
         )
 
@@ -495,7 +496,7 @@ class Uploadcare:
             filename=filename,
             metadata=metadata,
             secure_upload=self.signed_uploads,
-            expire=self.signed_uploads_ttl,
+            expire=int(time()) + self.signed_uploads_ttl,
             check_duplicates=check_duplicates,
             save_duplicates=save_duplicates,
         )
@@ -647,7 +648,7 @@ class Uploadcare:
         group_info = self.upload_api.create_group(
             files=file_urls,
             secure_upload=self.signed_uploads,
-            expire=self.signed_uploads_ttl,
+            expire=int(time()) + self.signed_uploads_ttl,
         )
 
         group = self.file_group(group_info["id"], group_info)
