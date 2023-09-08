@@ -1,4 +1,6 @@
 import os
+from datetime import datetime, timedelta
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -132,6 +134,31 @@ def test_file_upload_multiple(small_file, small_file2, uploadcare):
                 for input_file in [small_file, small_file2]
             ]
         )
+
+
+@pytest.mark.freeze_time("2021-10-12")
+def test_file_upload_signature(small_file, uploadcare, signed_uploads):
+    assert uploadcare.signed_uploads
+    fake_response = MagicMock()
+    fake_response.json.return_value = {
+        "sample1.txt": "96e0a8f8-91f3-4162-907d-2d67d36ebae8"
+    }
+    with open(small_file.name, "rb") as fh:
+        with patch.object(
+            uploadcare.upload_api._client, "post", return_value=fake_response
+        ) as mocked_post:
+            uploadcare.upload(fh)
+
+    assert mocked_post.called
+    data = mocked_post.call_args[1]["data"]
+    expected_expire = datetime.now() + timedelta(
+        seconds=uploadcare.signed_uploads_ttl
+    )
+    assert data["expire"] == str(int(expected_expire.timestamp()))
+    assert (
+        data["signature"]
+        == "f7d27174ad85736b9a4ace81a3cf420b99b2ddc78415b00adfc0c326a39cb490"
+    )
 
 
 @pytest.mark.vcr
