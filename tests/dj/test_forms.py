@@ -65,6 +65,19 @@ class FormFieldsAttributesTest(unittest.TestCase):
         self.assertIn('data-public-key="asdf"', str(f["ff"]))
         self.assertIn('type="hidden"', str(f["ff"]))
 
+    def test_form_field_custom_attrs(self):
+        class SomeForm(forms.Form):
+            cf = forms.CharField()
+            ff = uc_forms.FileField(
+                widget=uc_forms.FileWidget(attrs={"source-list": "local"})
+            )
+
+        f = SomeForm(label_suffix="")
+        self.assertFalse(f["ff"].field.legacy_widget)
+        ff_str = str(f["ff"])
+        self.assertIn("LR.registerBlocks(LR);", ff_str)
+        self.assertIn('source-list="local"', ff_str)
+
 
 class FileFieldURLTest(unittest.TestCase):
     def test_returns_url_if_uuid_is_given(self):

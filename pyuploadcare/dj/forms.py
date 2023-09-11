@@ -62,6 +62,8 @@ class FileWidget(TextInput):
         config = {
             "multiple": False,
         }
+
+        config.update(self.attrs)
         if attrs:
             config.update(attrs)
 

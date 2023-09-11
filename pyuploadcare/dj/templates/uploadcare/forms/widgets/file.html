@@ -1,8 +1,17 @@
+<pre>{{ value }}</pre>
 {% if value %}
     <script>
         window.addEventListener('DOMContentLoaded', (e) => {
             const uploaderCtx = document.querySelector('#uploaderctx_{{ name }}');
-            uploaderCtx.addFileFromUuid("{{ value.uuid }}")
+            {% if config.multiple %}
+                {# FileGroup #}
+                {% for file in value %}
+                    uploaderCtx.addFileFromUuid("{{ file.uuid }}")
+                {% endfor %}
+            {% else %}
+                {# File #}
+                uploaderCtx.addFileFromUuid("{{ value.uuid }}")
+            {% endif %}
         });
     </script>
 {% endif %}
@@ -16,8 +25,7 @@
     ctx-name="{{ name }}"
     pubkey="{{ pub_key }}"
     {% for k, v in config.items %}
-        {{ k|escape }}="{{ v|escape }}"
-    {% endfor %}
+    {{ k|escape }}="{{ v|escape }}"{% endfor %}
 >
 </lr-config>
 
@@ -34,7 +42,5 @@
 <lr-data-output
     ctx-name="{{ name }}"
     use-input
+    {% if config.multiple %}use-group{% endif %}
 ></lr-data-output>
-
-
-
