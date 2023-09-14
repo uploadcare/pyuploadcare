@@ -143,7 +143,8 @@ class ImageField(FileField):
         if self.legacy_widget:
             attrs["data-images-only"] = ""
         else:
-            attrs["imgOnly"] = True
+            attrs["img-only"] = True
+            attrs["use-cloud-image-editor"] = True
         if self.legacy_widget and self.manual_crop is not None:
             attrs["data-crop"] = self.manual_crop
         return attrs
@@ -192,5 +193,5 @@ class ImageGroupField(FileGroupField):
         if self.legacy_widget:
             attrs["data-images-only"] = ""
         else:
-            attrs["imgOnly"] = True
+            attrs["img-only"] = True
         return attrs

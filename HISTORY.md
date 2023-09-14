@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased 5.0.0
 
+In version 5.0, we introduce a new [file uploading widget](https://uploadcare.com/products/file-uploader/), also known as [@uploadcare/blocks](https://www.npmjs.com/package/@uploadcare/blocks), which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the `legacy_widget` option in your configuration:
+
+It's important to mention that these changes only apply to Django projects, and there are no breaking changes for non-Django projects.
+
+```python
+UPLOADCARE = {
+   ...,
+   "legacy_widget": True,
+}
+```
+
+Additionally, please take note that some settings have been renamed in this update (see the next section).
+
 ### Breaking changes
 
 - for Django settings (`UPLOADCARE = {...}`):
@@ -15,17 +28,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `widget_build` renamed to `legacy_widget_build`
   - `widget_variant` renamed to `legacy_widget_variant`
   - `widget_url` renamed to `legacy_widget_url`
-  - `widget_variant` renamed to `legacy_widget_variant`
-  - `widget_variant` renamed to `legacy_widget_variant`
-  - `widget_variant` renamed to `legacy_widget_variant`
-  - `widget_variant` renamed to `legacy_widget_variant`
-  - `widget_variant` renamed to `legacy_widget_variant`
 
 - for `pyuploadcare.dj.conf`:
   - `widget_filename` renamed to `legacy_widget_filename`.
   - `hosted_url` renamed to `legacy_hosted_url`.
   - `local_url` renamed to `legacy_local_url`.
   - `uploadcare_js` renamed to `legacy_uploadcare_js`
+
 - for `pyuploadcare.dj.forms`:
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
 

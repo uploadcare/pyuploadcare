@@ -10,15 +10,15 @@ Settings
 --------
 
 Besides required ``pub_key``, ``secret`` settings there are optional settings,
-for example, ``widget_version`` or ``widget_build``:
+for example, ``widget_version`` or ``widget_variant``:
 
 .. code-block:: python
 
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '3.x',  // ~= 3.0 (latest)
-        'widget_build': 'min',  // without jQuery
+        'widget_version': '0.25.6',
+        'widget_variant': 'inline',  # regular | inline | minimal
         'cdn_base': 'https://cdn.mycompany.com',
     }
 
@@ -26,7 +26,15 @@ PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
 
 .. code-block:: html
 
-    <script src="https://ucarecdn.com/widget/x.y.z/uploadcare/uploadcare.full.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.25.0/web/lr-file-uploader-regular.min.js"
+        type="module"
+    ></script>
+    <lr-file-uploader-regular
+        css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.25.0/web/lr-file-uploader-regular.min.css"
+        ctx-name="..."
+    ></lr-file-uploader-regular>
+
 
 If you don't want to use hosted assets you have to turn off this feature:
 
@@ -46,8 +54,8 @@ widget url:
 
     UPLOADCARE = {
         # ...
-        'use_hosted_assets': False,
-        'widget_url': 'http://path.to/your/widget.js',
+        'widget_url_js': 'http://path.to/your/widget.js',
+        'widget_url_css': 'http://path.to/your/widget.css', 
     }
 
 `Uploadcare widget`_ will use default upload handler url, unless you specify:
@@ -57,6 +65,38 @@ widget url:
     UPLOADCARE = {
         # ...
         'upload_base_url' = 'http://path.to/your/upload/handler',
+    }
+
+
+.. _django-legacy-widget-settings-ref:
+
+Settings for legacy widget
+--------------------------
+
+
+If you want to use our legacy jQuery-widget, you can enable it in settings:
+
+.. code-block:: python
+
+
+    UPLOADCARE = {
+        'pub_key': 'demopublickey',
+        'secret': 'demoprivatekey',
+        'legacy_widget': True,
+    }
+
+Settings that are specific to the legacy widget are prefixed with ``legacy_``:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        'pub_key': 'demopublickey',
+        'secret': 'demoprivatekey',
+        'legacy_widget': True,
+        'legacy_widget_version': '3.x',  # ~= 3.0 (latest)
+        'legacy_widget_build': 'min',  # without jQuery
+        'legacy_widget_url': 'http://path.to/your/widget.js',
+        'cdn_base': 'https://cdn.mycompany.com',
     }
 
 .. _django-widget-models-ref:
@@ -107,7 +147,7 @@ FileField
 ImageField
 ~~~~~~~~~~
 
-``ImageField`` requires an uploaded file to be an image. An optional parameter
+Legacy widget only: ``ImageField`` requires an uploaded file to be an image. An optional parameter
 ``manual_crop`` enables, if specified, a manual cropping tool: your user can
 select a part of an image she wants to use. If its value is an empty string,
 the user can select any part of an image; you can also use values like
@@ -125,10 +165,7 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 
         photo = ImageField(blank=True, manual_crop="")
 
-.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
-
-.. _django-widget-models-filegroupfield-ref:
-
+.. _django-widget-models-imagefield-advanced-ref:
 
 Advanced widget options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,14 +178,30 @@ You can pass any widget options via ``FileWidget``'s attrs argument:
 
     from pyuploadcare.dj.forms import FileWidget, ImageField
 
-
-    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
+    # optional. provide advanced widget options:
+    # https://uploadcare.com/docs/file-uploader/configuration/
+    # https://uploadcare.com/docs/file-uploader/options/
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
-            'data-cdn-base': 'https://cdn.super-candidates.com',
-            'data-image-shrink': '1024x1024',
+            'thumb-size': '128',
+            'source-list': 'local,url,camera',
         }))
 
+Use ``LegacyFileWidget`` whenever you want to switch back to jQuery-based
+widget on a field-by-field basis without turning it on globally (using
+``"legacy_widget": True``).
+
+.. code-block:: python
+
+    from django import forms
+
+    from pyuploadcare.dj.forms import LegacyFileWidget, ImageField
+
+    class CandidateForm(forms.Form):
+        photo = ImageField(widget=LegacyFileWidget)
+
+
+.. _django-widget-models-filegroupfield-ref:
 
 FileGroupField
 ~~~~~~~~~~~~~~
@@ -187,4 +240,4 @@ It stores uploaded images as a group:
         photos = ImageGroupField()
 
 .. _widget documentation: https://uploadcare.com/docs/uploads/widget/crop_options/
-.. _TextField: https://docs.djangoproject.com/en/1.8/ref/models/fields/#django.db.models.TextField
+.. _TextField: https://docs.djangoproject.com/en/4.2/ref/models/fields/#textfield

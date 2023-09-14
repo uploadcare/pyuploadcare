@@ -31,17 +31,17 @@ You can find an example project `here`_.
 
 
     class Candidate(models.Model):
-        photo = ImageField(blank=True, manual_crop="")
+        photo = ImageField(blank=True)
 
 
-    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
+    # optional. provide advanced widget options:
+    # https://uploadcare.com/docs/file-uploader/configuration/
+    # https://uploadcare.com/docs/file-uploader/options/
     class CandidateForm(forms.Form):
-        photo = ImageFormField(widget=FileWidget(attrs={
-            'data-cdn-base': 'https://cdn.super-candidates.com',
-            'data-image-shrink': '1024x1024',
+        photo = ImageField(widget=FileWidget(attrs={
+            'thumb-size': '128',
+            'source-list': 'local,url,camera',
         }))
-
-.. image:: https://ucarecdn.com/dbb4021e-b20e-40fa-907b-3da0a4f8ed70/-/resize/800/manual_crop.png
 
 Features
 ========
