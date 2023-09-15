@@ -133,6 +133,6 @@ Additionally, please take note that some settings have been renamed in this upda
 
 It's important to mention that these changes only apply to Django projects, and there are no breaking changes for non-Django projects.
 
-.. _file uploading widget: https://uploadcare.com/products/file-uploader/
+.. _file uploader: https://uploadcare.com/docs/file-uploader/
 .. _@uploadcare/blocks: https://www.npmjs.com/package/@uploadcare/blocks
 .. _changelog for version 5.0.0: https://github.com/uploadcare/pyuploadcare/blob/main/HISTORY.md#500---2023-10-01
