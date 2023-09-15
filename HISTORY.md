@@ -8,7 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased 5.0.0
 
-In version 5.0, we introduce a new [file uploading widget](https://uploadcare.com/products/file-uploader/), also known as [@uploadcare/blocks](https://www.npmjs.com/package/@uploadcare/blocks), which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the `legacy_widget` option in your configuration:
+In version 5.0, we introduce a new [file uploader](https://uploadcare.com/docs/file-uploader/), which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the `legacy_widget` option in your configuration:
 
 It's important to mention that these changes only apply to Django projects, and there are no breaking changes for non-Django projects.
 
