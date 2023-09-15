@@ -120,7 +120,7 @@ A version 4.0 uses REST API 0.7 and contains the next breaking changes:
 Update to version 5.0
 ---------------------
 
-In version 5.0, we introduce a new `file uploading widget`_, also known as `@uploadcare/blocks`_, which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the ``legacy_widget`` option in your configuration:
+In version 5.0, we introduce a new `file uploader`_, which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the ``legacy_widget`` option in your configuration:
 
 .. code-block:: python
     
