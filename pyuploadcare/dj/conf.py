@@ -24,6 +24,8 @@ user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
 
 cdn_base = settings.UPLOADCARE.get("cdn_base")
 
+upload_base_url = settings.UPLOADCARE.get("upload_base_url")
+
 legacy_widget = settings.UPLOADCARE.get("legacy_widget", False)
 
 use_hosted_assets = settings.UPLOADCARE.get("use_hosted_assets", True)
@@ -89,5 +91,3 @@ if "widget_url_js" in settings.UPLOADCARE:
 
 if "widget_url_css" in settings.UPLOADCARE:
     uploadcare_css = settings.UPLOADCARE["widget_url_css"]
-
-upload_base_url = settings.UPLOADCARE.get("upload_base_url")

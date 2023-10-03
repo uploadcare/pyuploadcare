@@ -64,11 +64,10 @@ class FileWidget(TextInput):
         }
 
         if dj_conf.cdn_base:
-            config.update(
-                {
-                    "cdnCname": dj_conf.cdn_base,
-                }
-            )
+            config["cdn-cname"] = dj_conf.cdn_base
+
+        if dj_conf.upload_base_url:
+            config["base-url"] = dj_conf.upload_base_url
 
         config.update(dj_conf.widget_options)
         config.update(self.attrs)
