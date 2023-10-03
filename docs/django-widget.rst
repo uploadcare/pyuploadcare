@@ -67,6 +67,19 @@ widget url:
         'upload_base_url' = 'http://path.to/your/upload/handler',
     }
 
+Use ``widget_options`` to pass arbitrary `options`_ to the file uploader:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        # ...
+        'widget_options' = {
+            'camera-mirror': True,
+            'source-list': 'local, camera',
+        }
+    }
+
+
 
 .. _django-legacy-widget-settings-ref:
 
@@ -170,7 +183,7 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 Advanced widget options
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-You can pass any widget options via ``FileWidget``'s attrs argument:
+You can pass any widget `options`_ via ``FileWidget``'s attrs argument:
 
 .. code-block:: python
 
@@ -239,5 +252,6 @@ It stores uploaded images as a group:
 
         photos = ImageGroupField()
 
+.. _options: https://uploadcare.com/docs/file-uploader/options/
 .. _widget documentation: https://uploadcare.com/docs/uploads/widget/crop_options/
 .. _TextField: https://docs.djangoproject.com/en/4.2/ref/models/fields/#textfield

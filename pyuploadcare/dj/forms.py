@@ -70,6 +70,7 @@ class FileWidget(TextInput):
                 }
             )
 
+        config.update(dj_conf.widget_options)
         config.update(self.attrs)
         if attrs:
             config.update(attrs)

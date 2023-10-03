@@ -56,6 +56,8 @@ if "legacy_widget_url" in settings.UPLOADCARE:
 
 # New widget (blocks.js)
 
+widget_options = settings.UPLOADCARE.get("widget_options", {})
+
 widget_version = settings.UPLOADCARE.get("widget_version", "0.25.6")
 widget_build = settings.UPLOADCARE.get(
     "widget_build", settings.UPLOADCARE.get("widget_variant", "regular")
