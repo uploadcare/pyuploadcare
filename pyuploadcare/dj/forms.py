@@ -63,6 +63,13 @@ class FileWidget(TextInput):
             "multiple": False,
         }
 
+        if dj_conf.cdn_base:
+            config.update(
+                {
+                    "cdnCname": dj_conf.cdn_base,
+                }
+            )
+
         config.update(self.attrs)
         if attrs:
             config.update(attrs)
