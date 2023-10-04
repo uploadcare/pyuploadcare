@@ -38,6 +38,18 @@ Additionally, please take note that some settings have been renamed in this upda
 - for `pyuploadcare.dj.forms`:
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
 
+## [4.1.2](https://github.com/uploadcare/pyuploadcare/compare/v4.1.1...v4.1.2) - 2023-09-08
+
+### Fixed
+
+- Incorrect expiration time was calculated for signed uploads causing the `AuthenticationError: Expired signature` exception.
+
+## [4.1.1](https://github.com/uploadcare/pyuploadcare/compare/v4.1.0...v4.1.1) - 2023-09-04
+
+### Fixed
+
+- Resolved a `ValidationError` that occurred when requesting file information for specific video files.
+
 ## [4.1.0](https://github.com/uploadcare/pyuploadcare/compare/v4.0.0...v4.1.0) - 2023-07-18
 
 ### Added
