@@ -58,7 +58,7 @@ class FileWidget(TextInput):
         self._client = get_uploadcare_client()
         super(FileWidget, self).__init__(attrs)
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def _widget_config(self, attrs=None):
         config = {
             "multiple": False,
         }
@@ -81,6 +81,10 @@ class FileWidget(TextInput):
             if k not in ["class"]
         }
 
+        return config
+
+    def render(self, name, value, attrs=None, renderer=None):
+
         uploadcare_js = dj_conf.uploadcare_js
         uploadcare_css = dj_conf.uploadcare_css
 
@@ -89,6 +93,8 @@ class FileWidget(TextInput):
             uploadcare_js = static(uploadcare_js)
         if not urlparse(uploadcare_css).netloc:
             uploadcare_css = static(uploadcare_css)
+
+        config = self._widget_config(attrs=attrs)
 
         return render_to_string(
             "uploadcare/forms/widgets/file.html",
