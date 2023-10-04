@@ -78,6 +78,7 @@ class FileWidget(TextInput):
         config = {
             k: str(v).lower() if isinstance(v, bool) else v
             for k, v in config.items()
+            if k not in ["class"]
         }
 
         uploadcare_js = dj_conf.uploadcare_js
