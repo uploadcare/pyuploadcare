@@ -31,7 +31,7 @@ You can find an example project `here`_.
 
 
     class Candidate(models.Model):
-        photo = ImageField(blank=True)
+        photo = ImageField(blank=True, manual_crop='4:3')
 
 
     # optional. provide advanced widget options:
