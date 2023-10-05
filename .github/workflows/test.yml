@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
 
     steps:
     - uses: actions/checkout@v3
@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # https://docs.djangoproject.com/en/3.2/faq/install/#what-python-version-can-i-use-with-django
+        # https://docs.djangoproject.com/en/4.2/faq/install/#what-python-version-can-i-use-with-django
         # this is a bit excessive, probably should run only before
         #   releasing new version
         python-version: ['3.7', '3.8', '3.9']
@@ -118,6 +118,8 @@ jobs:
             django-version: 4.1
           - python-version: '3.11'
             django-version: 4.2
+
+          # no django versions that support py3.12 - as of 2023-10-04
 
     steps:
     - uses: actions/checkout@v3

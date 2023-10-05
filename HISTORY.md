@@ -38,6 +38,17 @@ Additionally, please take note that some settings have been renamed in this upda
 - for `pyuploadcare.dj.forms`:
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
 
+## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
+
+### Added
+
+- For `AudioStreamInfo`:
+  - added `profile` field.
+
+### Changed
+
+- `pyuploadcare` now officially supports Python 3.12 (please notice that if you're using Django, that doesn't support Python 3.12 as of yet).
+
 ## [4.1.2](https://github.com/uploadcare/pyuploadcare/compare/v4.1.1...v4.1.2) - 2023-09-08
 
 ### Fixed
