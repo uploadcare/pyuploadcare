@@ -60,7 +60,7 @@ if "legacy_widget_url" in settings.UPLOADCARE:
 
 widget_options = settings.UPLOADCARE.get("widget_options", {})
 
-widget_version = settings.UPLOADCARE.get("widget_version", "0.25.6")
+widget_version = settings.UPLOADCARE.get("widget_version", "0.26.0")
 widget_build = settings.UPLOADCARE.get(
     "widget_build", settings.UPLOADCARE.get("widget_variant", "regular")
 )

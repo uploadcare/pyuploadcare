@@ -17,7 +17,7 @@ for example, ``widget_version`` or ``widget_variant``:
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '0.25.6',
+        'widget_version': '0.26.0',
         'widget_variant': 'inline',  # regular | inline | minimal
         'cdn_base': 'https://cdn.mycompany.com',
     }
@@ -27,11 +27,11 @@ PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
 .. code-block:: html
 
     <script
-        src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.25.0/web/lr-file-uploader-regular.min.js"
+        src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.26.0/web/lr-file-uploader-regular.min.js"
         type="module"
     ></script>
     <lr-file-uploader-regular
-        css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.25.0/web/lr-file-uploader-regular.min.css"
+        css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.26.0/web/lr-file-uploader-regular.min.css"
         ctx-name="..."
     ></lr-file-uploader-regular>
 
