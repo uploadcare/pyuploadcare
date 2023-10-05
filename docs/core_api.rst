@@ -322,7 +322,7 @@ List file groups::
         print(file_group.info)
 
 Delete file groups
-----------------
+------------------
 
 Delete file groups::
 

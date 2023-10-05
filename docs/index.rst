@@ -43,6 +43,8 @@ You can find an example project `here`_.
             'source-list': 'local,url,camera',
         }))
 
+.. image:: https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/manual_crop.png
+
 Features
 ========
 
