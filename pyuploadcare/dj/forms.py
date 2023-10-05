@@ -156,11 +156,13 @@ class ImageField(FileField):
         attrs = super(ImageField, self).widget_attrs(widget)
         if self.legacy_widget:
             attrs["data-images-only"] = ""
+            if self.manual_crop is not None:
+                attrs["data-crop"] = self.manual_crop
         else:
             attrs["img-only"] = True
             attrs["use-cloud-image-editor"] = True
-        if self.legacy_widget and self.manual_crop is not None:
-            attrs["data-crop"] = self.manual_crop
+            if self.manual_crop is not None:
+                attrs["crop-preset"] = self.manual_crop
         return attrs
 
 

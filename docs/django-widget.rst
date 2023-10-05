@@ -160,7 +160,7 @@ FileField
 ImageField
 ~~~~~~~~~~
 
-Legacy widget only: ``ImageField`` requires an uploaded file to be an image. An optional parameter
+``ImageField`` requires an uploaded file to be an image. An optional parameter
 ``manual_crop`` enables, if specified, a manual cropping tool: your user can
 select a part of an image she wants to use. If its value is an empty string,
 the user can select any part of an image; you can also use values like
@@ -253,5 +253,5 @@ It stores uploaded images as a group:
         photos = ImageGroupField()
 
 .. _options: https://uploadcare.com/docs/file-uploader/options/
-.. _widget documentation: https://uploadcare.com/docs/uploads/widget/crop_options/
+.. _widget documentation: https://uploadcare.com/docs/file-uploader/options/#crop-preset
 .. _TextField: https://docs.djangoproject.com/en/4.2/ref/models/fields/#textfield
