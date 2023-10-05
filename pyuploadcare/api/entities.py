@@ -68,6 +68,7 @@ class AudioStreamInfo(Entity):
     bitrate: Optional[Decimal]
     codec: Optional[str]
     sample_rate: Optional[Decimal]
+    profile: Optional[str]
     channels: Optional[str]
 
 
