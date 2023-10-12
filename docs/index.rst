@@ -39,8 +39,8 @@ You can find an example project `here`_.
     # https://uploadcare.com/docs/file-uploader/options/
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
-            'thumb-size': '128',
             'source-list': 'local,url,camera',
+            'camera-mirror': True,
         }))
 
 .. image:: https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/manual_crop.png

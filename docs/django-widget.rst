@@ -17,8 +17,8 @@ for example, ``widget_version`` or ``widget_variant``:
     UPLOADCARE = {
         'pub_key': 'demopublickey',
         'secret': 'demoprivatekey',
-        'widget_version': '0.26.0',
-        'widget_variant': 'inline',  # regular | inline | minimal
+        'widget_version': '0.x',  # "latest", specific version (e.g. "0.27.4") or wildcard ("0.x" is the default)
+        'widget_variant': 'inline',  # regular (default) | inline | minimal
         'cdn_base': 'https://cdn.mycompany.com',
     }
 
@@ -26,14 +26,17 @@ PyUploadcare takes assets from CDN by default, e.g.:
 
 .. code-block:: html
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.26.0/web/lr-file-uploader-regular.min.js"
-        type="module"
-    ></script>
-    <lr-file-uploader-regular
-        css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.26.0/web/lr-file-uploader-regular.min.css"
-        ctx-name="..."
-    ></lr-file-uploader-regular>
+    <script type="module">
+        import * as LR from "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.x/web/blocks.min.js";
+        LR.registerBlocks(LR);
+    </script>
+
+    <!-- ... -->
+
+    <lr-file-uploader-inline
+        css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.x/web/lr-file-uploader-regular.min.css"
+        ctx-name="my-uploader"
+    ></lr-file-uploader-inline>
 
 
 If you don't want to use hosted assets you have to turn off this feature:
@@ -74,11 +77,10 @@ Use ``widget_options`` to pass arbitrary `options`_ to the file uploader:
     UPLOADCARE = {
         # ...
         'widget_options' = {
+            'source-list': 'local,url,camera',
             'camera-mirror': True,
-            'source-list': 'local, camera',
         }
     }
-
 
 
 .. _django-legacy-widget-settings-ref:
@@ -196,8 +198,8 @@ You can pass any widget `options`_ via ``FileWidget``'s attrs argument:
     # https://uploadcare.com/docs/file-uploader/options/
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
-            'thumb-size': '128',
             'source-list': 'local,url,camera',
+            'camera-mirror': True,
         }))
 
 Use ``LegacyFileWidget`` whenever you want to switch back to jQuery-based
