@@ -22,7 +22,7 @@ for example, ``widget_version`` or ``widget_variant``:
         'cdn_base': 'https://cdn.mycompany.com',
     }
 
-PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
+PyUploadcare takes assets from CDN by default, e.g.:
 
 .. code-block:: html
 
