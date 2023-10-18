@@ -2,7 +2,7 @@
     <script>
         window.addEventListener('DOMContentLoaded', (e) => {
             const uploaderCtx = document.querySelector('#uploaderctx_{{ name }}');
-            {% if config.multiple == "true" %}
+            {% if options.multiple == "true" %}
                 {# FileGroup #}
                 {% for file in value %}
                     uploaderCtx.addFileFromUuid("{{ file.uuid }}")
@@ -23,7 +23,7 @@
 <lr-config
     ctx-name="{{ name }}"
     pubkey="{{ pub_key }}"
-    {% for k, v in config.items %}
+    {% for k, v in options.items %}
     {{ k|escape }}="{{ v|escape }}"{% endfor %}
 >
 </lr-config>
@@ -41,5 +41,5 @@
 <lr-data-output
     ctx-name="{{ name }}"
     use-input
-    {% if config.multiple == "true" %}use-group{% endif %}
+    {% if options.multiple == "true" %}use-group{% endif %}
 ></lr-data-output>

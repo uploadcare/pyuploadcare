@@ -6,20 +6,20 @@ import unittest
 from django import forms
 from django.core.exceptions import ValidationError
 
-from pyuploadcare.dj import conf as dj_conf
 from pyuploadcare.dj import forms as uc_forms
+from pyuploadcare.dj.conf import config
 
 
 class FormFieldsAttributesTest(unittest.TestCase):
     def setUp(self):
-        self._pub_key = dj_conf.pub_key
-        self._secret = dj_conf.secret
-        dj_conf.pub_key = "asdf"
-        dj_conf.secret = "qwer"
+        self._original_pub_key = config["pub_key"]
+        self._original_secret = config["secret"]
+        config["pub_key"] = "asdf"
+        config["secret"] = "qwer"
 
     def tearDown(self):
-        dj_conf.pub_key = self._pub_key
-        dj_conf.secret = self._secret
+        config["pub_key"] = self._original_pub_key
+        config["secret"] = self._original_secret
 
     def test_legacy_default_form_field(self):
         class SomeForm(forms.Form):

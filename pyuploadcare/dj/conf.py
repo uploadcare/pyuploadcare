@@ -1,93 +1,160 @@
 # coding: utf-8
 
+import typing
+from copy import deepcopy
+
+import typing_extensions
 from django import get_version as django_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from pydantic.utils import deep_update
 
 from pyuploadcare import __version__ as library_version
 
 
+__all__ = [
+    "LegacyWidgetSettingsType",
+    "WidgetSettingsType",
+    "SettingsType",
+    "config",
+    "user_agent_extension",
+    "get_legacy_widget_js_url",
+    "get_widget_js_url",
+    "get_widget_css_url",
+]
+
 if not hasattr(settings, "UPLOADCARE"):
     raise ImproperlyConfigured("UPLOADCARE setting must be set")
 
-if "pub_key" not in settings.UPLOADCARE:
+
+class LegacyWidgetSettingsType(typing_extensions.TypedDict):
+    version: str
+    build: str
+    override_js_url: typing.Optional[str]
+
+
+WidgetVariantType = typing_extensions.Literal["regular", "inline", "minimal"]
+
+
+class WidgetSettingsType(typing_extensions.TypedDict):
+    version: str
+    variant: WidgetVariantType
+    build: str
+    options: typing.Dict[str, typing.Any]
+    override_js_url: typing.Optional[str]
+    override_css_url: typing.Dict[WidgetVariantType, typing.Optional[str]]
+
+
+class SettingsType(typing_extensions.TypedDict):
+    pub_key: str
+    secret: str
+    cdn_base: typing.Optional[str]
+    upload_base_url: typing.Optional[str]
+    use_legacy_widget: bool
+    use_hosted_assets: bool
+    legacy_widget: LegacyWidgetSettingsType
+    widget: WidgetSettingsType
+
+
+DEFAULT_CONFIG: SettingsType = {
+    "pub_key": "",
+    "secret": "",
+    "cdn_base": None,
+    "upload_base_url": None,
+    "use_legacy_widget": False,
+    "use_hosted_assets": True,
+    "legacy_widget": {
+        "version": "3.x",
+        "build": "full.min",
+        "override_js_url": None,
+    },
+    "widget": {
+        "version": "0.x",
+        "variant": "regular",
+        "build": "min",
+        "options": {},
+        "override_js_url": None,
+        "override_css_url": {
+            "regular": None,
+            "inline": None,
+            "minimal": None,
+        },
+    },
+}
+
+_config = deepcopy(DEFAULT_CONFIG)
+_config = deep_update(_config, settings.UPLOADCARE)  # type: ignore
+
+config: SettingsType = typing.cast(SettingsType, _config)
+
+if not config["pub_key"]:
     raise ImproperlyConfigured("UPLOADCARE setting must have pub_key")
-if "secret" not in settings.UPLOADCARE:
+if not config["secret"]:
     raise ImproperlyConfigured("UPLOADCARE setting must have secret")
 
 
-pub_key = settings.UPLOADCARE["pub_key"]
-secret = settings.UPLOADCARE["secret"]
 user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
     django_version(), library_version
 )
 
-cdn_base = settings.UPLOADCARE.get("cdn_base")
-
-upload_base_url = settings.UPLOADCARE.get("upload_base_url")
-
-legacy_widget = settings.UPLOADCARE.get("legacy_widget", False)
-
-use_hosted_assets = settings.UPLOADCARE.get("use_hosted_assets", True)
-
 # Legacy widget (uploadcare.js)
 
-legacy_widget_version = settings.UPLOADCARE.get("legacy_widget_version", "3.x")
-legacy_widget_build = settings.UPLOADCARE.get(
-    "legacy_widget_build",
-    settings.UPLOADCARE.get("legacy_widget_variant", "full.min"),
-)
-legacy_widget_filename = "uploadcare.{0}.js".format(
-    legacy_widget_build
-).replace("..", ".")
-legacy_hosted_url = (
-    "https://ucarecdn.com/libs/widget/{version}/{filename}".format(
-        version=legacy_widget_version, filename=legacy_widget_filename
+
+def get_legacy_widget_js_url() -> str:
+    widget_config = config["legacy_widget"]
+    filename = "uploadcare.{0}.js".format(widget_config["build"]).replace(
+        "..", "."
     )
-)
+    hosted_url = (
+        "https://ucarecdn.com/libs/widget/{version}/{filename}".format(
+            version=widget_config["version"], filename=filename
+        )
+    )
+    local_url = "uploadcare/{filename}".format(filename=filename)
+    override_url = widget_config["override_js_url"]
 
-legacy_local_url = "uploadcare/{filename}".format(
-    filename=legacy_widget_filename
-)
-legacy_uploadcare_js = (
-    legacy_hosted_url if use_hosted_assets else legacy_local_url
-)
+    if override_url:
+        return override_url
+    elif config["use_hosted_assets"]:
+        return hosted_url
+    else:
+        return local_url
 
-if "legacy_widget_url" in settings.UPLOADCARE:
-    legacy_uploadcare_js = settings.UPLOADCARE["legacy_widget_url"]
 
 # New widget (blocks.js)
 
-widget_options = settings.UPLOADCARE.get("widget_options", {})
 
-widget_version = settings.UPLOADCARE.get("widget_version", "0.x")
-widget_build = settings.UPLOADCARE.get(
-    "widget_build", settings.UPLOADCARE.get("widget_variant", "regular")
-)
-widget_filename_js = "blocks.min.js"
-widget_filename_css = "lr-file-uploader-{0}.min.css".format(widget_build)
-hosted_url_js = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
-    version=widget_version, filename=widget_filename_js
-)
-hosted_url_css = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
-    version=widget_version, filename=widget_filename_css
-)
-
-local_url_js = "uploadcare/{filename}".format(filename=widget_filename_js)
-local_url_css = "uploadcare/{filename}".format(filename=widget_filename_css)
-
-if use_hosted_assets:
-    uploadcare_js = hosted_url_js
-    uploadcare_css = hosted_url_css
-else:
-    uploadcare_js = settings.UPLOADCARE.get(
-        "widget_url_js", settings.UPLOADCARE.get("widget_url", local_url_js)
+def get_widget_js_url() -> str:
+    widget_config = config["widget"]
+    filename = "blocks.{0}.js".format(widget_config["build"]).replace(
+        "..", "."
     )
-    uploadcare_css = settings.UPLOADCARE.get("widget_url_css", local_url_css)
+    hosted_url = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
+        version=widget_config["version"], filename=filename
+    )
+    local_url = "uploadcare/{filename}".format(filename=filename)
+    override_url = widget_config["override_js_url"]
+    if override_url:
+        return override_url
+    elif config["use_hosted_assets"]:
+        return hosted_url
+    else:
+        return local_url
 
 
-if "widget_url_js" in settings.UPLOADCARE:
-    uploadcare_js = settings.UPLOADCARE["widget_url_js"]
-
-if "widget_url_css" in settings.UPLOADCARE:
-    uploadcare_css = settings.UPLOADCARE["widget_url_css"]
+def get_widget_css_url(variant: WidgetVariantType) -> str:
+    widget_config = config["widget"]
+    filename = "lr-file-uploader-{0}.{1}.css".format(
+        variant, widget_config["build"]
+    ).replace("..", ".")
+    hosted_url = "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@{version}/web/{filename}".format(
+        version=widget_config["version"], filename=filename
+    )
+    local_url = "uploadcare/{filename}".format(filename=filename)
+    override_url = widget_config["override_css_url"][variant]
+    if override_url:
+        return override_url
+    elif config["use_hosted_assets"]:
+        return hosted_url
+    else:
+        return local_url
