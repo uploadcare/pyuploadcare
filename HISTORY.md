@@ -8,35 +8,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased 5.0.0
 
-In version 5.0, we introduce a new [file uploader](https://uploadcare.com/docs/file-uploader/), which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the `legacy_widget` option in your configuration:
-
-It's important to mention that these changes only apply to Django projects, and there are no breaking changes for non-Django projects.
+In version 5.0, we introduce a new [file uploader](https://uploadcare.com/docs/file-uploader/), which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the `use_legacy_widget` option in your configuration:
 
 ```python
 UPLOADCARE = {
-   ...,
-   "legacy_widget": True,
+    ...,
+    "use_legacy_widget": True,
+    "legacy_widget": {
+        "version": "3.x",
+    }
 }
 ```
+
+It's important to mention that these changes only apply to Django projects, and there are no breaking changes for non-Django projects.
 
 Additionally, please take note that some settings have been renamed in this update (see the next section).
 
 ### Breaking changes
 
 - for Django settings (`UPLOADCARE = {...}`):
-  - `widget_version` renamed to `legacy_widget_version`
-  - `widget_build` renamed to `legacy_widget_build`
-  - `widget_variant` renamed to `legacy_widget_variant`
-  - `widget_url` renamed to `legacy_widget_url`
+  - `widget_*` settings were renamed and moved:
+    - `UPLOADCARE["widget_version"]` to `UPLOADCARE["legacy_widget"]["version"]`
+    - `UPLOADCARE["widget_build"]` to `UPLOADCARE["legacy_widget"]["build"]`
+    - `UPLOADCARE["widget_variant"]` to `UPLOADCARE["legacy_widget"]["build"]` (it's not a typo: former `widget_build` and `widget_variant` settings were equialent)
+    - `UPLOADCARE["widget_url"]` to `UPLOADCARE["legacy_widget"]["override_js_url"]` and works regardless of `use_hosted_assets` value.
 
 - for `pyuploadcare.dj.conf`:
-  - `widget_filename` renamed to `legacy_widget_filename`.
-  - `hosted_url` renamed to `legacy_hosted_url`.
-  - `local_url` renamed to `legacy_local_url`.
-  - `uploadcare_js` renamed to `legacy_uploadcare_js`
+  - Individual variables were moved into one dict called `config`. If you've accessed these settings from `pyuploadcare.dj.conf` module in your code, please migrate:
+    - `pub_key` to `config["pub_key"]`
+    - `secret` to `config["secret"]`
+    - `cdn_base` to `config["cdn_base"]`
+    - `upload_base_url` to `config["upload_base_url"]`
+    - `use_hosted_assets` to `config["use_hosted_assets"]`
+    - `widget_version` to `config["legacy_widget"]["version"]`
+    - `widget_build` to `config["legacy_widget"]["build"]`
+    - `uploadcare_js` to `get_legacy_widget_js_url()`
+  - Gone from `pyuploadcare.dj.conf`:
+    - `widget_filename`
+    - `hosted_url`
+    - `local_url`
 
 - for `pyuploadcare.dj.forms`:
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
+  - By default, `FileWidget` is used. To use `LegacyFileWidget`, please set `UPLOADCARE["use_legacy_widget"]` to `True`
 
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 

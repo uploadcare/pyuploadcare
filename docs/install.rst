@@ -120,16 +120,16 @@ A version 4.0 uses REST API 0.7 and contains the next breaking changes:
 Update to version 5.0
 ---------------------
 
-In version 5.0, we introduce a new `file uploader`_, which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the ``legacy_widget`` option in your configuration:
+In version 5.0, we introduce a new `file uploader`_, which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the ``use_legacy_widget`` option in your configuration:
 
 .. code-block:: python
     
     UPLOADCARE = {
        ...,
-       "legacy_widget": True,
+       "use_legacy_widget": True,
     }
 
-Additionally, please take note that some settings have been renamed in this update. For example, ``widget_version`` has been changed to ``legacy_widget_version``. You can find the full list of these changes in the `changelog for version 5.0.0`_.
+Additionally, please take note that some settings have been renamed in this update. For example, ``UPLOADCARE["widget_version"]`` has been changed to ``UPLOADCARE["legacy_widget"]["version"]``. You can find the full list of these changes in the `changelog for version 5.0.0`_.
 
 It's important to mention that these changes only apply to Django projects, and there are no breaking changes for non-Django projects.
 

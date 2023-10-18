@@ -9,18 +9,38 @@ Django Widget
 Settings
 --------
 
-Besides required ``pub_key``, ``secret`` settings there are optional settings,
-for example, ``widget_version`` or ``widget_variant``:
+Besides required ``pub_key``, ``secret`` settings there are optional settings.
+
+Below is the default config:
 
 .. code-block:: python
 
-    UPLOADCARE = {
-        'pub_key': 'demopublickey',
-        'secret': 'demoprivatekey',
-        'widget_version': '0.x',  # "latest", specific version (e.g. "0.27.4") or wildcard ("0.x" is the default)
-        'widget_variant': 'inline',  # regular (default) | inline | minimal
-        'cdn_base': 'https://cdn.mycompany.com',
+   UPLOADCARE = {
+        "pub_key": "",
+        "secret": "",
+        "cdn_base": None,
+        "upload_base_url": None,
+        "use_legacy_widget": False,
+        "use_hosted_assets": True,
+        "legacy_widget": {
+            "version": "3.x",
+            "build": "full.min",
+            "override_js_url": None,
+        },
+        "widget": {
+            "version": "0.x",
+            "variant": "regular",
+            "build": "min",
+            "options": {},
+            "override_js_url": None,
+            "override_css_url": {
+                "regular": None,
+                "inline": None,
+                "minimal": None,
+            },
+        },
     }
+
 
 PyUploadcare takes assets from CDN by default, e.g.:
 
@@ -45,7 +65,7 @@ If you don't want to use hosted assets you have to turn off this feature:
 
     UPLOADCARE = {
         # ...
-        'use_hosted_assets': False,
+        "use_hosted_assets": False,
     }
 
 In this case local assets will be used.
@@ -57,8 +77,14 @@ widget url:
 
     UPLOADCARE = {
         # ...
-        'widget_url_js': 'http://path.to/your/widget.js',
-        'widget_url_css': 'http://path.to/your/widget.css', 
+        "widget": {
+            "override_js_url": "http://path.to/your/blocks.js",
+            "override_css_url": {
+                "regular": "http://path.to/your/lr-file-uploader-regular.css", 
+                "inline": "http://path.to/your/lr-file-uploader-inline.css", 
+                "minimal": "http://path.to/your/lr-file-uploader-minimal.css", 
+            },
+        },
     }
 
 `Uploadcare widget`_ will use default upload handler url, unless you specify:
@@ -67,7 +93,7 @@ widget url:
 
     UPLOADCARE = {
         # ...
-        'upload_base_url' = 'http://path.to/your/upload/handler',
+        "upload_base_url": "http://path.to/your/upload/handler",
     }
 
 Use ``widget_options`` to pass arbitrary `options`_ to the file uploader:
@@ -76,10 +102,12 @@ Use ``widget_options`` to pass arbitrary `options`_ to the file uploader:
 
     UPLOADCARE = {
         # ...
-        'widget_options' = {
-            'source-list': 'local,url,camera',
-            'camera-mirror': True,
-        }
+        "widget": {
+            "options": {
+                "source-list": "local,url,camera",
+                "camera-mirror": True,
+            },
+        },
     }
 
 
@@ -88,16 +116,15 @@ Use ``widget_options`` to pass arbitrary `options`_ to the file uploader:
 Settings for legacy widget
 --------------------------
 
-
 If you want to use our legacy jQuery-widget, you can enable it in settings:
 
 .. code-block:: python
 
 
     UPLOADCARE = {
-        'pub_key': 'demopublickey',
-        'secret': 'demoprivatekey',
-        'legacy_widget': True,
+        "pub_key": "demopublickey",
+        "secret": "demoprivatekey",
+        "use_legacy_widget": True,
     }
 
 Settings that are specific to the legacy widget are prefixed with ``legacy_``:
@@ -105,13 +132,13 @@ Settings that are specific to the legacy widget are prefixed with ``legacy_``:
 .. code-block:: python
 
     UPLOADCARE = {
-        'pub_key': 'demopublickey',
-        'secret': 'demoprivatekey',
-        'legacy_widget': True,
-        'legacy_widget_version': '3.x',  # ~= 3.0 (latest)
-        'legacy_widget_build': 'min',  # without jQuery
-        'legacy_widget_url': 'http://path.to/your/widget.js',
-        'cdn_base': 'https://cdn.mycompany.com',
+        # ...
+        "use_legacy_widget": True,
+        "legacy_widget": {
+            "version": "3.x",  # ~= 3.0 (latest)
+            "build": "min",  # without jQuery
+            "override_js_url": "http://path.to/your/uploadcare.js",
+        },
     }
 
 .. _django-widget-models-ref:
@@ -134,7 +161,7 @@ These fields play by common Django rules. South migrations are supported.
 
     .. code-block:: python
 
-        photo.photo_2x3 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+        photo.photo_2x3 = File("a771f854-c2cb-408a-8c36-71af77811f3b")
         photo.save()
 
         photo.photo_2x3.store()
@@ -198,13 +225,13 @@ You can pass any widget `options`_ via ``FileWidget``'s attrs argument:
     # https://uploadcare.com/docs/file-uploader/options/
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
-            'source-list': 'local,url,camera',
-            'camera-mirror': True,
+            "source-list": "local,url,camera",
+            "camera-mirror": True,
         }))
 
 Use ``LegacyFileWidget`` whenever you want to switch back to jQuery-based
 widget on a field-by-field basis without turning it on globally (using
-``"legacy_widget": True``).
+``"use_legacy_widget": True``).
 
 .. code-block:: python
 
