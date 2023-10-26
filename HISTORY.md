@@ -6,6 +6,18 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.4](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.1.4) - 2023-10-27
+
+This update introduces the ability to generate secure URLs with the same signature valid not only for the base URL of the file (e.g., `https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/`) but also for all of its transformations. This is optional by default.
+
+### Added
+
+- For `Uploadcare`
+  - added optional `wildcard` parameter to `generate_secure_url` method.
+
+- For `AkamaiSecureUrlBuilder`:
+  - added optional `wildcard` parameter to `build` method.
+
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 
 ### Added

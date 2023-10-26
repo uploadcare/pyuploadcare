@@ -43,6 +43,22 @@ def test_generate_secure_url_with_transformation():
 
 
 @pytest.mark.freeze_time("2021-10-12")
+def test_generate_secure_url_with_wildcard():
+    secure_url_bulder = AkamaiSecureUrlBuilder(
+        "cdn.yourdomain.com", known_secret
+    )
+    secure_url = secure_url_bulder.build(
+        "52da3bfc-7cd8-4861-8b05-126fef7a6994", wildcard=True
+    )
+    assert secure_url == (
+        "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/?token="
+        "exp=1633997100~"
+        "acl=/52da3bfc-7cd8-4861-8b05-126fef7a6994/*~"
+        "hmac=b2c7526a29d0588b121aa78bc2b2c9399bfb6e1cad3d95397efed722fdbc5a78"
+    )
+
+
+@pytest.mark.freeze_time("2021-10-12")
 def test_client_generate_secure_url():
     secure_url_bulder = AkamaiSecureUrlBuilder(
         "cdn.yourdomain.com", known_secret
@@ -61,4 +77,26 @@ def test_client_generate_secure_url():
         "exp=1633997100~"
         "acl=/52da3bfc-7cd8-4861-8b05-126fef7a6994/~"
         "hmac=81852547d9dbd9eefd24bee2cada6eab02244b9013533bc8511511923098df72"
+    )
+
+
+@pytest.mark.freeze_time("2021-10-12")
+def test_client_generate_secure_url_with_wildcard():
+    secure_url_bulder = AkamaiSecureUrlBuilder(
+        "cdn.yourdomain.com", known_secret
+    )
+
+    uploadcare = Uploadcare(
+        public_key="public",
+        secret_key="secret",
+        secure_url_builder=secure_url_bulder,
+    )
+    secure_url = uploadcare.generate_secure_url(
+        "52da3bfc-7cd8-4861-8b05-126fef7a6994", wildcard=True
+    )
+    assert secure_url == (
+        "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/?token="
+        "exp=1633997100~"
+        "acl=/52da3bfc-7cd8-4861-8b05-126fef7a6994/*~"
+        "hmac=b2c7526a29d0588b121aa78bc2b2c9399bfb6e1cad3d95397efed722fdbc5a78"
     )

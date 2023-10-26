@@ -8,7 +8,7 @@ from typing import Optional
 
 class BaseSecureUrlBuilder(ABC):
     @abstractmethod
-    def build(self, uuid: str) -> str:
+    def build(self, uuid: str, wildcard: bool = False) -> str:
         raise NotImplementedError
 
 
@@ -34,12 +34,12 @@ class AkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         self.window = window
         self.hash_algo = hash_algo
 
-    def build(self, uuid: str) -> str:
+    def build(self, uuid: str, wildcard: bool = False) -> str:
         uuid = uuid.lstrip("/").rstrip("/")
 
         expire = self._build_expire_time()
 
-        acl = self._format_acl(uuid)
+        acl = self._format_acl(uuid, wildcard=wildcard)
 
         signature = self._build_signature(expire, acl)
 
@@ -75,7 +75,9 @@ class AkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         ]
         return self.field_delimeter.join(token_parts)
 
-    def _format_acl(self, uuid: str) -> str:
+    def _format_acl(self, uuid: str, wildcard: bool) -> str:
+        if wildcard:
+            return f"/{uuid}/*"
         return f"/{uuid}/"
 
     def _build_expire_time(self) -> int:

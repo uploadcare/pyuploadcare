@@ -387,7 +387,7 @@ Secure delivery
 
 You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_).
 
-Generate secure for file::
+Generate secure url for file::
 
     from pyuploadcare import Uploadcare
     from pyuploadcare.secure_url import AkamaiSecureUrlBuilder
@@ -402,10 +402,17 @@ Generate secure for file::
 
     secure_url = uploadcare.generate_secure_url('52da3bfc-7cd8-4861-8b05-126fef7a6994')
 
-Generate secure for file with transformations::
+Generate secure url for file with transformations::
 
     secure_url = uploadcare.generate_secure_url(
         '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
+    )
+
+Generate secure url for file, with the same signature valid for its transformations::
+
+    secure_url = uploadcare.generate_secure_url(
+        '52da3bfc-7cd8-4861-8b05-126fef7a6994',
+        wildcard=True
     )
 
 Useful links

@@ -814,7 +814,9 @@ class Uploadcare:
 
         return self.project_api.retrieve()
 
-    def generate_secure_url(self, uuid: Union[str, UUID]) -> str:
+    def generate_secure_url(
+        self, uuid: Union[str, UUID], wildcard: bool = False
+    ) -> str:
         """Generate authenticated URL."""
         if isinstance(uuid, UUID):
             uuid = str(uuid)
@@ -822,4 +824,4 @@ class Uploadcare:
         if not self.secure_url_builder:
             raise ValueError("secure_url_builder must be set")
 
-        return self.secure_url_builder.build(uuid)
+        return self.secure_url_builder.build(uuid, wildcard=wildcard)
