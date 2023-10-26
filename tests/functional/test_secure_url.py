@@ -1,7 +1,10 @@
 import pytest
 
 from pyuploadcare import Uploadcare
-from pyuploadcare.secure_url import AkamaiSecureUrlBuilder
+from pyuploadcare.secure_url import (
+    AkamaiSecureUrlBuilderWithAclToken,
+    AkamaiSecureUrlBuilderWithUrlToken,
+)
 
 
 known_secret = (
@@ -10,8 +13,8 @@ known_secret = (
 
 
 @pytest.mark.freeze_time("2021-10-12")
-def test_generate_secure_url():
-    secure_url_bulder = AkamaiSecureUrlBuilder(
+def test_generate_secure_url_acl_token():
+    secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
         "cdn.yourdomain.com", known_secret
     )
     secure_url = secure_url_bulder.build(
@@ -26,8 +29,8 @@ def test_generate_secure_url():
 
 
 @pytest.mark.freeze_time("2021-10-12")
-def test_generate_secure_url_with_transformation():
-    secure_url_bulder = AkamaiSecureUrlBuilder(
+def test_generate_secure_url_with_transformation_acl_token():
+    secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
         "cdn.yourdomain.com", known_secret
     )
     secure_url = secure_url_bulder.build(
@@ -43,8 +46,8 @@ def test_generate_secure_url_with_transformation():
 
 
 @pytest.mark.freeze_time("2021-10-12")
-def test_generate_secure_url_with_wildcard():
-    secure_url_bulder = AkamaiSecureUrlBuilder(
+def test_generate_secure_url_with_wildcard_acl_token():
+    secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
         "cdn.yourdomain.com", known_secret
     )
     secure_url = secure_url_bulder.build(
@@ -59,8 +62,8 @@ def test_generate_secure_url_with_wildcard():
 
 
 @pytest.mark.freeze_time("2021-10-12")
-def test_client_generate_secure_url():
-    secure_url_bulder = AkamaiSecureUrlBuilder(
+def test_client_generate_secure_url_acl_token():
+    secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
         "cdn.yourdomain.com", known_secret
     )
 
@@ -81,8 +84,23 @@ def test_client_generate_secure_url():
 
 
 @pytest.mark.freeze_time("2021-10-12")
-def test_client_generate_secure_url_with_wildcard():
-    secure_url_bulder = AkamaiSecureUrlBuilder(
+def test_generate_secure_url_url_token():
+    secure_url_bulder = AkamaiSecureUrlBuilderWithUrlToken(
+        "cdn.yourdomain.com", known_secret
+    )
+    secure_url = secure_url_bulder.build(
+        "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/"
+    )
+    assert secure_url == (
+        "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/?token="
+        "exp=1633997100~"
+        "hmac=32b696b855ddc911b366f11dcecb75789adf6211a72c1dbdf234b83f22aaa368"
+    )
+
+
+@pytest.mark.freeze_time("2021-10-12")
+def test_client_generate_secure_url_with_wildcard_acl_token():
+    secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
         "cdn.yourdomain.com", known_secret
     )
 

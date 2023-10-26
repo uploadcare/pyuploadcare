@@ -8,15 +8,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [4.1.4](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.1.4) - 2023-10-27
 
-This update introduces the ability to generate secure URLs with the same signature valid not only for the base URL of the file (e.g., `https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/`) but also for all of its transformations. This is optional by default.
+This update introduces the ability to generate secure URLs with the same signature valid not only for the base URL of the file (e.g., `https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/`) but also for all of its transformations (#264). This is optional by default.
+
+Also, `AkamaiSecureUrlBuilderWithUrlToken` class has been implemented (#263).
 
 ### Added
 
 - For `Uploadcare`
   - added optional `wildcard` parameter to `generate_secure_url` method.
 
-- For `AkamaiSecureUrlBuilder`:
+- For `AkamaiSecureUrlBuilderWithAclToken`:
   - added optional `wildcard` parameter to `build` method.
+
+- `AkamaiSecureUrlBuilderWithUrlToken` class.
+
+### Changed
+
+- `AkamaiSecureUrlBuilder` has been renamed to `AkamaiSecureUrlBuilderWithAclToken`. It is still available under the old name and works as before, but it will give you a deprecation warning when you use it.
 
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 
