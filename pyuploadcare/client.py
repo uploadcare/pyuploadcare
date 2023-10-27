@@ -825,3 +825,15 @@ class Uploadcare:
             raise ValueError("secure_url_builder must be set")
 
         return self.secure_url_builder.build(uuid, wildcard=wildcard)
+
+    def generate_secure_url_token(
+        self, uuid: Union[str, UUID], wildcard: bool = False
+    ) -> str:
+        """Generate token for authenticated URL."""
+        if isinstance(uuid, UUID):
+            uuid = str(uuid)
+
+        if not self.secure_url_builder:
+            raise ValueError("secure_url_builder must be set")
+
+        return self.secure_url_builder.get_token(uuid, wildcard=wildcard)

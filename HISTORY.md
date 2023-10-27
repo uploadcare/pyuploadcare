@@ -12,12 +12,16 @@ This update introduces the ability to generate secure URLs with the same signatu
 
 Also, `AkamaiSecureUrlBuilderWithUrlToken` class has been implemented (#263).
 
+A new method called `generate_secure_url_token` is exposed for `Uploadcare`. Instead of full URL it will return just the token (unlike the `generate_secure_url` method).
+
 ### Added
 
-- For `Uploadcare`
+- For `Uploadcare`:
+  - added `generate_secure_url_token` method.
   - added optional `wildcard` parameter to `generate_secure_url` method.
 
 - For `AkamaiSecureUrlBuilderWithAclToken`:
+  - added `get_token` method.
   - added optional `wildcard` parameter to `build` method.
 
 - `AkamaiSecureUrlBuilderWithUrlToken` class.

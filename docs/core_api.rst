@@ -405,6 +405,10 @@ Generate secure url for file::
 
     secure_url = uploadcare.generate_secure_url('52da3bfc-7cd8-4861-8b05-126fef7a6994')
 
+Generate just the token::
+
+    token = uploadcare.get_secure_url_token('52da3bfc-7cd8-4861-8b05-126fef7a6994')
+
 Generate secure url for file with transformations::
 
     secure_url = uploadcare.generate_secure_url(
@@ -423,7 +427,7 @@ Generate secure url for file by its URL (please notice the usage of a different 
     from pyuploadcare import Uploadcare
     from pyuploadcare.secure_url import AkamaiSecureUrlBuilderWithUrlToken
 
-    secure_url_bulder = AkamaiSecureUrlBuilderWithAUrlToken(
+    secure_url_bulder = AkamaiSecureUrlBuilderWithUrlToken(
         "<your cdn>",
         "<your secret for token generation>"
     )
