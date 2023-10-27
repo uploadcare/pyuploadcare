@@ -56,9 +56,9 @@ class FileField(Field):
     _client: Uploadcare
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
         self._client = get_uploadcare_client()
+
+        super().__init__(*args, **kwargs)
 
     def to_python(self, value):
         if value is None or value == "":
@@ -73,6 +73,10 @@ class FileField(Field):
         attrs = {}
         if not self.required:
             attrs["data-clearable"] = ""
+        if dj_conf.signed_uploads:
+            expire, signature = self._client.generate_upload_signature()
+            attrs["data-secure-expire"] = expire
+            attrs["data-secure-signature"] = signature
         return attrs
 
 

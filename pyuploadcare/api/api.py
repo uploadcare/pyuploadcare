@@ -246,7 +246,7 @@ class UploadAPI(API):
     resource_type = "base"
 
     @staticmethod
-    def _generate_secure_signature(secret: str, expire: int):
+    def generate_secure_signature(secret: str, expire: int):
         return hmac.new(
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
@@ -282,7 +282,7 @@ class UploadAPI(API):
                 expire = int(time()) + self.signed_uploads_ttl
             data["expire"] = str(expire)
 
-            signature = self._generate_secure_signature(secret_key, expire)  # type: ignore
+            signature = self.generate_secure_signature(secret_key, expire)  # type: ignore
             data["signature"] = signature
 
         url = self._build_url()
@@ -321,7 +321,7 @@ class UploadAPI(API):
             )
 
             data["expire"] = str(expire)
-            data["signature"] = self._generate_secure_signature(
+            data["signature"] = self.generate_secure_signature(
                 self.secret_key, expire  # type: ignore
             )
 
@@ -377,7 +377,7 @@ class UploadAPI(API):
             )
 
             data["expire"] = str(expire)
-            data["signature"] = self._generate_secure_signature(
+            data["signature"] = self.generate_secure_signature(
                 self.secret_key, expire  # type: ignore
             )
 
@@ -434,7 +434,7 @@ class UploadAPI(API):
             )
 
             data["expire"] = str(expire)
-            data["signature"] = self._generate_secure_signature(
+            data["signature"] = self.generate_secure_signature(
                 self.secret_key, expire  # type: ignore
             )
 

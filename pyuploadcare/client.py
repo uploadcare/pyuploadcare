@@ -9,6 +9,7 @@ from typing import (
     Iterable,
     List,
     Optional,
+    Tuple,
     Type,
     Union,
 )
@@ -813,6 +814,16 @@ class Uploadcare:
         """Get info about account project."""
 
         return self.project_api.retrieve()
+
+    def generate_upload_signature(self) -> Tuple[int, str]:
+        """Expiration and signature for signed uploads."""
+        if not self.secret_key:
+            raise ValueError("secret_key is required")
+        expire = int(time()) + self.signed_uploads_ttl
+        signature = self.upload_api.generate_secure_signature(
+            self.secret_key, expire
+        )
+        return expire, signature
 
     def generate_secure_url(self, uuid: Union[str, UUID]) -> str:
         """Generate authenticated URL."""
