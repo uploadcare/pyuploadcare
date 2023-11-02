@@ -1,0 +1,104 @@
+interactions:
+- request:
+    body: '{"paths": ["da288a95-3029-4044-b902-5107e8579c5c/document/-/format/jpg/"],
+      "save_in_group": "1"}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '96'
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.1.2/5d5bb5639e3f2df33674 (CPython/3.11.5)
+    method: POST
+    uri: https://api.uploadcare.com/convert/document/
+  response:
+    content: '{"result": [{"original_source": "da288a95-3029-4044-b902-5107e8579c5c/document/-/format/jpg/",
+      "token": 39498673, "uuid": "482e9d07-08ee-4c6d-875f-216aabc561c9"}], "problems":
+      {}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - OPTIONS, POST
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 02 Nov 2023 22:16:05 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 7cb15931-717a-4b31-8cf7-909d7b4fe7c2
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.1.2/5d5bb5639e3f2df33674 (CPython/3.11.5)
+    method: GET
+    uri: https://api.uploadcare.com/convert/document/status/39498673/
+  response:
+    content: '{"error":null,"status":"pending","result":{"uuid":"482e9d07-08ee-4c6d-875f-216aabc561c9"}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '90'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Thu, 02 Nov 2023 22:16:05 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 6f4fa049-5337-43b9-bdec-a5cc77793eb9
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

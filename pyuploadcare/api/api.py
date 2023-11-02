@@ -185,14 +185,19 @@ class DocumentConvertAPI(API):
         self,
         paths: List[str],
         store: Optional[bool] = None,
+        save_in_group: bool = False,
     ) -> responses.DocumentConvertResponse:
         url = self._build_url()
 
         data = {
             "paths": paths,
         }
+
         if isinstance(store, bool):
             data["store"] = str(store).lower()  # type: ignore
+
+        if save_in_group:
+            data["save_in_group"] = "1"  # type: ignore
 
         response_class = self._get_response_class("convert")
         document = self._client.post(url, json=data).json()

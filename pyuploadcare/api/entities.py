@@ -248,6 +248,13 @@ class DocumentConvertStatus(Entity):
     result: DocumentConvertShortInfo
 
 
+class DocumentConvertRetrieveInfo(Entity):
+    ...  # TODO
+    error: Any
+    format: Any
+    converted_groups: Any
+
+
 class VideoConvertShortInfo(Entity):
     uuid: UUID
     thumbnails_group_uuid: str

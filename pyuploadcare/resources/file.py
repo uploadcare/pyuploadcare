@@ -371,6 +371,7 @@ class File:
         self,
         transformation: Union[VideoTransformation, DocumentTransformation],
         store: Optional[bool] = None,
+        save_in_group: bool = False,
     ) -> "File":
         """Convert video or document and return converted file.
 
@@ -396,18 +397,26 @@ class File:
             >>> converted_file: File = file.convert(transformation)
 
         Arguments:
-            - transformation (Union[VideoTransformation, Documenttransformation]): transformation
+            - transformation (Union[VideoTransformation, DocumentTransformation]): transformation
                 path builder with configured parameters.
                 Depending on type video or document conversion will be performed.
             - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
                 - False - do not store file
                 - True - store file
                 - None - use project settings
+            - save_in_group (bool): Should pages of a multipage document be stored as a file group.
+                Available only for documents. Defaults to False.
         """
         if isinstance(transformation, VideoTransformation):
+            if save_in_group:
+                raise ValueError(
+                    "Multipage conversion is available only for documents."
+                )
             return self.convert_video(transformation, store=store)
         elif isinstance(transformation, DocumentTransformation):
-            return self.convert_document(transformation, store=store)
+            return self.convert_document(
+                transformation, store=store, save_in_group=save_in_group
+            )
 
         raise ValueError(f"Unsupported transformation: {transformation}")
 
@@ -445,6 +454,7 @@ class File:
         self,
         transformation: Union[str, DocumentTransformation],
         store: Optional[bool] = None,
+        save_in_group: bool = False,
     ) -> "File":
         """Convert document and return converted file instance.
 
@@ -459,7 +469,9 @@ class File:
         transformation = DocumentTransformation(transformation)
         path = transformation.path(self.uuid)
         response = self._client.document_convert_api.convert(
-            paths=[path], store=store
+            paths=[path],
+            store=store,
+            save_in_group=save_in_group,
         )
         if response.problems:
             raise InvalidRequestError(str(response.problems))
