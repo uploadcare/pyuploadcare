@@ -44,3 +44,11 @@ def test_convert_document_with_save_in_group(uploadcare):
     )
 
     assert document_convert_status.result.uuid
+
+
+@pytest.mark.vcr
+def test_convert_document_get_group_info(uploadcare):
+    response = uploadcare.document_convert_api.retrieve(
+        "da288a95-3029-4044-b902-5107e8579c5c"
+    )
+    assert "~" in response.format.converted_groups[DocumentFormat.jpg]

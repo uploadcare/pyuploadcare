@@ -5,14 +5,22 @@ import time
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Union
 from uuid import UUID
 
-from pyuploadcare.api.entities import DocumentConvertInfo, VideoConvertInfo
+from pyuploadcare.api.entities import (
+    DocumentConvertFormatInfo,
+    DocumentConvertInfo,
+    VideoConvertInfo,
+)
 from pyuploadcare.exceptions import (
     InvalidParamError,
     InvalidRequestError,
     TimeoutError,
     UploadError,
 )
-from pyuploadcare.transformations.document import DocumentTransformation
+from pyuploadcare.resources.file_group import FileGroup
+from pyuploadcare.transformations.document import (
+    DocumentFormat,
+    DocumentTransformation,
+)
 from pyuploadcare.transformations.image import ImageTransformation
 from pyuploadcare.transformations.video import VideoTransformation
 
@@ -479,6 +487,15 @@ class File:
         conversion_info: DocumentConvertInfo = response.result[0]  # type: ignore
         new_uuid = conversion_info.uuid
         return File(new_uuid, self._client)
+
+    def get_converted_document_group(
+        self, format: DocumentFormat
+    ) -> FileGroup:
+        response: DocumentConvertFormatInfo = (
+            self._client.document_convert_api.retrieve(self.uuid)
+        )
+        group_id = response.format.converted_groups[format]
+        return self._client.file_group(group_id)
 
 
 class FileFromUrl:

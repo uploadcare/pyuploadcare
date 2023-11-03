@@ -7,6 +7,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConstrainedStr, EmailStr, Field, PrivateAttr
 
+from pyuploadcare.transformations.document import DocumentFormat
+
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
 
@@ -248,11 +250,19 @@ class DocumentConvertStatus(Entity):
     result: DocumentConvertShortInfo
 
 
-class DocumentConvertRetrieveInfo(Entity):
-    ...  # TODO
-    error: Any
-    format: Any
-    converted_groups: Any
+class DocumentConvertConversionFormat(Entity):
+    name: str
+
+
+class DocumentConvertFormat(Entity):
+    name: str
+    conversion_formats: List[DocumentConvertConversionFormat]
+    converted_groups: Dict[str, str]
+
+
+class DocumentConvertFormatInfo(Entity):
+    error: Optional[str]
+    format: DocumentConvertFormat
 
 
 class VideoConvertShortInfo(Entity):

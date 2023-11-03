@@ -227,6 +227,14 @@ def test_file_convert_document_with_save_in_group(uploadcare):
 
 
 @pytest.mark.vcr
+def test_file_get_converted_document_group(uploadcare):
+    file = uploadcare.file("da288a95-3029-4044-b902-5107e8579c5c")
+    group = file.get_converted_document_group(DocumentFormat.jpg)
+    assert isinstance(group, FileGroup)
+    assert group.id == "f56f1e80-31f8-426e-9213-690861252070~4"
+
+
+@pytest.mark.vcr
 def test_file_info_has_new_structure(uploadcare):
     """
     Test new structure of response since API v0.7

@@ -172,14 +172,21 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
             self._process_exceptions(request_error)
 
 
-class DocumentConvertAPI(API):
+class DocumentConvertAPI(API, RetrieveMixin):
     resource_type = "convert/document"
     entity_class = entities.DocumentConvertInfo
 
     response_classes = {
+        "retrieve": entities.DocumentConvertFormatInfo,
         "convert": responses.DocumentConvertResponse,
         "status": entities.DocumentConvertStatus,
     }
+
+    def retrieve(
+        self, file_uuid: Union[UUID, str, UUIDEntity]
+    ) -> entities.DocumentConvertFormatInfo:
+        response = super().retrieve(file_uuid)
+        return cast(entities.DocumentConvertFormatInfo, response)
 
     def convert(
         self,
