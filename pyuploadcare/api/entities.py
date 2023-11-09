@@ -2,10 +2,11 @@ import re
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Literal, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConstrainedStr, EmailStr, Field, PrivateAttr
+from typing_extensions import Literal
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
