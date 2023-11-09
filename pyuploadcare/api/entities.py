@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConstrainedStr, EmailStr, Field, PrivateAttr
@@ -50,6 +50,15 @@ class ColorMode(str, Enum):
 class GEOPoint(Entity):
     latitude: float
     longitude: float
+
+
+WebhookEvent = Literal[
+    "file.uploaded",
+    "file.infected",  # it will be deprecated in favor of info_upldated in the future updates
+    "file.stored",
+    "file.deleted",
+    "file.info_updated",
+]
 
 
 class ImageInfo(Entity):
