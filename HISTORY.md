@@ -6,6 +6,18 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.6](https://github.com/uploadcare/pyuploadcare/compare/v4.1.5...v4.1.6) - soon
+
+### Added
+
+- For `File`:
+  - added `save_in_group` parameter to `convert` and `convert_document` methods. It defaults to `False`. When set to `True`, multi-page documents additionally will be saved as a file group.
+  - added `get_converted_document_group` method. It returns a `FileGroup` instance for converted multi-page documents.
+
+- For `DocumentConvertAPI`:
+  - added `retrieve` method which corresponds to [`GET /convert/document/:uuid/`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo) API endpoint.
+
+
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 
 ### Added

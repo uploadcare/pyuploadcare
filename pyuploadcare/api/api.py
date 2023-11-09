@@ -183,9 +183,11 @@ class DocumentConvertAPI(API, RetrieveMixin):
     }
 
     def retrieve(
-        self, file_uuid: Union[UUID, str, UUIDEntity]
+        self,
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        include_appdata: bool = False,
     ) -> entities.DocumentConvertFormatInfo:
-        response = super().retrieve(file_uuid)
+        response = super().retrieve(resource_uuid)
         return cast(entities.DocumentConvertFormatInfo, response)
 
     def convert(
