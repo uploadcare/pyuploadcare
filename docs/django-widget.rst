@@ -59,9 +59,7 @@ widget url:
         'upload_base_url': 'http://path.to/your/upload/handler',
     }
 
-If you have signed uploads enabled in your Uploadcare project, widget-based uploads will fail unless you enable the ``signed_uploads`` setting in your Django project.
-
-Note that in this case, the benefits of signed uploads are essentially negated for user uploads. So enabling this feature is only feasible if, for example, files are only uploaded via the admin interface.
+If you have signed uploads enabled in your Uploadcare project, widget-based uploads will fail unless you enable the ``signed_uploads`` setting in your Django project::
 
 .. code-block:: python
 
