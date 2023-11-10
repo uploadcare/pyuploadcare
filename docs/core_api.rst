@@ -422,7 +422,7 @@ Generate secure URL for file, with the same signature valid for its transformati
         wildcard=True
     )
 
-Generate secure url for file by its URL (please notice the usage of a different builder class)::
+Generate secure URL for file by its URL (please notice the usage of a different builder class)::
 
     from pyuploadcare import Uploadcare
     from pyuploadcare.secure_url import AkamaiSecureUrlBuilderWithUrlToken
