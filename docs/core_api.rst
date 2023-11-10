@@ -387,7 +387,7 @@ Secure delivery
 
 You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_).
 
-Generate secure url for file::
+Generate secure URL for file::
 
     from pyuploadcare import Uploadcare
     from pyuploadcare.secure_url import AkamaiSecureUrlBuilderWithAclToken
