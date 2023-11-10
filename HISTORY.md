@@ -11,10 +11,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - For `Uploadcare`:
-  - added `generate_upload_signature` method. This shortcut could be useful for signed uploads from your website's frontend where the signature needs to be passed outside of your site's Python part (e.g. for an upload widget).
+  - added `generate_upload_signature` method. This shortcut could be useful for signed uploads from your website's frontend where the signature needs to be passed outside of your website's Python part (e.g. for the uploading widget).
 
 - For Django integration:
-  - added `signed_uploads` setting for Django projects. When enabled, this setting exposes the generated signature to the upload widget.
+  - added `signed_uploads` setting for Django projects. When enabled, this setting exposes the generated signature to the uploading widget.
 
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 
