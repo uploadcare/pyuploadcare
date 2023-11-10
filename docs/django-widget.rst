@@ -22,11 +22,6 @@ Below is the default config:
         "upload_base_url": None,
         "use_legacy_widget": False,
         "use_hosted_assets": True,
-        "legacy_widget": {
-            "version": "3.x",
-            "build": "full.min",
-            "override_js_url": None,
-        },
         "widget": {
             "version": "0.x",
             "variant": "regular",
@@ -38,6 +33,11 @@ Below is the default config:
                 "inline": None,
                 "minimal": None,
             },
+        },
+        "legacy_widget": {
+            "version": "3.x",
+            "build": "full.min",
+            "override_js_url": None,
         },
     }
 

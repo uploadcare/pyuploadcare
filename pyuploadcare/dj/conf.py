@@ -27,12 +27,6 @@ if not hasattr(settings, "UPLOADCARE"):
     raise ImproperlyConfigured("UPLOADCARE setting must be set")
 
 
-class LegacyWidgetSettingsType(typing_extensions.TypedDict):
-    version: str
-    build: str
-    override_js_url: typing.Optional[str]
-
-
 WidgetVariantType = typing_extensions.Literal["regular", "inline", "minimal"]
 
 
@@ -45,6 +39,12 @@ class WidgetSettingsType(typing_extensions.TypedDict):
     override_css_url: typing.Dict[WidgetVariantType, typing.Optional[str]]
 
 
+class LegacyWidgetSettingsType(typing_extensions.TypedDict):
+    version: str
+    build: str
+    override_js_url: typing.Optional[str]
+
+
 class SettingsType(typing_extensions.TypedDict):
     pub_key: str
     secret: str
@@ -52,8 +52,8 @@ class SettingsType(typing_extensions.TypedDict):
     upload_base_url: typing.Optional[str]
     use_legacy_widget: bool
     use_hosted_assets: bool
-    legacy_widget: LegacyWidgetSettingsType
     widget: WidgetSettingsType
+    legacy_widget: LegacyWidgetSettingsType
 
 
 DEFAULT_CONFIG: SettingsType = {
@@ -63,11 +63,6 @@ DEFAULT_CONFIG: SettingsType = {
     "upload_base_url": None,
     "use_legacy_widget": False,
     "use_hosted_assets": True,
-    "legacy_widget": {
-        "version": "3.x",
-        "build": "full.min",
-        "override_js_url": None,
-    },
     "widget": {
         "version": "0.x",
         "variant": "regular",
@@ -79,6 +74,11 @@ DEFAULT_CONFIG: SettingsType = {
             "inline": None,
             "minimal": None,
         },
+    },
+    "legacy_widget": {
+        "version": "3.x",
+        "build": "full.min",
+        "override_js_url": None,
     },
 }
 
