@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConstrainedStr, EmailStr, Field, PrivateAttr
+from typing_extensions import Literal
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
@@ -50,6 +51,15 @@ class ColorMode(str, Enum):
 class GEOPoint(Entity):
     latitude: float
     longitude: float
+
+
+WebhookEvent = Literal[
+    "file.uploaded",
+    "file.infected",  # it will be deprecated in favor of info_upldated in the future updates
+    "file.stored",
+    "file.deleted",
+    "file.info_updated",
+]
 
 
 class ImageInfo(Entity):

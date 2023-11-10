@@ -10,6 +10,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+
+- For `Uploadcare`:
+  - Added type for parameter `event` of `create_webhook` and `update_webhook` methods.
+
 - For `AddonsAPI` / `AddonLabels`:
   - Added support for [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
 
