@@ -6,6 +6,19 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.2.0) - unreleased
+
+### Added
+
+- For `AddonsAPI` / `AddonLabels`:
+  - Added support for [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
+
+### Fixed
+
+- For `AddonsAPI` / `AddonExecutionParams`:
+  - Fixed the issue where calling `execute` and `status` with `AddonLabels`'s attributes (such as `AddonLabels.REMOVE_BG`) for `addon_name` would result in a _404 Not Found_ error.
+  - Fixed `ValidationError` when constructing `AddonClamAVExecutionParams` or `AddonRemoveBGExecutionParams` with omitted optional parameters.
+
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 
 ### Added

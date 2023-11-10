@@ -216,18 +216,23 @@ To execute addon call an API `execute` method with the file and parameters::
     target_file = uploadcare.file("59fccca5-3af7-462f-905b-ed7de83b9762")
     # params - from previous step
     remove_bg_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.REMOVE_BG,
         remove_bg_params,
     )
 
     aws_recognition_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.AWS_LABEL_RECOGNITION,
     )
 
+    aws_moderation_result = uploadcare.addons_api.execute(
+        target_file.uuid,
+        AddonLabels.AWS_MODERATION_LABELS,
+    )
+
     clamav_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.CLAM_AV,
         clamav_params,
     )
