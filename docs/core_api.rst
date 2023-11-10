@@ -409,7 +409,7 @@ Generate just the token::
 
     token = uploadcare.get_secure_url_token('52da3bfc-7cd8-4861-8b05-126fef7a6994')
 
-Generate secure url for file with transformations::
+Generate secure URL for file with transformations::
 
     secure_url = uploadcare.generate_secure_url(
         '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
