@@ -1,4 +1,5 @@
 import re
+import warnings
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional
 
@@ -152,6 +153,10 @@ class FileGroup(Iterable):
     @property
     def datetime_stored(self):
         """Returns file group's store aware *datetime* in UTC format."""
+        warnings.warn(
+            "datetime_stored field is deprecated in the REST API.",
+            DeprecationWarning,
+        )
         datetime_ = self.info.get("datetime_stored")
         if isinstance(datetime_, str):
             return dateutil.parser.parse(datetime_)
