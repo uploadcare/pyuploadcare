@@ -415,7 +415,7 @@ Generate secure URL for file with transformations::
         '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
     )
 
-Generate secure url for file, with the same signature valid for its transformations::
+Generate secure URL for file, with the same signature valid for its transformations::
 
     secure_url = uploadcare.generate_secure_url(
         '52da3bfc-7cd8-4861-8b05-126fef7a6994',
