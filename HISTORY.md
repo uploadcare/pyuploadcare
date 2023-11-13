@@ -8,7 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [4.2.0](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.2.0) - 2023-11-16
 
-In this update:
+Summary of this update:
 
 1. Added support for the `save_in_group` parameter in [multipage conversion](https://uploadcare.com/docs/transformations/document-conversion/#multipage-conversion);
 2. Implemented the [AWS Rekognition Moderation](https://uploadcare.com/docs/unsafe-content/) addon API;
@@ -17,22 +17,22 @@ In this update:
 ### Added
 
 - For `File`:
-  - added `save_in_group` parameter to `convert` and `convert_document` methods. It defaults to `False`. When set to `True`, multi-page documents additionally will be saved as a file group.
-  - added `get_converted_document_group` method. It returns a `FileGroup` instance for converted multi-page documents.
+  - Added `save_in_group` parameter to `convert` and `convert_document` methods. It defaults to `False`. When set to `True`, multi-page documents will additionally be saved as a file group.
+  - Added `get_converted_document_group` method. It returns a `FileGroup` instance for converted multi-page documents.
 
 - For `DocumentConvertAPI`:
-  - added `retrieve` method which corresponds to [`GET /convert/document/:uuid/`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo) API endpoint.
+  - Added `retrieve` method which corresponds to the [`GET /convert/document/:uuid/`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo) API endpoint.
 
 - For `Uploadcare`:
-  - Added type for parameter `event` of `create_webhook` and `update_webhook` methods.
+  - Added type for the `event` parameter of the `create_webhook` and `update_webhook` methods.
 
 - For `AddonsAPI` / `AddonLabels`:
-  - Added support for [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
+  - Added support for the [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
 
 ### Fixed
 
 - For `AddonsAPI` / `AddonExecutionParams`:
-  - Fixed the issue where calling `execute` and `status` with `AddonLabels`'s attributes (such as `AddonLabels.REMOVE_BG`) for `addon_name` would result in a _404 Not Found_ error.
+  - Fixed an issue where calling `execute` and `status` with `AddonLabels`'s attributes (such as `AddonLabels.REMOVE_BG`) for the `addon_name` would result in a _404 Not Found_ error.
   - Fixed `ValidationError` when constructing `AddonClamAVExecutionParams` or `AddonRemoveBGExecutionParams` with omitted optional parameters.
 
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
