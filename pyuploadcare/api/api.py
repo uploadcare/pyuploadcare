@@ -172,27 +172,41 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
             self._process_exceptions(request_error)
 
 
-class DocumentConvertAPI(API):
+class DocumentConvertAPI(API, RetrieveMixin):
     resource_type = "convert/document"
     entity_class = entities.DocumentConvertInfo
 
     response_classes = {
+        "retrieve": entities.DocumentConvertFormatInfo,
         "convert": responses.DocumentConvertResponse,
         "status": entities.DocumentConvertStatus,
     }
+
+    def retrieve(
+        self,
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        include_appdata: bool = False,
+    ) -> entities.DocumentConvertFormatInfo:
+        response = super().retrieve(resource_uuid)
+        return cast(entities.DocumentConvertFormatInfo, response)
 
     def convert(
         self,
         paths: List[str],
         store: Optional[bool] = None,
+        save_in_group: bool = False,
     ) -> responses.DocumentConvertResponse:
         url = self._build_url()
 
         data = {
             "paths": paths,
         }
+
         if isinstance(store, bool):
             data["store"] = str(store).lower()  # type: ignore
+
+        if save_in_group:
+            data["save_in_group"] = "1"  # type: ignore
 
         response_class = self._get_response_class("convert")
         document = self._client.post(url, json=data).json()
@@ -510,8 +524,11 @@ class AddonsAPI(API):
         file_uuid: Union[UUID, str],
         params: Optional[AddonExecutionParams] = None,
     ) -> dict:
+        cleaned_params = {}
+        if params:
+            cleaned_params = params.dict(exclude_unset=True, exclude_none=True)
         execution_request_data = self.request_type.parse_obj(
-            dict(target=str(file_uuid), params=params)
+            dict(target=str(file_uuid), params=cleaned_params)
         )
         return execution_request_data.dict(
             exclude_unset=True, exclude_none=True
@@ -520,9 +537,11 @@ class AddonsAPI(API):
     def execute(
         self,
         file_uuid: Union[UUID, str],
-        addon_name: AddonLabels,
+        addon_name: Union[AddonLabels, str],
         params: Optional[AddonExecutionParams] = None,
     ) -> responses.AddonExecuteResponse:
+        if isinstance(addon_name, AddonLabels):
+            addon_name = addon_name.value
         suffix = f"{addon_name}/execute"
         url = self._build_url(suffix=suffix)
         response_class = self._get_response_class("execute")
@@ -532,8 +551,10 @@ class AddonsAPI(API):
         return cast(responses.AddonExecuteResponse, response)
 
     def status(
-        self, request_id: Union[UUID, str], addon_name: AddonLabels
+        self, request_id: Union[UUID, str], addon_name: Union[AddonLabels, str]
     ) -> responses.AddonResponse:
+        if isinstance(addon_name, AddonLabels):
+            addon_name = addon_name.value
         suffix = f"{addon_name}/execute/status"
         query = dict(request_id=str(request_id))
         url = self._build_url(suffix=suffix, query_parameters=query)

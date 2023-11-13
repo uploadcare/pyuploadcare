@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.1.2/5d5bb5639e3f2df33674 (CPython/3.11.5)
+    method: GET
+    uri: https://api.uploadcare.com/convert/document/da288a95-3029-4044-b902-5107e8579c5c/
+  response:
+    content: '{"error":null,"format":{"name":"pdf","conversion_formats":[{"name":"bmp"},{"name":"csv"},{"name":"doc"},{"name":"docx"},{"name":"dwg"},{"name":"dxf"},{"name":"enhanced.jpg"},{"name":"epub"},{"name":"fb2"},{"name":"gif"},{"name":"html"},{"name":"html5"},{"name":"html5-1page"},{"name":"htmlz"},{"name":"jpg"},{"name":"lit"},{"name":"lrf"},{"name":"md"},{"name":"mobi"},{"name":"mp3"},{"name":"pcx"},{"name":"pdb"},{"name":"png"},{"name":"ppt"},{"name":"pptx"},{"name":"prc"},{"name":"ps"},{"name":"rb"},{"name":"rtf"},{"name":"snb"},{"name":"svg"},{"name":"tcr"},{"name":"thumbnail"},{"name":"tiff"},{"name":"txt"},{"name":"txtz"},{"name":"xls"},{"name":"xlsx"}],"converted_groups":{"jpg":"f56f1e80-31f8-426e-9213-690861252070~4"}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '731'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Fri, 03 Nov 2023 22:32:16 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 09cfbddf-b19d-44c4-aa41-f93b9fcb21be
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
