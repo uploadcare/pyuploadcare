@@ -16,7 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - For `AddonsAPI` / `AddonLabels`:
   - Added support for [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
 
-### Changed
+### Deprecated
 
 - For `FileGroup`:
   - Added a deprecation warning when accessing `datetime_stored` property, as it has been deprecated in the REST API.
