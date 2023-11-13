@@ -157,6 +157,13 @@ or create an image of a particular page (if using image format)::
     transformation = DocumentTransformation().format(DocumentFormat.png).page(1)
     converted_file: File = file.convert(transformation)
 
+or create a file group of converted pages of a multipage document::
+
+    file = uploadcare.file('0e1cac48-1296-417f-9e7f-9bf13e330dcf')
+    transformation = DocumentTransformation().format(DocumentFormat.jpg)
+    file.convert(transformation, save_in_group=True)
+    converted_group: FileGroup = file.get_converted_document_group(DocumentFormat.jpg)
+
 or you can use API directly to convert single or multiple files::
 
     transformation = DocumentTransformation().format(DocumentFormat.pdf)
@@ -216,18 +223,23 @@ To execute addon call an API `execute` method with the file and parameters::
     target_file = uploadcare.file("59fccca5-3af7-462f-905b-ed7de83b9762")
     # params - from previous step
     remove_bg_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.REMOVE_BG,
         remove_bg_params,
     )
 
     aws_recognition_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.AWS_LABEL_RECOGNITION,
     )
 
+    aws_moderation_result = uploadcare.addons_api.execute(
+        target_file.uuid,
+        AddonLabels.AWS_MODERATION_LABELS,
+    )
+
     clamav_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.CLAM_AV,
         clamav_params,
     )

@@ -6,29 +6,54 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.1.4](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.1.4) - 2023-10-27
+## [4.2.0](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.2.0) - 2023-11-16
 
-This update introduces the ability to generate secure URLs with the same signature valid not only for the base URL of the file (e.g., `https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/`) but also for all of its transformations (#264). This is optional by default.
+Summary of this update:
 
-Also, `AkamaiSecureUrlBuilderWithUrlToken` class has been implemented (#263).
+1. Added support for the `save_in_group` parameter in [multipage conversion](https://uploadcare.com/docs/transformations/document-conversion/#multipage-conversion) (#258);
+2. Implemented the [AWS Rekognition Moderation](https://uploadcare.com/docs/unsafe-content/) addon API (#260);
+3. Added `signed_uploads` setting for Django projects (#262);
+4. Secure URL generation improvements (#263 & #264);
+5. Various bug fixes.
 
-A new method called `generate_secure_url_token` is exposed for `Uploadcare`. Instead of full URL it will return just the token (unlike the `generate_secure_url` method).
+There are no breaking changes in this release.
 
 ### Added
 
 - For `Uploadcare`:
-  - added `generate_secure_url_token` method.
-  - added optional `wildcard` parameter to `generate_secure_url` method.
+  - Added a type for the `event` parameter of the `create_webhook` and `update_webhook` methods.
+  - Added the `generate_upload_signature` method. This shortcut could be useful for signed uploads from your website's frontend, where the signature needs to be passed outside of your website's Python part (e.g., for the uploading widget).
+  - Added `generate_secure_url_token` method. Similar to `generate_secure_url`, it returns only a token, not the full URL.
+  - Added an optional `wildcard` parameter to the `generate_secure_url` method.
+
+- For `File`:
+  - Added the `save_in_group` parameter to the `convert` and `convert_document` methods. It defaults to `False`. When set to `True`, multi-page documents will additionally be saved as a file group.
+  - Added the `get_converted_document_group` method. It returns a `FileGroup` instance for converted multi-page documents.
+
+- For `DocumentConvertAPI`:
+  - Added the `retrieve` method, which corresponds to the [`GET /convert/document/:uuid/`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo) API endpoint.
+
+- For `AddonsAPI` / `AddonLabels`:
+  - Added support for the [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
+
+- For Django integration:
+  - Added the `signed_uploads` setting for Django projects. When enabled, this setting exposes the generated signature to the uploading widget.
 
 - For `AkamaiSecureUrlBuilderWithAclToken`:
-  - added `get_token` method.
-  - added optional `wildcard` parameter to `build` method.
+  - Added `get_token` method.
+  - Added an optional `wildcard` parameter to the `build` method.
 
-- `AkamaiSecureUrlBuilderWithUrlToken` class.
+- Introduced `AkamaiSecureUrlBuilderWithUrlToken` class.
 
 ### Changed
 
-- `AkamaiSecureUrlBuilder` has been renamed to `AkamaiSecureUrlBuilderWithAclToken`. It is still available under the old name and works as before, but it will give you a deprecation warning when you use it.
+- `AkamaiSecureUrlBuilder` has been renamed to `AkamaiSecureUrlBuilderWithAclToken`. It is still available under the old name and works as before, but it will issue a deprecation warning when used.
+
+### Fixed
+
+- For `AddonsAPI` / `AddonExecutionParams`:
+  - Fixed an issue where calling `execute` and `status` with `AddonLabels`'s attributes (such as `AddonLabels.REMOVE_BG`) for the `addon_name` would result in a _404 Not Found_ error.
+  - Fixed `ValidationError` when constructing `AddonClamAVExecutionParams` or `AddonRemoveBGExecutionParams` with omitted optional parameters.
 
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 

@@ -24,6 +24,7 @@ user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
 
 cdn_base = settings.UPLOADCARE.get("cdn_base")
 
+signed_uploads = settings.UPLOADCARE.get("signed_uploads", False)
 
 widget_version = settings.UPLOADCARE.get("widget_version", "3.x")
 widget_build = settings.UPLOADCARE.get(
