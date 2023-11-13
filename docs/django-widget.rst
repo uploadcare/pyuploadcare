@@ -56,8 +56,18 @@ widget url:
 
     UPLOADCARE = {
         # ...
-        'upload_base_url' = 'http://path.to/your/upload/handler',
+        'upload_base_url': 'http://path.to/your/upload/handler',
     }
+
+If you have signed uploads enabled in your Uploadcare project, widget-based uploads will fail unless you enable the ``signed_uploads`` setting in your Django project::
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        # ...,
+        'signed_uploads': True,
+    }
+
 
 .. _django-widget-models-ref:
 
