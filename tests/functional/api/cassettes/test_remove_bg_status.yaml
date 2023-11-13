@@ -1,0 +1,51 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.1.2/5d5bb5639e3f2df33674 (CPython/3.11.5)
+    method: GET
+    uri: https://api.uploadcare.com/addons/remove_bg/execute/status/?request_id=53930d55-8ecb-4b2b-ab9e-3c3b1ffe53cb
+  response:
+    content: '{"status": "done", "result": {"file_id": "d2a90661-a813-452d-9a38-a3cb7b168548"}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 09 Nov 2023 21:07:34 GMT
+      Server:
+      - nginx
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 5264a94b-072f-4877-92c5-8823f8dc2d9e
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

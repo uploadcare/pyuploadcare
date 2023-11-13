@@ -9,6 +9,7 @@ from pyuploadcare.api.entities import Entity
 
 class AddonLabels(str, Enum):
     AWS_LABEL_RECOGNITION = "aws_rekognition_detect_labels"
+    AWS_MODERATION_LABELS = "aws_rekognition_detect_moderation_labels"
     CLAM_AV = "uc_clamav_virus_scan"
     REMOVE_BG = "remove_bg"
 
@@ -38,11 +39,11 @@ class AddonClamAVExecutionRequestData(AddonExecutionGeneralRequestData):
 
 
 class AddonRemoveBGExecutionParams(AddonExecutionParams):
-    crop: bool = Field(
-        False, description="Whether to crop off all empty regions"
+    crop: Optional[bool] = Field(
+        None, description="Whether to crop off all empty regions"
     )
-    crop_margin: str = Field(
-        "0",
+    crop_margin: Optional[str] = Field(
+        None,
         description="Adds a margin around the cropped subject, e.g 30px or 30%",
     )
     scale: Optional[str] = Field(
@@ -50,10 +51,10 @@ class AddonRemoveBGExecutionParams(AddonExecutionParams):
         description="Scales the subject relative to the total image size, e.g 80%",
     )
     add_shadow: Optional[bool] = Field(
-        False, description="Whether to add an artificial shadow to the result"
+        None, description="Whether to add an artificial shadow to the result"
     )
     type_level: Optional[str] = Field(
-        "none",
+        None,
         description="""Enum: "none" "1" "2" "latest"
     "none" = No classification (foreground_type won't bet set in the application data)
     "1" = Use coarse classification classes: [person, product, animal, car, other]
@@ -63,15 +64,16 @@ class AddonRemoveBGExecutionParams(AddonExecutionParams):
     """,
     )
     type: Optional[str] = Field(
-        description="""Foreground type. Enum: "auto" "person" "product" "car"""
+        None,
+        description="""Foreground type. Enum: "auto" "person" "product" "car""",
     )
     semitransparency: Optional[bool] = Field(
-        True,
+        None,
         description="Whether to have semi-transparent regions in the result",
     )
-    channels: Optional[str] = Field("rgba", description="Enum: 'rgba' 'alpha'")
+    channels: Optional[str] = Field(None, description="Enum: 'rgba' 'alpha'")
     roi: Optional[str] = Field(
-        ...,
+        None,
         description="""
         Region of interest:
             Only contents of this rectangular region can be detected as foreground.
@@ -83,7 +85,7 @@ class AddonRemoveBGExecutionParams(AddonExecutionParams):
         """,
     )
     position: Optional[str] = Field(
-        ...,
+        None,
         description="""
         Positions the subject within the image canvas.
         Can be

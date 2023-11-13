@@ -524,8 +524,11 @@ class AddonsAPI(API):
         file_uuid: Union[UUID, str],
         params: Optional[AddonExecutionParams] = None,
     ) -> dict:
+        cleaned_params = {}
+        if params:
+            cleaned_params = params.dict(exclude_unset=True, exclude_none=True)
         execution_request_data = self.request_type.parse_obj(
-            dict(target=str(file_uuid), params=params)
+            dict(target=str(file_uuid), params=cleaned_params)
         )
         return execution_request_data.dict(
             exclude_unset=True, exclude_none=True
@@ -534,9 +537,11 @@ class AddonsAPI(API):
     def execute(
         self,
         file_uuid: Union[UUID, str],
-        addon_name: AddonLabels,
+        addon_name: Union[AddonLabels, str],
         params: Optional[AddonExecutionParams] = None,
     ) -> responses.AddonExecuteResponse:
+        if isinstance(addon_name, AddonLabels):
+            addon_name = addon_name.value
         suffix = f"{addon_name}/execute"
         url = self._build_url(suffix=suffix)
         response_class = self._get_response_class("execute")
@@ -546,8 +551,10 @@ class AddonsAPI(API):
         return cast(responses.AddonExecuteResponse, response)
 
     def status(
-        self, request_id: Union[UUID, str], addon_name: AddonLabels
+        self, request_id: Union[UUID, str], addon_name: Union[AddonLabels, str]
     ) -> responses.AddonResponse:
+        if isinstance(addon_name, AddonLabels):
+            addon_name = addon_name.value
         suffix = f"{addon_name}/execute/status"
         query = dict(request_id=str(request_id))
         url = self._build_url(suffix=suffix, query_parameters=query)

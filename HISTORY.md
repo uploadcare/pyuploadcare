@@ -6,7 +6,13 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.1.6](https://github.com/uploadcare/pyuploadcare/compare/v4.1.5...v4.1.6) - soon
+## [4.2.0](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.2.0) - 2023-11-16
+
+In this update:
+
+1. Added support for the `save_in_group` parameter in [multipage conversion](https://uploadcare.com/docs/transformations/document-conversion/#multipage-conversion);
+2. Implemented the [AWS Rekognition Moderation](https://uploadcare.com/docs/unsafe-content/) addon API;
+3. Various bug fixes.
 
 ### Added
 
@@ -17,6 +23,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - For `DocumentConvertAPI`:
   - added `retrieve` method which corresponds to [`GET /convert/document/:uuid/`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo) API endpoint.
 
+- For `Uploadcare`:
+  - Added type for parameter `event` of `create_webhook` and `update_webhook` methods.
+
+- For `AddonsAPI` / `AddonLabels`:
+  - Added support for [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
+
+### Fixed
+
+- For `AddonsAPI` / `AddonExecutionParams`:
+  - Fixed the issue where calling `execute` and `status` with `AddonLabels`'s attributes (such as `AddonLabels.REMOVE_BG`) for `addon_name` would result in a _404 Not Found_ error.
+  - Fixed `ValidationError` when constructing `AddonClamAVExecutionParams` or `AddonRemoveBGExecutionParams` with omitted optional parameters.
 
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 

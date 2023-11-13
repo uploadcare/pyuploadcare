@@ -28,7 +28,7 @@ from pyuploadcare.api import (
 )
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
-from pyuploadcare.api.entities import ProjectInfo, Webhook
+from pyuploadcare.api.entities import ProjectInfo, Webhook, WebhookEvent
 from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
     extracts_uuids,
@@ -754,7 +754,7 @@ class Uploadcare:
     def create_webhook(
         self,
         target_url: str,
-        event="file.uploaded",
+        event: WebhookEvent = "file.uploaded",
         is_active=True,
         signing_secret=None,
     ) -> Webhook:
@@ -780,7 +780,7 @@ class Uploadcare:
         self,
         webhook_id: Union[Webhook, int],
         target_url=None,
-        event=None,
+        event: Optional[WebhookEvent] = None,
         is_active=None,
         signing_secret=None,
     ) -> Webhook:
