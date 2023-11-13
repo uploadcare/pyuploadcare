@@ -157,7 +157,7 @@ or create an image of a particular page (if using image format)::
     transformation = DocumentTransformation().format(DocumentFormat.png).page(1)
     converted_file: File = file.convert(transformation)
 
-or create a file group of converted pages of multipage document::
+or create a file group of converted pages of a multipage document::
 
     file = uploadcare.file('0e1cac48-1296-417f-9e7f-9bf13e330dcf')
     transformation = DocumentTransformation().format(DocumentFormat.jpg)
