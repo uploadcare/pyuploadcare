@@ -10,14 +10,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Summary of this update:
 
-1. Added support for the `save_in_group` parameter in [multipage conversion](https://uploadcare.com/docs/transformations/document-conversion/#multipage-conversion);
-2. Implemented the [AWS Rekognition Moderation](https://uploadcare.com/docs/unsafe-content/) addon API;
-3. Added `signed_uploads` setting for Django projects;
-4. Various bug fixes.
+1. Added support for the `save_in_group` parameter in [multipage conversion](https://uploadcare.com/docs/transformations/document-conversion/#multipage-conversion) (#258);
+2. Implemented the [AWS Rekognition Moderation](https://uploadcare.com/docs/unsafe-content/) addon API (#260);
+3. Added `signed_uploads` setting for Django projects (#262);
+4. Secure URL generation improvements (#263 & #264);
+5. Various bug fixes.
 
 There are no breaking changes in this release.
 
 ### Added
+
+- For `Uploadcare`:
+  - Added a type for the `event` parameter of the `create_webhook` and `update_webhook` methods.
+  - Added the `generate_upload_signature` method. This shortcut could be useful for signed uploads from your website's frontend, where the signature needs to be passed outside of your website's Python part (e.g., for the uploading widget).
+  - Added `generate_secure_url_token` method. Similar to `generate_secure_url`, it returns only a token, not the full URL.
+  - Added an optional `wildcard` parameter to the `generate_secure_url` method.
 
 - For `File`:
   - Added the `save_in_group` parameter to the `convert` and `convert_document` methods. It defaults to `False`. When set to `True`, multi-page documents will additionally be saved as a file group.
@@ -26,15 +33,21 @@ There are no breaking changes in this release.
 - For `DocumentConvertAPI`:
   - Added the `retrieve` method, which corresponds to the [`GET /convert/document/:uuid/`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo) API endpoint.
 
-- For `Uploadcare`:
-  - Added type for the `event` parameter of the `create_webhook` and `update_webhook` methods.
-  - Added the `generate_upload_signature` method. This shortcut could be useful for signed uploads from your website's frontend, where the signature needs to be passed outside of your website's Python part (e.g., for the uploading widget).
-
 - For `AddonsAPI` / `AddonLabels`:
   - Added support for the [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
 
 - For Django integration:
   - Added the `signed_uploads` setting for Django projects. When enabled, this setting exposes the generated signature to the uploading widget.
+
+- For `AkamaiSecureUrlBuilderWithAclToken`:
+  - Added `get_token` method.
+  - Added an optional `wildcard` parameter to the `build` method.
+
+- Introduced `AkamaiSecureUrlBuilderWithUrlToken` class.
+
+### Changed
+
+- `AkamaiSecureUrlBuilder` has been renamed to `AkamaiSecureUrlBuilderWithAclToken`. It is still available under the old name and works as before, but it will issue a deprecation warning when used.
 
 ### Fixed
 

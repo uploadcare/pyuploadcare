@@ -399,12 +399,15 @@ Secure delivery
 
 You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_).
 
-Generate secure for file::
+Generate secure URL for file::
 
     from pyuploadcare import Uploadcare
-    from pyuploadcare.secure_url import AkamaiSecureUrlBuilder
+    from pyuploadcare.secure_url import AkamaiSecureUrlBuilderWithAclToken
 
-    secure_url_bulder = AkamaiSecureUrlBuilder("your cdn>", "<your secret for token generation>")
+    secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
+        "<your cdn>",
+        "<your secret for token generation>"
+    )
 
     uploadcare = Uploadcare(
         public_key='<your public key>',
@@ -414,11 +417,43 @@ Generate secure for file::
 
     secure_url = uploadcare.generate_secure_url('52da3bfc-7cd8-4861-8b05-126fef7a6994')
 
-Generate secure for file with transformations::
+Generate just the token::
+
+    token = uploadcare.get_secure_url_token('52da3bfc-7cd8-4861-8b05-126fef7a6994')
+
+Generate secure URL for file with transformations::
 
     secure_url = uploadcare.generate_secure_url(
         '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
     )
+
+Generate secure URL for file, with the same signature valid for its transformations::
+
+    secure_url = uploadcare.generate_secure_url(
+        '52da3bfc-7cd8-4861-8b05-126fef7a6994',
+        wildcard=True
+    )
+
+Generate secure URL for file by its URL (please notice the usage of a different builder class)::
+
+    from pyuploadcare import Uploadcare
+    from pyuploadcare.secure_url import AkamaiSecureUrlBuilderWithUrlToken
+
+    secure_url_bulder = AkamaiSecureUrlBuilderWithUrlToken(
+        "<your cdn>",
+        "<your secret for token generation>"
+    )
+
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        secret_key='<your private key>',
+        secure_url_builder=secure_url_bulder,
+    )
+
+    secure_url = uploadcare.generate_secure_url(
+        'https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/'
+    )
+
 
 Useful links
 ------------
