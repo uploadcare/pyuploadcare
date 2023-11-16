@@ -6,6 +6,13 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.1](https://github.com/uploadcare/pyuploadcare/compare/v4.2.0...v4.2.1) - 2023-11-17
+
+### Fixed
+
+- For `AddonsAPI`:
+  - In version 4.2.0, passing a Python dictionary as `params` to the `execute` method would cause an `AttributeError`. Now, you can use either an `AddonExecutionParams` instance or a `dict`.
+
 ## [4.2.0](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.2.0) - 2023-11-16
 
 Summary of this update:
