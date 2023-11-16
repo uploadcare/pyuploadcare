@@ -154,7 +154,7 @@ class FileGroup(Iterable):
     def datetime_stored(self):
         """Returns file group's store aware *datetime* in UTC format."""
         warnings.warn(
-            "datetime_stored field is deprecated in the REST API.",
+            "datetime_stored has been removed from REST API v0.7",
             DeprecationWarning,
         )
         datetime_ = self.info.get("datetime_stored")

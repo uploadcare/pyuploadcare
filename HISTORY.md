@@ -52,10 +52,12 @@ There are no breaking changes in this release.
 ### Deprecated
 
 - For `FileGroup`:
-  - Added a deprecation warning when accessing `datetime_stored` property, as it has been deprecated in the REST API.
+  - Added a deprecation warning when accessing `datetime_stored` property, as it has been deprecated in the REST API. This field does not exist in REST API v0.7.x.
 
 - For `GroupsAPI`:
-  - Added a deprecation warning when calling `store` method, as it has been deprecated in the REST API.
+  - Added a deprecation warning when calling `store` method, as it has been deprecated in the REST API. This API endpoint does not exist in REST API v0.7.x.
+
+- `AkamaiSecureUrlBuilder` has been renamed to `AkamaiSecureUrlBuilderWithAclToken`. It is still available under the old name and works as before, but it will issue a deprecation warning when used.
 
 ### Fixed
 
