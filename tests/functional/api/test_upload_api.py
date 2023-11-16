@@ -54,3 +54,13 @@ def test_multipart_upload(big_file, uploadcare):
 
     response = uploadcare.upload_api.multipart_complete(multipart_uuid)
     assert "file_id" in response
+
+
+@pytest.mark.freeze_time("2023-10-27")
+def test_generate_upload_signature(uploadcare):
+    expire, signature = uploadcare.generate_upload_signature()
+    assert expire == 1698364860
+    assert (
+        signature
+        == "bf659caf5e081da589634770a84494fdb310d117be6f3f7b8e9842abf2997695"
+    )

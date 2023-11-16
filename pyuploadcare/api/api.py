@@ -178,27 +178,41 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
             self._process_exceptions(request_error)
 
 
-class DocumentConvertAPI(API):
+class DocumentConvertAPI(API, RetrieveMixin):
     resource_type = "convert/document"
     entity_class = entities.DocumentConvertInfo
 
     response_classes = {
+        "retrieve": entities.DocumentConvertFormatInfo,
         "convert": responses.DocumentConvertResponse,
         "status": entities.DocumentConvertStatus,
     }
+
+    def retrieve(
+        self,
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        include_appdata: bool = False,
+    ) -> entities.DocumentConvertFormatInfo:
+        response = super().retrieve(resource_uuid)
+        return cast(entities.DocumentConvertFormatInfo, response)
 
     def convert(
         self,
         paths: List[str],
         store: Optional[bool] = None,
+        save_in_group: bool = False,
     ) -> responses.DocumentConvertResponse:
         url = self._build_url()
 
         data = {
             "paths": paths,
         }
+
         if isinstance(store, bool):
             data["store"] = str(store).lower()  # type: ignore
+
+        if save_in_group:
+            data["save_in_group"] = "1"  # type: ignore
 
         response_class = self._get_response_class("convert")
         document = self._client.post(url, json=data).json()
@@ -252,7 +266,7 @@ class UploadAPI(API):
     resource_type = "base"
 
     @staticmethod
-    def _generate_secure_signature(secret: str, expire: int):
+    def generate_secure_signature(secret: str, expire: int):
         return hmac.new(
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
@@ -288,7 +302,7 @@ class UploadAPI(API):
                 expire = int(time()) + self.signed_uploads_ttl
             data["expire"] = str(expire)
 
-            signature = self._generate_secure_signature(secret_key, expire)  # type: ignore
+            signature = self.generate_secure_signature(secret_key, expire)  # type: ignore
             data["signature"] = signature
 
         url = self._build_url()
@@ -327,7 +341,7 @@ class UploadAPI(API):
             )
 
             data["expire"] = str(expire)
-            data["signature"] = self._generate_secure_signature(
+            data["signature"] = self.generate_secure_signature(
                 self.secret_key, expire  # type: ignore
             )
 
@@ -383,7 +397,7 @@ class UploadAPI(API):
             )
 
             data["expire"] = str(expire)
-            data["signature"] = self._generate_secure_signature(
+            data["signature"] = self.generate_secure_signature(
                 self.secret_key, expire  # type: ignore
             )
 
@@ -440,7 +454,7 @@ class UploadAPI(API):
             )
 
             data["expire"] = str(expire)
-            data["signature"] = self._generate_secure_signature(
+            data["signature"] = self.generate_secure_signature(
                 self.secret_key, expire  # type: ignore
             )
 

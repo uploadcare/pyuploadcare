@@ -258,6 +258,21 @@ class DocumentConvertStatus(Entity):
     result: DocumentConvertShortInfo
 
 
+class DocumentConvertConversionFormat(Entity):
+    name: str
+
+
+class DocumentConvertFormat(Entity):
+    name: str
+    conversion_formats: List[DocumentConvertConversionFormat]
+    converted_groups: Dict[str, str]
+
+
+class DocumentConvertFormatInfo(Entity):
+    error: Optional[str]
+    format: DocumentConvertFormat
+
+
 class VideoConvertShortInfo(Entity):
     uuid: UUID
     thumbnails_group_uuid: str

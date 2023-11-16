@@ -9,6 +9,7 @@ from typing import (
     Iterable,
     List,
     Optional,
+    Tuple,
     Type,
     Union,
 )
@@ -814,7 +815,19 @@ class Uploadcare:
 
         return self.project_api.retrieve()
 
-    def generate_secure_url(self, uuid: Union[str, UUID]) -> str:
+    def generate_upload_signature(self) -> Tuple[int, str]:
+        """Expiration and signature for signed uploads."""
+        if not self.secret_key:
+            raise ValueError("secret_key is required")
+        expire = int(time()) + self.signed_uploads_ttl
+        signature = self.upload_api.generate_secure_signature(
+            self.secret_key, expire
+        )
+        return expire, signature
+
+    def generate_secure_url(
+        self, uuid: Union[str, UUID], wildcard: bool = False
+    ) -> str:
         """Generate authenticated URL."""
         if isinstance(uuid, UUID):
             uuid = str(uuid)
@@ -822,4 +835,16 @@ class Uploadcare:
         if not self.secure_url_builder:
             raise ValueError("secure_url_builder must be set")
 
-        return self.secure_url_builder.build(uuid)
+        return self.secure_url_builder.build(uuid, wildcard=wildcard)
+
+    def generate_secure_url_token(
+        self, uuid: Union[str, UUID], wildcard: bool = False
+    ) -> str:
+        """Generate token for authenticated URL."""
+        if isinstance(uuid, UUID):
+            uuid = str(uuid)
+
+        if not self.secure_url_builder:
+            raise ValueError("secure_url_builder must be set")
+
+        return self.secure_url_builder.get_token(uuid, wildcard=wildcard)
