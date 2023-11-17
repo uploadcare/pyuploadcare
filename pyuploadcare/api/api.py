@@ -522,11 +522,16 @@ class AddonsAPI(API):
     def _get_request_data(
         self,
         file_uuid: Union[UUID, str],
-        params: Optional[AddonExecutionParams] = None,
+        params: Optional[Union[AddonExecutionParams, dict]] = None,
     ) -> dict:
         cleaned_params = {}
         if params:
-            cleaned_params = params.dict(exclude_unset=True, exclude_none=True)
+            if isinstance(params, AddonExecutionParams):
+                cleaned_params = params.dict(
+                    exclude_unset=True, exclude_none=True
+                )
+            else:
+                cleaned_params = params
         execution_request_data = self.request_type.parse_obj(
             dict(target=str(file_uuid), params=cleaned_params)
         )
@@ -538,7 +543,7 @@ class AddonsAPI(API):
         self,
         file_uuid: Union[UUID, str],
         addon_name: Union[AddonLabels, str],
-        params: Optional[AddonExecutionParams] = None,
+        params: Optional[Union[AddonExecutionParams, dict]] = None,
     ) -> responses.AddonExecuteResponse:
         if isinstance(addon_name, AddonLabels):
             addon_name = addon_name.value
