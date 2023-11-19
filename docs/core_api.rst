@@ -251,6 +251,9 @@ To check status of performed task use `status` method::
 
 If addon execution produces new data for file (like an AWS recognition does), this data will be placed at `appdata` complex attribute of `File.info` (see `addons documentation`_)
 
+    file.update_info(include_appdata=True)
+    print(file.info["appdata"]["aws_rekognition_detect_labels"])
+
 
 File metadata
 -----------------

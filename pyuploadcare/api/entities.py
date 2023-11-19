@@ -146,6 +146,23 @@ class AWSRecognitionDetectLabelsApplicationData(ApplicationDataBase):
     data: AWSRecognitionDetectLabelsDetails
 
 
+class AWSRecognitionModerationLabel(Entity):
+    confidence: Decimal = Field(alias="Confidence")
+    name: str = Field(alias="Name")
+    parent_name: str = Field(alias="ParentName")
+
+
+class AWSRecognitionDetectModerationLabelsDetails(ApllicationDataDetails):
+    label_model_version: Optional[str] = Field(alias="ModerationModelVersion")
+    labels: List[AWSRecognitionModerationLabel] = Field(
+        alias="ModerationLabels", default_factory=list
+    )
+
+
+class AWSRecognitionDetectModerationLabelsApplicationData(ApplicationDataBase):
+    data: AWSRecognitionDetectModerationLabelsDetails
+
+
 class RemoveBackgroundDetails(ApllicationDataDetails):
     foreground_type: Optional[str]
 
@@ -166,6 +183,9 @@ class UCClamAVApplicationData(ApplicationDataBase):
 class ApplicationDataSet(Entity):
     aws_rekognition_detect_labels: Optional[
         AWSRecognitionDetectLabelsApplicationData
+    ]
+    aws_rekognition_detect_moderation_labels: Optional[
+        AWSRecognitionDetectModerationLabelsApplicationData
     ]
     remove_bg: Optional[RemoveBackgroundApplicationData]
     uc_clamav_virus_scan: Optional[UCClamAVApplicationData]
