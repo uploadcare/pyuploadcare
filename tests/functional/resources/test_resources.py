@@ -362,6 +362,35 @@ def test_list_files(uploadcare):
 def test_retrieve_fileinfo_with_metadata(uploadcare):
     file_ = uploadcare.file("a55d6b25-d03c-4038-9838-6e06bb7df598")
     assert isinstance(file_, File)
+    assert file_.info
 
     metadata_dict = file_.info["metadata"]
     assert len(metadata_dict) == 2
+
+
+@pytest.mark.vcr
+def test_retrieve_fileinfo_with_appdata(uploadcare):
+    file_ = uploadcare.file("04bd49fa-466d-49e7-afd7-bac108055371")
+    assert isinstance(file_, File)
+    file_.update_info(include_appdata=True)
+    assert file_.info
+    appdata = file_.info["appdata"]
+
+    assert "aws_rekognition_detect_labels" in appdata
+    labels_data = appdata["aws_rekognition_detect_labels"]
+    labels_details = labels_data["data"]
+    assert labels_details["label_model_version"]
+    assert len(labels_details["labels"]) == 10
+    label = labels_details["labels"][0]
+    assert label["confidence"]
+    assert label["name"] == "Accessories"
+
+    assert "aws_rekognition_detect_moderation_labels" in appdata
+    moderation_data = appdata["aws_rekognition_detect_moderation_labels"]
+    moderation_details = moderation_data["data"]
+    assert moderation_details["label_model_version"]
+    assert len(moderation_details["labels"]) == 1
+    moderation_label = moderation_details["labels"][0]
+    assert moderation_label["confidence"]
+    assert moderation_label["name"] == "Weapons"
+    assert moderation_label["parent_name"] == "Violence"
