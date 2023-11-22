@@ -117,6 +117,7 @@ class AkamaiSecureUrlBuilderWithAclToken(BaseAkamaiSecureUrlBuilder):
         return self.base_template.format(cdn=self.cdn_url, uuid=uuid_or_url)
 
     def _format_acl(self, uuid_or_url: str, wildcard: bool) -> str:
+        uuid_or_url = uuid_or_url.replace("~", "%7e")
         if wildcard:
             return f"/{uuid_or_url}/*"
         return f"/{uuid_or_url}/"
