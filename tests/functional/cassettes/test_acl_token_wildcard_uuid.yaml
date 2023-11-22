@@ -1,0 +1,104 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.27.1
+    method: GET
+    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/?token=exp=2015971200~acl=/1bd27101-6f40-460a-9358-d44c282e9d16/*~hmac=4f953bf9b238c59a90bd12972afd5d6fb5ec5377709f2d6b1f493d10cc08abda
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAMtIzcnJ5wIAIDA6NgYAAAA=
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Methods:
+      - HEAD, GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=31476662
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename=hello.txt
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '26'
+      Content-Type:
+      - text/plain
+      Date:
+      - Wed, 22 Nov 2023 23:26:27 GMT
+      ETag:
+      - '"b1946ac92492d2347c6235b4d2611184"'
+      Last-Modified:
+      - Wed, 22 Nov 2023 00:53:42 GMT
+      Server:
+      - Uploadcare
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.27.1
+    method: GET
+    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/hello.txt?token=exp=2015971200~acl=/1bd27101-6f40-460a-9358-d44c282e9d16/*~hmac=4f953bf9b238c59a90bd12972afd5d6fb5ec5377709f2d6b1f493d10cc08abda
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAMtIzcnJ5wIAIDA6NgYAAAA=
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Methods:
+      - HEAD, GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=31555737
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline; filename=hello.txt
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '26'
+      Content-Type:
+      - text/plain
+      Date:
+      - Wed, 22 Nov 2023 23:26:27 GMT
+      ETag:
+      - '"b1946ac92492d2347c6235b4d2611184"'
+      Last-Modified:
+      - Wed, 22 Nov 2023 00:53:42 GMT
+      Server:
+      - Uploadcare
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+    status:
+      code: 200
+      message: OK
+version: 1

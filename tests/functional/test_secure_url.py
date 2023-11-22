@@ -1,4 +1,5 @@
 import pytest
+import requests
 
 from pyuploadcare import Uploadcare
 from pyuploadcare.secure_url import (
@@ -166,3 +167,76 @@ def test_client_generate_secure_url_with_wildcard_acl_token():
         "acl=/52da3bfc-7cd8-4861-8b05-126fef7a6994/*~"
         "hmac=b2c7526a29d0588b121aa78bc2b2c9399bfb6e1cad3d95397efed722fdbc5a78"
     )
+
+
+@pytest.fixture
+def uploadcare_with_acl_token():
+    secure_url_builder = AkamaiSecureUrlBuilderWithAclToken(
+        cdn_url="sectest.ucarecdn.com",
+        secret_key=known_secret,
+        window=60 * 60 * 24 * 365 * 10,
+    )
+
+    uploadcare = Uploadcare(
+        public_key="public",
+        secret_key="secret",
+        secure_url_builder=secure_url_builder,
+    )
+    return uploadcare
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_acl_token_bare_uuid(uploadcare_with_acl_token: Uploadcare):
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "1bd27101-6f40-460a-9358-d44c282e9d16"
+    )
+    assert requests.get(secure_url).status_code == 200
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_acl_token_uuid_with_transformations(
+    uploadcare_with_acl_token: Uploadcare,
+):
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/"
+    )
+    assert "are not images" in requests.get(secure_url).text
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_acl_token_wildcard_uuid(uploadcare_with_acl_token: Uploadcare):
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "1bd27101-6f40-460a-9358-d44c282e9d16", wildcard=True
+    )
+    assert requests.get(secure_url).status_code == 200
+
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "1bd27101-6f40-460a-9358-d44c282e9d16", wildcard=True
+    )
+    secure_url = secure_url.replace("/?token=", "/hello.txt?token=")
+    assert "hello.txt" in secure_url
+    assert requests.get(secure_url).status_code == 200
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_acl_token_wildcard_uuid_with_transformations(
+    uploadcare_with_acl_token: Uploadcare,
+):
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/",
+        wildcard=True,
+    )
+    assert "are not images" in requests.get(secure_url).text
+
+    # UUID with transformations + wildcard [2]
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/",
+        wildcard=True,
+    )
+    secure_url = secure_url.replace("/?token=", "/hello.txt?token=")
+    assert "hello.txt" in secure_url
+    assert "are not images" in requests.get(secure_url).text
