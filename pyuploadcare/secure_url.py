@@ -57,15 +57,10 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         token = self._build_token(expire, acl, signature)
         return token
 
-    def _escape_early(self, text):
-        if True:
-
-            def toLower(match):
-                return match.group(1).lower()
-
-            return re.sub(r"(%..)", toLower, quote_plus(text))
-        else:
-            return text
+    def _escape_early(self, text: str) -> str:
+        return re.sub(
+            r"(%..)", lambda match: match.group(1).lower(), quote_plus(text)
+        )
 
     def _escape(self, text: str) -> str:
         for char in "~,":
@@ -78,9 +73,11 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     def _build_signature(
         self, uuid_or_url: str, expire: int, acl: Optional[str]
     ) -> str:
+        path = self._get_path(uuid_or_url)
+        path = self._escape_early(path)
         hash_source = [
             f"exp={expire}",
-            f"acl={acl}" if acl else f"url={uuid_or_url}",
+            f"acl={acl}" if acl else f"url={path}",
         ]
 
         signature = hmac.new(
@@ -126,7 +123,6 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         if parsed.netloc:
             # extract uuid with transformations from url
             path = parsed.path
-        path = path.lstrip("/").rstrip("/")
         return path
 
     def _build_base_url(self, uuid_or_url: str):
@@ -137,6 +133,7 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/
         """
         path = self._get_path(uuid_or_url)
+        path = path.lstrip("/").rstrip("/")
         base_url = self.base_template.format(cdn=self.cdn_url, path=path)
         return base_url
 
@@ -148,6 +145,7 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
 class AkamaiSecureUrlBuilderWithAclToken(BaseAkamaiSecureUrlBuilder):
     def _format_acl(self, uuid_or_url: str, wildcard: bool) -> str:
         path = self._get_path(uuid_or_url)
+        path = path.lstrip("/").rstrip("/")
         path = self._escape(path)
         if wildcard:
             return f"/{path}/*"

@@ -503,4 +503,254 @@ interactions:
     status:
       code: 400
       message: Bad Request
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - sectest.ucarecdn.com
+      User-Agent:
+      - Python-urllib/3.11
+    method: GET
+    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/?token=exp=2015971200~acl=/1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/*~hmac=e4d3477b3c5b88cc11ec916f2f853c82f3e83aa8119e85bc18a93eb5e7d84ded
+  response:
+    body:
+      string: '<!DOCTYPE html>
+
+        <html lang="en">
+
+        <head>
+
+        <meta charset="UTF-8">
+
+        <title>400: Bad Request</title>
+
+        <style>
+
+        body {
+
+        margin: 30px;
+
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+        line-height: 1.6;
+
+        color: #666;
+
+        background: white;
+
+        max-width: 700px;
+
+        }
+
+        h3 { color: black }
+
+        a {
+
+        color: #00cf70;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        }
+
+        a:hover { color: black }
+
+        code {
+
+        color: black;
+
+        font-size: 13px;
+
+        background: #f8f8f8;
+
+        border: solid 1px #e4e4e4;
+
+        padding: 2px 6px;
+
+        border-radius: 2px
+
+        }
+
+        </style>
+
+        </head>
+
+        <body>
+
+        <h3>Bad Request</h3>
+
+
+
+        <p>Not supported for files that are not images.</p>
+
+
+
+
+        <p>
+
+        See <a href="https://uploadcare.com/docs/delivery/cdn/">CDN documentation</a>.
+
+        </p>
+
+
+        </body>
+
+        </html>
+
+        '
+    headers:
+      Access-Control-Allow-Methods:
+      - HEAD, GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length, Etag, X-Image-Width, X-Image-Height, X-Image-Acceptable-Original,
+        X-Image-Acceptable-Improved
+      Cache-Control:
+      - public, max-age=3582
+      Connection:
+      - close
+      Content-Length:
+      - '694'
+      Content-Security-Policy:
+      - sandbox; default-src 'unsafe-inline' data:; script-src 'none'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Thu, 23 Nov 2023 22:45:40 GMT
+      Server:
+      - Uploadcare
+      Vary:
+      - accept
+    status:
+      code: 400
+      message: Bad Request
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - sectest.ucarecdn.com
+      User-Agent:
+      - Python-urllib/3.11
+    method: GET
+    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/hello.txt?token=exp=2015971200~acl=/1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/*~hmac=e4d3477b3c5b88cc11ec916f2f853c82f3e83aa8119e85bc18a93eb5e7d84ded
+  response:
+    body:
+      string: '<!DOCTYPE html>
+
+        <html lang="en">
+
+        <head>
+
+        <meta charset="UTF-8">
+
+        <title>400: Bad Request</title>
+
+        <style>
+
+        body {
+
+        margin: 30px;
+
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+        line-height: 1.6;
+
+        color: #666;
+
+        background: white;
+
+        max-width: 700px;
+
+        }
+
+        h3 { color: black }
+
+        a {
+
+        color: #00cf70;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        }
+
+        a:hover { color: black }
+
+        code {
+
+        color: black;
+
+        font-size: 13px;
+
+        background: #f8f8f8;
+
+        border: solid 1px #e4e4e4;
+
+        padding: 2px 6px;
+
+        border-radius: 2px
+
+        }
+
+        </style>
+
+        </head>
+
+        <body>
+
+        <h3>Bad Request</h3>
+
+
+
+        <p>Not supported for files that are not images.</p>
+
+
+
+
+        <p>
+
+        See <a href="https://uploadcare.com/docs/delivery/cdn/">CDN documentation</a>.
+
+        </p>
+
+
+        </body>
+
+        </html>
+
+        '
+    headers:
+      Access-Control-Allow-Methods:
+      - HEAD, GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length, Etag, X-Image-Width, X-Image-Height, X-Image-Acceptable-Original,
+        X-Image-Acceptable-Improved
+      Cache-Control:
+      - public, max-age=3600
+      Connection:
+      - close
+      Content-Length:
+      - '694'
+      Content-Security-Policy:
+      - sandbox; default-src 'unsafe-inline' data:; script-src 'none'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Thu, 23 Nov 2023 22:45:40 GMT
+      Server:
+      - Uploadcare
+      Vary:
+      - accept
+    status:
+      code: 400
+      message: Bad Request
 version: 1

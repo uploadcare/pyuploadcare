@@ -1,5 +1,6 @@
-import pytest
 from urllib.request import HTTPError, urlopen
+
+import pytest
 
 from pyuploadcare import Uploadcare
 from pyuploadcare.secure_url import (
@@ -249,7 +250,7 @@ def test_acl_token_wildcard_uuid_with_transformations(
 
 @pytest.mark.freeze_time("2023-11-22")
 @pytest.mark.vcr
-def test_acl_token_bare_url(uploadcare_with_acl_token: Uploadcare):
+def test_acl_token_basic_url(uploadcare_with_acl_token: Uploadcare):
     secure_url = uploadcare_with_acl_token.generate_secure_url(
         "https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/"
     )
@@ -261,5 +262,29 @@ def test_acl_token_bare_url(uploadcare_with_acl_token: Uploadcare):
 def test_acl_token_group_url(uploadcare_with_acl_token: Uploadcare):
     secure_url = uploadcare_with_acl_token.generate_secure_url(
         "https://sectest.ucarecdn.com/3b278cee-47bd-4276-8d7d-9cde5902b18c~1/nth/0/"
+    )
+    assert urlopen(secure_url).status == 200
+
+
+@pytest.fixture
+def uploadcare_with_url_token():
+    secure_url_builder = AkamaiSecureUrlBuilderWithUrlToken(
+        cdn_url="sectest.ucarecdn.com",
+        secret_key=known_secret,
+        window=60 * 60 * 24 * 365 * 10,
+    )
+
+    uploadcare = Uploadcare(
+        public_key="public",
+        secret_key="secret",
+        secure_url_builder=secure_url_builder,
+    )
+    return uploadcare
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_url_token_basic_url(uploadcare_with_url_token: Uploadcare):
+    secure_url = uploadcare_with_url_token.generate_secure_url(
+        "https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/"
     )
     assert urlopen(secure_url).status == 200
