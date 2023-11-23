@@ -1,5 +1,5 @@
 import pytest
-import requests
+from urllib.request import HTTPError, urlopen
 
 from pyuploadcare import Uploadcare
 from pyuploadcare.secure_url import (
@@ -191,7 +191,7 @@ def test_acl_token_bare_uuid(uploadcare_with_acl_token: Uploadcare):
     secure_url = uploadcare_with_acl_token.generate_secure_url(
         "1bd27101-6f40-460a-9358-d44c282e9d16"
     )
-    assert requests.get(secure_url).status_code == 200
+    assert urlopen(secure_url).status == 200
 
 
 @pytest.mark.freeze_time("2023-11-22")
@@ -200,9 +200,11 @@ def test_acl_token_uuid_with_transformations(
     uploadcare_with_acl_token: Uploadcare,
 ):
     secure_url = uploadcare_with_acl_token.generate_secure_url(
-        "1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/"
+        "1bd27101-6f40-460a-9358-d44c282e9d16/-/crop/10x10/20,20/"
     )
-    assert "are not images" in requests.get(secure_url).text
+    with pytest.raises(HTTPError) as e:
+        urlopen(secure_url)
+    assert "are not images" in e.value.read().decode()
 
 
 @pytest.mark.freeze_time("2023-11-22")
@@ -211,14 +213,14 @@ def test_acl_token_wildcard_uuid(uploadcare_with_acl_token: Uploadcare):
     secure_url = uploadcare_with_acl_token.generate_secure_url(
         "1bd27101-6f40-460a-9358-d44c282e9d16", wildcard=True
     )
-    assert requests.get(secure_url).status_code == 200
+    assert urlopen(secure_url).status == 200
 
     secure_url = uploadcare_with_acl_token.generate_secure_url(
         "1bd27101-6f40-460a-9358-d44c282e9d16", wildcard=True
     )
     secure_url = secure_url.replace("/?token=", "/hello.txt?token=")
     assert "hello.txt" in secure_url
-    assert requests.get(secure_url).status_code == 200
+    assert urlopen(secure_url).status == 200
 
 
 @pytest.mark.freeze_time("2023-11-22")
@@ -230,13 +232,34 @@ def test_acl_token_wildcard_uuid_with_transformations(
         "1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/",
         wildcard=True,
     )
-    assert "are not images" in requests.get(secure_url).text
+    with pytest.raises(HTTPError) as e:
+        urlopen(secure_url)
+    assert "are not images" in e.value.read().decode()
 
-    # UUID with transformations + wildcard [2]
     secure_url = uploadcare_with_acl_token.generate_secure_url(
         "1bd27101-6f40-460a-9358-d44c282e9d16/-/preview/400x400/",
         wildcard=True,
     )
     secure_url = secure_url.replace("/?token=", "/hello.txt?token=")
     assert "hello.txt" in secure_url
-    assert "are not images" in requests.get(secure_url).text
+    with pytest.raises(HTTPError) as e:
+        urlopen(secure_url)
+    assert "are not images" in e.value.read().decode()
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_acl_token_bare_url(uploadcare_with_acl_token: Uploadcare):
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/"
+    )
+    assert urlopen(secure_url).status == 200
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_acl_token_group_url(uploadcare_with_acl_token: Uploadcare):
+    secure_url = uploadcare_with_acl_token.generate_secure_url(
+        "https://sectest.ucarecdn.com/3b278cee-47bd-4276-8d7d-9cde5902b18c~1/nth/0/"
+    )
+    assert urlopen(secure_url).status == 200

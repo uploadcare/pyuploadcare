@@ -1,18 +1,20 @@
 import binascii
 import hashlib
 import hmac
+import re
 import time
 import warnings
 from abc import ABC, abstractmethod
 from typing import Optional
+from urllib.parse import quote, quote_plus, urlparse
 
 
 class BaseSecureUrlBuilder(ABC):
     @abstractmethod
-    def build(self, uuid: str, wildcard: bool = False) -> str:
+    def build(self, uuid_or_url: str, wildcard: bool = False) -> str:
         raise NotImplementedError
 
-    def get_token(self, uuid: str, wildcard: bool = False) -> str:
+    def get_token(self, uuid_or_url: str, wildcard: bool = False) -> str:
         raise NotImplementedError(
             f"{self.__class__} doesn't provide get_token()"
         )
@@ -25,6 +27,7 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     for more details.
     """
 
+    base_template = "https://{cdn}/{path}/"
     template = "{base}?token={token}"
     field_delimeter = "~"
 
@@ -40,19 +43,34 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         self.window = window
         self.hash_algo = hash_algo
 
-    def build(self, uuid: str, wildcard: bool = False) -> str:
-        uuid_or_url = self._format_uuid_or_url(uuid)
+    def build(self, uuid_or_url: str, wildcard: bool = False) -> str:
         token = self.get_token(uuid_or_url, wildcard=wildcard)
         secure_url = self._build_url(uuid_or_url, token)
+        print(secure_url)
         return secure_url
 
-    def get_token(self, uuid: str, wildcard: bool = False) -> str:
-        uuid_or_url = self._format_uuid_or_url(uuid)
+    def get_token(self, uuid_or_url: str, wildcard: bool = False) -> str:
+        path = self._get_path(uuid_or_url)
         expire = self._build_expire_time()
-        acl = self._format_acl(uuid_or_url, wildcard=wildcard)
+        acl = self._format_acl(path, wildcard=wildcard)
         signature = self._build_signature(uuid_or_url, expire, acl)
         token = self._build_token(expire, acl, signature)
         return token
+
+    def _escape_early(self, text):
+        if True:
+
+            def toLower(match):
+                return match.group(1).lower()
+
+            return re.sub(r"(%..)", toLower, quote_plus(text))
+        else:
+            return text
+
+    def _escape(self, text: str) -> str:
+        for char in "~,":
+            text = text.replace(char, "%" + hex(ord(char)).lower()[2:])
+        return text
 
     def _build_expire_time(self) -> int:
         return int(time.time()) + self.window
@@ -60,7 +78,6 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     def _build_signature(
         self, uuid_or_url: str, expire: int, acl: Optional[str]
     ) -> str:
-
         hash_source = [
             f"exp={expire}",
             f"acl={acl}" if acl else f"url={uuid_or_url}",
@@ -75,20 +92,16 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         return signature
 
     def _build_token(self, expire: int, acl: Optional[str], signature: str):
-
         token_parts = [
             f"exp={expire}",
             f"acl={acl}" if acl else None,
             f"hmac={signature}",
         ]
+        print(token_parts)
 
         return self.field_delimeter.join(
             part for part in token_parts if part is not None
         )
-
-    @abstractmethod
-    def _build_base_url(self, uuid_or_url: str):
-        raise NotImplementedError
 
     def _build_url(
         self,
@@ -101,46 +114,53 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
             token=token,
         )
 
+    def _get_path(self, uuid_or_url: str) -> str:
+        """
+        >>> builder._get_path("fake-uuid")
+        fake-uuid
+        >>> builder._get_path("https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/")
+        fake-uuid/-/resize/20x20
+        """
+        path = uuid_or_url
+        parsed = urlparse(path)
+        if parsed.netloc:
+            # extract uuid with transformations from url
+            path = parsed.path
+        path = path.lstrip("/").rstrip("/")
+        return path
+
+    def _build_base_url(self, uuid_or_url: str):
+        """
+        >>> builder._build_base_url("fake-uuid")
+        https://sectest.ucarecdn.com/fake-uuid/
+        >>> builder._get_path("https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/")
+        https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/
+        """
+        path = self._get_path(uuid_or_url)
+        base_url = self.base_template.format(cdn=self.cdn_url, path=path)
+        return base_url
+
     @abstractmethod
     def _format_acl(self, uuid_or_url: str, wildcard: bool) -> Optional[str]:
         raise NotImplementedError
 
-    @abstractmethod
-    def _format_uuid_or_url(self, uuid_or_url: str) -> str:
-        raise NotImplementedError
-
 
 class AkamaiSecureUrlBuilderWithAclToken(BaseAkamaiSecureUrlBuilder):
-    base_template = "https://{cdn}/{uuid}/"
-
-    def _build_base_url(self, uuid_or_url: str):
-        return self.base_template.format(cdn=self.cdn_url, uuid=uuid_or_url)
-
     def _format_acl(self, uuid_or_url: str, wildcard: bool) -> str:
-        uuid_or_url = uuid_or_url.replace("~", "%7e")
+        path = self._get_path(uuid_or_url)
+        path = self._escape(path)
         if wildcard:
-            return f"/{uuid_or_url}/*"
-        return f"/{uuid_or_url}/"
-
-    def _format_uuid_or_url(self, uuid_or_url: str) -> str:
-        return uuid_or_url.lstrip("/").rstrip("/")
+            return f"/{path}/*"
+        return f"/{path}/"
 
 
 class AkamaiSecureUrlBuilderWithUrlToken(BaseAkamaiSecureUrlBuilder):
-    def _build_base_url(self, uuid_or_url: str):
-        return uuid_or_url
-
     def _format_acl(self, uuid_or_url: str, wildcard: bool) -> None:
         if wildcard:
             raise ValueError(
                 "Wildcards are not supported in AkamaiSecureUrlBuilderWithUrlToken."
             )
         return None
-
-    def _format_uuid_or_url(self, uuid_or_url: str) -> str:
-        if "://" not in uuid_or_url:
-            raise ValueError(f"{uuid_or_url} doesn't look like a URL")
-        return uuid_or_url
 
 
 class AkamaiSecureUrlBuilder(AkamaiSecureUrlBuilderWithAclToken):
