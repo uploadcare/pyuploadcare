@@ -9,7 +9,7 @@ interactions:
       User-Agent:
       - Python-urllib/3.11
     method: GET
-    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/-/crop/10x10/20,20/?token=exp=2015971200~acl=/1bd27101-6f40-460a-9358-d44c282e9d16/-/crop/10x10/20,20/~hmac=742ef029bef6b1806a2ecf1075e3df9676d9192963da54c54f4bb8e6240a1ef6
+    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/-/crop/10x10/20,20/?token=exp=2015971200~hmac=0bfdf8d6e104ab4228cd2321cac3e5a9951dffb1b0e235a5509915c6e78b7e76
   response:
     body:
       string: '<!DOCTYPE html>
@@ -106,7 +106,7 @@ interactions:
       - Content-Length, Etag, X-Image-Width, X-Image-Height, X-Image-Acceptable-Original,
         X-Image-Acceptable-Improved
       Cache-Control:
-      - public, max-age=3580
+      - public, max-age=3583
       Connection:
       - close
       Content-Length:
@@ -116,7 +116,7 @@ interactions:
       Content-Type:
       - text/html; charset=UTF-8
       Date:
-      - Fri, 24 Nov 2023 21:55:28 GMT
+      - Fri, 24 Nov 2023 21:55:30 GMT
       Server:
       - Uploadcare
     status:

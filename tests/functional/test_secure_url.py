@@ -290,3 +290,25 @@ def test_url_token_basic_url(uploadcare_with_url_token: Uploadcare):
         "https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/"
     )
     assert urlopen(secure_url).status == 200
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_url_token_uuid_with_transformations(
+    uploadcare_with_url_token: Uploadcare,
+):
+    secure_url = uploadcare_with_url_token.generate_secure_url(
+        "1bd27101-6f40-460a-9358-d44c282e9d16/-/crop/10x10/20,20/"
+    )
+    with pytest.raises(HTTPError) as e:
+        urlopen(secure_url)
+    assert "are not images" in e.value.read().decode()
+
+
+@pytest.mark.freeze_time("2023-11-22")
+@pytest.mark.vcr
+def test_url_token_group_url(uploadcare_with_url_token: Uploadcare):
+    secure_url = uploadcare_with_url_token.generate_secure_url(
+        "https://sectest.ucarecdn.com/3b278cee-47bd-4276-8d7d-9cde5902b18c~1/nth/0/"
+    )
+    assert urlopen(secure_url).status == 200

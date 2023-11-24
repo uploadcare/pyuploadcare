@@ -106,7 +106,7 @@ interactions:
       - Content-Length, Etag, X-Image-Width, X-Image-Height, X-Image-Acceptable-Original,
         X-Image-Acceptable-Improved
       Cache-Control:
-      - public, max-age=3582
+      - public, max-age=3563
       Connection:
       - close
       Content-Length:
@@ -116,7 +116,7 @@ interactions:
       Content-Type:
       - text/html; charset=UTF-8
       Date:
-      - Fri, 24 Nov 2023 18:08:25 GMT
+      - Fri, 24 Nov 2023 21:55:29 GMT
       Server:
       - Uploadcare
       Vary:
@@ -231,7 +231,7 @@ interactions:
       - Content-Length, Etag, X-Image-Width, X-Image-Height, X-Image-Acceptable-Original,
         X-Image-Acceptable-Improved
       Cache-Control:
-      - public, max-age=3548
+      - public, max-age=3600
       Connection:
       - close
       Content-Length:
@@ -241,7 +241,7 @@ interactions:
       Content-Type:
       - text/html; charset=UTF-8
       Date:
-      - Fri, 24 Nov 2023 18:08:25 GMT
+      - Fri, 24 Nov 2023 21:55:30 GMT
       Server:
       - Uploadcare
       Vary:

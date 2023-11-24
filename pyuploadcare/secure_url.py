@@ -56,15 +56,21 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         token = self._build_token(expire, acl, signature)
         return token
 
-    def _escape_early(self, text: str) -> str:
-        return re.sub(
-            r"(%..)", lambda match: match.group(1).lower(), quote_plus(text)
+    def _prepare_path_for_url(self, path: str) -> str:
+        path = re.sub(
+            r"(%..)",
+            lambda match: match.group(1).lower(),
+            quote_plus(path, safe=","),
         )
+        path = self._prepare_path_for_acl(path)
+        return path
 
-    def _escape(self, text: str) -> str:
-        for char in "~,":
-            text = text.replace(char, "%" + hex(ord(char)).lower()[2:])
-        return text
+    def _prepare_path_for_acl(self, path: str) -> str:
+        for escape_char in "~":
+            path = path.replace(
+                escape_char, "%" + hex(ord(escape_char)).lower()[2:]
+            )
+        return path
 
     def _build_expire_time(self) -> int:
         return int(time.time()) + self.window
@@ -73,7 +79,7 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         self, uuid_or_url: str, expire: int, acl: Optional[str]
     ) -> str:
         path = self._get_path(uuid_or_url)
-        path = self._escape_early(path)
+        path = self._prepare_path_for_url(path)
         hash_source = [
             f"exp={expire}",
             f"acl={acl}" if acl else f"url={path}",
@@ -112,15 +118,17 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     def _get_path(self, uuid_or_url: str) -> str:
         """
         >>> builder._get_path("fake-uuid")
-        fake-uuid
+        /fake-uuid/
         >>> builder._get_path("https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/")
-        fake-uuid/-/resize/20x20
+        /fake-uuid/-/resize/20x20/
         """
         path = uuid_or_url
         parsed = urlparse(path)
         if parsed.netloc:
             # extract uuid with transformations from url
             path = parsed.path
+        if not path.startswith("/"):
+            path = f"/{path}"
         return path
 
     def _build_base_url(self, uuid_or_url: str):
@@ -144,7 +152,7 @@ class AkamaiSecureUrlBuilderWithAclToken(BaseAkamaiSecureUrlBuilder):
     def _format_acl(self, uuid_or_url: str, wildcard: bool) -> str:
         path = self._get_path(uuid_or_url)
         path = path.lstrip("/").rstrip("/")
-        path = self._escape(path)
+        path = self._prepare_path_for_acl(path)
         if wildcard:
             return f"/{path}/*"
         return f"/{path}/"
