@@ -2,57 +2,6 @@ interactions:
 - request:
     body: null
     headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python-requests/2.27.1
-    method: GET
-    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/?token=exp=2015971200~acl=/1bd27101-6f40-460a-9358-d44c282e9d16/~hmac=0e466b666443108e92a8b8255b95f7473073c8ea14aa074de5647d092c683e1f
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAAMtIzcnJ5wIAIDA6NgYAAAA=
-    headers:
-      Accept-Ranges:
-      - bytes
-      Access-Control-Allow-Methods:
-      - HEAD, GET, OPTIONS
-      Access-Control-Allow-Origin:
-      - '*'
-      Cache-Control:
-      - public, max-age=31476863
-      Connection:
-      - keep-alive
-      Content-Disposition:
-      - inline; filename=hello.txt
-      Content-Encoding:
-      - gzip
-      Content-Length:
-      - '26'
-      Content-Type:
-      - text/plain
-      Date:
-      - Wed, 22 Nov 2023 23:23:06 GMT
-      ETag:
-      - '"b1946ac92492d2347c6235b4d2611184"'
-      Last-Modified:
-      - Wed, 22 Nov 2023 00:53:42 GMT
-      Server:
-      - Uploadcare
-      Vary:
-      - Accept-Encoding
-      X-Robots-Tag:
-      - noindex, nofollow, nosnippet, noarchive
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
       Connection:
       - close
       Host:
@@ -72,7 +21,7 @@ interactions:
       Access-Control-Allow-Origin:
       - '*'
       Cache-Control:
-      - public, max-age=31397509
+      - public, max-age=31322944
       Connection:
       - close
       Content-Disposition:
@@ -82,53 +31,7 @@ interactions:
       Content-Type:
       - text/plain
       Date:
-      - Thu, 23 Nov 2023 21:25:37 GMT
-      ETag:
-      - '"b1946ac92492d2347c6235b4d2611184"'
-      Last-Modified:
-      - Wed, 22 Nov 2023 00:53:42 GMT
-      Server:
-      - Uploadcare
-      Vary:
-      - Accept-Encoding
-      X-Robots-Tag:
-      - noindex, nofollow, nosnippet, noarchive
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Connection:
-      - close
-      Host:
-      - sectest.ucarecdn.com
-      User-Agent:
-      - Python-urllib/3.11
-    method: GET
-    uri: https://sectest.ucarecdn.com/1bd27101-6f40-460a-9358-d44c282e9d16/?token=exp=2015971200~acl=/1bd27101-6f40-460a-9358-d44c282e9d16/~hmac=0e466b666443108e92a8b8255b95f7473073c8ea14aa074de5647d092c683e1f
-  response:
-    body:
-      string: 'hello
-
-        '
-    headers:
-      Access-Control-Allow-Methods:
-      - HEAD, GET, OPTIONS
-      Access-Control-Allow-Origin:
-      - '*'
-      Cache-Control:
-      - public, max-age=31392707
-      Connection:
-      - close
-      Content-Disposition:
-      - inline; filename=hello.txt
-      Content-Length:
-      - '6'
-      Content-Type:
-      - text/plain
-      Date:
-      - Thu, 23 Nov 2023 22:45:39 GMT
+      - Fri, 24 Nov 2023 18:08:22 GMT
       ETag:
       - '"b1946ac92492d2347c6235b4d2611184"'
       Last-Modified:

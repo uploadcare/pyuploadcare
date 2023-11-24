@@ -6,7 +6,7 @@ import time
 import warnings
 from abc import ABC, abstractmethod
 from typing import Optional
-from urllib.parse import quote, quote_plus, urlparse
+from urllib.parse import quote_plus, urlparse
 
 
 class BaseSecureUrlBuilder(ABC):
@@ -46,7 +46,6 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     def build(self, uuid_or_url: str, wildcard: bool = False) -> str:
         token = self.get_token(uuid_or_url, wildcard=wildcard)
         secure_url = self._build_url(uuid_or_url, token)
-        print(secure_url)
         return secure_url
 
     def get_token(self, uuid_or_url: str, wildcard: bool = False) -> str:
@@ -94,7 +93,6 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
             f"acl={acl}" if acl else None,
             f"hmac={signature}",
         ]
-        print(token_parts)
 
         return self.field_delimeter.join(
             part for part in token_parts if part is not None

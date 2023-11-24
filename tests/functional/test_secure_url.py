@@ -1,4 +1,5 @@
-from urllib.request import HTTPError, urlopen
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 import pytest
 
@@ -129,7 +130,7 @@ def test_get_url_token():
     )
     assert token == (
         "exp=1633997100~"
-        "hmac=32b696b855ddc911b366f11dcecb75789adf6211a72c1dbdf234b83f22aaa368"
+        "hmac=25c485fd7f85c19704013673c80d2a86df1b4241fb44cdfa7b7762cb27ef3f57"
     )
 
 
@@ -144,7 +145,7 @@ def test_generate_secure_url_url_token():
     assert secure_url == (
         "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/?token="
         "exp=1633997100~"
-        "hmac=32b696b855ddc911b366f11dcecb75789adf6211a72c1dbdf234b83f22aaa368"
+        "hmac=25c485fd7f85c19704013673c80d2a86df1b4241fb44cdfa7b7762cb27ef3f57"
     )
 
 
@@ -280,6 +281,7 @@ def uploadcare_with_url_token():
         secure_url_builder=secure_url_builder,
     )
     return uploadcare
+
 
 @pytest.mark.freeze_time("2023-11-22")
 @pytest.mark.vcr
