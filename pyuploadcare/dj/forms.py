@@ -148,7 +148,7 @@ class FileField(Field):
         attrs = {}
         if self.legacy_widget and not self.required:
             attrs["data-clearable"] = ""
-        if dj_conf.signed_uploads:
+        if config["signed_uploads"]:
             expire, signature = self._client.generate_upload_signature()
             attrs["data-secure-expire"] = expire
             attrs["data-secure-signature"] = signature

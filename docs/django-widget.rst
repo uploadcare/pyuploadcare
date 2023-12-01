@@ -20,6 +20,7 @@ Below is the default config:
         "secret": "",
         "cdn_base": None,
         "upload_base_url": None,
+        "signed_uploads": False,
         "use_legacy_widget": False,
         "use_hosted_assets": True,
         "widget": {

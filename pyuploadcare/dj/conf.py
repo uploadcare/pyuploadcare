@@ -50,6 +50,7 @@ class SettingsType(typing_extensions.TypedDict):
     secret: str
     cdn_base: typing.Optional[str]
     upload_base_url: typing.Optional[str]
+    signed_uploads: bool
     use_legacy_widget: bool
     use_hosted_assets: bool
     widget: WidgetSettingsType
@@ -61,6 +62,7 @@ DEFAULT_CONFIG: SettingsType = {
     "secret": "",
     "cdn_base": None,
     "upload_base_url": None,
+    "signed_uploads": False,
     "use_legacy_widget": False,
     "use_hosted_assets": True,
     "widget": {
@@ -98,8 +100,6 @@ user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
 )
 
 # Legacy widget (uploadcare.js)
-
-signed_uploads = settings.UPLOADCARE.get("signed_uploads", False)
 
 
 def get_legacy_widget_js_url() -> str:
