@@ -2,11 +2,14 @@
 
 import os
 import sys
+from pathlib import Path
 
 from django.core import management
 
 
-sys.path.append("..")
+git_root = Path(__file__).parent.parent.parent
+sys.path.append(str(git_root))
+sys.path.append(str(git_root / "tests"))
 
 
 if "DJANGO_SETTINGS_MODULE" not in os.environ:

@@ -30,6 +30,11 @@ test-integration:
 docs_html:
 	poetry run sh -c "cd docs && make html"
 
+run_django:
+	poetry run python tests/test_project/manage.py migrate
+	DJANGO_SUPERUSER_PASSWORD=admin poetry run python tests/test_project/manage.py createsuperuser --no-input --username=admin --email=admin@example.com
+	poetry run python tests/test_project/manage.py runserver
+
 update_bundled_static:
 	blocks_version=$$(DJANGO_SETTINGS_MODULE=tests.test_project.settings poetry run python -c "from pyuploadcare.dj.conf import DEFAULT_CONFIG; print(DEFAULT_CONFIG['widget']['version'])"); \
 	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/blocks.min.js" -o pyuploadcare/dj/static/uploadcare/blocks.min.js; \
