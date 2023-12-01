@@ -24,7 +24,7 @@ Below is the default config:
         "use_legacy_widget": False,
         "use_hosted_assets": True,
         "widget": {
-            "version": "0.x",
+            "version": "0.30.2",
             "variant": "regular",
             "build": "min",
             "options": {},

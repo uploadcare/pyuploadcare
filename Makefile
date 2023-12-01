@@ -31,7 +31,7 @@ docs_html:
 	poetry run sh -c "cd docs && make html"
 
 update_bundled_static:
-	blocks_version=$$(sed -n 's/widget_version = settings.UPLOADCARE.get("widget_version", "\(.*\)")/\1/p' pyuploadcare/dj/conf.py); \
+	blocks_version=$$(DJANGO_SETTINGS_MODULE=tests.test_project.settings poetry run python -c "from pyuploadcare.dj.conf import DEFAULT_CONFIG; print(DEFAULT_CONFIG['widget']['version'])"); \
 	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/blocks.min.js" -o pyuploadcare/dj/static/uploadcare/blocks.min.js; \
 	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/lr-file-uploader-inline.min.css" -o pyuploadcare/dj/static/uploadcare/lr-file-uploader-inline.min.css; \
 	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/lr-file-uploader-minimal.min.css" -o pyuploadcare/dj/static/uploadcare/lr-file-uploader-minimal.min.css; \
