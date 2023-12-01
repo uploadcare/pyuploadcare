@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased 5.0.0
+## [5.0.0](https://github.com/uploadcare/pyuploadcare/compare/v?.?.?...v5.0.0) - unreleased
 
 In version 5.0, we introduce a new [file uploader](https://uploadcare.com/docs/file-uploader/), which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the `use_legacy_widget` option in your configuration:
 
@@ -51,6 +51,79 @@ Additionally, please take note that some settings have been renamed in this upda
 - for `pyuploadcare.dj.forms`:
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
   - By default, `FileWidget` is used. To use `LegacyFileWidget`, please set `UPLOADCARE["use_legacy_widget"]` to `True`
+
+## [4.2.3](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.2.3) - unreleased
+
+### Deprecated
+
+- For `FileGroup`:
+  - Added a deprecation warning when accessing `datetime_stored` property, as it has been deprecated in the REST API. This field does not exist in REST API v0.7.x.
+
+- For `GroupsAPI`:
+  - Added a deprecation warning when calling `store` method, as it has been deprecated in the REST API. This API endpoint does not exist in REST API v0.7.x.
+
+## [4.2.2](https://github.com/uploadcare/pyuploadcare/compare/v4.2.1...v4.2.2) - 2023-11-20
+
+### Added
+
+- For `File`:
+  - AWS Rekognition Moderation results are now accessible via `File.info["appdata"]["aws_rekognition_detect_moderation_labels"]`.
+
+## [4.2.1](https://github.com/uploadcare/pyuploadcare/compare/v4.2.0...v4.2.1) - 2023-11-17
+
+### Fixed
+
+- For `AddonsAPI`:
+  - In version 4.2.0, passing a Python dictionary as `params` to the `execute` method would cause an `AttributeError`. Now, you can use either an `AddonExecutionParams` instance or a `dict`.
+
+## [4.2.0](https://github.com/uploadcare/pyuploadcare/compare/v4.1.3...v4.2.0) - 2023-11-16
+
+Summary of this update:
+
+1. Added support for the `save_in_group` parameter in [multipage conversion](https://uploadcare.com/docs/transformations/document-conversion/#multipage-conversion) (#258);
+2. Implemented the [AWS Rekognition Moderation](https://uploadcare.com/docs/unsafe-content/) addon API (#260);
+3. Added `signed_uploads` setting for Django projects (#262);
+4. Secure URL generation improvements (#263 & #264);
+5. Various bug fixes.
+
+There are no breaking changes in this release.
+
+### Added
+
+- For `Uploadcare`:
+  - Added a type for the `event` parameter of the `create_webhook` and `update_webhook` methods.
+  - Added the `generate_upload_signature` method. This shortcut could be useful for signed uploads from your website's frontend, where the signature needs to be passed outside of your website's Python part (e.g., for the uploading widget).
+  - Added `generate_secure_url_token` method. Similar to `generate_secure_url`, it returns only a token, not the full URL.
+  - Added an optional `wildcard` parameter to the `generate_secure_url` method.
+
+- For `File`:
+  - Added the `save_in_group` parameter to the `convert` and `convert_document` methods. It defaults to `False`. When set to `True`, multi-page documents will additionally be saved as a file group.
+  - Added the `get_converted_document_group` method. It returns a `FileGroup` instance for converted multi-page documents.
+
+- For `DocumentConvertAPI`:
+  - Added the `retrieve` method, which corresponds to the [`GET /convert/document/:uuid/`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo) API endpoint.
+
+- For `AddonsAPI` / `AddonLabels`:
+  - Added support for the [Unsafe content detection](https://uploadcare.com/docs/unsafe-content/) addon (`AddonLabels.AWS_MODERATION_LABELS`).
+
+- For Django integration:
+  - Added the `signed_uploads` setting for Django projects. When enabled, this setting exposes the generated signature to the uploading widget.
+
+- For `AkamaiSecureUrlBuilderWithAclToken`:
+  - Added `get_token` method.
+  - Added an optional `wildcard` parameter to the `build` method.
+
+- Introduced `AkamaiSecureUrlBuilderWithUrlToken` class.
+
+### Changed
+
+- `AkamaiSecureUrlBuilder` has been renamed to `AkamaiSecureUrlBuilderWithAclToken`. It is still available under the old name and works as before, but it will issue a deprecation warning when used.
+
+### Fixed
+
+- For `AddonsAPI` / `AddonExecutionParams`:
+  - Fixed an issue where calling `execute` and `status` with `AddonLabels`'s attributes (such as `AddonLabels.REMOVE_BG`) for the `addon_name` would result in a _404 Not Found_ error.
+  - Fixed `ValidationError` when constructing `AddonClamAVExecutionParams` or `AddonRemoveBGExecutionParams` with omitted optional parameters.
 
 ## [4.1.3](https://github.com/uploadcare/pyuploadcare/compare/v4.1.2...v4.1.3) - 2023-10-05
 

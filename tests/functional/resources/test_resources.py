@@ -219,6 +219,22 @@ def test_file_convert_document(uploadcare):
 
 
 @pytest.mark.vcr
+def test_file_convert_document_with_save_in_group(uploadcare):
+    file = uploadcare.file("da288a95-3029-4044-b902-5107e8579c5c")
+    transformation = DocumentTransformation().format(DocumentFormat.jpg)
+    converted_file = file.convert(transformation, save_in_group=True)
+    assert not converted_file.is_ready
+
+
+@pytest.mark.vcr
+def test_file_get_converted_document_group(uploadcare):
+    file = uploadcare.file("da288a95-3029-4044-b902-5107e8579c5c")
+    group = file.get_converted_document_group(DocumentFormat.jpg)
+    assert isinstance(group, FileGroup)
+    assert group.id == "f56f1e80-31f8-426e-9213-690861252070~4"
+
+
+@pytest.mark.vcr
 def test_file_info_has_new_structure(uploadcare):
     """
     Test new structure of response since API v0.7
@@ -346,6 +362,35 @@ def test_list_files(uploadcare):
 def test_retrieve_fileinfo_with_metadata(uploadcare):
     file_ = uploadcare.file("a55d6b25-d03c-4038-9838-6e06bb7df598")
     assert isinstance(file_, File)
+    assert file_.info
 
     metadata_dict = file_.info["metadata"]
     assert len(metadata_dict) == 2
+
+
+@pytest.mark.vcr
+def test_retrieve_fileinfo_with_appdata(uploadcare):
+    file_ = uploadcare.file("04bd49fa-466d-49e7-afd7-bac108055371")
+    assert isinstance(file_, File)
+    file_.update_info(include_appdata=True)
+    assert file_.info
+    appdata = file_.info["appdata"]
+
+    assert "aws_rekognition_detect_labels" in appdata
+    labels_data = appdata["aws_rekognition_detect_labels"]
+    labels_details = labels_data["data"]
+    assert labels_details["label_model_version"]
+    assert len(labels_details["labels"]) == 10
+    label = labels_details["labels"][0]
+    assert label["confidence"]
+    assert label["name"] == "Accessories"
+
+    assert "aws_rekognition_detect_moderation_labels" in appdata
+    moderation_data = appdata["aws_rekognition_detect_moderation_labels"]
+    moderation_details = moderation_data["data"]
+    assert moderation_details["label_model_version"]
+    assert len(moderation_details["labels"]) == 1
+    moderation_label = moderation_details["labels"][0]
+    assert moderation_label["confidence"]
+    assert moderation_label["name"] == "Weapons"
+    assert moderation_label["parent_name"] == "Violence"

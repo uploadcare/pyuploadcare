@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConstrainedStr, EmailStr, Field, PrivateAttr
+from typing_extensions import Literal
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
@@ -50,6 +51,15 @@ class ColorMode(str, Enum):
 class GEOPoint(Entity):
     latitude: float
     longitude: float
+
+
+WebhookEvent = Literal[
+    "file.uploaded",
+    "file.infected",  # it will be deprecated in favor of info_upldated in the future updates
+    "file.stored",
+    "file.deleted",
+    "file.info_updated",
+]
 
 
 class ImageInfo(Entity):
@@ -136,6 +146,23 @@ class AWSRecognitionDetectLabelsApplicationData(ApplicationDataBase):
     data: AWSRecognitionDetectLabelsDetails
 
 
+class AWSRecognitionModerationLabel(Entity):
+    confidence: Decimal = Field(alias="Confidence")
+    name: str = Field(alias="Name")
+    parent_name: str = Field(alias="ParentName")
+
+
+class AWSRecognitionDetectModerationLabelsDetails(ApllicationDataDetails):
+    label_model_version: Optional[str] = Field(alias="ModerationModelVersion")
+    labels: List[AWSRecognitionModerationLabel] = Field(
+        alias="ModerationLabels", default_factory=list
+    )
+
+
+class AWSRecognitionDetectModerationLabelsApplicationData(ApplicationDataBase):
+    data: AWSRecognitionDetectModerationLabelsDetails
+
+
 class RemoveBackgroundDetails(ApllicationDataDetails):
     foreground_type: Optional[str]
 
@@ -156,6 +183,9 @@ class UCClamAVApplicationData(ApplicationDataBase):
 class ApplicationDataSet(Entity):
     aws_rekognition_detect_labels: Optional[
         AWSRecognitionDetectLabelsApplicationData
+    ]
+    aws_rekognition_detect_moderation_labels: Optional[
+        AWSRecognitionDetectModerationLabelsApplicationData
     ]
     remove_bg: Optional[RemoveBackgroundApplicationData]
     uc_clamav_virus_scan: Optional[UCClamAVApplicationData]
@@ -246,6 +276,21 @@ class DocumentConvertStatus(Entity):
     status: str
     error: Optional[str]
     result: DocumentConvertShortInfo
+
+
+class DocumentConvertConversionFormat(Entity):
+    name: str
+
+
+class DocumentConvertFormat(Entity):
+    name: str
+    conversion_formats: List[DocumentConvertConversionFormat]
+    converted_groups: Dict[str, str]
+
+
+class DocumentConvertFormatInfo(Entity):
+    error: Optional[str]
+    format: DocumentConvertFormat
 
 
 class VideoConvertShortInfo(Entity):

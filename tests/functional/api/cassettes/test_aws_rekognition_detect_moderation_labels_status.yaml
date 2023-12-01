@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.1.2/5d5bb5639e3f2df33674 (CPython/3.11.5)
+    method: GET
+    uri: https://api.uploadcare.com/addons/aws_rekognition_detect_moderation_labels/execute/status/?request_id=6666a652-a79d-4991-9c4b-3f7705ed7c6c
+  response:
+    content: '{"status": "done"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '18'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 09 Nov 2023 16:58:59 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 83aee3a8-cdb3-4684-b364-6278fc8a10b8
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

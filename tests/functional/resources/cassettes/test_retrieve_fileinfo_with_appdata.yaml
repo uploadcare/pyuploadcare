@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/4.2.1/5d5bb5639e3f2df33674 (CPython/3.11.6)
+    method: GET
+    uri: https://api.uploadcare.com/files/04bd49fa-466d-49e7-afd7-bac108055371/?include=appdata
+  response:
+    content: '{"datetime_removed":null,"datetime_stored":"2023-11-16T22:43:33.133404Z","datetime_uploaded":"2023-11-16T22:43:32.941596Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/04bd49fa-466d-49e7-afd7-bac108055371/IMG_8919.jpeg","original_filename":"IMG_8919.jpeg","size":2738012,"url":"https://api.uploadcare.com/files/04bd49fa-466d-49e7-afd7-bac108055371/","uuid":"04bd49fa-466d-49e7-afd7-bac108055371","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":[72,72],"width":3011,"format":"JPEG","height":4516,"sequence":false,"color_mode":"RGB","orientation":1,"geo_location":null,"datetime_original":"2023-03-10T16:23:15"}},"metadata":{},"appdata":{"uc_clamav_virus_scan":{"data":{"infected":false},"datetime_created":"2023-11-16T22:43:33.240822Z","datetime_updated":"2023-11-16T22:43:33.240840Z","version":"1.0.1"},"aws_rekognition_detect_labels":{"data":{"Labels":[{"Name":"Accessories","Parents":[],"Instances":[],"Confidence":99.99989318847656},{"Name":"Strap","Parents":[{"Name":"Accessories"}],"Instances":[],"Confidence":99.99989318847656},{"Name":"Path","Parents":[],"Instances":[],"Confidence":99.9789810180664},{"Name":"Road","Parents":[],"Instances":[],"Confidence":99.6391830444336},{"Name":"Street","Parents":[{"Name":"City"},{"Name":"Road"},{"Name":"Urban"}],"Instances":[],"Confidence":98.96985626220703},{"Name":"Dog","Parents":[{"Name":"Animal"},{"Name":"Canine"},{"Name":"Mammal"},{"Name":"Pet"}],"Instances":[{"Confidence":96.09213256835938,"BoundingBox":{"Top":0.22825734317302704,"Left":0.21121233701705933,"Width":0.6009787321090698,"Height":0.5943910479545593}}],"Confidence":97.46222686767578},{"Name":"Husky","Parents":[{"Name":"Animal"},{"Name":"Canine"},{"Name":"Dog"},{"Name":"Mammal"},{"Name":"Pet"}],"Instances":[],"Confidence":97.46222686767578},{"Name":"Leash","Parents":[],"Instances":[],"Confidence":95.12698364257812},{"Name":"Tarmac","Parents":[{"Name":"Road"}],"Instances":[],"Confidence":94.74235534667969},{"Name":"Sidewalk","Parents":[{"Name":"Path"}],"Instances":[],"Confidence":91.32418823242188}],"LabelModelVersion":"3.0"},"datetime_created":"2023-11-16T22:43:34.151968Z","datetime_updated":"2023-11-16T22:43:34.151992Z","version":"2016-06-27"},"aws_rekognition_detect_moderation_labels":{"data":{"ModerationLabels":[{ "Confidence": 93.41645812988281, "Name": "Weapons", "ParentName": "Violence" }],"ModerationModelVersion":"6.1"},"datetime_created":"2023-11-16T22:55:25.482969Z","datetime_updated":"2023-11-16T23:54:56.243287Z","version":"2016-06-27"}}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - DELETE, GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2521'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Sun, 19 Nov 2023 17:53:38 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-Uploadcare-Request-Id:
+      - 1a75e573-84e7-4ec4-a681-c1844265f906
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

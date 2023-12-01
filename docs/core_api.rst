@@ -157,6 +157,13 @@ or create an image of a particular page (if using image format)::
     transformation = DocumentTransformation().format(DocumentFormat.png).page(1)
     converted_file: File = file.convert(transformation)
 
+or create a file group of converted pages of a multipage document::
+
+    file = uploadcare.file('0e1cac48-1296-417f-9e7f-9bf13e330dcf')
+    transformation = DocumentTransformation().format(DocumentFormat.jpg)
+    file.convert(transformation, save_in_group=True)
+    converted_group: FileGroup = file.get_converted_document_group(DocumentFormat.jpg)
+
 or you can use API directly to convert single or multiple files::
 
     transformation = DocumentTransformation().format(DocumentFormat.pdf)
@@ -216,18 +223,23 @@ To execute addon call an API `execute` method with the file and parameters::
     target_file = uploadcare.file("59fccca5-3af7-462f-905b-ed7de83b9762")
     # params - from previous step
     remove_bg_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.REMOVE_BG,
         remove_bg_params,
     )
 
     aws_recognition_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.AWS_LABEL_RECOGNITION,
     )
 
+    aws_moderation_result = uploadcare.addons_api.execute(
+        target_file.uuid,
+        AddonLabels.AWS_MODERATION_LABELS,
+    )
+
     clamav_result = uploadcare.addons_api.execute(
-        target_file,
+        target_file.uuid,
         AddonLabels.CLAM_AV,
         clamav_params,
     )
@@ -238,6 +250,9 @@ To check status of performed task use `status` method::
     addon_task_status = uploadcare.addons_api.status(request_id, addon)
 
 If addon execution produces new data for file (like an AWS recognition does), this data will be placed at `appdata` complex attribute of `File.info` (see `addons documentation`_)
+
+    file.update_info(include_appdata=True)
+    print(file.info["appdata"]["aws_rekognition_detect_labels"])
 
 
 File metadata
@@ -387,12 +402,15 @@ Secure delivery
 
 You can use your own custom domain and CDN provider for deliver files with authenticated URLs (see `original documentation`_).
 
-Generate secure for file::
+Generate secure URL for file::
 
     from pyuploadcare import Uploadcare
-    from pyuploadcare.secure_url import AkamaiSecureUrlBuilder
+    from pyuploadcare.secure_url import AkamaiSecureUrlBuilderWithAclToken
 
-    secure_url_bulder = AkamaiSecureUrlBuilder("your cdn>", "<your secret for token generation>")
+    secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
+        "<your cdn>",
+        "<your secret for token generation>"
+    )
 
     uploadcare = Uploadcare(
         public_key='<your public key>',
@@ -402,11 +420,43 @@ Generate secure for file::
 
     secure_url = uploadcare.generate_secure_url('52da3bfc-7cd8-4861-8b05-126fef7a6994')
 
-Generate secure for file with transformations::
+Generate just the token::
+
+    token = uploadcare.get_secure_url_token('52da3bfc-7cd8-4861-8b05-126fef7a6994')
+
+Generate secure URL for file with transformations::
 
     secure_url = uploadcare.generate_secure_url(
         '52da3bfc-7cd8-4861-8b05-126fef7a6994/-/resize/640x/other/transformations/'
     )
+
+Generate secure URL for file, with the same signature valid for its transformations::
+
+    secure_url = uploadcare.generate_secure_url(
+        '52da3bfc-7cd8-4861-8b05-126fef7a6994',
+        wildcard=True
+    )
+
+Generate secure URL for file by its URL (please notice the usage of a different builder class)::
+
+    from pyuploadcare import Uploadcare
+    from pyuploadcare.secure_url import AkamaiSecureUrlBuilderWithUrlToken
+
+    secure_url_bulder = AkamaiSecureUrlBuilderWithUrlToken(
+        "<your cdn>",
+        "<your secret for token generation>"
+    )
+
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        secret_key='<your private key>',
+        secure_url_builder=secure_url_bulder,
+    )
+
+    secure_url = uploadcare.generate_secure_url(
+        'https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/'
+    )
+
 
 Useful links
 ------------

@@ -23,6 +23,13 @@ def register_arguments(subparsers):
         type=int,
     )
     subparser.add_argument(
+        "--save-in-group",
+        action="store_true",
+        default=False,
+        dest="save_in_group",
+        help="Save pages of a multipage document to a group",
+    )
+    subparser.add_argument(
         "--store",
         action="store_true",
         default=False,
@@ -44,8 +51,12 @@ def convert_document(arg_namespace, client: Uploadcare) -> None:
         transformation.format(arg_namespace.page)
 
     kwargs = {}
+
     if arg_namespace.store:
         kwargs["store"] = True
+
+    if arg_namespace.save_in_group:
+        kwargs["save_in_group"] = True
 
     converted_file = file.convert_document(transformation, **kwargs)
 
