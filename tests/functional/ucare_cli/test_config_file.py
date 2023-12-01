@@ -22,7 +22,6 @@ def test_use_pub_key_from_config_file(config_file):
 
 
 def test_redefine_pub_key_by_second_config_file(config_file):
-
     config_file.write("[ucare]\n" "pub_key = demopublickey")
     config_file.close()
 

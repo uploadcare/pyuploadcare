@@ -7,7 +7,6 @@ import pyuploadcare.dj.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []

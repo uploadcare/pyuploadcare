@@ -4,7 +4,6 @@ from pyuploadcare.dj.models import FileField, ImageField, ImageGroupField
 
 
 class Gallery(models.Model):
-
     title = models.CharField(max_length=255)
 
     def __unicode__(self):
@@ -12,7 +11,6 @@ class Gallery(models.Model):
 
 
 class Photo(models.Model):
-
     gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     arbitrary_file = FileField(blank=True, null=True)
@@ -23,7 +21,6 @@ class Photo(models.Model):
 
 
 class GalleryMultiupload(models.Model):
-
     title = models.CharField(max_length=255)
     photos = ImageGroupField()
 

@@ -4,12 +4,10 @@ from .models import Gallery, GalleryMultiupload, Photo
 
 
 class PhotoInline(admin.StackedInline):
-
     model = Photo
 
 
 class GalleryAdmin(admin.ModelAdmin):
-
     inlines = [
         PhotoInline,
     ]

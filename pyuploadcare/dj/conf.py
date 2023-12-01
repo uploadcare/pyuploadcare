@@ -101,6 +101,7 @@ user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
 
 signed_uploads = settings.UPLOADCARE.get("signed_uploads", False)
 
+
 def get_legacy_widget_js_url() -> str:
     widget_config = config["legacy_widget"]
     filename = "uploadcare.{0}.js".format(widget_config["build"]).replace(
