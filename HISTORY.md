@@ -6,6 +6,16 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.3](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.2.3) - unreleased
+
+### Deprecated
+
+- For `FileGroup`:
+  - Added a deprecation warning when accessing `datetime_stored` property, as it has been deprecated in the REST API. This field does not exist in REST API v0.7.x.
+
+- For `GroupsAPI`:
+  - Added a deprecation warning when calling `store` method, as it has been deprecated in the REST API. This API endpoint does not exist in REST API v0.7.x.
+
 ## [4.2.2](https://github.com/uploadcare/pyuploadcare/compare/v4.2.1...v4.2.2) - 2023-11-20
 
 ### Added
