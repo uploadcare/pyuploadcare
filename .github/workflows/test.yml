@@ -87,6 +87,28 @@ jobs:
           - python-version: "3.10"
             django-version: "3.2"
 
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.4.2
+          virtualenvs-create: true
+          virtualenvs-in-project: false
+      - name: install dependencies
+        run: |
+          poetry install
+      - name: install specific django version
+        run: |
+          poetry run pip install django~=${{ matrix.django-version }}
+      - name: test with pytest
+        run: |
+          make test-django
+
   django-4:
     needs: functional
     runs-on: ubuntu-latest
@@ -106,6 +128,28 @@ jobs:
           - python-version: "3.12"
             django-version: "4.2"
 
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.4.2
+          virtualenvs-create: true
+          virtualenvs-in-project: false
+      - name: install dependencies
+        run: |
+          poetry install
+      - name: install specific django version
+        run: |
+          poetry run pip install django~=${{ matrix.django-version }}
+      - name: test with pytest
+        run: |
+          make test-django
+
   django-5:
     needs: functional
     runs-on: ubuntu-latest
@@ -117,23 +161,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
+      - name: install poetry
         uses: snok/install-poetry@v1
         with:
           version: 1.4.2
           virtualenvs-create: true
           virtualenvs-in-project: false
-      - name: Install dependencies
+      - name: install dependencies
         run: |
           poetry install
-      - name: Install specific Django version
+      - name: install specific django version
         run: |
           poetry run pip install django~=${{ matrix.django-version }}
-      - name: Test with pytest
+      - name: test with pytest
         run: |
           make test-django
 
