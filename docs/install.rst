@@ -115,3 +115,8 @@ A version 4.0 uses REST API 0.7 and contains the next breaking changes:
 * For ``File``:
   * Removed method ``copy`` in favor of ``local_copy`` and ``remote_copy`` methods.
   * Files to upload must be opened in a binary mode.
+
+Update to version 5.0
+---------------------
+
+...

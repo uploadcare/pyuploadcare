@@ -11,10 +11,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Breaking changes
 
 - Python 3.6 is no longer supported.
+- Removed `tox.ini`. The recommended way to run tests locally is by using [act](https://github.com/nektos/act) with Docker.
 
 ### Added
 
+...
+
 ### Changed
+
+- Python 3.12 and Django 5.0 were added to the test matrix.
 
 ## [4.2.3](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.2.3) - unreleased
 

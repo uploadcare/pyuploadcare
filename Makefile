@@ -27,5 +27,8 @@ test-django:
 test-integration:
 	poetry run pytest tests/integration --cov=pyuploadcare
 
+test-with-github-actions:
+	act -W .github/workflows/test.yml --container-architecture linux/amd64
+
 docs_html:
 	poetry run sh -c "cd docs && make html"
