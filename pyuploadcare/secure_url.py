@@ -11,10 +11,16 @@ from urllib.parse import quote_plus, urlparse
 
 class BaseSecureUrlBuilder(ABC):
     @abstractmethod
-    def build(self, uuid_or_url: str, wildcard: bool = False) -> str:
+    def build(self, handle: str, wildcard: bool = False) -> str:
+        """
+        :param handle: Can be one of the following: UUID, UUID with transformations, full URL.
+        """
         raise NotImplementedError
 
-    def get_token(self, uuid_or_url: str, wildcard: bool = False) -> str:
+    def get_token(self, handle: str, wildcard: bool = False) -> str:
+        """
+        :param handle: Can be one of the following: UUID, UUID with transformations, full URL.
+        """
         raise NotImplementedError(
             f"{self.__class__} doesn't provide get_token()"
         )
@@ -43,16 +49,16 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         self.window = window
         self.hash_algo = hash_algo
 
-    def build(self, uuid_or_url: str, wildcard: bool = False) -> str:
-        token = self.get_token(uuid_or_url, wildcard=wildcard)
-        secure_url = self._build_url(uuid_or_url, token)
+    def build(self, handle: str, wildcard: bool = False) -> str:
+        token = self.get_token(handle, wildcard=wildcard)
+        secure_url = self._build_url(handle, token)
         return secure_url
 
-    def get_token(self, uuid_or_url: str, wildcard: bool = False) -> str:
-        path = self._get_path(uuid_or_url)
+    def get_token(self, handle: str, wildcard: bool = False) -> str:
+        path = self._get_path(handle)
         expire = self._build_expire_time()
         acl = self._format_acl(path, wildcard=wildcard)
-        signature = self._build_signature(uuid_or_url, expire, acl)
+        signature = self._build_signature(handle, expire, acl)
         token = self._build_token(expire, acl, signature)
         return token
 
@@ -76,9 +82,9 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         return int(time.time()) + self.window
 
     def _build_signature(
-        self, uuid_or_url: str, expire: int, acl: Optional[str]
+        self, handle: str, expire: int, acl: Optional[str]
     ) -> str:
-        path = self._get_path(uuid_or_url)
+        path = self._get_path(handle)
         path = self._prepare_path_for_url(path)
         hash_source = [
             f"exp={expire}",
@@ -106,23 +112,23 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
 
     def _build_url(
         self,
-        uuid_or_url: str,
+        handle: str,
         token: str,
     ) -> str:
-        base_url = self._build_base_url(uuid_or_url)
+        base_url = self._build_base_url(handle)
         return self.template.format(
             base=base_url,
             token=token,
         )
 
-    def _get_path(self, uuid_or_url: str) -> str:
+    def _get_path(self, handle: str) -> str:
         """
         >>> builder._get_path("fake-uuid")
         /fake-uuid/
         >>> builder._get_path("https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/")
         /fake-uuid/-/resize/20x20/
         """
-        path = uuid_or_url
+        path = handle
         parsed = urlparse(path)
         if parsed.netloc:
             # extract uuid with transformations from url
@@ -131,26 +137,26 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
             path = f"/{path}"
         return path
 
-    def _build_base_url(self, uuid_or_url: str):
+    def _build_base_url(self, handle: str):
         """
         >>> builder._build_base_url("fake-uuid")
         https://sectest.ucarecdn.com/fake-uuid/
         >>> builder._get_path("https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/")
         https://sectest.ucarecdn.com/fake-uuid/-/resize/20x20/
         """
-        path = self._get_path(uuid_or_url)
+        path = self._get_path(handle)
         path = path.lstrip("/").rstrip("/")
         base_url = self.base_template.format(cdn=self.cdn_url, path=path)
         return base_url
 
     @abstractmethod
-    def _format_acl(self, uuid_or_url: str, wildcard: bool) -> Optional[str]:
+    def _format_acl(self, handle: str, wildcard: bool) -> Optional[str]:
         raise NotImplementedError
 
 
 class AkamaiSecureUrlBuilderWithAclToken(BaseAkamaiSecureUrlBuilder):
-    def _format_acl(self, uuid_or_url: str, wildcard: bool) -> str:
-        path = self._get_path(uuid_or_url)
+    def _format_acl(self, handle: str, wildcard: bool) -> str:
+        path = self._get_path(handle)
         path = path.lstrip("/").rstrip("/")
         path = self._prepare_path_for_acl(path)
         if wildcard:
@@ -159,7 +165,7 @@ class AkamaiSecureUrlBuilderWithAclToken(BaseAkamaiSecureUrlBuilder):
 
 
 class AkamaiSecureUrlBuilderWithUrlToken(BaseAkamaiSecureUrlBuilder):
-    def _format_acl(self, uuid_or_url: str, wildcard: bool) -> None:
+    def _format_acl(self, handle: str, wildcard: bool) -> None:
         if wildcard:
             raise ValueError(
                 "Wildcards are not supported in AkamaiSecureUrlBuilderWithUrlToken."
