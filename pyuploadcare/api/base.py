@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type, Union, cast
+from typing import Any, Dict, Optional, Type, TypeVar, Union, cast
 from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
@@ -10,6 +10,9 @@ from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response
 from pyuploadcare.exceptions import DefaultResponseClassNotDefined
+
+
+EntityOrResponse = TypeVar("EntityOrResponse", Entity, Response)
 
 
 class API:
@@ -32,9 +35,12 @@ class API:
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Union[Type[Response], Type[Entity]],
-    ) -> Union[Response, Entity]:
-        return TypeAdapter(response_class).validate_python(raw_resource)
+        response_class: Type[EntityOrResponse],
+    ) -> EntityOrResponse:
+        return cast(
+            response_class,
+            TypeAdapter(response_class).validate_python(raw_resource),
+        )
 
     def _build_url(  # noqa: C901
         self,
@@ -85,7 +91,7 @@ class API:
 
     def _put(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity] = None,
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         data: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid)
@@ -93,13 +99,13 @@ class API:
         return document.json()
 
     def _delete(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> None:
         url = self._build_url(resource_uuid)
         self._client.delete(url)
 
     def _delete_with_response(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid, suffix="storage")
         document = self._client.delete(url)
@@ -114,8 +120,8 @@ class APIProtocol(Protocol):
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Union[Type[Response], Type[Entity]],
-    ) -> Union[Response, Entity]:
+        response_class: Type[EntityOrResponse],
+    ) -> EntityOrResponse:
         ...
 
     def _build_url(
@@ -144,18 +150,18 @@ class APIProtocol(Protocol):
 
     def _put(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity] = None,
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         data: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         ...
 
     def _delete(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> None:
         ...
 
     def _delete_with_response(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> Dict[str, Any]:
         ...
 
