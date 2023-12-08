@@ -42,7 +42,10 @@ pytest = "^7.1"
 black = "^22.3.0"
 isort = "^5.9.3"
 flake8 = "^3.9.2"
-mypy = "^0.910"
+mypy = [
+    {version = "^1.4.1", python = "<3.8"},
+    {version = "^1.7.1", python = ">=3.8"}
+]
 flake8-print = "^4.0.0"
 pytest-vcr = "^1.0.2"
 vcrpy = [
