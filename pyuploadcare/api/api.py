@@ -480,7 +480,7 @@ class MetadataAPI(API):
         url = self._build_url(file_uuid, suffix=suffix)
         response_class = self._get_response_class("update")
         json_response = self._client.put(url, json=mvalue).json()
-        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        response = self._parse_response(json_response, response_class).root  # type: ignore
         return cast(str, response)
 
     def get_all_metadata(self, file_uuid: Union[UUID, str]) -> dict:
@@ -496,7 +496,7 @@ class MetadataAPI(API):
             )
             json_response = {}
 
-        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        response = self._parse_response(json_response, response_class).root  # type: ignore
         return cast(dict, response)
 
     def delete_key(self, file_uuid: Union[UUID, str], mkey: str) -> None:
@@ -511,7 +511,7 @@ class MetadataAPI(API):
         url = self._build_url(file_uuid, suffix=suffix)
         response_class = self._get_response_class("get_key")
         json_response = self._client.get(url).json()
-        response = self._parse_response(json_response, response_class).__root__  # type: ignore
+        response = self._parse_response(json_response, response_class).root  # type: ignore
         return cast(str, response)
 
 
