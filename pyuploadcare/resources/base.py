@@ -66,7 +66,7 @@ class BaseApiList:
     def __iter__(self):
         qs = self.query_parameters()
         for entity in self.resource_api.list(**qs):
-            resource_info = entity.dict()
+            resource_info = entity.model_dump()
             resource_id = resource_info.get(self.resource_id_field)
             constructor = getattr(self._client, self.constructor_name)
             yield constructor(resource_id, resource_info)

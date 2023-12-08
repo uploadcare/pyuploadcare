@@ -191,7 +191,7 @@ class File:
         """Updates and returns file information by requesting Uploadcare API."""
         self._info_cache = self._client.files_api.retrieve(
             self.uuid, include_appdata=include_appdata
-        ).dict()
+        ).model_dump()
         return self._info_cache
 
     @property
@@ -297,7 +297,7 @@ class File:
           on S3.
 
         """
-        self._info_cache = self._client.files_api.store(self.uuid).dict()
+        self._info_cache = self._client.files_api.store(self.uuid).model_dump()
 
     def create_local_copy(
         self,
@@ -373,7 +373,9 @@ class File:
 
     def delete(self) -> "None":
         """Deletes file by requesting Uploadcare API."""
-        self._info_cache = self._client.files_api.delete(self.uuid).dict()
+        self._info_cache = self._client.files_api.delete(
+            self.uuid
+        ).model_dump()
 
     def convert(
         self,

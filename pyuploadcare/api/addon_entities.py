@@ -22,7 +22,7 @@ AddonParamsType = TypeVar("AddonParamsType", bound=AddonExecutionParams)
 
 
 class AddonExecutionGeneralRequestData(Entity):
-    target: UUID
+    target: Union[UUID, str]
     params: Optional[Union[Dict[str, Any], AddonExecutionParams]] = None
 
     @field_validator("target")

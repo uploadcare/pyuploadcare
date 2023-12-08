@@ -3,7 +3,7 @@ from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
 from httpx._types import RequestFiles
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 from typing_extensions import Protocol
 
 from pyuploadcare.api.client import Client
@@ -34,7 +34,7 @@ class API:
         raw_resource: Dict[str, Any],
         response_class: Union[Type[Response], Type[Entity]],
     ) -> Union[Response, Entity]:
-        return parse_obj_as(response_class, raw_resource)  # type: ignore
+        return TypeAdapter(response_class).validate_python(raw_resource)
 
     def _build_url(  # noqa: C901
         self,

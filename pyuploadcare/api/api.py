@@ -533,15 +533,15 @@ class AddonsAPI(API):
         cleaned_params = {}
         if params:
             if isinstance(params, AddonExecutionParams):
-                cleaned_params = params.dict(
+                cleaned_params = params.model_dump(
                     exclude_unset=True, exclude_none=True
                 )
             else:
                 cleaned_params = params
-        execution_request_data = self.request_type.parse_obj(
+        execution_request_data = self.request_type.model_validate(
             dict(target=str(file_uuid), params=cleaned_params)
         )
-        return execution_request_data.dict(
+        return execution_request_data.model_dump(
             exclude_unset=True, exclude_none=True
         )
 

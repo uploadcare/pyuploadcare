@@ -11,5 +11,5 @@ def register_arguments(subparsers):
 
 
 def list_webhooks(arg_namespace, client: Uploadcare):
-    webhooks = [webhook.dict() for webhook in client.list_webhooks()]
+    webhooks = [webhook.model_dump() for webhook in client.list_webhooks()]
     pprint(webhooks)

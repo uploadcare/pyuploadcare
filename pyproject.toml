@@ -53,16 +53,19 @@ vcrpy = [
     {version = "^5.1.0", python = ">=3.8"}
 ]
 yarl = "^1.9.2"
-Django = "^3.2.7"
-coverage = "^7.2.5"
-pytest-cov = "^2.12.1"
+Django = [
+    {version = "^3.2.23", python = "<3.8"},
+    {version = "^4.2.8", python = ">=3.8"}
+]
+coverage = "^7.2.7"
+pytest-cov = "^4.1.0"
 python-coveralls = "^2.9.3"
 types-python-dateutil = "^2.8.0"
 types-pytz = "^2021.1.2"
 Sphinx = "^4.2.0"
 sphinx-argparse = "^0.3.1"
 types-dataclasses = "^0.1.7"
-pytest-freezegun = "^0.4.2"
+pytest-freezer = "^0.4.8"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
