@@ -10,7 +10,6 @@ classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
@@ -26,59 +25,34 @@ classifiers = [
 ucare = 'pyuploadcare.ucare_cli.main:main'
 
 [tool.poetry.dependencies]
-python = "^3.7.0"
-httpx = [
-    {version = "^0.24.1", python = "<3.8"},
-    {version = "^0.25.1", python = ">=3.8"}
-]
+python = "^3.8.1"
+httpx = "^0.25.1"
 pydantic = {extras = ["email"], version = "^2.5.2"}
 python-dateutil = "^2.8.2"
 pytz = "^2023.3.post1"
-typing-extensions = [
-    {version = "^4.7.1", python = "<3.8"},
-    {version = "^4.9.0", python = ">=3.8"}
-]
-Django = {version = ">=1.11", optional = true}
+typing-extensions = "^4.9.0"
+Django = {version = ">=2.2", optional = true}
 
 [tool.poetry.extras]
 django = ["Django"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4"
-black = [
-    {version = "^23.3.0", python = "<3.8"},
-    {version = "^23.12.0", python = ">=3.8"}
-]
-isort = [
-    {version = "^5.11.5", python = "<3.8"},
-    {version = "^5.13.2", python = ">=3.8"}
-]
-flake8 = "^3.9.2"
-# flake8 = "^6.1.0"
-mypy = [
-    {version = "^1.4.1", python = "<3.8"},
-    {version = "^1.7.1", python = ">=3.8"}
-]
-flake8-print = "^4.0.0"
+black = "^23.12.0"
+isort = "^5.13.2"
+flake8 = "^6.1.0"
+mypy = "^1.7.1"
+flake8-print = "^5.0.0"
 pytest-vcr = "^1.0.2"
-vcrpy = [
-    {version = "^4.4.0", python = "<3.8"},
-    {version = "^5.1.0", python = ">=3.8"}
-]
+vcrpy = "^5.1.0"
 yarl = "^1.9.4"
-Django = [
-    {version = "^3.2.23", python = "<3.8"},
-    {version = "^4.2.8", python = ">=3.8"}
-]
-coverage = [
-    {version = "^5.5", python = "<3.8"},
-    {version = "^7.3.3", python = ">=3.8"}
-]
+Django = "^4.2.8"
+coverage = "^7.3.3"
 pytest-cov = "^4.1.0"
 python-coveralls = "^2.9.3"
 types-python-dateutil = "^2.8.19.14"
 types-pytz = "^2023.3.1.1"
-Sphinx = "^5.3.0"
+Sphinx = "^7.1.2"
 sphinx-argparse = "^0.4.0"
 types-dataclasses = "^0.6.6"
 pytest-freezer = "^0.4.8"
