@@ -11,6 +11,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Breaking changes
 
 - Python 3.6 is no longer supported.
+- [Pydantic](https://docs.pydantic.dev) has been updated to V2. If your project relies on Pydantic V1, you may encounter errors, as versions 1 and 2 of this library are not fully compatible with each other.
 - Removed `tox.ini`. The recommended way to run tests locally is by using [act](https://github.com/nektos/act) with Docker.
 
 ### Added
@@ -19,6 +20,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Bumped dependencies: ...
 - Python 3.12 and Django 5.0 were added to the test matrix.
 
 ## [4.2.3](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.2.3) - unreleased
