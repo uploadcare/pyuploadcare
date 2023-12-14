@@ -148,6 +148,7 @@ class FileGroup(Iterable):
             self.id
         ).model_dump()
         if self.is_stored and self._stored_at:
+            assert self._info_cache
             self._info_cache["datetime_stored"] = self._stored_at.isoformat()
 
         return self._info_cache

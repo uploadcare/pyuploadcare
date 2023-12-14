@@ -194,7 +194,9 @@ class ListMixin(APIProtocol):
         if request_limit is not None:
             query_parameters["limit"] = request_limit
 
-        next_ = self._build_url(query_parameters=query_parameters)
+        next_: Optional[str] = self._build_url(
+            query_parameters=query_parameters
+        )
 
         while next_:
             document = self._client.get(next_)

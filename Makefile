@@ -13,7 +13,7 @@ lint:
 	poetry run black --check .
 	poetry run isort --check .
 	poetry run flake8 .
-	poetry run mypy --namespace-packages --show-error-codes .
+	poetry run mypy --namespace-packages --show-error-codes --check-untyped-defs .
 
 test:
 	poetry run pytest -v tests/ --cov=pyuploadcare

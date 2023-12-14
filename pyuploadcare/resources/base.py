@@ -1,6 +1,6 @@
 import itertools
 from datetime import date, datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from pyuploadcare.api.base import ListCountMixin
 
@@ -29,8 +29,8 @@ class BaseApiList:
         self.starting_point = starting_point
         self.limit = limit
         self.request_limit = request_limit
-        self._count = None
-        self._client = client
+        self._count: Optional[int] = None
+        self._client: "Uploadcare" = client
 
     @property
     def starting_point(self):

@@ -75,7 +75,7 @@ class FileField(Field):
             attrs["data-clearable"] = ""
         if dj_conf.signed_uploads:
             expire, signature = self._client.generate_upload_signature()
-            attrs["data-secure-expire"] = expire
+            attrs["data-secure-expire"] = str(expire)
             attrs["data-secure-signature"] = signature
         return attrs
 

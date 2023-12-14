@@ -541,7 +541,7 @@ class FileFromUrl:
         self.token = token
         self._client = client
 
-        self._info_cache = None
+        self._info_cache: Optional[Dict[str, Any]] = None
 
     def __repr__(self):
         return f"<uploadcare.FileFromUrl {self.token}>"
