@@ -4,12 +4,15 @@ from uuid import UUID
 
 from httpx._types import RequestFiles
 from pydantic import TypeAdapter
-from typing_extensions import Protocol
+from typing_extensions import Protocol, TypeVar
 
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response
 from pyuploadcare.exceptions import DefaultResponseClassNotDefined
+
+
+ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Union[Response, Entity])
 
 
 class API:
@@ -32,8 +35,8 @@ class API:
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Union[Type[Response], Type[Entity]],
-    ) -> Union[Response, Entity]:
+        response_class: Type[ResponseOrEntity],
+    ) -> ResponseOrEntity:
         return TypeAdapter(response_class).validate_python(raw_resource)
 
     def _build_url(  # noqa: C901
@@ -114,8 +117,8 @@ class APIProtocol(Protocol):
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Union[Type[Response], Type[Entity]],
-    ) -> Union[Response, Entity]:
+        response_class: Type[ResponseOrEntity],
+    ) -> ResponseOrEntity:
         ...
 
     def _build_url(
