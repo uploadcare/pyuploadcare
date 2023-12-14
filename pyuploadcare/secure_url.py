@@ -60,7 +60,6 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     def _build_signature(
         self, uuid_or_url: str, expire: int, acl: Optional[str]
     ) -> str:
-
         hash_source = [
             f"exp={expire}",
             f"acl={acl}" if acl else f"url={uuid_or_url}",
@@ -75,7 +74,6 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
         return signature
 
     def _build_token(self, expire: int, acl: Optional[str], signature: str):
-
         token_parts = [
             f"exp={expire}",
             f"acl={acl}" if acl else None,

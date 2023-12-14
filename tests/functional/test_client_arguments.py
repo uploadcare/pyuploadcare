@@ -21,7 +21,6 @@ def test_deprecated_argument_for_PY37_if_allow_is_set(test_client, caplog):
     real_PY36 = pyuploadcare.api.client.PY36
 
     with mock.patch("pyuploadcare.api.client.PY36", False):
-
         if real_PY36:
             # allow_redirects converted into follow_redirects
             # but there is an old version of httpx on real PY36 environment
@@ -64,7 +63,6 @@ def test_deprecated_argument_is_OK_for_PY36_if_allow_is_set(test_client):
     real_PY36 = pyuploadcare.api.client.PY36
 
     with mock.patch("pyuploadcare.api.client.PY36", True):
-
         if real_PY36:
             """`allow_redirects` is valid argument"""
             with pytest.raises(httpx.UnsupportedProtocol):

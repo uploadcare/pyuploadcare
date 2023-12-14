@@ -64,7 +64,7 @@ jobs:
         run: |
           make test-functional
 
-  django-1-2-3:
+  django-2-and-3:
     needs: functional
     runs-on: ubuntu-latest
     strategy:
