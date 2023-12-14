@@ -16,12 +16,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-...
+- Python 3.12 and Django 5.0 were added to the test matrix.
 
 ### Changed
 
-- Bumped dependencies: ...
-- Python 3.12 and Django 5.0 were added to the test matrix.
+- Updated dependencies: `httpx`, `pydantic`, `pytz`, `typing-extensions`.
+- Updated dev-dependencies: `mypy`, `pytest`, `black`, `isort`, `flake8`, `vcrpy`, `yarl`, `coverage`, `sphinx`, `sphinx-argparse`, `types-*`; `pytest-freezegun` has been replaced with `pytest-freezer`.
 
 ## [4.2.3](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.2.3) - unreleased
 
