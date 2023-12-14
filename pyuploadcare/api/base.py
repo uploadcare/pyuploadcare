@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type, TypeVar, Union, cast
+from typing import Any, Dict, Optional, Type, Union, cast
 from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
@@ -10,9 +10,6 @@ from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response
 from pyuploadcare.exceptions import DefaultResponseClassNotDefined
-
-
-EntityOrResponse = TypeVar("EntityOrResponse", Entity, Response)
 
 
 class API:
@@ -35,12 +32,9 @@ class API:
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Type[EntityOrResponse],
-    ) -> EntityOrResponse:
-        return cast(
-            response_class,
-            TypeAdapter(response_class).validate_python(raw_resource),
-        )
+        response_class: Union[Type[Response], Type[Entity]],
+    ) -> Union[Response, Entity]:
+        return TypeAdapter(response_class).validate_python(raw_resource)
 
     def _build_url(  # noqa: C901
         self,
@@ -120,8 +114,8 @@ class APIProtocol(Protocol):
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Type[EntityOrResponse],
-    ) -> EntityOrResponse:
+        response_class: Union[Type[Response], Type[Entity]],
+    ) -> Union[Response, Entity]:
         ...
 
     def _build_url(
