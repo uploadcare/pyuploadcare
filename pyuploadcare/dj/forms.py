@@ -17,6 +17,7 @@ from pyuploadcare.dj.conf import (
     get_widget_css_url,
     get_widget_js_url,
     user_agent_extension,
+    user_agent_extension_short,
 )
 from pyuploadcare.exceptions import InvalidRequestError
 
@@ -66,6 +67,7 @@ class FileWidget(TextInput):
     def _widget_options(self, attrs=None) -> Dict[str, Any]:
         options: Dict[str, Any] = {
             "multiple": False,
+            "user-agent-integration": user_agent_extension_short,
         }
 
         if config["cdn_base"] is not None:

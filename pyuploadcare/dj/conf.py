@@ -18,6 +18,7 @@ __all__ = [
     "SettingsType",
     "config",
     "user_agent_extension",
+    "user_agent_extension_short",
     "get_legacy_widget_js_url",
     "get_widget_js_url",
     "get_widget_css_url",
@@ -98,6 +99,8 @@ if not config["secret"]:
 user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
     django_version(), library_version
 )
+
+user_agent_extension_short = "PyUploadcare-Django/{0}".format(library_version)
 
 # Legacy widget (uploadcare.js)
 
