@@ -9,13 +9,24 @@ Django Widget
 Settings
 --------
 
-Besides required ``pub_key``, ``secret`` settings there are optional settings.
-
-Below is the default config:
+The minimal configuration for a Django project using Uploadcare looks like this:
 
 .. code-block:: python
 
-   UPLOADCARE = {
+    UPLOADCARE = {
+        "pub_key": "<your public key>",
+        "secret": "<your private key>",
+    }
+
+You can generate these keys in your project settings on the `Uploadcare dashboard`_.
+
+In addition to the required settings `pub_key` and `secret`, there are several optional settings available.
+
+Below is the full default configuration:
+
+.. code-block:: python
+
+    UPLOADCARE = {
         "pub_key": "",
         "secret": "",
         "cdn_base": None,
@@ -121,10 +132,9 @@ If you want to use our legacy jQuery-widget, you can enable it in settings:
 
 .. code-block:: python
 
-
     UPLOADCARE = {
-        "pub_key": "demopublickey",
-        "secret": "demoprivatekey",
+        "pub_key": "<your public key>",
+        "secret": "<your private key>",
         "use_legacy_widget": True,
     }
 
@@ -142,7 +152,7 @@ Settings that are specific to the legacy widget are prefixed with ``legacy_``:
         },
     }
 
-If you have signed uploads enabled in your Uploadcare project, widget-based uploads will fail unless you enable the ``signed_uploads`` setting in your Django project::
+If you have signed uploads enabled in your Uploadcare project, widget-based uploads will fail unless you enable the ``signed_uploads`` setting in your Django project:
 
 .. code-block:: python
 
@@ -292,6 +302,7 @@ It stores uploaded images as a group:
 
         photos = ImageGroupField()
 
+.. _Uploadcare dashboard: https://app.uploadcare.com/
 .. _options: https://uploadcare.com/docs/file-uploader/options/
 .. _widget documentation: https://uploadcare.com/docs/file-uploader/options/#crop-preset
 .. _TextField: https://docs.djangoproject.com/en/4.2/ref/models/fields/#textfield
