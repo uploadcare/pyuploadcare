@@ -42,4 +42,5 @@
     ctx-name="{{ name }}"
     use-input
     {% if options.multiple == "true" %}use-group{% endif %}
+    {% if is_required %}input-required{% endif %}
 ></lr-data-output>

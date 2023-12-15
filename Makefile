@@ -32,7 +32,6 @@ docs_html:
 
 run_django:
 	poetry run python tests/test_project/manage.py migrate
-	DJANGO_SUPERUSER_PASSWORD=admin poetry run python tests/test_project/manage.py createsuperuser --no-input --username=admin --email=admin@example.com
 	poetry run python tests/test_project/manage.py runserver
 
 update_bundled_static:

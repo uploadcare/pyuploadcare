@@ -107,6 +107,7 @@ class FileWidget(TextInput):
             {
                 "name": name,
                 "value": value,
+                "is_required": self.is_required,
                 "options": widget_options,
                 "pub_key": config["pub_key"],
                 "variant": variant,
