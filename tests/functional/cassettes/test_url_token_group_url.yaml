@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - sectest.ucarecdn.com
+      User-Agent:
+      - Python-urllib/3.11
+    method: GET
+    uri: https://sectest.ucarecdn.com/3b278cee-47bd-4276-8d7d-9cde5902b18c~1/nth/0/?token=exp=2015971200~hmac=3d18d965fbf5d93e434c11ca209e2a7068b50b00962ebf7a19eae357a098bdd2
+  response:
+    body:
+      string: 'hello
+
+        '
+    headers:
+      Access-Control-Allow-Methods:
+      - HEAD, GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Cache-Control:
+      - public, max-age=31457414
+      Connection:
+      - close
+      Content-Disposition:
+      - inline; filename=hello.txt
+      Content-Length:
+      - '6'
+      Content-Type:
+      - text/plain
+      Date:
+      - Fri, 24 Nov 2023 21:55:30 GMT
+      ETag:
+      - '"b1946ac92492d2347c6235b4d2611184"'
+      Last-Modified:
+      - Wed, 22 Nov 2023 00:53:42 GMT
+      Server:
+      - Uploadcare
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+    status:
+      code: 200
+      message: OK
+version: 1
