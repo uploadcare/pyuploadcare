@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.0.0](https://github.com/uploadcare/pyuploadcare/compare/v4.2.3...v5.0.0) - Unreleased
+## [4.4.0](https://github.com/uploadcare/pyuploadcare/compare/v4.3.0...v4.4.0) - Unreleased
 
 ### Breaking Changes
 
@@ -24,7 +24,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Updated dependencies: `httpx`, `pydantic`, `pytz`, `typing-extensions`.
 - Updated development dependencies: `mypy`, `pytest`, `black`, `isort`, `flake8`, `flake8-print`, `vcrpy`, `yarl`, `coverage`, `pytest-cov`, `sphinx`, `sphinx-argparse`, `types-*`. Replaced `pytest-freezegun` with `pytest-freezer`.
 
-## [4.2.3](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.2.3) - unreleased
+## [4.3.0](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.3.0) - 2023-12-24
+
+### Fixed
+
+- For `AkamaiSecureUrlBuilderWithAclToken` and `AkamaiSecureUrlBuilderWithUrlToken`:
+  - Special characters that were not previously escaped are now properly handled, as detailed in issue [#275](https://github.com/uploadcare/pyuploadcare/issues/275).
+
+### Changed
+
+- For `AkamaiSecureUrlBuilderWithAclToken` and `AkamaiSecureUrlBuilderWithUrlToken`:
+  - Both classes have been made more consistent and now accept a full URL, URL path, or just the UUID of a file – whichever is more convenient for you.
 
 ### Deprecated
 
