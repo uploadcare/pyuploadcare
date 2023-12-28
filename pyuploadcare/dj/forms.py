@@ -205,10 +205,11 @@ class FileGroupField(Field):
         return isinstance(self.widget, LegacyFileWidget)
 
     def widget_attrs(self, widget):
+        attrs: Dict[str, Any] = {}
         if self.legacy_widget:
-            attrs = {"data-multiple": ""}
+            attrs["data-multiple"] = ""
         else:
-            attrs = {"multiple": True}
+            attrs["multiple"] = True
         if not self.required:
             attrs["data-clearable"] = ""
         return attrs
