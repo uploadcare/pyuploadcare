@@ -8,7 +8,7 @@ To run tests using `Github Actions`_ workflows, but locally, install the `act`_ 
 
 .. code-block:: console
 
-    make test-with-github-actions
+    make test_with_github_actions
 
 This runs the full suite of tests across Python and Django versions.
 
