@@ -115,3 +115,22 @@ A version 4.0 uses REST API 0.7 and contains the next breaking changes:
 * For ``File``:
   * Removed method ``copy`` in favor of ``local_copy`` and ``remote_copy`` methods.
   * Files to upload must be opened in a binary mode.
+
+
+Update to version 5.0
+---------------------
+
+In version 5.0, we introduce a new `file uploader`_, which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the ``use_legacy_widget`` option in your configuration:
+
+.. code-block:: python
+    
+    UPLOADCARE = {
+       ...,
+       "use_legacy_widget": True,
+    }
+
+Additionally, please take note that some settings have been renamed in this update. For example, ``UPLOADCARE["widget_version"]`` has been changed to ``UPLOADCARE["legacy_widget"]["version"]``. You can find the full list of these changes in the `changelog for version 5.0.0`_.
+
+.. _file uploader: https://uploadcare.com/docs/file-uploader/
+.. _@uploadcare/blocks: https://www.npmjs.com/package/@uploadcare/blocks
+.. _changelog for version 5.0.0: https://github.com/uploadcare/pyuploadcare/blob/main/HISTORY.md#500---2023-12-28

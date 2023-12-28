@@ -9,24 +9,67 @@ Django Widget
 Settings
 --------
 
-Besides required ``pub_key``, ``secret`` settings there are optional settings,
-for example, ``widget_version`` or ``widget_build``:
+The minimal configuration for a Django project using Uploadcare looks like this:
 
 .. code-block:: python
 
     UPLOADCARE = {
-        'pub_key': 'demopublickey',
-        'secret': 'demoprivatekey',
-        'widget_version': '3.x',  // ~= 3.0 (latest)
-        'widget_build': 'min',  // without jQuery
-        'cdn_base': 'https://cdn.mycompany.com',
+        "pub_key": "<your public key>",
+        "secret": "<your private key>",
     }
 
-PyUploadcare takes assets from Uploadcare CDN by default, e.g.:
+You can generate these keys in your project settings on the `Uploadcare dashboard`_.
+
+In addition to the required settings `pub_key` and `secret`, there are several optional settings available.
+
+Below is the full default configuration:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        "pub_key": "",
+        "secret": "",
+        "cdn_base": None,
+        "upload_base_url": None,
+        "signed_uploads": False,
+        "use_legacy_widget": False,
+        "use_hosted_assets": True,
+        "widget": {
+            "version": "0.30.7",
+            "variant": "regular",
+            "build": "min",
+            "options": {},
+            "override_js_url": None,
+            "override_css_url": {
+                "regular": None,
+                "inline": None,
+                "minimal": None,
+            },
+        },
+        "legacy_widget": {
+            "version": "3.x",
+            "build": "full.min",
+            "override_js_url": None,
+        },
+    }
+
+
+PyUploadcare takes assets from CDN by default, e.g.:
 
 .. code-block:: html
 
-    <script src="https://ucarecdn.com/widget/x.y.z/uploadcare/uploadcare.full.min.js"></script>
+    <script type="module">
+        import * as LR from "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.x/web/blocks.min.js";
+        LR.registerBlocks(LR);
+    </script>
+
+    <!-- ... -->
+
+    <lr-file-uploader-inline
+        css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.x/web/lr-file-uploader-regular.min.css"
+        ctx-name="my-uploader"
+    ></lr-file-uploader-inline>
+
 
 If you don't want to use hosted assets you have to turn off this feature:
 
@@ -34,7 +77,7 @@ If you don't want to use hosted assets you have to turn off this feature:
 
     UPLOADCARE = {
         # ...
-        'use_hosted_assets': False,
+        "use_hosted_assets": False,
     }
 
 In this case local assets will be used.
@@ -46,8 +89,14 @@ widget url:
 
     UPLOADCARE = {
         # ...
-        'use_hosted_assets': False,
-        'widget_url': 'http://path.to/your/widget.js',
+        "widget": {
+            "override_js_url": "http://path.to/your/blocks.js",
+            "override_css_url": {
+                "regular": "http://path.to/your/lr-file-uploader-regular.css", 
+                "inline": "http://path.to/your/lr-file-uploader-inline.css", 
+                "minimal": "http://path.to/your/lr-file-uploader-minimal.css", 
+            },
+        },
     }
 
 `Uploadcare widget`_ will use default upload handler url, unless you specify:
@@ -56,10 +105,54 @@ widget url:
 
     UPLOADCARE = {
         # ...
-        'upload_base_url': 'http://path.to/your/upload/handler',
+        "upload_base_url": "http://path.to/your/upload/handler",
     }
 
-If you have signed uploads enabled in your Uploadcare project, widget-based uploads will fail unless you enable the ``signed_uploads`` setting in your Django project::
+Use ``widget_options`` to pass arbitrary `options`_ to the file uploader:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        # ...
+        "widget": {
+            "options": {
+                "source-list": "local,url,camera",
+                "camera-mirror": True,
+            },
+        },
+    }
+
+
+.. _django-legacy-widget-settings-ref:
+
+Settings for legacy widget
+--------------------------
+
+If you want to use our legacy jQuery-widget, you can enable it in settings:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        "pub_key": "<your public key>",
+        "secret": "<your private key>",
+        "use_legacy_widget": True,
+    }
+
+Settings that are specific to the legacy widget are prefixed with ``legacy_``:
+
+.. code-block:: python
+
+    UPLOADCARE = {
+        # ...
+        "use_legacy_widget": True,
+        "legacy_widget": {
+            "version": "3.x",  # ~= 3.0 (latest)
+            "build": "min",  # without jQuery
+            "override_js_url": "http://path.to/your/uploadcare.js",
+        },
+    }
+
+If you have signed uploads enabled in your Uploadcare project, widget-based uploads will fail unless you enable the ``signed_uploads`` setting in your Django project:
 
 .. code-block:: python
 
@@ -89,7 +182,7 @@ These fields play by common Django rules. South migrations are supported.
 
     .. code-block:: python
 
-        photo.photo_2x3 = File('a771f854-c2cb-408a-8c36-71af77811f3b')
+        photo.photo_2x3 = File("a771f854-c2cb-408a-8c36-71af77811f3b")
         photo.save()
 
         photo.photo_2x3.store()
@@ -135,15 +228,12 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
 
         photo = ImageField(blank=True, manual_crop="")
 
-.. image:: https://ucarecdn.com/93b254a3-8c7a-4533-8c01-a946449196cb/-/resize/800/manual_crop.png
-
-.. _django-widget-models-filegroupfield-ref:
-
+.. _django-widget-models-imagefield-advanced-ref:
 
 Advanced widget options
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-You can pass any widget options via ``FileWidget``'s attrs argument:
+You can pass any widget `options`_ via ``FileWidget``'s attrs argument:
 
 .. code-block:: python
 
@@ -151,14 +241,30 @@ You can pass any widget options via ``FileWidget``'s attrs argument:
 
     from pyuploadcare.dj.forms import FileWidget, ImageField
 
-
-    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
+    # optional. provide advanced widget options:
+    # https://uploadcare.com/docs/file-uploader/configuration/
+    # https://uploadcare.com/docs/file-uploader/options/
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
-            'data-cdn-base': 'https://cdn.super-candidates.com',
-            'data-image-shrink': '1024x1024',
+            "source-list": "local,url,camera",
+            "camera-mirror": True,
         }))
 
+Use ``LegacyFileWidget`` whenever you want to switch back to jQuery-based
+widget on a field-by-field basis without turning it on globally (using
+``"use_legacy_widget": True``).
+
+.. code-block:: python
+
+    from django import forms
+
+    from pyuploadcare.dj.forms import LegacyFileWidget, ImageField
+
+    class CandidateForm(forms.Form):
+        photo = ImageField(widget=LegacyFileWidget)
+
+
+.. _django-widget-models-filegroupfield-ref:
 
 FileGroupField
 ~~~~~~~~~~~~~~
@@ -196,5 +302,7 @@ It stores uploaded images as a group:
 
         photos = ImageGroupField()
 
-.. _widget documentation: https://uploadcare.com/docs/uploads/widget/crop_options/
-.. _TextField: https://docs.djangoproject.com/en/1.8/ref/models/fields/#django.db.models.TextField
+.. _Uploadcare dashboard: https://app.uploadcare.com/
+.. _options: https://uploadcare.com/docs/file-uploader/options/
+.. _widget documentation: https://uploadcare.com/docs/file-uploader/options/#crop-preset
+.. _TextField: https://docs.djangoproject.com/en/4.2/ref/models/fields/#textfield

@@ -66,7 +66,7 @@ You can find an example project [here](https://github.com/uploadcare/pyuploadcar
 
 ```
 
-![](https://ucarecdn.com/dbb4021e-b20e-40fa-907b-3da0a4f8ed70/-/resize/800/manual_crop.png)
+![](https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/manual_crop.png)
 
 ## Documentation
 

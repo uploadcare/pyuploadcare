@@ -1,16 +1,28 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+from typing import Any, Dict
+from urllib.parse import urlparse
+
 from django.core.exceptions import ValidationError
 from django.forms import Field, TextInput
+from django.template.loader import render_to_string
+from django.templatetags.static import static
 
 from pyuploadcare.client import Uploadcare
-from pyuploadcare.dj import conf as dj_conf
 from pyuploadcare.dj.client import get_uploadcare_client
+from pyuploadcare.dj.conf import (
+    config,
+    get_legacy_widget_js_url,
+    get_widget_css_url,
+    get_widget_js_url,
+    user_agent_extension,
+    user_agent_extension_short,
+)
 from pyuploadcare.exceptions import InvalidRequestError
 
 
-class FileWidget(TextInput):
+class LegacyFileWidget(TextInput):
     """Django form widget that sets up Uploadcare Widget.
 
     It adds js and hidden input with basic Widget's params, e.g.
@@ -22,27 +34,89 @@ class FileWidget(TextInput):
     is_hidden = False
 
     class Media:
-        js = (dj_conf.uploadcare_js,)
+        js = (get_legacy_widget_js_url(),)
 
     def __init__(self, attrs=None):
         default_attrs = {
             "role": "uploadcare-uploader",
-            "data-public-key": dj_conf.pub_key,
+            "data-public-key": config["pub_key"],
+            "data-integration": user_agent_extension,
         }
 
-        if dj_conf.user_agent_extension is not None:
-            default_attrs["data-integration"] = dj_conf.user_agent_extension
-
-        if dj_conf.upload_base_url is not None:
-            default_attrs["data-url-base"] = dj_conf.upload_base_url
+        if config["upload_base_url"] is not None:
+            default_attrs["data-url-base"] = config["upload_base_url"]
 
         if attrs is not None:
             default_attrs.update(attrs)
 
-        super(FileWidget, self).__init__(default_attrs)
+        super(LegacyFileWidget, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None, renderer=None):
-        return super(FileWidget, self).render(name, value, attrs, renderer)
+        return super(LegacyFileWidget, self).render(
+            name, value, attrs, renderer
+        )
+
+
+class FileWidget(TextInput):
+    _client: Uploadcare
+
+    def __init__(self, attrs=None):
+        self._client = get_uploadcare_client()
+        super(FileWidget, self).__init__(attrs)
+
+    def _widget_options(self, attrs=None) -> Dict[str, Any]:
+        options: Dict[str, Any] = {
+            "multiple": False,
+            "user-agent-integration": user_agent_extension_short,
+        }
+
+        if config["cdn_base"] is not None:
+            options["cdn-cname"] = config["cdn_base"]
+
+        if config["upload_base_url"] is not None:
+            options["base-url"] = config["upload_base_url"]
+
+        options.update(config["widget"]["options"])
+        options.update(self.attrs)
+        if attrs:
+            options.update(attrs)
+
+        # Convert True, False to "true", "false"
+        options = {
+            k: str(v).lower() if isinstance(v, bool) else v
+            for k, v in options.items()
+            if k not in ["class"]
+        }
+
+        return options
+
+    def render(self, name, value, attrs=None, renderer=None):
+        variant = config["widget"]["variant"]
+
+        uploadcare_js = get_widget_js_url()
+        uploadcare_css = get_widget_css_url(variant)
+
+        # If assets are locally served, use STATIC_URL to prefix their URLs
+        if not urlparse(uploadcare_js).netloc:
+            uploadcare_js = static(uploadcare_js)
+        if not urlparse(uploadcare_css).netloc:
+            uploadcare_css = static(uploadcare_css)
+
+        widget_options = self._widget_options(attrs=attrs)
+
+        return render_to_string(
+            "uploadcare/forms/widgets/file.html",
+            {
+                "name": name,
+                "value": value,
+                "is_required": self.is_required,
+                "options": widget_options,
+                "pub_key": config["pub_key"],
+                "variant": variant,
+                "uploadcare_js": uploadcare_js,
+                "uploadcare_css": uploadcare_css,
+            },
+        )
 
 
 class FileField(Field):
@@ -52,7 +126,7 @@ class FileField(Field):
 
     """
 
-    widget = FileWidget
+    widget = LegacyFileWidget if config["use_legacy_widget"] else FileWidget
     _client: Uploadcare
 
     def __init__(self, *args, **kwargs):
@@ -69,11 +143,15 @@ class FileField(Field):
         except InvalidRequestError as exc:
             raise ValidationError(f"Invalid value for a field: {exc}")
 
+    @property
+    def legacy_widget(self) -> bool:
+        return isinstance(self.widget, LegacyFileWidget)
+
     def widget_attrs(self, widget):
         attrs = {}
-        if not self.required:
+        if self.legacy_widget and not self.required:
             attrs["data-clearable"] = ""
-        if dj_conf.signed_uploads:
+        if config["signed_uploads"]:
             expire, signature = self._client.generate_upload_signature()
             attrs["data-secure-expire"] = str(expire)
             attrs["data-secure-signature"] = signature
@@ -89,16 +167,22 @@ class ImageField(FileField):
 
     def widget_attrs(self, widget):
         attrs = super(ImageField, self).widget_attrs(widget)
-        attrs["data-images-only"] = ""
-        if self.manual_crop is not None:
-            attrs["data-crop"] = self.manual_crop
+        if self.legacy_widget:
+            attrs["data-images-only"] = ""
+            if self.manual_crop is not None:
+                attrs["data-crop"] = self.manual_crop
+        else:
+            attrs["img-only"] = True
+            attrs["use-cloud-image-editor"] = True
+            if self.manual_crop is not None:
+                attrs["crop-preset"] = self.manual_crop
         return attrs
 
 
 class FileGroupField(Field):
     """Django form field that sets up ``FileWidget`` in multiupload mode."""
 
-    widget = FileWidget
+    widget = LegacyFileWidget if config["use_legacy_widget"] else FileWidget
 
     _client: Uploadcare
 
@@ -116,8 +200,16 @@ class FileGroupField(Field):
         except InvalidRequestError as exc:
             raise ValidationError(f"Invalid value for a field: {exc}")
 
+    @property
+    def legacy_widget(self) -> bool:
+        return isinstance(self.widget, LegacyFileWidget)
+
     def widget_attrs(self, widget):
-        attrs = {"data-multiple": ""}
+        attrs: Dict[str, Any] = {}
+        if self.legacy_widget:
+            attrs["data-multiple"] = ""
+        else:
+            attrs["multiple"] = True
         if not self.required:
             attrs["data-clearable"] = ""
         return attrs
@@ -128,5 +220,8 @@ class ImageGroupField(FileGroupField):
 
     def widget_attrs(self, widget):
         attrs = super(ImageGroupField, self).widget_attrs(widget)
-        attrs["data-images-only"] = ""
+        if self.legacy_widget:
+            attrs["data-images-only"] = ""
+        else:
+            attrs["img-only"] = True
         return attrs

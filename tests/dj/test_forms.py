@@ -6,27 +6,28 @@ import unittest
 from django import forms
 from django.core.exceptions import ValidationError
 
-from pyuploadcare.dj import conf as dj_conf
 from pyuploadcare.dj import forms as uc_forms
+from pyuploadcare.dj.conf import config
 
 
 class FormFieldsAttributesTest(unittest.TestCase):
     def setUp(self):
-        self._pub_key = dj_conf.pub_key
-        self._secret = dj_conf.secret
-        dj_conf.pub_key = "asdf"
-        dj_conf.secret = "qwer"
+        self._original_pub_key = config["pub_key"]
+        self._original_secret = config["secret"]
+        config["pub_key"] = "asdf"
+        config["secret"] = "qwer"
 
     def tearDown(self):
-        dj_conf.pub_key = self._pub_key
-        dj_conf.secret = self._secret
+        config["pub_key"] = self._original_pub_key
+        config["secret"] = self._original_secret
 
-    def test_default_form_field(self):
+    def test_legacy_default_form_field(self):
         class SomeForm(forms.Form):
             cf = forms.CharField()
-            ff = uc_forms.FileField()
+            ff = uc_forms.FileField(widget=uc_forms.LegacyFileWidget)
 
         f = SomeForm(label_suffix="")
+        self.assertTrue(f["ff"].field.legacy_widget)
         self.assertRegex(
             str(f.media),
             r"https://ucarecdn\.com/libs/widget/[\d\.x]+/uploadcare\.full.min\.js",
@@ -35,11 +36,24 @@ class FormFieldsAttributesTest(unittest.TestCase):
         self.assertIn('data-public-key="asdf"', str(f["ff"]))
         self.assertIn('type="hidden"', str(f["ff"]))
 
-    def test_form_field_custom_attrs(self):
+    def test_default_form_field(self):
+        class SomeForm(forms.Form):
+            cf = forms.CharField()
+            ff = uc_forms.FileField()
+
+        f = SomeForm(label_suffix="")
+        self.assertFalse(f["ff"].field.legacy_widget)
+        ff_str = str(f["ff"])
+        self.assertIn("LR.registerBlocks(LR);", ff_str)
+        self.assertIn("<lr-config\n", ff_str)
+        self.assertIn('pubkey="asdf"', ff_str)
+        self.assertIn('ctx-name="ff"', ff_str)
+
+    def test_legacy_form_field_custom_attrs(self):
         class SomeForm(forms.Form):
             cf = forms.CharField()
             ff = uc_forms.FileField(
-                widget=uc_forms.FileWidget(attrs={"role": "role"})
+                widget=uc_forms.LegacyFileWidget(attrs={"role": "role"})
             )
 
         f = SomeForm(label_suffix="")
@@ -50,6 +64,19 @@ class FormFieldsAttributesTest(unittest.TestCase):
         self.assertIn('role="role"', str(f["ff"]))
         self.assertIn('data-public-key="asdf"', str(f["ff"]))
         self.assertIn('type="hidden"', str(f["ff"]))
+
+    def test_form_field_custom_attrs(self):
+        class SomeForm(forms.Form):
+            cf = forms.CharField()
+            ff = uc_forms.FileField(
+                widget=uc_forms.FileWidget(attrs={"source-list": "local"})
+            )
+
+        f = SomeForm(label_suffix="")
+        self.assertFalse(f["ff"].field.legacy_widget)
+        ff_str = str(f["ff"])
+        self.assertIn("LR.registerBlocks(LR);", ff_str)
+        self.assertIn('source-list="local"', ff_str)
 
 
 class FileFieldURLTest(unittest.TestCase):

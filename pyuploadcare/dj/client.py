@@ -1,18 +1,20 @@
+from typing import Any, Dict
+
 from pyuploadcare.client import Uploadcare
-from pyuploadcare.dj import conf as dj_conf
+from pyuploadcare.dj.conf import config, user_agent_extension
 
 
 def get_uploadcare_client():
-    config = {
-        "public_key": dj_conf.pub_key,
-        "secret_key": dj_conf.secret,
-        "user_agent_extension": dj_conf.user_agent_extension,
+    client_config: Dict[str, Any] = {
+        "public_key": config["pub_key"],
+        "secret_key": config["secret"],
+        "user_agent_extension": user_agent_extension,
     }
 
-    if dj_conf.cdn_base:
-        config["cdn_base"] = dj_conf.cdn_base
+    if config["cdn_base"]:
+        client_config["cdn_base"] = config["cdn_base"]
 
-    if dj_conf.upload_base_url:
-        config["upload_base"] = dj_conf.upload_base_url
+    if config["upload_base_url"]:
+        client_config["upload_base"] = config["upload_base_url"]
 
-    return Uploadcare(**config)
+    return Uploadcare(**client_config)

@@ -27,8 +27,20 @@ test-django:
 test-integration:
 	poetry run pytest tests/integration --cov=pyuploadcare
 
-test-with-github-actions:
+test_with_github_actions:
 	act -W .github/workflows/test.yml --container-architecture linux/amd64
 
 docs_html:
 	poetry run sh -c "cd docs && make html"
+
+run_django:
+	poetry run python tests/test_project/manage.py migrate
+	poetry run python tests/test_project/manage.py runserver
+
+update_bundled_static:
+	blocks_version=$$(DJANGO_SETTINGS_MODULE=tests.test_project.settings poetry run python -c "from pyuploadcare.dj.conf import DEFAULT_CONFIG; print(DEFAULT_CONFIG['widget']['version'])"); \
+	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/blocks.min.js" -o pyuploadcare/dj/static/uploadcare/blocks.min.js; \
+	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/lr-file-uploader-inline.min.css" -o pyuploadcare/dj/static/uploadcare/lr-file-uploader-inline.min.css; \
+	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/lr-file-uploader-minimal.min.css" -o pyuploadcare/dj/static/uploadcare/lr-file-uploader-minimal.min.css; \
+	curl "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@$${blocks_version}/web/lr-file-uploader-regular.min.css" -o pyuploadcare/dj/static/uploadcare/lr-file-uploader-regular.min.css
+
