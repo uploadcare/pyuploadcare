@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from pyuploadcare.api.entities import (
     DocumentConvertInfo,
@@ -23,8 +23,8 @@ class EntityListResponse(Response):
 
 
 class PaginatedResponse(EntityListResponse):
-    next: Optional[str]
-    previous: Optional[str]
+    next: Optional[str] = None
+    previous: Optional[str] = None
     total: int
     per_page: int
 
@@ -42,8 +42,8 @@ class GroupListResponse(PaginatedResponse):
 class BatchFileOperationResponse(Response):
     # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesStoring
     status: str
-    problems: Optional[Dict[str, Any]]
-    result: Optional[List[FileInfo]]
+    problems: Optional[Dict[str, Any]] = None
+    result: Optional[List[FileInfo]] = None
 
 
 class CreateLocalCopyResponse(Response):
@@ -59,25 +59,25 @@ class CreateRemoteCopyResponse(Response):
 
 
 class DocumentConvertResponse(Entity):
-    problems: Optional[Dict[str, Any]]
-    result: Optional[List[DocumentConvertInfo]]
+    problems: Optional[Dict[str, Any]] = None
+    result: Optional[List[DocumentConvertInfo]] = None
 
 
 class VideoConvertResponse(Entity):
-    problems: Optional[Dict[str, Any]]
-    result: Optional[List[VideoConvertInfo]]
+    problems: Optional[Dict[str, Any]] = None
+    result: Optional[List[VideoConvertInfo]] = None
 
 
-class UpdateMetadataKeyResponse(Entity):
-    __root__: str
+class UpdateMetadataKeyResponse(RootModel, Entity):
+    root: str
 
 
 class DeleteMetadataKeyResponse(Entity):
     pass
 
 
-class GetAllMetadataResponse(Entity):
-    __root__: MetadataDict
+class GetAllMetadataResponse(RootModel, Entity):
+    root: MetadataDict
 
 
 class AddonResponseResult(Entity):
@@ -100,4 +100,4 @@ AddonResultType = TypeVar("AddonResultType", bound=AddonResponseResult)
 
 class AddonResponse(Response):
     status: AddonStatus
-    result: Optional[Dict[str, Any]]
+    result: Optional[Dict[str, Any]] = None

@@ -42,4 +42,4 @@ def update_webhook(arg_namespace, client: Uploadcare):  # noqa: C901
     webhook = client.update_webhook(
         webhook_id=arg_namespace.webhook_id, **kwargs
     )
-    pprint(webhook.dict())
+    pprint(webhook.model_dump())

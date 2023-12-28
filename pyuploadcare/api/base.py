@@ -3,13 +3,16 @@ from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
 from httpx._types import RequestFiles
-from pydantic import parse_obj_as
-from typing_extensions import Protocol
+from pydantic import TypeAdapter
+from typing_extensions import Protocol, TypeVar
 
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response
 from pyuploadcare.exceptions import DefaultResponseClassNotDefined
+
+
+ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Union[Response, Entity])
 
 
 class API:
@@ -32,9 +35,9 @@ class API:
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Union[Type[Response], Type[Entity]],
-    ) -> Union[Response, Entity]:
-        return parse_obj_as(response_class, raw_resource)  # type: ignore
+        response_class: Type[ResponseOrEntity],
+    ) -> ResponseOrEntity:
+        return TypeAdapter(response_class).validate_python(raw_resource)
 
     def _build_url(  # noqa: C901
         self,
@@ -85,7 +88,7 @@ class API:
 
     def _put(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity] = None,
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         data: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid)
@@ -93,13 +96,13 @@ class API:
         return document.json()
 
     def _delete(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> None:
         url = self._build_url(resource_uuid)
         self._client.delete(url)
 
     def _delete_with_response(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> Dict[str, Any]:
         url = self._build_url(resource_uuid, suffix="storage")
         document = self._client.delete(url)
@@ -114,8 +117,8 @@ class APIProtocol(Protocol):
     def _parse_response(
         self,
         raw_resource: Dict[str, Any],
-        response_class: Union[Type[Response], Type[Entity]],
-    ) -> Union[Response, Entity]:
+        response_class: Type[ResponseOrEntity],
+    ) -> ResponseOrEntity:
         ...
 
     def _build_url(
@@ -144,18 +147,18 @@ class APIProtocol(Protocol):
 
     def _put(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity] = None,
+        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         data: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         ...
 
     def _delete(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> None:
         ...
 
     def _delete_with_response(
-        self, resource_uuid: Union[UUID, str, UUIDEntity] = None
+        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
     ) -> Dict[str, Any]:
         ...
 
@@ -191,7 +194,9 @@ class ListMixin(APIProtocol):
         if request_limit is not None:
             query_parameters["limit"] = request_limit
 
-        next_ = self._build_url(query_parameters=query_parameters)
+        next_: Optional[str] = self._build_url(
+            query_parameters=query_parameters
+        )
 
         while next_:
             document = self._client.get(next_)

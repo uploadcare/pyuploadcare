@@ -1,12 +1,11 @@
-import re
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConstrainedStr, EmailStr, Field, PrivateAttr
-from typing_extensions import Literal
+from pydantic import BaseModel, EmailStr, Field, PrivateAttr
+from typing_extensions import Annotated, Literal
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
@@ -64,36 +63,36 @@ WebhookEvent = Literal[
 
 class ImageInfo(Entity):
     color_mode: ColorMode
-    orientation: Optional[int]
+    orientation: Optional[int] = None
     format: str
     sequence: bool
     height: int
     width: int
-    geo_location: Optional[GEOPoint]
-    datetime_original: Optional[datetime]
-    dpi: Optional[Tuple[int, int]]
+    geo_location: Optional[GEOPoint] = None
+    datetime_original: Optional[datetime] = None
+    dpi: Optional[Tuple[int, int]] = None
 
 
 class AudioStreamInfo(Entity):
-    bitrate: Optional[Decimal]
-    codec: Optional[str]
-    sample_rate: Optional[Decimal]
-    profile: Optional[str]
-    channels: Optional[str]
+    bitrate: Optional[Decimal] = None
+    codec: Optional[str] = None
+    sample_rate: Optional[Decimal] = None
+    profile: Optional[str] = None
+    channels: Optional[int] = None
 
 
 class VideoStreamInfo(Entity):
     height: Decimal
     width: Decimal
     frame_rate: float
-    bitrate: Optional[Decimal]
-    codec: Optional[str]
+    bitrate: Optional[Decimal] = None
+    codec: Optional[str] = None
 
 
 class VideoInfo(Entity):
-    duration: Optional[Decimal]
+    duration: Optional[Decimal] = None
     format: str
-    bitrate: Optional[Decimal]
+    bitrate: Optional[Decimal] = None
     audio: List[AudioStreamInfo]
     video: List[VideoStreamInfo]
 
@@ -105,9 +104,9 @@ class MIMEInfo(Entity):
 
 
 class ContentInfo(Entity):
-    mime: Optional[MIMEInfo]
-    image: Optional[ImageInfo]
-    video: Optional[VideoInfo]
+    mime: Optional[MIMEInfo] = None
+    image: Optional[ImageInfo] = None
+    video: Optional[VideoInfo] = None
 
 
 class ApllicationDataDetails(Entity):
@@ -136,7 +135,7 @@ class AWSRecognitionLabel(Entity):
 
 
 class AWSRecognitionDetectLabelsDetails(ApllicationDataDetails):
-    label_model_version: Optional[str] = Field(alias="LabelModelVersion")
+    label_model_version: Optional[str] = Field(None, alias="LabelModelVersion")
     labels: List[AWSRecognitionLabel] = Field(
         alias="Labels", default_factory=list
     )
@@ -153,7 +152,9 @@ class AWSRecognitionModerationLabel(Entity):
 
 
 class AWSRecognitionDetectModerationLabelsDetails(ApllicationDataDetails):
-    label_model_version: Optional[str] = Field(alias="ModerationModelVersion")
+    label_model_version: Optional[str] = Field(
+        None, alias="ModerationModelVersion"
+    )
     labels: List[AWSRecognitionModerationLabel] = Field(
         alias="ModerationLabels", default_factory=list
     )
@@ -164,7 +165,7 @@ class AWSRecognitionDetectModerationLabelsApplicationData(ApplicationDataBase):
 
 
 class RemoveBackgroundDetails(ApllicationDataDetails):
-    foreground_type: Optional[str]
+    foreground_type: Optional[str] = None
 
 
 class RemoveBackgroundApplicationData(ApplicationDataBase):
@@ -172,8 +173,8 @@ class RemoveBackgroundApplicationData(ApplicationDataBase):
 
 
 class UCClamAVDetails(ApllicationDataDetails):
-    infected: Optional[bool]
-    infected_with: Optional[str]
+    infected: Optional[bool] = None
+    infected_with: Optional[str] = None
 
 
 class UCClamAVApplicationData(ApplicationDataBase):
@@ -183,22 +184,19 @@ class UCClamAVApplicationData(ApplicationDataBase):
 class ApplicationDataSet(Entity):
     aws_rekognition_detect_labels: Optional[
         AWSRecognitionDetectLabelsApplicationData
-    ]
+    ] = None
     aws_rekognition_detect_moderation_labels: Optional[
         AWSRecognitionDetectModerationLabelsApplicationData
-    ]
-    remove_bg: Optional[RemoveBackgroundApplicationData]
-    uc_clamav_virus_scan: Optional[UCClamAVApplicationData]
+    ] = None
+    remove_bg: Optional[RemoveBackgroundApplicationData] = None
+    uc_clamav_virus_scan: Optional[UCClamAVApplicationData] = None
 
 
-class MetadataKeyConStrType(ConstrainedStr):
-    regex = re.compile(META_KEY_PATTERN)
-    max_length = META_KEY_MAX_LEN
+MetadataKeyConStrType = Annotated[
+    str, Field(pattern=META_KEY_PATTERN, max_length=META_KEY_MAX_LEN)
+]
 
-
-class MetadataValueConStrType(ConstrainedStr):
-    max_length = META_VALUE_MAX_LEN
-
+MetadataValueConStrType = Annotated[str, Field(max_length=META_VALUE_MAX_LEN)]
 
 MetadataDict = Dict[MetadataKeyConStrType, MetadataValueConStrType]
 
@@ -212,55 +210,55 @@ class FileInfo(UUIDEntity):
 
     """
 
-    datetime_removed: Optional[datetime]
-    datetime_stored: Optional[datetime]
-    datetime_uploaded: Optional[datetime]
-    metadata: Optional[MetadataDict]
-    is_image: Optional[bool]
-    is_ready: Optional[bool]
-    mime_type: Optional[str]
-    original_file_url: Optional[str]
-    original_filename: Optional[str]
-    size: Optional[int]
-    url: Optional[str]
-    variations: Optional[Dict[str, UUID]]
-    source: Optional[str]
-    content_info: Optional[ContentInfo]
-    appdata: Optional[ApplicationDataSet]
+    datetime_removed: Optional[datetime] = None
+    datetime_stored: Optional[datetime] = None
+    datetime_uploaded: Optional[datetime] = None
+    metadata: Optional[MetadataDict] = None
+    is_image: Optional[bool] = None
+    is_ready: Optional[bool] = None
+    mime_type: Optional[str] = None
+    original_file_url: Optional[str] = None
+    original_filename: Optional[str] = None
+    size: Optional[int] = None
+    url: Optional[str] = None
+    variations: Optional[Dict[str, UUID]] = None
+    source: Optional[str] = None
+    content_info: Optional[ContentInfo] = None
+    appdata: Optional[ApplicationDataSet] = None
 
 
 class GroupInfo(Entity):
     id: str
     _fetched: Optional[bool] = PrivateAttr(default=False)
-    datetime_created: Optional[datetime]
-    datetime_stored: Optional[datetime]
-    files_count: Optional[int]
-    cdn_url: Optional[str]
-    url: Optional[str]
-    files: Optional[List[Optional[FileInfo]]]
+    datetime_created: Optional[datetime] = None
+    datetime_stored: Optional[datetime] = None
+    files_count: Optional[int] = None
+    cdn_url: Optional[str] = None
+    url: Optional[str] = None
+    files: Optional[List[Optional[FileInfo]]] = None
 
 
 class ColaboratorInfo(Entity):
-    email: Optional[EmailStr]
-    name: Optional[str]
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
 
 
 class ProjectInfo(Entity):
-    collaborators: Optional[List[ColaboratorInfo]]
+    collaborators: Optional[List[ColaboratorInfo]] = None
     name: str
     pub_key: str
-    autostore_enabled: Optional[bool]
+    autostore_enabled: Optional[bool] = None
 
 
 class Webhook(Entity):
     id: int
-    created: Optional[datetime]
-    updated: Optional[datetime]
-    event: Optional[str]
-    target_url: Optional[str]
-    project: Optional[str]
-    is_active: Optional[bool]
-    signing_secret: Optional[str]
+    created: Optional[datetime] = None
+    updated: Optional[datetime] = None
+    event: Optional[str] = None
+    target_url: Optional[str] = None
+    project: Optional[int] = None
+    is_active: Optional[bool] = None
+    signing_secret: Optional[str] = None
 
 
 class DocumentConvertShortInfo(Entity):
@@ -274,7 +272,7 @@ class DocumentConvertInfo(DocumentConvertShortInfo):
 
 class DocumentConvertStatus(Entity):
     status: str
-    error: Optional[str]
+    error: Optional[str] = None
     result: DocumentConvertShortInfo
 
 
@@ -289,7 +287,7 @@ class DocumentConvertFormat(Entity):
 
 
 class DocumentConvertFormatInfo(Entity):
-    error: Optional[str]
+    error: Optional[str] = None
     format: DocumentConvertFormat
 
 
@@ -305,5 +303,5 @@ class VideoConvertInfo(VideoConvertShortInfo):
 
 class VideoConvertStatus(Entity):
     status: str
-    error: Optional[str]
+    error: Optional[str] = None
     result: VideoConvertShortInfo

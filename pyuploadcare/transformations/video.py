@@ -1,5 +1,7 @@
 from typing import Optional, Union
 
+from typing_extensions import Self
+
 from pyuploadcare.transformations.base import BaseTransformation, StrEnum
 
 
@@ -25,9 +27,7 @@ class Quality(StrEnum):
 
 
 class VideoTransformation(BaseTransformation):
-    def format(
-        self, file_format: Union[VideoFormat, str]
-    ) -> "VideoTransformation":
+    def format(self, file_format: Union[VideoFormat, str]) -> Self:
         self.set("format", [file_format])
         return self
 
@@ -36,22 +36,22 @@ class VideoTransformation(BaseTransformation):
         width: Optional[int] = None,
         height: Optional[int] = None,
         resize_mode: Optional[Union[str, ResizeMode]] = None,
-    ) -> "VideoTransformation":
+    ) -> Self:
         parameters = [f'{width or ""}x{height or ""}']
         if resize_mode:
             parameters.append(resize_mode)
         self.set("size", parameters)
         return self
 
-    def quality(self, file_quality: Quality) -> "VideoTransformation":
+    def quality(self, file_quality: Quality) -> Self:
         self.set("quality", [file_quality])
         return self
 
-    def cut(self, start_time: str, length: str) -> "VideoTransformation":
+    def cut(self, start_time: str, length: str) -> Self:
         self.set("cut", [start_time, length])
         return self
 
-    def thumbs(self, amount: int) -> "VideoTransformation":
+    def thumbs(self, amount: int) -> Self:
         self.set("thumbs", [str(amount)])
         return self
 

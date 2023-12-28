@@ -27,4 +27,4 @@ def create_webhook(arg_namespace, client: Uploadcare):
         event=arg_namespace.event,
         signing_secret=arg_namespace.signing_secret,
     )
-    pprint(webhook.dict())
+    pprint(webhook.model_dump())
