@@ -826,25 +826,31 @@ class Uploadcare:
         return expire, signature
 
     def generate_secure_url(
-        self, uuid: Union[str, UUID], wildcard: bool = False
+        self, handle: Union[str, UUID], wildcard: bool = False
     ) -> str:
-        """Generate authenticated URL."""
-        if isinstance(uuid, UUID):
-            uuid = str(uuid)
+        """
+        Generate authenticated URL.
+        :param handle: Can be one of the following: UUID, UUID with transformations, full URL.
+        """
+        if isinstance(handle, UUID):
+            handle = str(handle)
 
         if not self.secure_url_builder:
             raise ValueError("secure_url_builder must be set")
 
-        return self.secure_url_builder.build(uuid, wildcard=wildcard)
+        return self.secure_url_builder.build(handle, wildcard=wildcard)
 
     def generate_secure_url_token(
-        self, uuid: Union[str, UUID], wildcard: bool = False
+        self, handle: Union[str, UUID], wildcard: bool = False
     ) -> str:
-        """Generate token for authenticated URL."""
-        if isinstance(uuid, UUID):
-            uuid = str(uuid)
+        """
+        Generate token for authenticated URL.
+        :param handle: Can be one of the following: UUID, UUID with transformations, full URL.
+        """
+        if isinstance(handle, UUID):
+            handle = str(handle)
 
         if not self.secure_url_builder:
             raise ValueError("secure_url_builder must be set")
 
-        return self.secure_url_builder.get_token(uuid, wildcard=wildcard)
+        return self.secure_url_builder.get_token(handle, wildcard=wildcard)

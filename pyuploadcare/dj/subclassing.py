@@ -23,7 +23,7 @@ class SubfieldBase(type):
 
     def __new__(cls, name, bases, attrs):
         new_class = super(SubfieldBase, cls).__new__(cls, name, bases, attrs)
-        new_class.contribute_to_class = make_contrib(
+        new_class.contribute_to_class = make_contrib(  # type: ignore[attr-defined]
             new_class, attrs.get("contribute_to_class")
         )
         return new_class

@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.0.0](https://github.com/uploadcare/pyuploadcare/compare/v?.?.?...v5.0.0) - unreleased
+## [5.0.0](https://github.com/uploadcare/pyuploadcare/compare/v4.3.0...v5.0.0) - 2023-12-28
 
 In version 5.0, we introduce a new [file uploader](https://uploadcare.com/docs/file-uploader/), which is now the default for Django projects. If you prefer to continue using the old jQuery-based widget, you can enable it by setting the `use_legacy_widget` option in your configuration:
 
@@ -20,17 +20,20 @@ UPLOADCARE = {
 }
 ```
 
-It's important to mention that these changes only apply to Django projects, and there are no breaking changes for non-Django projects.
-
 Additionally, please take note that some settings have been renamed in this update (see the next section).
 
-### Breaking changes
+### Breaking Changes
+
+- Python 3.6 and 3.7 are no longer supported.
+- Django 1.11, 2.0, and 2.1 are no longer supported.
+- [Pydantic](https://docs.pydantic.dev) has been updated to Version 2. Projects dependent on Pydantic Version 1 may encounter errors due to incompatibility between Versions 1 and 2.
+- Removed `tox.ini`. The recommended method for running tests locally is now through [act](https://github.com/nektos/act) with Docker.
 
 - for Django settings (`UPLOADCARE = {...}`):
   - `widget_*` settings were renamed and moved:
     - `UPLOADCARE["widget_version"]` to `UPLOADCARE["legacy_widget"]["version"]`
     - `UPLOADCARE["widget_build"]` to `UPLOADCARE["legacy_widget"]["build"]`
-    - `UPLOADCARE["widget_variant"]` to `UPLOADCARE["legacy_widget"]["build"]` (it's not a typo: former `widget_build` and `widget_variant` settings were equialent)
+    - `UPLOADCARE["widget_variant"]` to `UPLOADCARE["legacy_widget"]["build"]` (this is not a typo: former `widget_build` and `widget_variant` settings were equialent)
     - `UPLOADCARE["widget_url"]` to `UPLOADCARE["legacy_widget"]["override_js_url"]` and works regardless of `use_hosted_assets` value.
 
 - for `pyuploadcare.dj.conf`:
@@ -52,7 +55,26 @@ Additionally, please take note that some settings have been renamed in this upda
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
   - By default, `FileWidget` is used. To use `LegacyFileWidget`, please set `UPLOADCARE["use_legacy_widget"]` to `True`
 
-## [4.2.3](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.2.3) - unreleased
+### Added
+
+- Added Python 3.12 and Django 5.0 to the test matrix.
+
+### Changed
+
+- Updated dependencies: `httpx`, `pydantic`, `pytz`, `typing-extensions`.
+- Updated development dependencies: `mypy`, `pytest`, `black`, `isort`, `flake8`, `flake8-print`, `vcrpy`, `yarl`, `coverage`, `pytest-cov`, `sphinx`, `sphinx-argparse`, `types-*`. Replaced `pytest-freezegun` with `pytest-freezer`.
+
+## [4.3.0](https://github.com/uploadcare/pyuploadcare/compare/v4.2.2...v4.3.0) - 2023-12-24
+
+### Fixed
+
+- For `AkamaiSecureUrlBuilderWithAclToken` and `AkamaiSecureUrlBuilderWithUrlToken`:
+  - Special characters that were not previously escaped are now properly handled, as detailed in issue [#275](https://github.com/uploadcare/pyuploadcare/issues/275).
+
+### Changed
+
+- For `AkamaiSecureUrlBuilderWithAclToken` and `AkamaiSecureUrlBuilderWithUrlToken`:
+  - Both classes have been made more consistent and now accept a full URL, URL path, or just the UUID of a file – whichever is more convenient for you.
 
 ### Deprecated
 

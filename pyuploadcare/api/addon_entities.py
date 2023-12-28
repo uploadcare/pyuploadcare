@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict, Optional, TypeVar, Union
 from uuid import UUID
 
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 
 from pyuploadcare.api.entities import Entity
 
@@ -22,10 +22,11 @@ AddonParamsType = TypeVar("AddonParamsType", bound=AddonExecutionParams)
 
 
 class AddonExecutionGeneralRequestData(Entity):
-    target: UUID
-    params: Optional[Union[Dict[str, Any], AddonExecutionParams]]
+    target: Union[UUID, str]
+    params: Optional[Union[Dict[str, Any], AddonExecutionParams]] = None
 
-    @validator("target")
+    @field_validator("target")
+    @classmethod
     def coerce_target_to_str(cls, v):
         return str(v)
 

@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import List, Optional, Union
 
+from typing_extensions import Self
+
 
 class StrEnum(str, Enum):
     def __str__(self):
@@ -19,9 +21,7 @@ class BaseTransformation:
             transformation = transformation.rstrip("/")  # type: ignore
             self._effects.append(transformation)
 
-    def set(
-        self, transformation_name: str, parameters: List[str]
-    ) -> "BaseTransformation":
+    def set(self, transformation_name: str, parameters: List[str]) -> Self:
         effect = transformation_name
         if parameters:
             effect += "/" + "/".join(parameters)

@@ -1,4 +1,5 @@
 import os
+import sys
 from io import BytesIO
 from tempfile import TemporaryDirectory
 from typing import Tuple
@@ -7,6 +8,23 @@ import pytest
 
 from pyuploadcare import conf
 from pyuploadcare.client import Uploadcare
+
+
+# XXX workaround for vcrpy incompability with Python 3.12
+# https://github.com/mgorny/vcrpy/commit/5f2623886dda2fd8bb6035370251fe07cec958ca
+# Remove this when an updated version of vcrpy is released.
+if sys.version_info >= (3, 12):
+    from vcr.stubs import (
+        HTTPConnection,
+        HTTPSConnection,
+        VCRHTTPConnection,
+        VCRHTTPSConnection,
+    )
+
+    VCRHTTPConnection.debuglevel = HTTPConnection.debuglevel
+    VCRHTTPConnection._http_vsn = HTTPConnection._http_vsn
+    VCRHTTPSConnection.debuglevel = HTTPSConnection.debuglevel
+    VCRHTTPSConnection._http_vsn = HTTPSConnection._http_vsn
 
 
 @pytest.fixture()

@@ -11,4 +11,4 @@ def register_arguments(subparsers):
 
 def get_project(arg_namespace, client: Uploadcare):
     project: ProjectInfo = client.get_project_info()
-    pprint(project.dict())
+    pprint(project.model_dump())

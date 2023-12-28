@@ -144,8 +144,11 @@ class FileGroup(Iterable):
 
     def update_info(self):
         """Updates and returns group information by requesting Uploadcare API."""
-        self._info_cache = self._client.groups_api.retrieve(self.id).dict()
+        self._info_cache = self._client.groups_api.retrieve(
+            self.id
+        ).model_dump()
         if self.is_stored and self._stored_at:
+            assert self._info_cache
             self._info_cache["datetime_stored"] = self._stored_at.isoformat()
 
         return self._info_cache
