@@ -17,7 +17,7 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 
 ## Features
 
-This library consists of the Uploadcare APIs interface and a couple of Django goodies, 100% covering [Upload](https://uploadcare.com/api-refs/upload-api/), [REST](https://uploadcare.com/api-refs/rest-api/) and [URL](https://uploadcare.com/api-refs/url-api/) Uploadcare APIs.
+This library consists of the APIs interface and a couple of Django goodies, 100% covering [Upload](https://uploadcare.com/api-refs/upload-api/), [REST](https://uploadcare.com/api-refs/rest-api/) and [URL](https://uploadcare.com/api-refs/url-api/) Uploadcare APIs.
 
 Enable obsessively friendly file uploads:
 * Built-in [File Uploader](https://uploadcare.com/docs/uploads/storage/#file-storing-behavior)
@@ -96,13 +96,9 @@ pip install pyuploadcare[django]
 
 ## Usage example
 
-Let's add [File Uploader](https://uploadcare.com/docs/uploads/storage/#file-storing-behavior)
-to an existing Django project. To do so, follow a few simple steps described in
-our [quickstart](https://pyuploadcare.readthedocs.org/en/latest/quickstart.html).
+Let's add [File Uploader](https://uploadcare.com/docs/uploads/storage/#file-storing-behavior) to an existing Django project. To do so, follow a few simple steps described in our [quickstart](https://pyuploadcare.readthedocs.org/en/latest/quickstart.html).
 
-This will enable users to see the upload progress, pick files from sources like
-Google Drive or Instagram, and edit a form while files are being uploaded
-asynchronously.
+This will enable users to see the upload progress, pick files from sources like Google Drive or Instagram, and edit a form while files are being uploaded asynchronously.
 
 ```python
     from django import forms
@@ -128,20 +124,17 @@ asynchronously.
 
 ## Documentation
 
-Detailed specification of this library is available
-[on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
+Detailed specification of this library is available [on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
 
-We highly recommend to check out [Uploadcare documentation](https://uploadcare.com/docs/)
-to fully understand what our platform enables you.
+We highly recommend to check out [Uploadcare documentation](https://uploadcare.com/docs/) to fully understand what our platform enables you.
 
 ## Use cases
 
-In this section, we also want to showcase some common use cases you can solve
-with Uploadcare, regardless of using Python integration.
+In this section, we also want to showcase some common use cases you can solve with Uploadcare, regardless of using Python integration.
 
 Main use cases:
 * Accept user-generated content ([file uploader](https://uploadcare.com/docs/file-uploader/), [upload sources](https://uploadcare.com/docs/upload-sources/))
-* Serve responsive images ([optimization](https://uploadcare.com/docs/transformations/image/compression/), [proxy](https://uploadcare.com/docs/delivery/proxy/), [adaptive image](https://uploadcare.com/docs/adaptive-image/) and other [integrations](https://uploadcare.com/docs/integrations/)) 
+* Serve responsive images ([optimization](https://uploadcare.com/docs/transformations/image/compression/), [proxy](https://uploadcare.com/docs/delivery/proxy/), [adaptive image](https://uploadcare.com/docs/adaptive-image/) and other [integrations](https://uploadcare.com/docs/integrations/))
 
 Common:
 * Art-direction of the content on your page ([transformations](https://uploadcare.com/docs/transformations/image/), [remove.bg](https://uploadcare.com/docs/remove-bg/), [smart crop](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-smart-crop), [scale crop](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-scale-crop), [smart resize](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-smart-resize), [zoom](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects), [circle](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-border-radius), [fill](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-setfill))
@@ -172,10 +165,7 @@ Less common:
 
 ## Demo app
 
-We've developed a demo app that showcases most of the features. You can install
-[pyuploadcare-example](https://github.com/uploadcare/pyuploadcare-example)
-using Docker or without it. You can use it as a reference or even base your
-project on it.
+We've developed a demo app that showcases most of the features. You can install [pyuploadcare-example](https://github.com/uploadcare/pyuploadcare-example) using Docker or without it. You can use it as a reference or even base your project on it.
 
 ## Useful links
 
