@@ -128,9 +128,10 @@ asynchronously.
 
 ## Documentation
 
-Detailed documentation is available [on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
+Detailed specification of this library is available
+[on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
 
-Though we highly recommend to read [Uploadcare documentation](https://uploadcare.com/docs/)
+We highly recommend to check out [Uploadcare documentation](https://uploadcare.com/docs/)
 to fully understand what our platform enables you.
 
 ## Use cases
