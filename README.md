@@ -96,8 +96,9 @@ pip install pyuploadcare[django]
 
 ## Usage example
 
-Let's add [File Uploader][file-uploader] to an existing Django project. Follow
-a few simple steps described in our [quickstart](https://pyuploadcare.readthedocs.org/en/latest/quickstart.html).
+Let's add [File Uploader](https://uploadcare.com/docs/uploads/storage/#file-storing-behavior)
+to an existing Django project. To do so, follow a few simple steps described in
+our [quickstart](https://pyuploadcare.readthedocs.org/en/latest/quickstart.html).
 
 This will enable users to see the upload progress, pick files from sources like
 Google Drive or Instagram, and edit a form while files are being uploaded
