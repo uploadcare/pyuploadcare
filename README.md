@@ -9,8 +9,8 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 
 * [Features](#features)
 * [Requirements and installation](#requirements-and-installation)
-* [Documentation](#documentation)
 * [Usage example](#usage-example)
+* [Documentation](#documentation)
 * [Use cases](#use-cases)
 * [Demo app](#demo-app)
 * [Useful links](#useful-links)
@@ -130,7 +130,7 @@ We highly recommend to check out [Uploadcare documentation](https://uploadcare.c
 
 ## Use cases
 
-In this section, we also want to showcase some common use cases you can solve with Uploadcare, regardless of using Python integration.
+To help you figure what this library can help you with, we want to showcase some use cases that you can solve with Uploadcare.
 
 Main use cases:
 * Accept user-generated content ([file uploader](https://uploadcare.com/docs/file-uploader/), [upload sources](https://uploadcare.com/docs/upload-sources/))
