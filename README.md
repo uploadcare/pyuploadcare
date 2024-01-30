@@ -12,7 +12,7 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 * [Requirements and installation](#requirements-and-installation)
 * [Usage example](#usage-example)
 * [Use cases](#use-cases)
-* [Demo app](#demo-app)
+* [Demo app (Docker)](#demo-app)
 * [Suggestions and questions](#suggestions-and-questions)
 
 ## Features
@@ -166,7 +166,7 @@ This will enable users to see the upload progress, pick files from sources like 
 To help you figure what this library can help you with, we want to showcase some use cases that you can solve with Uploadcare.
 
 Main use cases:
-* Accept user-generated content ([file uploader](https://uploadcare.com/docs/file-uploader/), [upload sources](https://uploadcare.com/docs/upload-sources/))
+* Accept user-generated content ([upload api](https://uploadcare.com/docs/uploading-files/), [file uploader](https://uploadcare.com/docs/file-uploader/), [upload sources](https://uploadcare.com/docs/upload-sources/))
 * Serve responsive images ([optimization](https://uploadcare.com/docs/transformations/image/compression/), [proxy](https://uploadcare.com/docs/delivery/proxy/), [adaptive image](https://uploadcare.com/docs/adaptive-image/) and other [integrations](https://uploadcare.com/docs/integrations/))
 
 Common:
