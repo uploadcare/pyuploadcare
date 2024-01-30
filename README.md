@@ -8,9 +8,9 @@
 Build file handling in minutes. Upload or accept UGC, store, transform, optimize, and deliver images, videos, and documents to billions of users.
 
 * [Features](#features)
+* [Documentation](#documentation)
 * [Requirements and installation](#requirements-and-installation)
 * [Usage example](#usage-example)
-* [Documentation](#documentation)
 * [Use cases](#use-cases)
 * [Demo app](#demo-app)
 * [Useful links](#useful-links)
@@ -19,8 +19,14 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 
 This library consists of the APIs interface and a couple of Django goodies, 100% covering [Upload](https://uploadcare.com/api-refs/upload-api/), [REST](https://uploadcare.com/api-refs/rest-api/) and [URL](https://uploadcare.com/api-refs/url-api/) Uploadcare APIs.
 
-Enable obsessively friendly file uploads:
-* Built-in [File Uploader](https://uploadcare.com/docs/uploads/storage/#file-storing-behavior)
+* Enable obsessively friendly file uploads
+* Store files the way you need
+* Handle all files smart & RESTfully
+* Process images on the fly right before delivery time
+* Fast and reliable delivery
+
+<!-- Enable obsessively friendly file uploads:
+* Built-in File Uploader
 * Upload files from anywhere
 * Multipart uploading for large files
 * File size and MIME type filtering
@@ -56,7 +62,40 @@ Fast and reliable delivery:
 * Custom CDN CNAME
 * Signed URLs
 * Search engine indexing behaviour
-* Proxy to fetch and deliver remote files
+* Proxy to fetch and deliver remote files -->
+
+## Documentation
+
+Detailed specification of this library is available [on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
+In this spreadsheet we also provide links to the [Uploadcare documentation](https://uploadcare.com/docs/) so you can fully understand what our platform enables.
+
+| Feature                        | Description | Manual                                                                     | Specification                                                                                      |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| _Uploading_                    |             | [_Overview_](https://uploadcare.com/docs/uploads/)                         | [_Upload API reference_](https://uploadcare.com/api-refs/upload-api/)                              |
+| Uploading files                |             | [Manual](https://uploadcare.com/docs/uploading-files/)                     | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#uploading-files)       |
+| File Uploader                  |             | [Manual](https://uploadcare.com/docs/file-uploader/)                       | [Specification](https://pyuploadcare.readthedocs.io/en/latest/django-widget.html)                  |
+| Storage options                |             | [Manual](https://uploadcare.com/docs/uploads/storage/)                     | ?                                                                                                  |
+| Signed uploads                 |             | [Manual](https://uploadcare.com/docs/security/secure-uploads/)             | ?                                                                                                  |
+| File analysis on upload        |             | [Manual](https://uploadcare.com/docs/file-analysis/)                       | ?                                                                                                  |
+| Validation and moderation      |             | [Manual](https://uploadcare.com/docs/moderation/)                          | N/A                                                                                                |
+| _File management_              |             | [_Overview_](https://uploadcare.com/docs/start/file-management/)           | [_REST API reference_](https://uploadcare.com/api-refs/rest-api/)                                  |
+| Managing files                 |             | [Manual](https://uploadcare.com/docs/managing-files/)                      | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#list-files)            |
+| Projects                       |             | [Manual](https://uploadcare.com/docs/start/settings/)                      | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#get-project-info)      |
+| Webhook notifications          |             | [Manual](https://uploadcare.com/docs/webhooks/)                            | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#create-webhook)        |
+| S3 bucket integration          |             | [Manual](https://uploadcare.com/docs/s3-integration/)                      | N/A                                                                                                |
+| Arbitrary file metadata        |             | [Manual](https://uploadcare.com/docs/file-metadata/)                       | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#file-metadata)         |
+| Video processing               |             | [Manual](https://uploadcare.com/docs/transformations/video-encoding/)      | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#video-conversion)      |
+| Document conversion            |             | [Manual](https://uploadcare.com/docs/transformations/document-conversion/) | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#document-conversion)   |
+| Unsafe content detection       |             | [Manual](https://uploadcare.com/docs/unsafe-content/)                      | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#using-addons)          |
+| Object recognition             |             | [Manual](https://uploadcare.com/docs/intelligence/object-recognition/)     | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#using-addons)          |
+| Malware protection             |             | [Manual](https://uploadcare.com/docs/security/malware-protection/)         | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#using-addons)          |
+| _Delivery_                     |             | [_Overview_](https://uploadcare.com/docs/delivery/)                        | [_URL API_](https://uploadcare.com/api-refs/url-api/)                                              |
+| On-the-fly operations          |             | [Manual](https://uploadcare.com/docs/cdn-operations/)                      | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#image-transformations) |
+| Image optimization             |             | [Manual](https://uploadcare.com/docs/transformations/image/compression/)   | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#image-transformations) |
+| Image transformation           |             | [Manual](https://uploadcare.com/docs/transformations/image/)               | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#image-transformations) |
+| CDN settings                   |             | [Manual](https://uploadcare.com/docs/delivery/cdn/)                        | N/A                                                                                                |
+| Fetch and deliver remote files |             | [Manual](https://uploadcare.com/docs/delivery/proxy/)                      | N/A                                                                                                |
+| Signed URLs                    |             | [Manual](https://uploadcare.com/docs/security/secure-delivery/)            | [Specification](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#secure-delivery)       |
 
 ## Requirements and installation
 
@@ -68,13 +107,13 @@ To use pyuploadcare with Python 2.7 please install `pyuploadcare < 3.0`.
 
 Django compatibility:
 
-| Py/Dj | 2.2 | 3.0 | 3.1 | 3.2 | 4.0 |	4.1 | 4.2 | 5.0 |
-|-------|-----|-----|-----|-----|-----|-----|-----|-----|
-| 3.8   |  X  |  X  |  X  |  X  |  X  |  X  |  X  |     |
-| 3.9   |  X  |  X  |  X  |  X  |  X  |  X  |  X  |     |
-| 3.10  |     |     |     |  X  |  X  |  X  |  X  |  X  |
-| 3.11  |     |     |     |     |     |  X  |  X  |  X  |
-| 3.12  |     |     |     |     |     |     |  X  |  X  |
+| Py/Dj | 2.2 | 3.0 | 3.1 | 3.2 | 4.0 | 4.1 | 4.2 | 5.0 |
+| ----- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3.8   | X   | X   | X   | X   | X   | X   | X   |     |
+| 3.9   | X   | X   | X   | X   | X   | X   | X   |     |
+| 3.10  |     |     |     | X   | X   | X   | X   | X   |
+| 3.11  |     |     |     |     |     | X   | X   | X   |
+| 3.12  |     |     |     |     |     |     | X   | X   |
 
 In order to install `pyuploadcare`, run these commands in CLI:
 
@@ -121,12 +160,6 @@ This will enable users to see the upload progress, pick files from sources like 
 ```
 
 ![](https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/josi.png)
-
-## Documentation
-
-Detailed specification of this library is available [on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
-
-We highly recommend to check out [Uploadcare documentation](https://uploadcare.com/docs/) to fully understand what our platform enables you.
 
 ## Use cases
 
