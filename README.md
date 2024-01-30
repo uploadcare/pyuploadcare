@@ -13,7 +13,7 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 * [Usage example](#usage-example)
 * [Use cases](#use-cases)
 * [Demo app](#demo-app)
-* [Useful links](#useful-links)
+* [Suggestions or questions](#suggestions-or-questions)
 
 ## Features
 
@@ -200,13 +200,8 @@ Less common:
 
 We've developed a demo app that showcases most of the features. You can install [pyuploadcare-example](https://github.com/uploadcare/pyuploadcare-example) using Docker or without it. You can use it as a reference or even base your project on it.
 
-## Useful links
+## Suggestions or questions
 
-[Uploadcare documentation](https://uploadcare.com/docs/)  
-[File Uploader](https://uploadcare.com/docs/file-uploader/)  
-[Upload API reference](https://uploadcare.com/api-refs/upload-api/)  
-[REST API reference](https://uploadcare.com/api-refs/rest-api/)  
-[URL API reference](https://uploadcare.com/api-refs/url-api/)  
 [Contributing guide](https://github.com/uploadcare/.github/blob/master/CONTRIBUTING.md)  
 [Security policy](https://github.com/uploadcare/uploadcare-swift/security/policy)  
 [Support](https://github.com/uploadcare/.github/blob/master/SUPPORT.md)  
