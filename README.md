@@ -167,7 +167,7 @@ To help you figure what this library can help you with, we want to showcase some
 
 Main use cases:
 * Accept user-generated content ([upload api](https://uploadcare.com/docs/uploading-files/), [file uploader](https://uploadcare.com/docs/file-uploader/), [upload sources](https://uploadcare.com/docs/upload-sources/))
-* Serve responsive images ([optimization](https://uploadcare.com/docs/transformations/image/compression/), [proxy](https://uploadcare.com/docs/delivery/proxy/), [adaptive image](https://uploadcare.com/docs/adaptive-image/) and other [integrations](https://uploadcare.com/docs/integrations/))
+* Serve responsive images ([optimization](https://uploadcare.com/docs/transformations/image/compression/), [adaptive image SDK](https://uploadcare.com/docs/adaptive-image/), [proxy](https://uploadcare.com/docs/delivery/proxy/), and other [integrations](https://uploadcare.com/docs/integrations/))
 
 Common:
 * Art-direction of the content on your page ([transformations](https://uploadcare.com/docs/transformations/image/), [remove.bg](https://uploadcare.com/docs/remove-bg/), [smart crop](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-smart-crop), [scale crop](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-scale-crop), [smart resize](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-smart-resize), [zoom](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects), [circle](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-border-radius), [fill](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-setfill))
