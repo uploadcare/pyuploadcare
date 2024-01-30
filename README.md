@@ -67,6 +67,7 @@ Fast and reliable delivery:
 ## Documentation
 
 Detailed specification of this library is available [on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
+
 In this spreadsheet we also provide links to the [Uploadcare documentation](https://uploadcare.com/docs/) so you can fully understand what our platform enables.
 
 | Feature                        | Description | Manual                                                                     | Specification                                                                                      |
