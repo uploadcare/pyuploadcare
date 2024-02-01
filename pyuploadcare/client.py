@@ -1,5 +1,6 @@
 import os
 import socket
+import ssl
 from time import time
 from typing import (
     IO,
@@ -39,6 +40,9 @@ from pyuploadcare.helpers import (
 )
 from pyuploadcare.resources.file import FileFromUrl, UploadProgress
 from pyuploadcare.secure_url import BaseSecureUrlBuilder
+
+
+DEFAULT_SSL_CONTEXT = ssl.create_default_context()
 
 
 class Uploadcare:
@@ -122,7 +126,11 @@ class Uploadcare:
         self.rest_client = Client(
             base_url=api_base,
             auth=auth,
-            verify=verify_api_ssl,
+            verify=(
+                DEFAULT_SSL_CONTEXT
+                if verify_api_ssl is True
+                else verify_api_ssl
+            ),
             timeout=timeout,
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
@@ -131,7 +139,11 @@ class Uploadcare:
 
         self.upload_client = Client(
             base_url=upload_base,
-            verify=verify_upload_ssl,
+            verify=(
+                DEFAULT_SSL_CONTEXT
+                if verify_upload_ssl is True
+                else verify_upload_ssl
+            ),
             timeout=timeout,
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
