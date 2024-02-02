@@ -22,9 +22,8 @@ from .utils import create_file_group, upload_tmp_txt_file
 # increase throttle retries for Travis CI
 conf.retry_throttled = 10
 
-IMAGE_URL = (
-    "https://github.githubassets.com/images/modules/logos_page/Octocat.png"
-)
+IMAGE_URL = "https://octodex.github.com/images/original.png"
+IMAGE_FILENAME = "original.png"
 
 ASSETS_PATH = Path(__file__).parent / "assets"
 IMAGE_PATH = ASSETS_PATH / "img.png"
@@ -106,7 +105,7 @@ def test_successful_upload_from_url(uploadcare):
 def test_successful_upload_from_url_sync_autostore(uploadcare):
     file = uploadcare.upload_from_url_sync(IMAGE_URL, interval=1)
     assert isinstance(file, File)
-    assert file.filename == "Octocat.png"
+    assert file.filename == IMAGE_FILENAME
     assert file.datetime_stored is not None
     assert isinstance(file.datetime_stored, datetime)
 
@@ -114,7 +113,7 @@ def test_successful_upload_from_url_sync_autostore(uploadcare):
 def test_successful_upload_by_url(uploadcare):
     file = uploadcare.upload(IMAGE_URL)
     assert isinstance(file, File)
-    assert file.filename == "Octocat.png"
+    assert file.filename == IMAGE_FILENAME
 
 
 def test_successful_upload_from_url_signed(uploadcare):
@@ -148,7 +147,7 @@ def test_successful_upload_from_url_check_duplicates(uploadcare):
 def test_successful_upload_from_url_sync_autostore_signed(uploadcare):
     file = uploadcare.upload_from_url_sync(IMAGE_URL, interval=1)
     assert isinstance(file, File)
-    assert file.filename == "Octocat.png"
+    assert file.filename == IMAGE_FILENAME
     assert file.datetime_stored is not None
     assert isinstance(file.datetime_stored, datetime)
 
@@ -156,7 +155,7 @@ def test_successful_upload_from_url_sync_autostore_signed(uploadcare):
 def test_successful_upload_from_url_sync_dont_store(uploadcare):
     file = uploadcare.upload_from_url_sync(IMAGE_URL, store=False, interval=1)
     assert isinstance(file, File)
-    assert file.filename == "Octocat.png"
+    assert file.filename == IMAGE_FILENAME
     assert file.datetime_stored is None
 
 
