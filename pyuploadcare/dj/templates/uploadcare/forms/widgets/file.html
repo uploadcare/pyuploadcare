@@ -27,8 +27,7 @@
         pubkey="{{ pub_key }}"
         {% for k, v in options.items %}
         {{ k|escape }}="{{ v|escape }}"{% endfor %}
-    >
-    </lr-config>
+    ></lr-config>
 
     <lr-upload-ctx-provider
         id="uploaderctx_{{ name }}"
@@ -38,15 +37,12 @@
     <lr-file-uploader-{{ variant }}
         css-src="{{ uploadcare_css }}"
         ctx-name="{{ name }}"
-    ></lr-file-uploader-{{ variant }}>
+    >
+        <lr-form-input
+            ctx-name="{{ name }}"
+        ></lr-form-input>
+    </lr-file-uploader-{{ variant }}>
 
-    <lr-data-output
-        ctx-name="{{ name }}"
-        style="position: absolute;"
-        use-input
-        {% if options.multiple == "true" %}use-group{% endif %}
-        {% if is_required %}input-required{% endif %}
-    ></lr-data-output>
 
 </div>
 
