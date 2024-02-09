@@ -10,7 +10,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- The SSL context is now cached by default, resulting in significant performance improvements when initializing the `Uploadcare` class frequently.  [#279](https://github.com/uploadcare/pyuploadcare/issues/279)
+- The SSL context is now cached by default, resulting in significant performance improvements when initializing the `Uploadcare` class frequently. [#279](https://github.com/uploadcare/pyuploadcare/issues/279)
+- Removed the warning for the usage of the deprecated `pydantic.utils.deep_update` [#283](https://github.com/uploadcare/pyuploadcare/issues/283)
 
 ## [5.0.0](https://github.com/uploadcare/pyuploadcare/compare/v4.3.0...v5.0.0) - 2023-12-28
 
