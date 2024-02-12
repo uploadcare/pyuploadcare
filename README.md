@@ -29,7 +29,7 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 * [Documentation](#documentation)
 * [Requirements and installation](#requirements-and-installation)
 * [Usage example](#usage-example)
-* [Use cases](#use-cases)
+<!-- * [Use cases](#use-cases) -->
 * [Demo app (Docker)](#demo-app)
 * [Suggestions and questions](#suggestions-and-questions)
 
@@ -104,16 +104,10 @@ Django compatibility:
 | 3.11  |     |     |     |     |     | X   | X   | X   |
 | 3.12  |     |     |     |     |     |     | X   | X   |
 
-In order to install `pyuploadcare`, run these commands in CLI:
+In order to install `pyuploadcare`, run these command in CLI:
 
 ```bash
 pip install pyuploadcare
-```
-
-or, if you prefer it the old way:
-
-```bash
-easy_install pyuploadcare
 ```
 
 To use in Django project install with extra dependencies:
@@ -306,5 +300,5 @@ We've developed a demo app that showcases most of the features. You can install 
 ## Suggestions and questions
 
 [Contributing guide](https://github.com/uploadcare/.github/blob/master/CONTRIBUTING.md)  
-[Security policy](https://github.com/uploadcare/uploadcare-swift/security/policy)  
+[Security policy](https://github.com/uploadcare/pyuploadcare/security/policy)  
 [Support](https://github.com/uploadcare/.github/blob/master/SUPPORT.md)  
