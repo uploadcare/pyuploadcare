@@ -45,12 +45,14 @@ You can find an example project `here`_.
 
 .. image:: https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/manual_crop.png
 
+
 Features
 ========
 
 - Python wrapper for Uploadcare `REST`_ and `Upload`_ APIs.
 - Django `widget`_ with useful manual crop and multi-upload.
 - *ucare* console utility.
+
 
 Requirements
 ============
@@ -74,6 +76,7 @@ If you're using ``pyuploadcare`` with Django, refer the following compatibility 
     3.11,,,,,,X,X,X
     3.12,,,,,,,X,X
 
+
 Contents
 ========
 
@@ -87,6 +90,7 @@ Contents
    testing
    security_issues
    feedback
+
 
 Indices and tables
 ==================

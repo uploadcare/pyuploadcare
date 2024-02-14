@@ -6,6 +6,7 @@ Django Widget
 
 .. _django-widget-settings-ref:
 
+
 Settings
 --------
 
@@ -53,7 +54,6 @@ Below is the full default configuration:
         },
     }
 
-
 PyUploadcare takes assets from CDN by default, e.g.:
 
 .. code-block:: html
@@ -69,7 +69,6 @@ PyUploadcare takes assets from CDN by default, e.g.:
         css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.x/web/lr-file-uploader-regular.min.css"
         ctx-name="my-uploader"
     ></lr-file-uploader-inline>
-
 
 If you don't want to use hosted assets you have to turn off this feature:
 
@@ -125,6 +124,7 @@ Use ``widget_options`` to pass arbitrary `options`_ to the file uploader:
 
 .. _django-legacy-widget-settings-ref:
 
+
 Settings for legacy widget
 --------------------------
 
@@ -161,8 +161,8 @@ If you have signed uploads enabled in your Uploadcare project, widget-based uplo
         'signed_uploads': True,
     }
 
-
 .. _django-widget-models-ref:
+
 
 Model Fields
 ------------
@@ -189,6 +189,7 @@ These fields play by common Django rules. South migrations are supported.
 
 .. _django-widget-models-filefield-ref:
 
+
 FileField
 ~~~~~~~~~
 
@@ -206,6 +207,7 @@ FileField
         resume = FileField()
 
 .. _django-widget-models-imagefield-ref:
+
 
 ImageField
 ~~~~~~~~~~
@@ -229,6 +231,7 @@ image. Consult `widget documentation`_ regarding setting up the manual crop:
         photo = ImageField(blank=True, manual_crop="")
 
 .. _django-widget-models-imagefield-advanced-ref:
+
 
 Advanced widget options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -266,6 +269,7 @@ widget on a field-by-field basis without turning it on globally (using
 
 .. _django-widget-models-filegroupfield-ref:
 
+
 FileGroupField
 ~~~~~~~~~~~~~~
 
@@ -285,6 +289,7 @@ uploaded files as a group:
 
 .. _django-widget-models-imagegroupfield-ref:
 
+
 ImageGroupField
 ~~~~~~~~~~~~~~~
 
@@ -301,6 +306,7 @@ It stores uploaded images as a group:
     class Gallery(models.Model):
 
         photos = ImageGroupField()
+
 
 .. _Uploadcare dashboard: https://app.uploadcare.com/
 .. _options: https://uploadcare.com/docs/file-uploader/options/
