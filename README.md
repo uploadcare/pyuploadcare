@@ -37,48 +37,10 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 
 This library consists of the APIs interface and a couple of Django goodies, 100% covering [Upload](https://uploadcare.com/api-refs/upload-api/), [REST](https://uploadcare.com/api-refs/rest-api/) and [URL](https://uploadcare.com/api-refs/url-api/) Uploadcare APIs.
 
-* Enable obsessively friendly [file uploads](http://uploadcare.com/products/file-uploader/)
-* Manage stored files RESTfully: from malware detection to file conversion
-* [Optimize and process images on the fly](https://uploadcare.com/cdn/image-cdn/) right before delivery time
-
-<!-- Enable obsessively friendly file uploads:
-* Built-in File Uploader
-* Upload files from anywhere
-* Multipart uploading for large files
-* File size and MIME type filtering
-* Malware protection
-* Signed uploads
-* Uploading network to speed up uploading jobs
-
-Store files the way you need:
-* Define file storing behaviour
-* Create projects with separate settings programmatically
-* Connect custom storage
-
-Handle all files smart & RESTfully:
-* CRUD files and their metadata
-* Scan for unsafe and malicious content
-* Convert documents and other files
-* Encode and transform videos
-* Recognize objects in the image
-* Add arbitrary file metadata
-* Control events with webhooks
-
-Process images on the fly right before delivery time:
-* Compression
-* Geometry
-* Colors
-* Definition
-* Overlays
-* Rotations
-* Recognition
-
-Fast and reliable delivery:
-* Worldwide CDN
-* Custom CDN CNAME
-* Signed URLs
-* Search engine indexing behaviour
-* Proxy to fetch and deliver remote files -->
+* [Upload](https://uploadcare.com/docs/uploads/) files from anywhere via API or ready-made File Uploader
+* [Manage](https://uploadcare.com/docs/start/file-management/) stored files and perform various actions and conversions with them
+* [Optimize](https://uploadcare.com/docs/transformations/image/compression/) and [transform](https://uploadcare.com/docs/transformations/image/) images on the fly
+* [Deliver](https://uploadcare.com/docs/delivery/) files fast and secure
 
 ## Documentation
 
@@ -224,74 +186,6 @@ To run tests using [Github Actions](https://github.com/uploadcare/pyuploadcare/a
 ```make test_with_github_actions```
 
 This runs the full suite of tests across Python and Django versions.
-
-<!--
-## Use cases
-
-In this spreadsheet we also provide links to the [Uploadcare documentation](https://uploadcare.com/docs/) so you can fully understand what our platform enables.
-Manual describes a product feature, and code leads to the library code specification.
-
-| Feature                        | Description | Manual                                                                     | Code                                                                                      |
-| ------------------------------ | ----------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| _Uploading_                    |             | [_Overview_](https://uploadcare.com/docs/uploads/)                         |                                                                                           |
-| Uploading files                |             | [Manual](https://uploadcare.com/docs/uploading-files/)                     | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#uploading-files)       |
-| File Uploader                  |             | [Manual](https://uploadcare.com/docs/file-uploader/)                       | [Code](https://pyuploadcare.readthedocs.io/en/latest/django-widget.html)                  |
-| Storage options                |             | [Manual](https://uploadcare.com/docs/uploads/storage/)                     | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#store-files)           |
-| Signed uploads                 |             | [Manual](https://uploadcare.com/docs/security/secure-uploads/)             | ?                                                                                         |
-| File analysis on upload        |             | [Manual](https://uploadcare.com/docs/file-analysis/)                       | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#retrieve-files)        |
-| Validation and moderation      |             | [Manual](https://uploadcare.com/docs/moderation/)                          | N/A                                                                                       |
-| _File management_              |             | [_Overview_](https://uploadcare.com/docs/start/file-management/)           |                                                                                           |
-| Managing files                 |             | [Manual](https://uploadcare.com/docs/managing-files/)                      | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#list-files)            |
-| Projects                       |             | [Manual](https://uploadcare.com/docs/start/settings/)                      | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#get-project-info)      |
-| Webhook notifications          |             | [Manual](https://uploadcare.com/docs/webhooks/)                            | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#create-webhook)        |
-| S3 bucket integration          |             | [Manual](https://uploadcare.com/docs/s3-integration/)                      | N/A                                                                                       |
-| Arbitrary file metadata        |             | [Manual](https://uploadcare.com/docs/file-metadata/)                       | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#file-metadata)         |
-| Video processing               |             | [Manual](https://uploadcare.com/docs/transformations/video-encoding/)      | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#video-conversion)      |
-| Document conversion            |             | [Manual](https://uploadcare.com/docs/transformations/document-conversion/) | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#document-conversion)   |
-| Unsafe content detection       |             | [Manual](https://uploadcare.com/docs/unsafe-content/)                      | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#using-addons)          |
-| Object recognition             |             | [Manual](https://uploadcare.com/docs/intelligence/object-recognition/)     | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#using-addons)          |
-| Malware protection             |             | [Manual](https://uploadcare.com/docs/security/malware-protection/)         | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#using-addons)          |
-| _Delivery_                     |             | [_Overview_](https://uploadcare.com/docs/delivery/)                        |                                                                                           |
-| On-the-fly operations          |             | [Manual](https://uploadcare.com/docs/cdn-operations/)                      | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#image-transformations) |
-| Image optimization             |             | [Manual](https://uploadcare.com/docs/transformations/image/compression/)   | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#image-transformations) |
-| Image transformation           |             | [Manual](https://uploadcare.com/docs/transformations/image/)               | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#image-transformations) |
-| CDN settings                   |             | [Manual](https://uploadcare.com/docs/delivery/cdn/)                        | N/A                                                                                       |
-| Fetch and deliver remote files |             | [Manual](https://uploadcare.com/docs/delivery/proxy/)                      | N/A                                                                                       |
-| Signed URLs                    |             | [Manual](https://uploadcare.com/docs/security/secure-delivery/)            | [Code](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#secure-delivery)       |
-
-To help you figure what this library can help you with, we want to showcase some use cases that you can solve with Uploadcare.
-
-Main use cases:
-* Accept user-generated content ([upload api](https://uploadcare.com/docs/uploading-files/), [file uploader](https://uploadcare.com/docs/file-uploader/), [upload sources](https://uploadcare.com/docs/upload-sources/))
-* Serve responsive images ([optimization](https://uploadcare.com/docs/transformations/image/compression/), [adaptive image SDK](https://uploadcare.com/docs/adaptive-image/), [proxy](https://uploadcare.com/docs/delivery/proxy/), and other [integrations](https://uploadcare.com/docs/integrations/))
-
-Common:
-* Art-direction of the content on your page ([transformations](https://uploadcare.com/docs/transformations/image/), [remove.bg](https://uploadcare.com/docs/remove-bg/), [smart crop](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-smart-crop), [scale crop](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-scale-crop), [smart resize](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-smart-resize), [zoom](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects), [circle](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-border-radius), [fill](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-setfill))
-* Unify accepted video files to web-friendly formats and quality ([encoding](https://uploadcare.com/docs/transformations/video-encoding/))
-* Create thumbnails ([videos](https://uploadcare.com/docs/transformations/video-encoding/#operation-thumbs), [documents](https://uploadcare.com/docs/transformations/document-conversion/#thumbnails))
-* Validate incoming files ([validation](https://uploadcare.com/docs/moderation/), [NSFW](https://uploadcare.com/docs/unsafe-content/), [malware](https://uploadcare.com/docs/security/malware-protection/))
-* Watermark and protect your content ([overlays](https://uploadcare.com/docs/transformations/image/overlay/), [blur](https://uploadcare.com/docs/effects-enhancements/#operation-blur-region) + [baking](https://uploadcare.com/docs/mutability/))
-* Optimize the size of animated images ([gif2video](https://uploadcare.com/docs/transformations/gif-to-video/))
-* Access control (signed [uploads](https://uploadcare.com/docs/security/secure-uploads/) and [downloads](https://uploadcare.com/docs/security/secure-delivery/))
-
-Less common:
-* Image art-direction based on faces or objects ([faces](https://uploadcare.com/docs/intelligence/face-detection/), [objects](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-crop-tags))
-* Image delivery when color science is important ([colors](https://uploadcare.com/docs/effects-enhancements/#image-color-profile-management))
-* Native uploads on mobile ([iOS](https://uploadcare.com/docs/integrations/swift/), [Android](https://uploadcare.com/docs/integrations/android/))
-* SVG transformations ([rasterization](https://uploadcare.com/docs/transformations/image/svg/))
-* Remove geolocation data ([strip](https://uploadcare.com/docs/transformations/image/compression/#meta-information-control) + [workaround](https://uploadcare.com/docs/mutability/))
-* Download static files for scrsets ([webpack](https://github.com/uploadcare/uploadcare-loader))
-* Substitute DB with arbitrary metadata ([metadata](https://uploadcare.com/docs/file-metadata/))
-* Prepare OG pictures with text ([text overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-text))
-* Scrap pictures from the web ([from url](https://uploadcare.com/docs/uploading-files/#from-url))
-* Make decisions based on files info ([analysis](https://uploadcare.com/docs/file-analysis/) + [webhooks](https://uploadcare.com/docs/webhooks/))
-* Weird file conversions ([file coversion](https://uploadcare.com/docs/transformations/document-conversion/#document-file-formats))
-* Process and save ([copy remotely](https://uploadcare.com/docs/managing-files/#copy))
-* Check for duplicates ([phash](https://uploadcare.com/docs/cdn-operations/#operation-phash))
-* Prepare a bunch of files for download ([archive](https://uploadcare.com/docs/cdn-operations/#get-as-archive))
-* No-code automate uploads ([Zapier](https://uploadcare.com/docs/integrations/zapier/), [Make](https://www.make.com/en/integrations/uploadcare?utm_source=uploadcare&utm_medium=partner&utm_campaign=uploadcare-partner-program), [Integrately](https://uploadcare.com/docs/integrations/integrately/))
-* Do something and don’t store files after it ([storing](https://uploadcare.com/docs/uploads/storage/#file-storing-behavior))
- -->
 
 ## Demo app
 
