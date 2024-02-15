@@ -28,7 +28,7 @@ Build file handling in minutes. Upload or accept UGC, store, transform, optimize
 * [Features](#features)
 * [Documentation](#documentation)
 * [Requirements and installation](#requirements-and-installation)
-* [Usage example](#usage-example)
+* [Usage examples](#usage-examples)
 <!-- * [Use cases](#use-cases) -->
 * [Demo app (Docker)](#demo-app)
 * [Suggestions and questions](#suggestions-and-questions)
@@ -78,11 +78,50 @@ To use in Django project install with extra dependencies:
 pip install pyuploadcare[django]
 ```
 
-## Usage example
+## Usage examples
+
+After package [installation](#requirements-and-installation), you’ll need API keys: public and secret. Get them in [Uploadcare dashboard](https://app.uploadcare.com/projects/-/api-keys). If you don’t have an account yet, you can use demo keys, as in example. However, the files on demo account are regularly removed, so create an account as soon as Uploadcare catches your fancy.
+
+In these examples we’re going to use the aforementioned demo keys.
 
 ### Basic usage
 
-<!-- TODO: simple upload via API request / and maybe something more-->
+Let’s start with the basics. Say, you want to upload a file:
+
+```python
+from pyuploadcare import Uploadcare
+
+uploadcare = Uploadcare(public_key="demopublickey", secret_key="demoprivatekey")
+with open("sample-file.jpeg", "rb") as file_object:
+    ucare_file = uploadcare.upload(file_object)
+```
+
+And your file is now uploaded to the Uploadcare CDN. But how do you access it from the web? It’s really simple:
+
+```python
+print(ucare_file.cdn_url)  # file URL, e.g.: https://ucarecdn.com/7d4e9387-26c2-4e58-840e-9254f1871c94/
+```
+
+If you don’t have the “Automatic file storing” setting enabled in your project, don’t forget to store the uploaded file:
+
+```python
+ucare_file.store()
+print(ucare_file.is_stored)  # True
+```
+
+A whole slew of other file operations are available. Do you want to crop your image, but don't want important information (faces, objects) to be cropped? You can do that with content-aware (“smart”) crop:
+
+```python
+from pyuploadcare.transformations.image import ImageTransformation, ScaleCropMode
+
+# These two function calls are equivalent
+ucare_file.set_effects("scale_crop/512x512/smart/")
+ucare_file.set_effects(ImageTransformation().scale_crop(512, 512, mode=ScaleCropMode.smart))
+
+print(ucare_file.cdn_url)  # https://ucarecdn.com/7d4e9387-26c2-4e58-840e-9254f1871c94/-/scale_crop/512x512/smart/
+```
+
+There’s a lot more to uncover. For more information please refer to the [documentation](#documentation).
 
 ### Django integration
 
@@ -90,8 +129,6 @@ pip install pyuploadcare[django]
 
 <!-- TODO: Update it with "and deliver an image" -->
 Let's add [File Uploader](https://uploadcare.com/docs/file-uploader/) to an existing Django project.
-
-After package [installation](#requirements-and-installation), you’ll need API keys: public and secret. Get them in [Uploadcare dashboard](https://app.uploadcare.com/projects/-/api-keys). If you don’t have an account yet, you can use demo keys, as in example. However, the files on demo account are regularly removed, so create an account as soon as Uploadcare catches your fancy.
 
 Assume you have a Django project with gallery app.
 
