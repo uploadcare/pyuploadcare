@@ -80,6 +80,12 @@ pip install pyuploadcare[django]
 
 ## Usage example
 
+### Basic usage
+
+<!-- TODO: simple upload via API request / and maybe something more-->
+
+### Django integration
+
 <!-- TODO: The idea of this example is to show how upload and deliver an image -->
 
 <!-- TODO: Update it with "and deliver an image" -->
@@ -129,7 +135,7 @@ class Photo(models.Model):
 
 Obviously, you would want to use Uploadcare field outside an admin. It’s going to work just as well, but, however, you have to remember to add {{ form.media }} in the <head> tag of your page:
 
-```python
+```htmldjango
 {{ form.media }}
 
 <form action="" method="post">
@@ -144,10 +150,10 @@ This is a default Django form property which is going to render any scripts need
 <!-- TODO: Update how we get an UUID and pass it further -->
 After an image is uploaded, you can deliver it while transforming it on the fly:
 
-```python
+```htmldjango
 {% for photo in photos %}
-    {{ photo.title }}
-    {{ photo.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/
+    <h2>{{ photo.title }}</h2>
+    <img src="{{ photo.photo.cdn_url }}-/resize/400x300/-/effect/flip/-/effect/grayscale/">
 {% endfor %}
 ```
 
@@ -158,23 +164,23 @@ After an image is uploaded, you can deliver it while transforming it on the fly:
 This will enable users to see the upload progress, pick files from sources like Google Drive or Instagram, and edit a form while files are being uploaded asynchronously.
 
 ```python
-    from django import forms
-    from django.db import models
+from django import forms
+from django.db import models
 
-    from pyuploadcare.dj.models import ImageField
-    from pyuploadcare.dj.forms import FileWidget, ImageField as ImageFormField
-
-
-    class Candidate(models.Model):
-        photo = ImageField(blank=True, manual_crop="")
+from pyuploadcare.dj.models import ImageField
+from pyuploadcare.dj.forms import FileWidget, ImageField as ImageFormField
 
 
-    # optional. provide advanced widget options: https://uploadcare.com/docs/uploads/widget/config/#options
-    class CandidateForm(forms.Form):
-        photo = ImageFormField(widget=FileWidget(attrs={
-            'data-cdn-base': 'https://cdn.super-candidates.com',
-            'data-image-shrink': '1024x1024',
-        }))
+class Candidate(models.Model):
+    photo = ImageField(blank=True, manual_crop="")
+
+
+# Optional: provide advanced widget options https://uploadcare.com/docs/file-uploader/options/
+class CandidateForm(forms.Form):
+    photo = ImageFormField(widget=FileWidget(attrs={
+        "source-list": "local,url,camera",
+        "camera-mirror": True,
+    }))
 ```
 
 ![](https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/josi.png)
