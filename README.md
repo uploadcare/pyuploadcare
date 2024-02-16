@@ -160,6 +160,8 @@ There’s a lot more to uncover. For more information please refer to the [docum
 <!-- TODO: Update it with "and deliver an image" -->
 Let's add [File Uploader](https://uploadcare.com/docs/file-uploader/) to an existing Django project.
 
+We will allow users to upload their images through a nice and modern UI within the standard Django admin or outside of it, and then display these images on the website and modify them using advanced Uploadcare CDN features.
+
 Assume you have a Django project with `gallery` app.
 
 Add `pyuploadcare.dj` into `INSTALLED_APPS`:
