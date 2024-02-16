@@ -169,17 +169,16 @@ Add `pyuploadcare.dj` into `INSTALLED_APPS`:
 ```python
 INSTALLED_APPS = (
     # ...
-    'pyuploadcare.dj',
-
-    'gallery',
+    "pyuploadcare.dj",
+    "gallery",
 )
 ```
 Add API keys to your Django settings file:
 
 ```python
 UPLOADCARE = {
-    'pub_key': 'demopublickey',
-    'secret': 'demoprivatekey',
+    "pub_key": "demopublickey",
+    "secret": "demoprivatekey",
 }
 ```
 
@@ -192,7 +191,6 @@ from pyuploadcare.dj.models import ImageField
 
 
 class Photo(models.Model):
-
     title = models.CharField(max_length=255)
     photo = ImageField()
 ```
