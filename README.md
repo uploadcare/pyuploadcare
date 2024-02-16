@@ -99,17 +99,47 @@ with open("sample-file.jpeg", "rb") as file_object:
 And your file is now uploaded to the Uploadcare CDN. But how do you access it from the web? It’s really simple:
 
 ```python
-print(ucare_file.cdn_url)  # file URL, e.g.: https://ucarecdn.com/7d4e9387-26c2-4e58-840e-9254f1871c94/
+print(ucare_file.cdn_url)  # file URL, e.g.: https://ucarecdn.com/640fe4b7-7352-42ca-8d87-0e4387957157/
 ```
 
-If you don’t have the “Automatic file storing” setting enabled in your project, don’t forget to store the uploaded file:
+And what about information about the file?
 
 ```python
-ucare_file.store()
-print(ucare_file.is_stored)  # True
+from pprint import pprint
+
+pprint(ucare_file.info)
+
+# {'appdata': None,
+#  'content_info': {'image': {'color_mode': <ColorMode.RGB: 'RGB'>,
+#                             'datetime_original': datetime.datetime(2023, 3, 10, 16, 23, 15),
+#                             'dpi': (72, 72),
+#                             'format': 'JPEG',
+#                             'geo_location': None,
+#                             'height': 4516,
+#                             'orientation': 1,
+#                             'sequence': False,
+#                             'width': 3011},
+#                   'mime': {'mime': 'image/jpeg',
+#                            'subtype': 'jpeg',
+#                            'type': 'image'},
+#                   'video': None},
+#  'datetime_removed': None,
+#  'datetime_stored': datetime.datetime(2024, 2, 16, 14, 44, 29, 637342, tzinfo=TzInfo(UTC)),
+#  'datetime_uploaded': datetime.datetime(2024, 2, 16, 14, 44, 29, 395043, tzinfo=TzInfo(UTC)),
+#  'is_image': True,
+#  'is_ready': True,
+#  'metadata': {},
+#  'mime_type': 'image/jpeg',
+#  'original_file_url': 'https://ucarecdn.com/640fe4b7-7352-42ca-8d87-0e4387957157/samplefile.jpeg',
+#  'original_filename': 'sample-file.jpeg',
+#  'size': 3518420,
+#  'source': None,
+#  'url': 'https://api.uploadcare.com/files/640fe4b7-7352-42ca-8d87-0e4387957157/',
+#  'uuid': UUID('640fe4b7-7352-42ca-8d87-0e4387957157'),
+#  'variations': None}
 ```
 
-A whole slew of other file operations are available. Do you want to crop your image, but don't want important information (faces, objects) to be cropped? You can do that with content-aware (“smart”) crop:
+A whole slew of different file operations are available. Do you want to crop your image, but don't want important information (faces, objects) to be cropped? You can do that with content-aware (“smart”) crop:
 
 ```python
 from pyuploadcare.transformations.image import ImageTransformation, ScaleCropMode
@@ -118,7 +148,7 @@ from pyuploadcare.transformations.image import ImageTransformation, ScaleCropMod
 ucare_file.set_effects("scale_crop/512x512/smart/")
 ucare_file.set_effects(ImageTransformation().scale_crop(512, 512, mode=ScaleCropMode.smart))
 
-print(ucare_file.cdn_url)  # https://ucarecdn.com/7d4e9387-26c2-4e58-840e-9254f1871c94/-/scale_crop/512x512/smart/
+print(ucare_file.cdn_url)  # https://ucarecdn.com/640fe4b7-7352-42ca-8d87-0e4387957157/-/scale_crop/512x512/smart/
 ```
 
 There’s a lot more to uncover. For more information please refer to the [documentation](#documentation).
@@ -130,7 +160,7 @@ There’s a lot more to uncover. For more information please refer to the [docum
 <!-- TODO: Update it with "and deliver an image" -->
 Let's add [File Uploader](https://uploadcare.com/docs/file-uploader/) to an existing Django project.
 
-Assume you have a Django project with gallery app.
+Assume you have a Django project with `gallery` app.
 
 Add `pyuploadcare.dj` into `INSTALLED_APPS`:
 
@@ -167,10 +197,9 @@ class Photo(models.Model):
 
 `ImageField` doesn’t require any arguments, file paths or whatever. **It just works**. That’s the point of it all. It looks nice in the admin interface as well:
 
-<!-- TODO: Update screenshot -->
-![](https://ucarecdn.com/84e614e4-8faf-4090-ba3a-83294715434b/)
+![](https://ucarecdn.com/6dbac4f4-7cda-42cd-872b-cecf45b9f515/-/scale_crop/900x600/left/)
 
-Obviously, you would want to use Uploadcare field outside an admin. It’s going to work just as well, but, however, you have to remember to add {{ form.media }} in the <head> tag of your page:
+Obviously, you would want to use Uploadcare field outside an admin. It’s going to work just as well, but, however, you have to remember to add `{{ form.media }}` in the `<head>` tag of your page:
 
 ```htmldjango
 {{ form.media }}
@@ -181,8 +210,9 @@ Obviously, you would want to use Uploadcare field outside an admin. It’s going
     <input type="submit" value="Save"/>
 </form>
 ```
-
 This is a default Django form property which is going to render any scripts needed for the form to work, in our case — Uploadcare scripts.
+
+![](https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/josi.png)
 
 <!-- TODO: Update how we get an UUID and pass it further -->
 After an image is uploaded, you can deliver it while transforming it on the fly:
@@ -196,31 +226,6 @@ After an image is uploaded, you can deliver it while transforming it on the fly:
 
 <!-- TODO: Maybe we should link to the URL builder pyuploadcare docs? -->
 (Refer to Uploadcare [image processing docs](https://uploadcare.com/docs/transformations/image/) for more information).
-
-<!-- TODO: Connect this example to the rest of them -->
-This will enable users to see the upload progress, pick files from sources like Google Drive or Instagram, and edit a form while files are being uploaded asynchronously.
-
-```python
-from django import forms
-from django.db import models
-
-from pyuploadcare.dj.models import ImageField
-from pyuploadcare.dj.forms import FileWidget, ImageField as ImageFormField
-
-
-class Candidate(models.Model):
-    photo = ImageField(blank=True, manual_crop="")
-
-
-# Optional: provide advanced widget options https://uploadcare.com/docs/file-uploader/options/
-class CandidateForm(forms.Form):
-    photo = ImageFormField(widget=FileWidget(attrs={
-        "source-list": "local,url,camera",
-        "camera-mirror": True,
-    }))
-```
-
-![](https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/josi.png)
 
 ## Testing
 
