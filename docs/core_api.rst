@@ -109,7 +109,7 @@ Create a file group::
 Get a file group::
 
     file_group: FileGroup = uploadcare.file_group('0513dda0-582f-447d-846f-096e5df9e2bb~2')
-    print(file_group.info())
+    print(file_group.info)
 
 Stores all group's files::
 
