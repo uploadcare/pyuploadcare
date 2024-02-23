@@ -179,7 +179,7 @@ Or the whole metadata may be got at once::
 
 But you should better use a special attribute of `File.info`::
 
-    file_metadata = file.info.metadata
+    file_metadata = file.info["metadata"]
 
 
 Video conversion
