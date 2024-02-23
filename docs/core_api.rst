@@ -432,7 +432,7 @@ Useful links
 .. _Uploadcare documentation: https://uploadcare.com/docs/?utm_source=github&utm_campaign=pyuploadcare
 .. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
 .. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
-.. _REST: https://uploadcare.com/api-refs/url-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _URL: https://uploadcare.com/api-refs/url-api/?utm_source=github&utm_campaign=pyuploadcare
 .. _Django app example: https://github.com/uploadcare/pyuploadcare-example
 .. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
 .. _addons documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Add-Ons
