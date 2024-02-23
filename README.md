@@ -23,13 +23,12 @@
 [![](https://readthedocs.org/projects/pyuploadcare/badge/?version=latest)](https://pyuploadcare.readthedocs.io/)
 [![](https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat)](https://stackshare.io/uploadcare)
 
-Build file handling in minutes. Upload or accept UGC, store, transform, optimize, and deliver images, videos, and documents to billions of users.
+Build file handling in minutes. Upload or accept user-generated content, store, transform, optimize, and deliver images, videos, and documents to billions of users.
 
 * [Features](#features)
 * [Documentation](#documentation)
 * [Requirements and installation](#requirements-and-installation)
 * [Usage examples](#usage-examples)
-<!-- * [Use cases](#use-cases) -->
 * [Demo app (Docker)](#demo-app)
 * [Suggestions and questions](#suggestions-and-questions)
 
@@ -155,9 +154,6 @@ There’s a lot more to uncover. For more information please refer to the [docum
 
 ### Django integration
 
-<!-- TODO: The idea of this example is to show how upload and deliver an image -->
-
-<!-- TODO: Update it with "and deliver an image" -->
 Let's add [File Uploader](https://uploadcare.com/docs/file-uploader/) to an existing Django project.
 
 We will allow users to upload their images through a nice and modern UI within the standard Django admin or outside of it, and then display these images on the website and modify them using advanced Uploadcare CDN features.
@@ -173,6 +169,7 @@ INSTALLED_APPS = (
     "gallery",
 )
 ```
+
 Add API keys to your Django settings file:
 
 ```python
@@ -214,7 +211,6 @@ This is a default Django form property which is going to render any scripts need
 
 ![](https://ucarecdn.com/f0894ef2-352e-406a-8279-737dd6e1f10c/-/resize/800/josi.png)
 
-<!-- TODO: Update how we get an UUID and pass it further -->
 After an image is uploaded, you can deliver it while transforming it on the fly:
 
 ```htmldjango
@@ -224,7 +220,6 @@ After an image is uploaded, you can deliver it while transforming it on the fly:
 {% endfor %}
 ```
 
-<!-- TODO: Maybe we should link to the URL builder pyuploadcare docs? -->
 (Refer to Uploadcare [image processing docs](https://uploadcare.com/docs/transformations/image/) for more information).
 
 ## Testing
