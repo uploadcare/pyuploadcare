@@ -175,7 +175,7 @@ Value may be retrieved by key::
 
 Or the whole metadata may be got at once::
 
-    file_metadata = uploadcare.metadata_api.get_all_metadata(file_id, mkey=md_key)
+    file_metadata = uploadcare.metadata_api.get_all_metadata(file_id)
 
 But you should better use a special attribute of `File.info`::
 
