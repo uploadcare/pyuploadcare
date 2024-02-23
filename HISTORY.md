@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.32.4](https://github.com/uploadcare/blocks/releases)
+- [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.33.2](https://github.com/uploadcare/blocks/releases)
 
 ### Fixed
 
