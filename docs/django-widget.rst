@@ -241,9 +241,7 @@ You can pass any widget `options`_ via ``FileWidget``'s attrs argument:
 
     from pyuploadcare.dj.forms import FileWidget, ImageField
 
-    # optional. provide advanced widget options:
-    # https://uploadcare.com/docs/file-uploader/configuration/
-    # https://uploadcare.com/docs/file-uploader/options/
+    # Optional: provide advanced widget options https://uploadcare.com/docs/file-uploader/options/
     class CandidateForm(forms.Form):
         photo = ImageField(widget=FileWidget(attrs={
             "source-list": "local,url,camera",
