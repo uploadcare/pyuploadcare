@@ -30,6 +30,7 @@ Build file handling in minutes. Upload or accept user-generated content, store, 
 * [Installation](#installation)
 * [Requirements](#requirements)
 * [Usage](#usage)
+* [Testing](#testing)
 * [Demo app (Docker)](#demo-app)
 
 ## Description
