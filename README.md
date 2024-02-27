@@ -25,13 +25,14 @@
 
 Build file handling in minutes. Upload or accept user-generated content, store, transform, optimize, and deliver images, videos, and documents to billions of users.
 
-* [Features](#features)
+* [Description](#description)
 * [Documentation](#documentation)
-* [Requirements and installation](#requirements-and-installation)
-* [Usage examples](#usage-examples)
+* [Installation](#installation)
+* [Requirements](#requirements)
+* [Usage](#usage)
 * [Demo app (Docker)](#demo-app)
 
-## Features
+## Description
 
 This library consists of the APIs interface and a couple of Django goodies, 100% covering [Upload](https://uploadcare.com/api-refs/upload-api/), [REST](https://uploadcare.com/api-refs/rest-api/) and [URL](https://uploadcare.com/api-refs/url-api/) Uploadcare APIs.
 
@@ -46,7 +47,21 @@ Detailed specification of this library is available [on RTD](https://pyuploadcar
 
 Please note that this package uses Uploadcare [API keys](https://app.uploadcare.com/projects/-/api-keys) and is intended to be used in server-side code only.
 
-## Requirements and installation
+## Installation
+
+In order to install `pyuploadcare`, run these command in CLI:
+
+```bash
+pip install pyuploadcare
+```
+
+To use in Django project install with extra dependencies:
+
+```bash
+pip install pyuploadcare[django]
+```
+
+## Requirements
 
 * Python 3.8, 3.9, 3.10, 3.11, 3.12
 
@@ -64,19 +79,7 @@ Django compatibility:
 | 3.11  |     |     |     |     |     | X   | X   | X   |
 | 3.12  |     |     |     |     |     |     | X   | X   |
 
-In order to install `pyuploadcare`, run these command in CLI:
-
-```bash
-pip install pyuploadcare
-```
-
-To use in Django project install with extra dependencies:
-
-```bash
-pip install pyuploadcare[django]
-```
-
-## Usage examples
+## Usage
 
 After package [installation](#requirements-and-installation), you’ll need API keys: public and secret. Get them in [Uploadcare dashboard](https://app.uploadcare.com/projects/-/api-keys). If you don’t have an account yet, you can use demo keys, as in example. However, the files on demo account are regularly removed, so create an account as soon as Uploadcare catches your fancy.
 
