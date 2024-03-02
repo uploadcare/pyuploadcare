@@ -208,10 +208,13 @@ class FileGroupField(Field):
         attrs: Dict[str, Any] = {}
         if self.legacy_widget:
             attrs["data-multiple"] = ""
+            if not self.required:
+                attrs["data-clearable"] = ""
         else:
             attrs["multiple"] = True
-        if not self.required:
-            attrs["data-clearable"] = ""
+            attrs["group-output"] = True
+            if self.required:
+                attrs["multiple-min"] = 1
         return attrs
 
 

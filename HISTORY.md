@@ -8,6 +8,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - unreleased
 
+### Changed
+
+- [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.33.2](https://github.com/uploadcare/blocks/releases)
+
 ### Fixed
 
 - The SSL context is now cached by default, resulting in significant performance improvements when initializing the `Uploadcare` class frequently.  [#279](https://github.com/uploadcare/pyuploadcare/issues/279)

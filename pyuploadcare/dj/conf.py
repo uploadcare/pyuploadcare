@@ -67,7 +67,7 @@ DEFAULT_CONFIG: SettingsType = {
     "use_legacy_widget": False,
     "use_hosted_assets": True,
     "widget": {
-        "version": "0.30.7",
+        "version": "0.33.2",
         "variant": "regular",
         "build": "min",
         "options": {},
