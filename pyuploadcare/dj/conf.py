@@ -7,9 +7,9 @@ import typing_extensions
 from django import get_version as django_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from pydantic.utils import deep_update
 
 from pyuploadcare import __version__ as library_version
+from pyuploadcare.helpers import deep_update
 
 
 __all__ = [

@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - unreleased
+## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - 2024-03-02
 
 ### Changed
 
@@ -14,7 +14,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- The SSL context is now cached by default, resulting in significant performance improvements when initializing the `Uploadcare` class frequently.  [#279](https://github.com/uploadcare/pyuploadcare/issues/279)
+- The SSL context is now cached by default, resulting in significant performance improvements when initializing the `Uploadcare` class frequently. [#279](https://github.com/uploadcare/pyuploadcare/issues/279)
+- Removed the warning for the usage of the deprecated `pydantic.utils.deep_update` [#283](https://github.com/uploadcare/pyuploadcare/issues/283)
 
 ## [5.0.0](https://github.com/uploadcare/pyuploadcare/compare/v4.3.0...v5.0.0) - 2023-12-28
 
