@@ -8,6 +8,7 @@ This part of the documentation covers the installation of PyUploadcare.
 
 .. _install-pip-ref:
 
+
 Pip
 ---
 
@@ -17,12 +18,6 @@ In order to install ``pyuploadcare``, simply run:
 
     $ pip install pyuploadcare
 
-or, if you prefer it the old way:
-
-.. code-block:: console
-
-    $ easy_install pyuploadcare
-
 To use in Django project install with extra dependencies:
 
 .. code-block:: console
@@ -30,6 +25,7 @@ To use in Django project install with extra dependencies:
     $ pip install pyuploadcare[django]
 
 .. _install-get-the-code-ref:
+
 
 Get the Code
 ------------
@@ -68,6 +64,7 @@ Also, note that Django configuration option ``UPLOADCARE['widget_variant']``
 now is deprecated and it will be removed in next major release. Use
 ``UPLOADCARE['widget_build']`` instead.
 
+
 Update to version 3.0
 ---------------------
 
@@ -85,7 +82,6 @@ A version 3.0 contains the next breaking changes:
         public_key='<your public key>',
         secret_key='<your private key>',
     )
-
 
 * ``File``, ``FileGroup``, ``FileList`` and ``GroupList`` resources cannot be initialized directly.
   ``uploadcare.file``, ``uploadcare.file_group``, ``uploadcare.list_files``, ``uploadcare.list_file_groups``
