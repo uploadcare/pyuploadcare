@@ -3,6 +3,7 @@ from pyuploadcare.transformations.image import (
     CropAlignment,
     Gif2VideoFormat,
     Gif2VideoQuality,
+    HorizontalTextAlignment,
     ImageFilter,
     ImageFormat,
     ImageQuality,
@@ -11,6 +12,8 @@ from pyuploadcare.transformations.image import (
     ScaleCropMode,
     SRGBConversion,
     StretchMode,
+    TextBoxMode,
+    VerticalTextAlignment,
 )
 
 
@@ -199,7 +202,7 @@ def test_image_unsharp():
     assert str(transformation) == "scale_crop/880x600/-/blur/200/-120/"
 
 
-def tes_image_sharp():
+def test_image_sharp():
     transformation = ImageTransformation().preview(600, 600).sharp(20)
     assert str(transformation) == "preview/600x600/-/sharp/20/"
 
@@ -277,6 +280,29 @@ def test_overlay_self():
     )
     assert str(transformation) == (
         "scale_crop/440x440/center/-/blur/60/-/gamma/50/-/overlay/self/100px100p/center/"
+    )
+
+
+def test_text():
+    transformation = (
+        ImageTransformation()
+        .preview(440, 440)
+        .text(
+            "Up~load\nca/re 👍",
+            overlay_width="80p",
+            overlay_height="80p",
+            offset=OverlayOffset.center,
+            horizontal_alignment=HorizontalTextAlignment.right,
+            vertical_alignment=VerticalTextAlignment.bottom,
+            font_size=20,
+            font_color="fff",
+            box_mode=TextBoxMode.fill,
+            box_color="fcba0355",
+        )
+    )
+    assert str(transformation) == (
+        "preview/440x440/-/text_align/right/bottom/-/font/20/fff/-/text_box/fill/fcba0355/"
+        "-/text/80px80p/center/Up~~load~nca~sre%20%F0%9F%91%8D/"
     )
 
 

@@ -34,6 +34,7 @@ class ImageFormat(StrEnum):
     """
     https://uploadcare.com/docs/transformations/image/compression/#operation-format
     """
+
     jpeg = "jpeg"
     png = "png"
     webp = "webp"
@@ -129,6 +130,37 @@ class OverlayOffset(StrEnum):
     top = "top"
     bottom = "bottom"
     center = "center"  # type: ignore
+
+
+class HorizontalTextAlignment(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/overlay/#text-alignment
+    """
+
+    left = "left"
+    center = "center"  # type: ignore
+    right = "right"
+
+
+class VerticalTextAlignment(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/overlay/#text-alignment
+    """
+
+    top = "top"
+    center = "center"  # type: ignore
+    bottom = "bottom"
+
+
+class TextBoxMode(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/overlay/#text-background-box
+    """
+
+    none = "none"
+    fit = "fit"
+    line = "line"
+    fill = "fill"
 
 
 class ImageTransformation(BaseTransformation):
@@ -366,6 +398,64 @@ class ImageTransformation(BaseTransformation):
             parameters.append(f"{strength}p")
 
         self.set("overlay", parameters)
+        return self
+
+    def text(
+        self,
+        text: str,
+        overlay_width: str,
+        overlay_height: str,
+        offset: Optional[OverlayOffset] = None,
+        offset_x: Optional[str] = None,
+        offset_y: Optional[str] = None,
+        horizontal_alignment: Optional[HorizontalTextAlignment] = None,
+        vertical_alignment: Optional[VerticalTextAlignment] = None,
+        font_size: Optional[int] = None,
+        font_color: Optional[str] = None,
+        box_mode: Optional[TextBoxMode] = None,
+        box_color: Optional[str] = None,
+        box_padding: Optional[int] = None,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
+        """
+
+        if horizontal_alignment and vertical_alignment:
+            self.set("text_align", [horizontal_alignment, vertical_alignment])
+
+        if font_size or font_color:
+            font_parameters: List[str] = []
+
+            if font_size:
+                font_parameters.append(str(font_size))
+
+            if font_color:
+                font_parameters.append(font_color)
+
+            self.set("font", font_parameters)
+
+        if box_mode:
+            box_parameters: List[str] = [box_mode]
+
+            if box_color:
+                box_parameters.append(box_color)
+
+            if box_padding:
+                box_parameters.append(str(box_padding))
+
+            self.set("text_box", box_parameters)
+
+        parameters: List[str] = [f"{overlay_width}x{overlay_height}"]
+        if offset:
+            parameters.append(offset)
+        else:
+            parameters.append(f"{offset_x},{offset_y}")
+
+        parameters.append(
+            self._escape_text(text),
+        )
+
+        self.set("text", parameters)
         return self
 
     def autorotate(self, enabled=True) -> "ImageTransformation":
