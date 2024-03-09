@@ -31,10 +31,14 @@ class ScaleCropMode(StrEnum):
 
 
 class ImageFormat(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/compression/#operation-format
+    """
     jpeg = "jpeg"
     png = "png"
     webp = "webp"
     auto = "auto"
+    preserve = "preserve"
 
 
 class ImageQuality(StrEnum):
