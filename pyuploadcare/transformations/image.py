@@ -351,8 +351,8 @@ class ImageTransformation(BaseTransformation):
 
     def _get_parameters_for_overlay_position(
         self,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
+        overlay_width: Optional[Union[str, int]],
+        overlay_height: Optional[Union[str, int]],
         offset: Optional[OverlayOffset],
         offset_x: Optional[Union[str, int]],
         offset_y: Optional[Union[str, int]],
@@ -362,11 +362,13 @@ class ImageTransformation(BaseTransformation):
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-image
         """
 
-        parameters: List[str] = [f"{overlay_width}x{overlay_height}"]
+        parameters: List[str] = []
+        if overlay_width is not None or overlay_height is not None:
+            parameters.append(f"{overlay_width}x{overlay_height}")
 
         if offset:
             parameters.append(str(offset))
-        else:
+        elif offset_x is not None and offset_y is not None:
             parameters.append(f"{offset_x},{offset_y}")
 
         return parameters
@@ -374,13 +376,17 @@ class ImageTransformation(BaseTransformation):
     def overlay(
         self,
         uuid: str,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
+        overlay_width: Optional[Union[str, int]] = None,
+        overlay_height: Optional[Union[str, int]] = None,
         offset: Optional[OverlayOffset] = None,
         offset_x: Optional[Union[str, int]] = None,
         offset_y: Optional[Union[str, int]] = None,
         strength: Optional[int] = None,
     ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-image
+        """
+
         parameters: List[str] = [
             uuid,
             *self._get_parameters_for_overlay_position(
@@ -396,13 +402,16 @@ class ImageTransformation(BaseTransformation):
 
     def overlay_self(
         self,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
+        overlay_width: Optional[Union[str, int]] = None,
+        overlay_height: Optional[Union[str, int]] = None,
         offset: Optional[OverlayOffset] = None,
         offset_x: Optional[Union[str, int]] = None,
         offset_y: Optional[Union[str, int]] = None,
         strength: Optional[int] = None,
     ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-self
+        """
         return self.overlay(
             "self",
             overlay_width=overlay_width,

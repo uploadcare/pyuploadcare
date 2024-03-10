@@ -6,12 +6,24 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.1.0) - unreleased
+
+### Added
+
+- For `pyuploadcare.transformations.image.ImageTransformation`:
+  - `text` method to allow adding [text overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-text) to images.
+
+### Changed
+
+- For `pyuploadcare.transformations.image.ImageTransformation`:
+  - `overlay_width` and `overlay_height` parameters are now optional for the `overlay` and `overlay_self` methods.
+
+
 ## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - 2024-03-02
 
 ### Changed
 
 - [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.33.2](https://github.com/uploadcare/blocks/releases)
-
 ### Fixed
 
 - The SSL context is now cached by default, resulting in significant performance improvements when initializing the `Uploadcare` class frequently. [#279](https://github.com/uploadcare/pyuploadcare/issues/279)
