@@ -236,6 +236,37 @@ class ImageTransformation(BaseTransformation):
         self.set("scale_crop", parameters)
         return self
 
+    def border_radius(
+        self,
+        radii: Union[int, str, List[Union[int, str]]],
+        vertical_radii: Optional[
+            Union[int, str, List[Union[int, str]]]
+        ] = None,
+    ) -> "ImageTransformation":
+        def _format_radii(
+            radii: Union[int, str, List[Union[int, str]]]
+        ) -> str:
+            """
+            >>> _format_radii(10)
+            '10'
+            >>> _format_radii([10, "20%"])
+            '10,20p'
+            """
+            radii_as_list: List[str] = (
+                [str(r) for r in radii]
+                if isinstance(radii, list)
+                else [str(radii)]
+            )
+            return ",".join(self._escape_percent(r) for r in radii_as_list)
+
+        parameters: List[str] = [_format_radii(radii)]
+
+        if vertical_radii:
+            parameters.append(_format_radii(vertical_radii))
+
+        self.set("border_radius", parameters)
+        return self
+
     def setfill(self, color: str) -> "ImageTransformation":
         self.set("setfill", [color])
         return self

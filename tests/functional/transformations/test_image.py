@@ -72,6 +72,17 @@ def test_image_scale_crop():
     assert str(transformation) == "scale_crop/1024x1024/center/"
 
 
+def test_border_radius():
+    transformation = (
+        ImageTransformation()
+        .border_radius("10%")
+        .border_radius([10, "20", "40%", "80p"], "30%")
+    )
+    assert str(transformation) == (
+        "border_radius/10p/-/border_radius/10,20,40p,80p/30p/"
+    )
+
+
 def test_setfill():
     transformation = (
         ImageTransformation().setfill("ece3d2").format(ImageFormat.jpeg)

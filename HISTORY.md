@@ -14,6 +14,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `text()` method to allow adding [text overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-text) to images.
   - `rect()` method to allow adding [solid color overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-solid) to images.
   - `strip_meta()` method to [control the presence of EXIF metadata](https://uploadcare.com/docs/transformations/image/compression/#meta-information-control) in the resulting image.
+  - `border_radius()` method to [add rounded corners](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-border-radius) to images.
 
 ### Changed
 
