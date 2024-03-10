@@ -421,41 +421,66 @@ class ImageTransformation(BaseTransformation):
         """
 
         if horizontal_alignment and vertical_alignment:
-            self.set("text_align", [horizontal_alignment, vertical_alignment])
+            self._text_align(horizontal_alignment, vertical_alignment)
 
         if font_size or font_color:
-            font_parameters: List[str] = []
-
-            if font_size:
-                font_parameters.append(str(font_size))
-
-            if font_color:
-                font_parameters.append(font_color)
-
-            self.set("font", font_parameters)
+            self._font(font_size, font_color)
 
         if box_mode:
-            box_parameters: List[str] = [box_mode]
-
-            if box_color:
-                box_parameters.append(box_color)
-
-            if box_padding:
-                box_parameters.append(str(box_padding))
-
-            self.set("text_box", box_parameters)
+            self._text_box(box_mode, box_color, box_padding)
 
         parameters: List[str] = [f"{overlay_width}x{overlay_height}"]
         if offset:
             parameters.append(offset)
         else:
             parameters.append(f"{offset_x},{offset_y}")
-
         parameters.append(
             self._escape_text(text),
         )
-
         self.set("text", parameters)
+
+        return self
+
+    def _text_align(
+        self,
+        horizontal_alignment: HorizontalTextAlignment,
+        vertical_alignment: VerticalTextAlignment,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#text-alignment
+        """
+        self.set("text_align", [horizontal_alignment, vertical_alignment])
+        return self
+
+    def _font(
+        self, font_size: Optional[int], font_color: Optional[str]
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#font-size-and-color
+        """
+        parameters: List[str] = []
+        if font_size:
+            parameters.append(str(font_size))
+        if font_color:
+            parameters.append(font_color)
+        self.set("font", parameters)
+        return self
+
+    def _text_box(
+        self,
+        box_mode: TextBoxMode,
+        box_color: Optional[str],
+        box_padding: Optional[int],
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#text-background-box
+        """
+        parameters: List[str] = [box_mode]
+        if box_color:
+            parameters.append(box_color)
+        if box_padding:
+            parameters.append(str(box_padding))
+        self.set("text_box", parameters)
         return self
 
     def autorotate(self, enabled=True) -> "ImageTransformation":
