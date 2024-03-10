@@ -363,12 +363,16 @@ class ImageTransformation(BaseTransformation):
         """
 
         parameters: List[str] = []
-        if overlay_width is not None or overlay_height is not None:
+        if overlay_width is not None and overlay_height is not None:
+            overlay_width = self._escape_percent(overlay_width)
+            overlay_height = self._escape_percent(overlay_height)
             parameters.append(f"{overlay_width}x{overlay_height}")
 
         if offset:
             parameters.append(str(offset))
         elif offset_x is not None and offset_y is not None:
+            offset_x = self._escape_percent(offset_x)
+            offset_y = self._escape_percent(offset_y)
             parameters.append(f"{offset_x},{offset_y}")
 
         return parameters
@@ -528,6 +532,28 @@ class ImageTransformation(BaseTransformation):
         ]
 
         self.set("text", parameters)
+        return self
+
+    def rect(
+        self,
+        color: str,
+        overlay_width: Union[str, int],
+        overlay_height: Union[str, int],
+        offset: Optional[OverlayOffset] = None,
+        offset_x: Optional[str] = None,
+        offset_y: Optional[str] = None,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-solid
+        """
+        parameters: List[str] = [
+            color,
+            *self._get_parameters_for_overlay_position(
+                overlay_width, overlay_height, offset, offset_x, offset_y
+            ),
+        ]
+
+        self.set("rect", parameters)
         return self
 
     def autorotate(self, enabled=True) -> "ImageTransformation":

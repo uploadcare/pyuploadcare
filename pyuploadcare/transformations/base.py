@@ -29,6 +29,9 @@ class BaseTransformation:
         self._effects.append(effect)
         return self
 
+    def _escape_percent(self, value: Union[str, int]) -> str:
+        return str(value).replace("%", "p")
+
     def _escape_text(self, value: str) -> str:
         return quote(
             value.replace("~", "~~").replace("/", "~s").replace("\n", "~n")

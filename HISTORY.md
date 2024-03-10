@@ -11,12 +11,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - For `pyuploadcare.transformations.image.ImageTransformation`:
-  - `text` method to allow adding [text overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-text) to images.
+  - `text()` method to allow adding [text overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-text) to images.
+  - `rect()` method to allow adding [solid color overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-solid) to images.
 
 ### Changed
 
 - For `pyuploadcare.transformations.image.ImageTransformation`:
-  - `overlay_width` and `overlay_height` parameters are now optional for the `overlay` and `overlay_self` methods.
+  - `overlay_width` and `overlay_height` parameters are now optional for the `overlay()` and `overlay_self()` methods.
 
 
 ## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - 2024-03-02

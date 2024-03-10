@@ -306,6 +306,29 @@ def test_text():
     )
 
 
+def test_rect():
+    transformation = (
+        ImageTransformation()
+        .preview(440, 440)
+        .rect(
+            color="ff000080",
+            overlay_width="50%",
+            overlay_height="33%",
+            offset_x="50%",
+            offset_y="50%",
+        )
+        .rect(
+            color="00ff0080",
+            overlay_width="33p",
+            overlay_height="50p",
+            offset=OverlayOffset.center,
+        )
+    )
+    assert str(transformation) == (
+        "preview/440x440/-/rect/ff000080/50px33p/50p,50p/-/rect/00ff0080/33px50p/center/"
+    )
+
+
 def test_image_autorotate():
     transformation = ImageTransformation().preview().autorotate(False)
     assert str(transformation) == "preview/-/autorotate/no/"
