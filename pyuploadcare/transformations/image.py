@@ -413,7 +413,7 @@ class ImageTransformation(BaseTransformation):
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-self
         """
         return self.overlay(
-            "self",
+            uuid="self",
             overlay_width=overlay_width,
             overlay_height=overlay_height,
             offset=offset,
@@ -425,8 +425,8 @@ class ImageTransformation(BaseTransformation):
     def text(
         self,
         text: str,
-        overlay_width: str,
-        overlay_height: str,
+        overlay_width: Union[str, int],
+        overlay_height: Union[str, int],
         offset: Optional[OverlayOffset] = None,
         offset_x: Optional[str] = None,
         offset_y: Optional[str] = None,
@@ -443,22 +443,27 @@ class ImageTransformation(BaseTransformation):
         """
 
         if horizontal_alignment and vertical_alignment:
-            self._text_align(horizontal_alignment, vertical_alignment)
+            self._text_align(
+                horizontal_alignment=horizontal_alignment,
+                vertical_alignment=vertical_alignment,
+            )
 
         if font_size or font_color:
-            self._font(font_size, font_color)
+            self._font(font_size=font_size, font_color=font_color)
 
         if box_mode:
-            self._text_box(box_mode, box_color, box_padding)
+            self._text_box(
+                box_mode=box_mode, box_color=box_color, box_padding=box_padding
+            )
 
-        parameters: List[str] = [
-            *self._get_parameters_for_overlay_position(
-                overlay_width, overlay_height, offset, offset_x, offset_y
-            ),
-            self._escape_text(text),
-        ]
-
-        self.set("text", parameters)
+        self._text(
+            text=text,
+            overlay_width=overlay_width,
+            overlay_height=overlay_height,
+            offset=offset,
+            offset_x=offset_x,
+            offset_y=offset_y,
+        )
         return self
 
     def _text_align(
@@ -501,6 +506,28 @@ class ImageTransformation(BaseTransformation):
         if box_padding:
             parameters.append(str(box_padding))
         self.set("text_box", parameters)
+        return self
+
+    def _text(
+        self,
+        text: str,
+        overlay_width: Union[str, int],
+        overlay_height: Union[str, int],
+        offset: Optional[OverlayOffset],
+        offset_x: Optional[str],
+        offset_y: Optional[str],
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
+        """
+        parameters: List[str] = [
+            *self._get_parameters_for_overlay_position(
+                overlay_width, overlay_height, offset, offset_x, offset_y
+            ),
+            self._escape_text(text),
+        ]
+
+        self.set("text", parameters)
         return self
 
     def autorotate(self, enabled=True) -> "ImageTransformation":
