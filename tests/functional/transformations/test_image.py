@@ -12,6 +12,7 @@ from pyuploadcare.transformations.image import (
     ScaleCropMode,
     SRGBConversion,
     StretchMode,
+    StripMetaMode,
     TextBoxMode,
     VerticalTextAlignment,
 )
@@ -88,6 +89,12 @@ def test_image_progressive():
     )
 
     assert str(transformation) == "preview/-/quality/best/-/progressive/yes/"
+
+
+def test_strip_meta():
+    transformation = ImageTransformation().strip_meta(mode=StripMetaMode.all)
+
+    assert str(transformation) == "strip_meta/all/"
 
 
 def test_image_gif2video():

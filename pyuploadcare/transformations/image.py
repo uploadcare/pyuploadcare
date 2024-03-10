@@ -52,6 +52,12 @@ class ImageQuality(StrEnum):
     smart_retina = "smart_retina"
 
 
+class StripMetaMode(StrEnum):
+    all = "all"
+    none = "none"
+    sensitive = "sensitive"
+
+
 class Gif2VideoFormat(StrEnum):
     mp4 = "mp4"
     webm = "webm"
@@ -244,6 +250,13 @@ class ImageTransformation(BaseTransformation):
 
     def progressive(self, is_progressive=True) -> "ImageTransformation":
         self.set("progressive", ["yes" if is_progressive else "no"])
+        return self
+
+    def strip_meta(self, mode: StripMetaMode) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/compression/#meta-information-control
+        """
+        self.set("strip_meta", [mode])
         return self
 
     def gif2video(self) -> "ImageTransformation":
