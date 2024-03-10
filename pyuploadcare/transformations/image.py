@@ -349,6 +349,28 @@ class ImageTransformation(BaseTransformation):
         self.set("sharp", parameters)
         return self
 
+    def _get_parameters_for_overlay_position(
+        self,
+        overlay_width: Union[str, int],
+        overlay_height: Union[str, int],
+        offset: Optional[OverlayOffset],
+        offset_x: Optional[Union[str, int]],
+        offset_y: Optional[Union[str, int]],
+    ) -> List[str]:
+        """
+        relative_dimensions and relative_coordinates for overlays.
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-image
+        """
+
+        parameters: List[str] = [f"{overlay_width}x{overlay_height}"]
+
+        if offset:
+            parameters.append(str(offset))
+        else:
+            parameters.append(f"{offset_x},{offset_y}")
+
+        return parameters
+
     def overlay(
         self,
         uuid: str,
@@ -361,13 +383,10 @@ class ImageTransformation(BaseTransformation):
     ) -> "ImageTransformation":
         parameters: List[str] = [
             uuid,
-            f"{overlay_width}x{overlay_height}",
+            *self._get_parameters_for_overlay_position(
+                overlay_width, overlay_height, offset, offset_x, offset_y
+            ),
         ]
-
-        if offset:
-            parameters.append(str(offset))
-        else:
-            parameters.append(f"{offset_x},{offset_y}")
 
         if strength is not None:
             parameters.append(f"{strength}p")
@@ -384,21 +403,15 @@ class ImageTransformation(BaseTransformation):
         offset_y: Optional[Union[str, int]] = None,
         strength: Optional[int] = None,
     ) -> "ImageTransformation":
-        parameters: List[str] = [
+        return self.overlay(
             "self",
-            f"{overlay_width}x{overlay_height}",
-        ]
-
-        if offset:
-            parameters.append(offset)
-        else:
-            parameters.append(f"{offset_x},{offset_y}")
-
-        if strength is not None:
-            parameters.append(f"{strength}p")
-
-        self.set("overlay", parameters)
-        return self
+            overlay_width=overlay_width,
+            overlay_height=overlay_height,
+            offset=offset,
+            offset_x=offset_x,
+            offset_y=offset_y,
+            strength=strength,
+        )
 
     def text(
         self,
@@ -429,16 +442,14 @@ class ImageTransformation(BaseTransformation):
         if box_mode:
             self._text_box(box_mode, box_color, box_padding)
 
-        parameters: List[str] = [f"{overlay_width}x{overlay_height}"]
-        if offset:
-            parameters.append(offset)
-        else:
-            parameters.append(f"{offset_x},{offset_y}")
-        parameters.append(
+        parameters: List[str] = [
+            *self._get_parameters_for_overlay_position(
+                overlay_width, overlay_height, offset, offset_x, offset_y
+            ),
             self._escape_text(text),
-        )
-        self.set("text", parameters)
+        ]
 
+        self.set("text", parameters)
         return self
 
     def _text_align(
