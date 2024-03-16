@@ -16,6 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `strip_meta()` method to [control the presence of EXIF metadata](https://uploadcare.com/docs/transformations/image/compression/#meta-information-control) in the resulting image.
   - `border_radius()` method to [add rounded corners](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-border-radius).
   - `zoom_objects()` method to [zoom in on objects](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects).
+  - `rasterize()` method to [rasterize SVG images](https://uploadcare.com/docs/transformations/image/svg/).
 
 ### Changed
 

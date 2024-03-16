@@ -282,6 +282,10 @@ class ImageTransformation(BaseTransformation):
         self.set("format", [image_format])
         return self
 
+    def rasterize(self) -> "ImageTransformation":
+        self.set("rasterize", [])
+        return self
+
     def quality(self, image_quality: ImageQuality) -> "ImageTransformation":
         self.set("quality", [image_quality])
         return self

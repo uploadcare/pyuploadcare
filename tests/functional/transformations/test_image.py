@@ -96,6 +96,11 @@ def test_zoom_objects():
     assert str(transformation) == "zoom_objects/50/"
 
 
+def test_rasterize():
+    transformation = ImageTransformation().rasterize().blur(20)
+    assert str(transformation) == "rasterize/-/blur/20/"
+
+
 def test_image_progressive():
     transformation = (
         ImageTransformation()
