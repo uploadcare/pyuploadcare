@@ -91,6 +91,11 @@ def test_setfill():
     assert str(transformation) == "setfill/ece3d2/-/format/jpeg/"
 
 
+def test_zoom_objects():
+    transformation = ImageTransformation().zoom_objects(50)
+    assert str(transformation) == "zoom_objects/50/"
+
+
 def test_image_progressive():
     transformation = (
         ImageTransformation()

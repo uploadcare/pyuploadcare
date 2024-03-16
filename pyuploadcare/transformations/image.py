@@ -271,6 +271,13 @@ class ImageTransformation(BaseTransformation):
         self.set("setfill", [color])
         return self
 
+    def zoom_objects(self, amount: int) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects
+        """
+        self.set("zoom_objects", [str(amount)])
+        return self
+
     def format(self, image_format: ImageFormat) -> "ImageTransformation":
         self.set("format", [image_format])
         return self
