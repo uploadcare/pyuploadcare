@@ -21,8 +21,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - For `pyuploadcare.transformations.image.ImageTransformation`:
-  - `overlay_width` and `overlay_height` parameters are now optional for the `overlay()` and `overlay_self()` methods.
+  - The `overlay()` and `overlay_self()` methods now treat `overlay_width` and `overlay_height` parameters as optional.
+  - Unified `gif2video()`, `gif2video_format()`, and `gif2video_quality()` methods into a single `gif2video()` method. The `format` and `quality` parameters can now be accepted directly in the `gif2video()` method.
 
+### Deprecated
+
+- For `pyuploadcare.transformations.image.ImageTransformation`:
+  - Deprecated the separate `gif2video_format` and `gif2video_quality` methods. Please use the `format` and `quality` parameters directly in the `gif2video` method for setting these properties.
 
 ## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - 2024-03-02
 

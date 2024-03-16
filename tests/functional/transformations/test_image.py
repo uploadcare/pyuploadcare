@@ -119,11 +119,9 @@ def test_strip_meta():
 
 
 def test_image_gif2video():
-    transformation = (
-        ImageTransformation()
-        .gif2video()
-        .gif2video_quality(Gif2VideoQuality.lighter)
-        .gif2video_format(Gif2VideoFormat.webm)
+    transformation = ImageTransformation().gif2video(
+        format=Gif2VideoFormat.webm,
+        quality=Gif2VideoQuality.lighter,
     )
 
     assert str(transformation) == "gif2video/-/quality/lighter/-/format/webm/"

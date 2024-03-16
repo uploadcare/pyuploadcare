@@ -1,3 +1,4 @@
+import warnings
 from typing import List, Optional, Union
 
 from pyuploadcare.transformations.base import BaseTransformation, StrEnum
@@ -301,21 +302,52 @@ class ImageTransformation(BaseTransformation):
         self.set("strip_meta", [mode])
         return self
 
-    def gif2video(self) -> "ImageTransformation":
+    def gif2video(
+        self,
+        format: Optional[Gif2VideoFormat] = None,
+        quality: Optional[Gif2VideoQuality] = None,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/gif-to-video/
+        """
         self.set("gif2video", [])
+        if format:
+            self._gif2video_format(format)
+        if quality:
+            self._gif2video_quality(quality)
         return self
 
-    def gif2video_format(
+    def _gif2video_format(
         self, format: Gif2VideoFormat
     ) -> "ImageTransformation":
         self.set("format", [format])
         return self
 
-    def gif2video_quality(
+    def _gif2video_quality(
         self, quality: Gif2VideoQuality
     ) -> "ImageTransformation":
         self.set("quality", [quality])
         return self
+
+    def gif2video_format(
+        self, format: Gif2VideoFormat
+    ) -> "ImageTransformation":
+        warnings.warn(
+            "The method `gif2video_format` is deprecated. "
+            "Use the `format` parameter of `gif2video` instead.",
+            DeprecationWarning,
+        )
+        return self._gif2video_format(format)
+
+    def gif2video_quality(
+        self, quality: Gif2VideoQuality
+    ) -> "ImageTransformation":
+        warnings.warn(
+            "The method `gif2video_quality` is deprecated. "
+            "Use the `quality` parameter of `gif2video` instead.",
+            DeprecationWarning,
+        )
+        return self._gif2video_quality(quality)
 
     def adjust_color(
         self, adjustment: ColorAdjustment, value: Optional[int] = None
