@@ -235,6 +235,19 @@ def test_file_get_converted_document_group(uploadcare):
 
 
 @pytest.mark.vcr
+def test_file_detect_faces(uploadcare):
+    file = uploadcare.file("5128ec65-9957-47b8-a6ad-4c2f172ef660")
+    faces = file.detect_faces()
+    assert faces
+    assert len(faces) == 3
+    face = faces[0]
+    assert face.x == 482
+    assert face.y == 105
+    assert face.width == 199
+    assert face.height == 271
+
+
+@pytest.mark.vcr
 def test_file_info_has_new_structure(uploadcare):
     """
     Test new structure of response since API v0.7

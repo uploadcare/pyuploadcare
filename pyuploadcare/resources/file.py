@@ -2,12 +2,13 @@ import dataclasses
 import logging
 import re
 import time
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 from uuid import UUID
 
 from pyuploadcare.api.entities import (
     DocumentConvertFormatInfo,
     DocumentConvertInfo,
+    Face,
     VideoConvertInfo,
 )
 from pyuploadcare.exceptions import (
@@ -498,6 +499,10 @@ class File:
         )
         group_id = response.format.converted_groups[format]
         return self._client.file_group(group_id)
+
+    def detect_faces(self) -> List[Face]:
+        response = self._client.url_api.detect_faces(self.uuid)
+        return response.faces
 
 
 class FileFromUrl:
