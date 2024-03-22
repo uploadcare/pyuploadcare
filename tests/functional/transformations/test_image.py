@@ -124,10 +124,10 @@ def test_image_gif2video():
         quality=Gif2VideoQuality.lighter,
     )
 
-    assert str(transformation) == "gif2video/-/quality/lighter/-/format/webm/"
+    assert str(transformation) == "gif2video/-/format/webm/-/quality/lighter/"
 
     assert transformation.path("af0136cc-c60a-49a3-a10f-f9319f0ce7e1") == (
-        "af0136cc-c60a-49a3-a10f-f9319f0ce7e1/gif2video/-/quality/lighter/-/format/webm/"
+        "af0136cc-c60a-49a3-a10f-f9319f0ce7e1/gif2video/-/format/webm/-/quality/lighter/"
     )
 
 
