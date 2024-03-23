@@ -517,9 +517,9 @@ class MetadataAPI(API):
 
 class AddonsAPI(API):
     resource_type = "addons"
-    request_type: Type[
+    request_type: Type[AddonExecutionGeneralRequestData] = (
         AddonExecutionGeneralRequestData
-    ] = AddonExecutionGeneralRequestData
+    )
     response_classes = {
         "execute": responses.AddonExecuteResponse,
         "status": responses.AddonResponse,
