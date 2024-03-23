@@ -14,8 +14,7 @@ from pyuploadcare.api.entities import (
 )
 
 
-class Response(BaseModel):
-    ...
+class Response(BaseModel): ...
 
 
 class EntityListResponse(Response):
