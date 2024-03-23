@@ -295,6 +295,10 @@ class ImageTransformation(BaseTransformation):
         self.set("progressive", ["yes" if is_progressive else "no"])
         return self
 
+    def detect_faces(self) -> "ImageTransformation":
+        self.set("detect_faces", [])
+        return self
+
     def strip_meta(self, mode: StripMetaMode) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/compression/#meta-information-control
@@ -664,4 +668,5 @@ class ImageTransformation(BaseTransformation):
     def path(self, file_id: str) -> str:
         path_ = super().path(file_id)
         path_ = path_.replace("/-/gif2video", "/gif2video")
+        path_ = path_.replace("/-/detect_faces", "/detect_faces")
         return path_

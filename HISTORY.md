@@ -10,6 +10,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- For `File`:
+  - `detect_faces()` method to [detect faces in images](https://uploadcare.com/docs/intelligence/face-detection/).
 - For `ImageTransformation`:
   - `text()` method to allow adding [text overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-text) to images.
   - `rect()` method to allow adding [solid color overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-solid) to images.
@@ -17,8 +19,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `border_radius()` method to [add rounded corners](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-border-radius).
   - `zoom_objects()` method to [zoom in on objects](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects).
   - `rasterize()` method to [rasterize SVG images](https://uploadcare.com/docs/transformations/image/svg/).
-- For `File`:
-  - `detect_faces()` method to [detect faces in images](https://uploadcare.com/docs/intelligence/face-detection/).
+  - `detect_faces()` method, which provides [face detection in images](https://uploadcare.com/docs/intelligence/face-detection/). While `ImageTransformation.detect_faces()` ensures consistency within the `ImageTransformation` API, you are more likely to use `File.detect_faces()` to obtain face detection results.
 
 ### Changed
 

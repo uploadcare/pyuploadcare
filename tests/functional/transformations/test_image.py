@@ -112,6 +112,16 @@ def test_image_progressive():
     assert str(transformation) == "preview/-/quality/best/-/progressive/yes/"
 
 
+def test_detect_faces():
+    transformation = ImageTransformation().detect_faces()
+
+    assert str(transformation) == "detect_faces/"
+
+    assert transformation.path("af0136cc-c60a-49a3-a10f-f9319f0ce7e1") == (
+        "af0136cc-c60a-49a3-a10f-f9319f0ce7e1/detect_faces/"
+    )
+
+
 def test_strip_meta():
     transformation = ImageTransformation().strip_meta(mode=StripMetaMode.all)
 
