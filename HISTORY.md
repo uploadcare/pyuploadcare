@@ -6,6 +6,16 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.2](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.0.2) - unreleased
+
+### Changed
+
+- [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.36.0](https://github.com/uploadcare/blocks/releases)
+
+### Fixed
+
+- Django forms: Any modifications made in an image editor are now correctly restored when editing the same image again. Previously, the editor state was not restored, and the original image was displayed instead. [via uploadcare/blocks#615](https://github.com/uploadcare/blocks/issues/615).
+
 ## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - 2024-03-02
 
 ### Changed

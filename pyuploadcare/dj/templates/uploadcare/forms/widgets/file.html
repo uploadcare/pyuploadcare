@@ -5,11 +5,11 @@
             {% if options.multiple == "true" %}
                 {# FileGroup #}
                 {% for file in value %}
-                    uploaderCtx.addFileFromUuid("{{ file.uuid }}")
+                    uploaderCtx.addFileFromCdnUrl("{{ file.cdn_url }}")
                 {% endfor %}
             {% else %}
                 {# File #}
-                uploaderCtx.addFileFromUuid("{{ value.uuid }}")
+                uploaderCtx.addFileFromCdnUrl("{{ value.cdn_url }}")
             {% endif %}
         });
     </script>
