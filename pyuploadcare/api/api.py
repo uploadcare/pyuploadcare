@@ -574,3 +574,19 @@ class AddonsAPI(API):
         json_response = self._client.get(url).json()
         response = self._parse_response(json_response, response_class)
         return cast(responses.AddonResponse, response)
+
+
+class URLAPI(API):
+    resource_type = ""
+    response_classes = {
+        "detect_faces": entities.ImageInfoWithFaces,
+    }
+
+    def detect_faces(
+        self, file_uuid: Union[UUID, str]
+    ) -> entities.ImageInfoWithFaces:
+        url = self._build_url(file_uuid, suffix="detect_faces/")
+        response_class = self._get_response_class("detect_faces")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(entities.ImageInfoWithFaces, response)

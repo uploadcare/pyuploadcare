@@ -1,3 +1,4 @@
+import warnings
 from typing import List, Optional, Union
 
 from pyuploadcare.transformations.base import BaseTransformation, StrEnum
@@ -31,10 +32,15 @@ class ScaleCropMode(StrEnum):
 
 
 class ImageFormat(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/compression/#operation-format
+    """
+
     jpeg = "jpeg"
     png = "png"
     webp = "webp"
     auto = "auto"
+    preserve = "preserve"
 
 
 class ImageQuality(StrEnum):
@@ -45,6 +51,12 @@ class ImageQuality(StrEnum):
     lightest = "lightest"
     smart = "smart"
     smart_retina = "smart_retina"
+
+
+class StripMetaMode(StrEnum):
+    all = "all"
+    none = "none"
+    sensitive = "sensitive"
 
 
 class Gif2VideoFormat(StrEnum):
@@ -127,6 +139,37 @@ class OverlayOffset(StrEnum):
     center = "center"  # type: ignore
 
 
+class HorizontalTextAlignment(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/overlay/#text-alignment
+    """
+
+    left = "left"
+    center = "center"  # type: ignore
+    right = "right"
+
+
+class VerticalTextAlignment(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/overlay/#text-alignment
+    """
+
+    top = "top"
+    center = "center"  # type: ignore
+    bottom = "bottom"
+
+
+class TextBoxMode(StrEnum):
+    """
+    https://uploadcare.com/docs/transformations/image/overlay/#text-background-box
+    """
+
+    none = "none"
+    fit = "fit"
+    line = "line"
+    fill = "fill"
+
+
 class ImageTransformation(BaseTransformation):
     def preview(
         self,
@@ -194,12 +237,54 @@ class ImageTransformation(BaseTransformation):
         self.set("scale_crop", parameters)
         return self
 
+    def border_radius(
+        self,
+        radii: Union[int, str, List[Union[int, str]]],
+        vertical_radii: Optional[
+            Union[int, str, List[Union[int, str]]]
+        ] = None,
+    ) -> "ImageTransformation":
+        def _format_radii(
+            radii: Union[int, str, List[Union[int, str]]]
+        ) -> str:
+            """
+            >>> _format_radii(10)
+            '10'
+            >>> _format_radii([10, "20%"])
+            '10,20p'
+            """
+            radii_as_list: List[str] = (
+                [str(r) for r in radii]
+                if isinstance(radii, list)
+                else [str(radii)]
+            )
+            return ",".join(self._escape_percent(r) for r in radii_as_list)
+
+        parameters: List[str] = [_format_radii(radii)]
+
+        if vertical_radii:
+            parameters.append(_format_radii(vertical_radii))
+
+        self.set("border_radius", parameters)
+        return self
+
     def setfill(self, color: str) -> "ImageTransformation":
         self.set("setfill", [color])
         return self
 
+    def zoom_objects(self, amount: int) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects
+        """
+        self.set("zoom_objects", [str(amount)])
+        return self
+
     def format(self, image_format: ImageFormat) -> "ImageTransformation":
         self.set("format", [image_format])
+        return self
+
+    def rasterize(self) -> "ImageTransformation":
+        self.set("rasterize", [])
         return self
 
     def quality(self, image_quality: ImageQuality) -> "ImageTransformation":
@@ -210,21 +295,63 @@ class ImageTransformation(BaseTransformation):
         self.set("progressive", ["yes" if is_progressive else "no"])
         return self
 
-    def gif2video(self) -> "ImageTransformation":
-        self.set("gif2video", [])
+    def detect_faces(self) -> "ImageTransformation":
+        self.set("detect_faces", [])
         return self
 
-    def gif2video_format(
+    def strip_meta(self, mode: StripMetaMode) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/compression/#meta-information-control
+        """
+        self.set("strip_meta", [mode])
+        return self
+
+    def gif2video(
+        self,
+        format: Optional[Gif2VideoFormat] = None,
+        quality: Optional[Gif2VideoQuality] = None,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/gif-to-video/
+        """
+        self.set("gif2video", [])
+        if format:
+            self._gif2video_format(format)
+        if quality:
+            self._gif2video_quality(quality)
+        return self
+
+    def _gif2video_format(
         self, format: Gif2VideoFormat
     ) -> "ImageTransformation":
         self.set("format", [format])
         return self
 
-    def gif2video_quality(
+    def _gif2video_quality(
         self, quality: Gif2VideoQuality
     ) -> "ImageTransformation":
         self.set("quality", [quality])
         return self
+
+    def gif2video_format(
+        self, format: Gif2VideoFormat
+    ) -> "ImageTransformation":
+        warnings.warn(
+            "The method `gif2video_format` is deprecated. "
+            "Use the `format` parameter of `gif2video` instead.",
+            DeprecationWarning,
+        )
+        return self._gif2video_format(format)
+
+    def gif2video_quality(
+        self, quality: Gif2VideoQuality
+    ) -> "ImageTransformation":
+        warnings.warn(
+            "The method `gif2video_quality` is deprecated. "
+            "Use the `quality` parameter of `gif2video` instead.",
+            DeprecationWarning,
+        )
+        return self._gif2video_quality(quality)
 
     def adjust_color(
         self, adjustment: ColorAdjustment, value: Optional[int] = None
@@ -313,25 +440,54 @@ class ImageTransformation(BaseTransformation):
         self.set("sharp", parameters)
         return self
 
+    def _get_parameters_for_overlay_position(
+        self,
+        overlay_width: Optional[Union[str, int]],
+        overlay_height: Optional[Union[str, int]],
+        offset: Optional[OverlayOffset],
+        offset_x: Optional[Union[str, int]],
+        offset_y: Optional[Union[str, int]],
+    ) -> List[str]:
+        """
+        relative_dimensions and relative_coordinates for overlays.
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-image
+        """
+
+        parameters: List[str] = []
+        if overlay_width is not None and overlay_height is not None:
+            overlay_width = self._escape_percent(overlay_width)
+            overlay_height = self._escape_percent(overlay_height)
+            parameters.append(f"{overlay_width}x{overlay_height}")
+
+        if offset:
+            parameters.append(str(offset))
+        elif offset_x is not None and offset_y is not None:
+            offset_x = self._escape_percent(offset_x)
+            offset_y = self._escape_percent(offset_y)
+            parameters.append(f"{offset_x},{offset_y}")
+
+        return parameters
+
     def overlay(
         self,
         uuid: str,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
+        overlay_width: Optional[Union[str, int]] = None,
+        overlay_height: Optional[Union[str, int]] = None,
         offset: Optional[OverlayOffset] = None,
         offset_x: Optional[Union[str, int]] = None,
         offset_y: Optional[Union[str, int]] = None,
         strength: Optional[int] = None,
     ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-image
+        """
+
         parameters: List[str] = [
             uuid,
-            f"{overlay_width}x{overlay_height}",
+            *self._get_parameters_for_overlay_position(
+                overlay_width, overlay_height, offset, offset_x, offset_y
+            ),
         ]
-
-        if offset:
-            parameters.append(str(offset))
-        else:
-            parameters.append(f"{offset_x},{offset_y}")
 
         if strength is not None:
             parameters.append(f"{strength}p")
@@ -341,27 +497,154 @@ class ImageTransformation(BaseTransformation):
 
     def overlay_self(
         self,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
+        overlay_width: Optional[Union[str, int]] = None,
+        overlay_height: Optional[Union[str, int]] = None,
         offset: Optional[OverlayOffset] = None,
         offset_x: Optional[Union[str, int]] = None,
         offset_y: Optional[Union[str, int]] = None,
         strength: Optional[int] = None,
     ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-self
+        """
+        return self.overlay(
+            uuid="self",
+            overlay_width=overlay_width,
+            overlay_height=overlay_height,
+            offset=offset,
+            offset_x=offset_x,
+            offset_y=offset_y,
+            strength=strength,
+        )
+
+    def text(
+        self,
+        text: str,
+        overlay_width: Union[str, int],
+        overlay_height: Union[str, int],
+        offset: Optional[OverlayOffset] = None,
+        offset_x: Optional[str] = None,
+        offset_y: Optional[str] = None,
+        horizontal_alignment: Optional[HorizontalTextAlignment] = None,
+        vertical_alignment: Optional[VerticalTextAlignment] = None,
+        font_size: Optional[int] = None,
+        font_color: Optional[str] = None,
+        box_mode: Optional[TextBoxMode] = None,
+        box_color: Optional[str] = None,
+        box_padding: Optional[int] = None,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
+        """
+
+        if horizontal_alignment and vertical_alignment:
+            self._text_align(
+                horizontal_alignment=horizontal_alignment,
+                vertical_alignment=vertical_alignment,
+            )
+
+        if font_size or font_color:
+            self._font(font_size=font_size, font_color=font_color)
+
+        if box_mode:
+            self._text_box(
+                box_mode=box_mode, box_color=box_color, box_padding=box_padding
+            )
+
+        self._text(
+            text=text,
+            overlay_width=overlay_width,
+            overlay_height=overlay_height,
+            offset=offset,
+            offset_x=offset_x,
+            offset_y=offset_y,
+        )
+        return self
+
+    def _text_align(
+        self,
+        horizontal_alignment: HorizontalTextAlignment,
+        vertical_alignment: VerticalTextAlignment,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#text-alignment
+        """
+        self.set("text_align", [horizontal_alignment, vertical_alignment])
+        return self
+
+    def _font(
+        self, font_size: Optional[int], font_color: Optional[str]
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#font-size-and-color
+        """
+        parameters: List[str] = []
+        if font_size:
+            parameters.append(str(font_size))
+        if font_color:
+            parameters.append(font_color)
+        self.set("font", parameters)
+        return self
+
+    def _text_box(
+        self,
+        box_mode: TextBoxMode,
+        box_color: Optional[str],
+        box_padding: Optional[int],
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#text-background-box
+        """
+        parameters: List[str] = [box_mode]
+        if box_color:
+            parameters.append(box_color)
+        if box_padding:
+            parameters.append(str(box_padding))
+        self.set("text_box", parameters)
+        return self
+
+    def _text(
+        self,
+        text: str,
+        overlay_width: Union[str, int],
+        overlay_height: Union[str, int],
+        offset: Optional[OverlayOffset],
+        offset_x: Optional[str],
+        offset_y: Optional[str],
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
+        """
         parameters: List[str] = [
-            "self",
-            f"{overlay_width}x{overlay_height}",
+            *self._get_parameters_for_overlay_position(
+                overlay_width, overlay_height, offset, offset_x, offset_y
+            ),
+            self._escape_text(text),
         ]
 
-        if offset:
-            parameters.append(offset)
-        else:
-            parameters.append(f"{offset_x},{offset_y}")
+        self.set("text", parameters)
+        return self
 
-        if strength is not None:
-            parameters.append(f"{strength}p")
+    def rect(
+        self,
+        color: str,
+        overlay_width: Union[str, int],
+        overlay_height: Union[str, int],
+        offset: Optional[OverlayOffset] = None,
+        offset_x: Optional[str] = None,
+        offset_y: Optional[str] = None,
+    ) -> "ImageTransformation":
+        """
+        https://uploadcare.com/docs/transformations/image/overlay/#overlay-solid
+        """
+        parameters: List[str] = [
+            color,
+            *self._get_parameters_for_overlay_position(
+                overlay_width, overlay_height, offset, offset_x, offset_y
+            ),
+        ]
 
-        self.set("overlay", parameters)
+        self.set("rect", parameters)
         return self
 
     def autorotate(self, enabled=True) -> "ImageTransformation":
@@ -385,4 +668,5 @@ class ImageTransformation(BaseTransformation):
     def path(self, file_id: str) -> str:
         path_ = super().path(file_id)
         path_ = path_.replace("/-/gif2video", "/gif2video")
+        path_ = path_.replace("/-/detect_faces", "/detect_faces")
         return path_

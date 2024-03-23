@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import List, Optional, Union
+from urllib.parse import quote
 
 from typing_extensions import Self
 
@@ -27,6 +28,14 @@ class BaseTransformation:
             effect += "/" + "/".join(parameters)
         self._effects.append(effect)
         return self
+
+    def _escape_percent(self, value: Union[str, int]) -> str:
+        return str(value).replace("%", "p")
+
+    def _escape_text(self, value: str) -> str:
+        return quote(
+            value.replace("~", "~~").replace("/", "~s").replace("\n", "~n")
+        )
 
     def _prefix(self, file_id: str) -> str:
         return f"{file_id}/"

@@ -3,6 +3,7 @@ from pyuploadcare.transformations.image import (
     CropAlignment,
     Gif2VideoFormat,
     Gif2VideoQuality,
+    HorizontalTextAlignment,
     ImageFilter,
     ImageFormat,
     ImageQuality,
@@ -11,6 +12,9 @@ from pyuploadcare.transformations.image import (
     ScaleCropMode,
     SRGBConversion,
     StretchMode,
+    StripMetaMode,
+    TextBoxMode,
+    VerticalTextAlignment,
 )
 
 
@@ -68,12 +72,33 @@ def test_image_scale_crop():
     assert str(transformation) == "scale_crop/1024x1024/center/"
 
 
+def test_border_radius():
+    transformation = (
+        ImageTransformation()
+        .border_radius("10%")
+        .border_radius([10, "20", "40%", "80p"], "30%")
+    )
+    assert str(transformation) == (
+        "border_radius/10p/-/border_radius/10,20,40p,80p/30p/"
+    )
+
+
 def test_setfill():
     transformation = (
         ImageTransformation().setfill("ece3d2").format(ImageFormat.jpeg)
     )
 
     assert str(transformation) == "setfill/ece3d2/-/format/jpeg/"
+
+
+def test_zoom_objects():
+    transformation = ImageTransformation().zoom_objects(50)
+    assert str(transformation) == "zoom_objects/50/"
+
+
+def test_rasterize():
+    transformation = ImageTransformation().rasterize().blur(20)
+    assert str(transformation) == "rasterize/-/blur/20/"
 
 
 def test_image_progressive():
@@ -87,18 +112,32 @@ def test_image_progressive():
     assert str(transformation) == "preview/-/quality/best/-/progressive/yes/"
 
 
-def test_image_gif2video():
-    transformation = (
-        ImageTransformation()
-        .gif2video()
-        .gif2video_quality(Gif2VideoQuality.lighter)
-        .gif2video_format(Gif2VideoFormat.webm)
-    )
+def test_detect_faces():
+    transformation = ImageTransformation().detect_faces()
 
-    assert str(transformation) == "gif2video/-/quality/lighter/-/format/webm/"
+    assert str(transformation) == "detect_faces/"
 
     assert transformation.path("af0136cc-c60a-49a3-a10f-f9319f0ce7e1") == (
-        "af0136cc-c60a-49a3-a10f-f9319f0ce7e1/gif2video/-/quality/lighter/-/format/webm/"
+        "af0136cc-c60a-49a3-a10f-f9319f0ce7e1/detect_faces/"
+    )
+
+
+def test_strip_meta():
+    transformation = ImageTransformation().strip_meta(mode=StripMetaMode.all)
+
+    assert str(transformation) == "strip_meta/all/"
+
+
+def test_image_gif2video():
+    transformation = ImageTransformation().gif2video(
+        format=Gif2VideoFormat.webm,
+        quality=Gif2VideoQuality.lighter,
+    )
+
+    assert str(transformation) == "gif2video/-/format/webm/-/quality/lighter/"
+
+    assert transformation.path("af0136cc-c60a-49a3-a10f-f9319f0ce7e1") == (
+        "af0136cc-c60a-49a3-a10f-f9319f0ce7e1/gif2video/-/format/webm/-/quality/lighter/"
     )
 
 
@@ -199,7 +238,7 @@ def test_image_unsharp():
     assert str(transformation) == "scale_crop/880x600/-/blur/200/-120/"
 
 
-def tes_image_sharp():
+def test_image_sharp():
     transformation = ImageTransformation().preview(600, 600).sharp(20)
     assert str(transformation) == "preview/600x600/-/sharp/20/"
 
@@ -277,6 +316,52 @@ def test_overlay_self():
     )
     assert str(transformation) == (
         "scale_crop/440x440/center/-/blur/60/-/gamma/50/-/overlay/self/100px100p/center/"
+    )
+
+
+def test_text():
+    transformation = (
+        ImageTransformation()
+        .preview(440, 440)
+        .text(
+            "Up~load\nca/re 👍",
+            overlay_width="80p",
+            overlay_height="80p",
+            offset=OverlayOffset.center,
+            horizontal_alignment=HorizontalTextAlignment.right,
+            vertical_alignment=VerticalTextAlignment.bottom,
+            font_size=20,
+            font_color="fff",
+            box_mode=TextBoxMode.fill,
+            box_color="fcba0355",
+        )
+    )
+    assert str(transformation) == (
+        "preview/440x440/-/text_align/right/bottom/-/font/20/fff/-/text_box/fill/fcba0355/"
+        "-/text/80px80p/center/Up~~load~nca~sre%20%F0%9F%91%8D/"
+    )
+
+
+def test_rect():
+    transformation = (
+        ImageTransformation()
+        .preview(440, 440)
+        .rect(
+            color="ff000080",
+            overlay_width="50%",
+            overlay_height="33%",
+            offset_x="50%",
+            offset_y="50%",
+        )
+        .rect(
+            color="00ff0080",
+            overlay_width="33p",
+            overlay_height="50p",
+            offset=OverlayOffset.center,
+        )
+    )
+    assert str(transformation) == (
+        "preview/440x440/-/rect/ff000080/50px33p/50p,50p/-/rect/00ff0080/33px50p/center/"
     )
 
 
