@@ -7,8 +7,7 @@ from httpx import Auth, Request, Response
 from httpx._utils import to_bytes, to_str
 
 
-class AuthBase(Auth):
-    ...
+class AuthBase(Auth): ...
 
 
 class UploadcareSimpleAuth(AuthBase):
@@ -28,9 +27,9 @@ class UploadcareSimpleAuth(AuthBase):
         if "Content-Type" not in request.headers:
             request.headers["Content-Type"] = "application/json"
 
-        request.headers[
-            "Accept"
-        ] = f"application/vnd.uploadcare-v{self.api_version}+json"
+        request.headers["Accept"] = (
+            f"application/vnd.uploadcare-v{self.api_version}+json"
+        )
         request.headers["Authorization"] = self._build_auth_header(
             request, self.public_key, self.secret_key
         )
@@ -56,9 +55,9 @@ class UploadcareAuth(UploadcareSimpleAuth):
         if "Content-Type" not in request.headers:
             request.headers["Content-Type"] = "application/json"
 
-        request.headers[
-            "Accept"
-        ] = f"application/vnd.uploadcare-v{self.api_version}+json"
+        request.headers["Accept"] = (
+            f"application/vnd.uploadcare-v{self.api_version}+json"
+        )
         request.headers["Authorization"] = self._build_auth_header(
             request, self.public_key, self.secret_key, formated_date_time
         )
