@@ -10,8 +10,7 @@ from typing_extensions import Annotated, Literal, NamedTuple
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
 
-class Entity(BaseModel):
-    ...
+class Entity(BaseModel): ...
 
 
 class IDEntity(Entity):

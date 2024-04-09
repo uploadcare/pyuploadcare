@@ -2,6 +2,7 @@
 max-line-length = 100
 max-complexity = 5
 exclude = .venv,venv,**/migrations/*,snapshots
+extend-ignore = E203,E701
 per-file-ignores =
     tests/**: S101
     **/tests/**: S101

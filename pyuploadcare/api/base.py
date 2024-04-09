@@ -118,8 +118,7 @@ class APIProtocol(Protocol):
         self,
         raw_resource: Dict[str, Any],
         response_class: Type[ResponseOrEntity],
-    ) -> ResponseOrEntity:
-        ...
+    ) -> ResponseOrEntity: ...
 
     def _build_url(
         self,
@@ -127,40 +126,33 @@ class APIProtocol(Protocol):
         base: Optional[str] = None,
         suffix: Optional[str] = None,
         query_parameters: Optional[Dict[str, Any]] = None,
-    ) -> str:
-        ...
+    ) -> str: ...
 
     def _get_response_class(
         self, action: str
-    ) -> Union[Type[Response], Type[Entity]]:
-        ...
+    ) -> Union[Type[Response], Type[Entity]]: ...
 
-    def _post(self, data: Optional[Dict] = None) -> Dict[str, Any]:
-        ...
+    def _post(self, data: Optional[Dict] = None) -> Dict[str, Any]: ...
 
     def _get(
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         **query_parameters,
-    ) -> Dict[str, Any]:
-        ...
+    ) -> Dict[str, Any]: ...
 
     def _put(
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
         data: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
-        ...
+    ) -> Dict[str, Any]: ...
 
     def _delete(
         self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def _delete_with_response(
         self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
-    ) -> Dict[str, Any]:
-        ...
+    ) -> Dict[str, Any]: ...
 
 
 class RetrieveMixin(APIProtocol):
