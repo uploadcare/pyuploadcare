@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyuploadcare"
-version = "5.0.1"
+version = "5.1.0"
 description = "Python library for Uploadcare.com"
 authors = ["Uploadcare Inc <hello@uploadcare.com>"]
 readme = "README.md"
