@@ -27,6 +27,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - For `ImageTransformation`:
   - The `overlay()` and `overlay_self()` methods now treat `overlay_width` and `overlay_height` parameters as optional.
   - Unified `gif2video()`, `gif2video_format()`, and `gif2video_quality()` methods into a single `gif2video()` method. The `format` and `quality` parameters can now be accepted directly in the `gif2video()` method.
+- [Black](https://black.readthedocs.io/) dev dependency has been updated to 24.3.0.
 
 ### Fixed
 
