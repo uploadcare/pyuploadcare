@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.1.0](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.1.0) - unreleased
+## [5.1.0](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.1.0) - 2024-04-09
 
 ### Added
 
@@ -23,9 +23,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.36.0](https://github.com/uploadcare/blocks/releases)
 - For `ImageTransformation`:
   - The `overlay()` and `overlay_self()` methods now treat `overlay_width` and `overlay_height` parameters as optional.
   - Unified `gif2video()`, `gif2video_format()`, and `gif2video_quality()` methods into a single `gif2video()` method. The `format` and `quality` parameters can now be accepted directly in the `gif2video()` method.
+
+### Fixed
+
+- Django forms: Any modifications made in an image editor are now correctly restored when editing the same image again. Previously, the editor state was not restored, and the original image was displayed instead. [via uploadcare/blocks#615](https://github.com/uploadcare/blocks/issues/615).
 
 ### Deprecated
 
@@ -37,6 +42,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.33.2](https://github.com/uploadcare/blocks/releases)
+
 ### Fixed
 
 - The SSL context is now cached by default, resulting in significant performance improvements when initializing the `Uploadcare` class frequently. [#279](https://github.com/uploadcare/pyuploadcare/issues/279)

@@ -9,7 +9,10 @@ You can use pyuploadcare in any Python project. You need to pass
 your project keys to ``Uploadcare`` client::
 
     from pyuploadcare import Uploadcare
-    uploadcare = Uploadcare(public_key='<your public key>', secret_key='<your private key>')
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        secret_key='<your private key>'
+    )
 
 
 Uploading files
@@ -24,6 +27,20 @@ direct or multipart upload method will be chosen::
 Upload file from url::
 
     ucare_file: File = uploadcare.upload("https://github.githubassets.com/images/modules/logos_page/Octocat.png")
+
+Use ``upload_from_url`` or ``upload_from_url_sync`` to access additional parameters, such as ``check_duplicates`` and ``save_duplicates``, when uploading from url::
+
+    file_from_url: FileFromUrl = uploadcare.upload_from_url(
+        "https://github.githubassets.com/images/modules/logos_page/Octocat.png",
+        store=True,
+        filename="octocat.png",
+        check_duplicates=True,
+        save_duplicates=True,
+    )
+
+    ucare_file: File = uploadcare.upload_from_url_sync(
+        "https://github.githubassets.com/images/modules/logos_page/Octocat.png",
+    )
 
 Upload multiple files. Direct upload method is used::
 
