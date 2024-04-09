@@ -28,6 +28,7 @@ from pyuploadcare.api import (
     VideoConvertAPI,
     WebhooksAPI,
 )
+from pyuploadcare.api.api import URLAPI
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook, WebhookEvent
@@ -150,6 +151,19 @@ class Uploadcare:
             public_key=public_key,
         )
 
+        self.cdn_client = Client(
+            base_url=cdn_base,
+            verify=(
+                DEFAULT_SSL_CONTEXT
+                if verify_upload_ssl is True
+                else verify_upload_ssl
+            ),
+            timeout=timeout,
+            user_agent_extension=user_agent_extension,
+            retry_throttled=retry_throttled,
+            public_key=public_key,
+        )
+
         api_config = {
             "public_key": public_key,
             "secret_key": secret_key,
@@ -168,6 +182,7 @@ class Uploadcare:
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
         self.metadata_api = MetadataAPI(client=self.rest_client, **api_config)  # type: ignore
         self.addons_api = AddonsAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.url_api = URLAPI(client=self.cdn_client, **api_config)
 
     def file(
         self,

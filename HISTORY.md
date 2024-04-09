@@ -6,15 +6,36 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.0.2](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.0.2) - unreleased
+## [5.1.0](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.1.0) - 2024-04-09
+
+### Added
+
+- For `File`:
+  - `detect_faces()` method to [detect faces in images](https://uploadcare.com/docs/intelligence/face-detection/).
+- For `ImageTransformation`:
+  - `text()` method to allow adding [text overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-text) to images.
+  - `rect()` method to allow adding [solid color overlays](https://uploadcare.com/docs/transformations/image/overlay/#overlay-solid) to images.
+  - `strip_meta()` method to [control the presence of EXIF metadata](https://uploadcare.com/docs/transformations/image/compression/#meta-information-control) in the resulting image.
+  - `border_radius()` method to [add rounded corners](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-border-radius).
+  - `zoom_objects()` method to [zoom in on objects](https://uploadcare.com/docs/transformations/image/resize-crop/#operation-zoom-objects).
+  - `rasterize()` method to [rasterize SVG images](https://uploadcare.com/docs/transformations/image/svg/).
+  - `detect_faces()` method, which provides [face detection in images](https://uploadcare.com/docs/intelligence/face-detection/). While `ImageTransformation.detect_faces()` ensures consistency within the `ImageTransformation` API, you are more likely to use `File.detect_faces()` to obtain face detection results.
 
 ### Changed
 
 - [Blocks](https://github.com/uploadcare/blocks) have been updated to [v0.36.0](https://github.com/uploadcare/blocks/releases)
+- For `ImageTransformation`:
+  - The `overlay()` and `overlay_self()` methods now treat `overlay_width` and `overlay_height` parameters as optional.
+  - Unified `gif2video()`, `gif2video_format()`, and `gif2video_quality()` methods into a single `gif2video()` method. The `format` and `quality` parameters can now be accepted directly in the `gif2video()` method.
 
 ### Fixed
 
 - Django forms: Any modifications made in an image editor are now correctly restored when editing the same image again. Previously, the editor state was not restored, and the original image was displayed instead. [via uploadcare/blocks#615](https://github.com/uploadcare/blocks/issues/615).
+
+### Deprecated
+
+- For `ImageTransformation`:
+  - Deprecated the separate `gif2video_format` and `gif2video_quality` methods. Please use the `format` and `quality` parameters directly in the `gif2video` method for setting these properties.
 
 ## [5.0.1](https://github.com/uploadcare/pyuploadcare/compare/v5.0.0...v5.0.1) - 2024-03-02
 
@@ -50,14 +71,14 @@ Additionally, please take note that some settings have been renamed in this upda
 - [Pydantic](https://docs.pydantic.dev) has been updated to Version 2. Projects dependent on Pydantic Version 1 may encounter errors due to incompatibility between Versions 1 and 2.
 - Removed `tox.ini`. The recommended method for running tests locally is now through [act](https://github.com/nektos/act) with Docker.
 
-- for Django settings (`UPLOADCARE = {...}`):
+- For Django settings (`UPLOADCARE = {...}`):
   - `widget_*` settings were renamed and moved:
     - `UPLOADCARE["widget_version"]` to `UPLOADCARE["legacy_widget"]["version"]`
     - `UPLOADCARE["widget_build"]` to `UPLOADCARE["legacy_widget"]["build"]`
     - `UPLOADCARE["widget_variant"]` to `UPLOADCARE["legacy_widget"]["build"]` (this is not a typo: former `widget_build` and `widget_variant` settings were equialent)
     - `UPLOADCARE["widget_url"]` to `UPLOADCARE["legacy_widget"]["override_js_url"]` and works regardless of `use_hosted_assets` value.
 
-- for `pyuploadcare.dj.conf`:
+- For `pyuploadcare.dj.conf`:
   - Individual variables were moved into one dict called `config`. If you've accessed these settings from `pyuploadcare.dj.conf` module in your code, please migrate:
     - `pub_key` to `config["pub_key"]`
     - `secret` to `config["secret"]`
@@ -72,7 +93,7 @@ Additionally, please take note that some settings have been renamed in this upda
     - `hosted_url`
     - `local_url`
 
-- for `pyuploadcare.dj.forms`:
+- For `pyuploadcare.dj.forms`:
   - `FileWidget` renamed to `LegacyFileWidget`. `FileWidget` is an all-new implementation now.
   - By default, `FileWidget` is used. To use `LegacyFileWidget`, please set `UPLOADCARE["use_legacy_widget"]` to `True`
 

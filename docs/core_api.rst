@@ -318,7 +318,7 @@ To check status of performed task use `status` method::
 
     addon_task_status = uploadcare.addons_api.status(request_id, addon)
 
-If addon execution produces new data for file (like an AWS recognition does), this data will be placed at `appdata` complex attribute of `File.info` (see `addons documentation`_)
+If addon execution produces new data for file (like an AWS recognition does), this data will be placed at `appdata` complex attribute of `File.info` (see `addons documentation`_)::
 
     file.update_info(include_appdata=True)
     print(file.info["appdata"]["aws_rekognition_detect_labels"])
@@ -436,6 +436,8 @@ or by image transformation builder::
     >>> file_.cdn_url
     https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/grayscale/-/flip/
 
+To check out the list of available transformations, please refer to the `URL`_ API reference and to `ImageTransformation`_ class source code.
+
 
 Useful links
 ------------
@@ -455,3 +457,4 @@ Useful links
 .. _addons documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Add-Ons
 .. _metadata documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-metadata
 .. _file uploader: https://uploadcare.com/products/file-uploader/?utm_source=github&utm_campaign=pyuploadcare
+.. _ImageTransformation: https://github.com/uploadcare/pyuploadcare/blob/main/pyuploadcare/transformations/image.py

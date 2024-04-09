@@ -1,0 +1,46 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - ucarecdn.com
+      user-agent:
+      - PyUploadcare/5.0.1/demopublickey (CPython/3.11.7)
+    method: GET
+    uri: https://ucarecdn.com/5128ec65-9957-47b8-a6ad-4c2f172ef660/detect_faces//
+  response:
+    content: '{"id": "5128ec65-9957-47b8-a6ad-4c2f172ef660", "orientation": null,
+      "format": "JPEG", "height": 450, "width": 1200, "geo_location": null, "datetime_original":
+      null, "dpi": null, "faces": [[482, 105, 199, 271], [74, 124, 194, 261], [890,
+      54, 260, 316]]}'
+    headers:
+      Access-Control-Allow-Methods:
+      - HEAD, GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length, Etag, X-Image-Width, X-Image-Height, X-Image-Acceptable-Original,
+        X-Image-Acceptable-Improved
+      Cache-Control:
+      - public, max-age=81270
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '252'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 22 Mar 2024 19:20:47 GMT
+      ETag:
+      - '"06166c7b7ab26e36f8cb6f4809ec20fb1d3a534c"'
+      Server:
+      - Uploadcare
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

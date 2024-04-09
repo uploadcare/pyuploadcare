@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, PrivateAttr
-from typing_extensions import Annotated, Literal
+from typing_extensions import Annotated, Literal, NamedTuple
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
@@ -52,6 +52,13 @@ class GEOPoint(Entity):
     longitude: float
 
 
+class Face(NamedTuple):
+    x: int
+    y: int
+    width: int
+    height: int
+
+
 WebhookEvent = Literal[
     "file.uploaded",
     "file.infected",  # it will be deprecated in favor of info_upldated in the future updates
@@ -62,15 +69,19 @@ WebhookEvent = Literal[
 
 
 class ImageInfo(Entity):
-    color_mode: ColorMode
+    color_mode: Optional[ColorMode] = None
     orientation: Optional[int] = None
     format: str
-    sequence: bool
+    sequence: Optional[bool] = None
     height: int
     width: int
     geo_location: Optional[GEOPoint] = None
     datetime_original: Optional[datetime] = None
     dpi: Optional[Tuple[int, int]] = None
+
+
+class ImageInfoWithFaces(ImageInfo):
+    faces: List[Face]
 
 
 class AudioStreamInfo(Entity):
