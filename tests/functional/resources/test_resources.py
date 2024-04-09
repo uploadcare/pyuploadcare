@@ -123,10 +123,9 @@ def test_file_upload_by_url_callback(vcr, uploadcare):
 
 @pytest.mark.vcr
 def test_file_upload_multiple(small_file, small_file2, uploadcare):
-    with (
-        open(small_file.name, mode="rb") as file1,
-        open(small_file2.name, mode="rb") as file2,
-    ):
+    with open(small_file.name, mode="rb") as file1, open(
+        small_file2.name, mode="rb"
+    ) as file2:
         files = uploadcare.upload_files([file1, file2])
         created_filenames = [file.filename for file in files]
         assert sorted(created_filenames) == sorted(
