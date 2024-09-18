@@ -131,12 +131,13 @@ def get_legacy_widget_js_url() -> str:
 
 def get_widget_js_url() -> str:
     widget_config = config["widget"]
-    filename = "file-uploader.{0}.min.js".format(widget_config["build"]).replace(
-        "..", "."
-    )
-    hosted_url = "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@{version}/web/{filename}".format(
-        version=widget_config["version"], filename=filename
-    )
+    filename = "file-uploader.{0}.min.js".format(
+        widget_config["build"]
+    ).replace("..", ".")
+    hosted_url = (
+        "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@{version}"
+        + "/web/{filename}"
+    ).format(version=widget_config["version"], filename=filename)
     local_url = "uploadcare/{filename}".format(filename=filename)
     override_url = widget_config["override_js_url"]
     if override_url:
@@ -152,9 +153,10 @@ def get_widget_css_url(variant: WidgetVariantType) -> str:
     filename = "uc-file-uploader-{0}.{1}.min.css".format(
         variant, widget_config["build"]
     ).replace("..", ".")
-    hosted_url = "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@{version}/web/{filename}".format(
-        version=widget_config["version"], filename=filename
-    )
+    hosted_url = (
+        "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@{version}"
+        + "/web/{filename}"
+    ).format(version=widget_config["version"], filename=filename)
     local_url = "uploadcare/{filename}".format(filename=filename)
     override_url = widget_config["override_css_url"][variant]
     if override_url:

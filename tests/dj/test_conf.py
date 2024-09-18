@@ -76,7 +76,9 @@ class GetWidgetAssetsTest(unittest.TestCase):
 
     def test_local_js_url(self):
         config["use_hosted_assets"] = False
-        self.assertEqual(get_widget_js_url(), "uploadcare/file-uploader.min.js")
+        self.assertEqual(
+            get_widget_js_url(), "uploadcare/file-uploader.min.js"
+        )
 
     def test_override_js_url(self):
         config["widget"]["override_js_url"] = "https://example.com/blocks.js"
@@ -86,7 +88,8 @@ class GetWidgetAssetsTest(unittest.TestCase):
         config["use_hosted_assets"] = True
         self.assertEqual(
             get_widget_css_url("minimal"),
-            "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/uc-file-uploader-minimal.min.css"
+            "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1"
+            + "/web/uc-file-uploader-minimal.min.css",
         )
 
     def test_local_css_url(self):
