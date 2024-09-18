@@ -58,17 +58,22 @@ PyUploadcare takes assets from CDN by default, e.g.:
 
 .. code-block:: html
 
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/uc-file-uploader-regular.min.css"
+    >
+
+
     <script type="module">
-        import * as LR from "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.x/web/blocks.min.js";
-        LR.registerBlocks(LR);
+        import * as UC from "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/file-uploader.min.js";
+        UC.defineComponents(UC);
     </script>
 
     <!-- ... -->
 
-    <lr-file-uploader-inline
-        css-src="https://cdn.jsdelivr.net/npm/@uploadcare/blocks@0.x/web/lr-file-uploader-regular.min.css"
+    <uc-file-uploader-inline
         ctx-name="my-uploader"
-    ></lr-file-uploader-inline>
+    ></uc-file-uploader-inline>
 
 If you don't want to use hosted assets you have to turn off this feature:
 
@@ -91,9 +96,9 @@ widget url:
         "widget": {
             "override_js_url": "http://path.to/your/blocks.js",
             "override_css_url": {
-                "regular": "http://path.to/your/lr-file-uploader-regular.css", 
-                "inline": "http://path.to/your/lr-file-uploader-inline.css", 
-                "minimal": "http://path.to/your/lr-file-uploader-minimal.css", 
+                "regular": "http://path.to/your/uc-file-uploader-regular.css",
+                "inline": "http://path.to/your/uc-file-uploader-inline.css",
+                "minimal": "http://path.to/your/uc-file-uploader-minimal.css",
             },
         },
     }

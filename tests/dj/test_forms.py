@@ -44,8 +44,8 @@ class FormFieldsAttributesTest(unittest.TestCase):
         f = SomeForm(label_suffix="")
         self.assertFalse(f["ff"].field.legacy_widget)
         ff_str = str(f["ff"])
-        self.assertIn("LR.registerBlocks(LR);", ff_str)
-        self.assertIn("<lr-config\n", ff_str)
+        self.assertIn("UC.defineComponents(UC);", ff_str)
+        self.assertIn("<uc-config\n", ff_str)
         self.assertIn('pubkey="asdf"', ff_str)
         self.assertIn('ctx-name="ff"', ff_str)
 
@@ -75,7 +75,7 @@ class FormFieldsAttributesTest(unittest.TestCase):
         f = SomeForm(label_suffix="")
         self.assertFalse(f["ff"].field.legacy_widget)
         ff_str = str(f["ff"])
-        self.assertIn("LR.registerBlocks(LR);", ff_str)
+        self.assertIn("UC.defineComponents(UC);", ff_str)
         self.assertIn('source-list="local"', ff_str)
 
 

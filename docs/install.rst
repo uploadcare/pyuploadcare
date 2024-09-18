@@ -128,5 +128,5 @@ In version 5.0, we introduce a new `file uploader`_, which is now the default fo
 Additionally, please take note that some settings have been renamed in this update. For example, ``UPLOADCARE["widget_version"]`` has been changed to ``UPLOADCARE["legacy_widget"]["version"]``. You can find the full list of these changes in the `changelog for version 5.0.0`_.
 
 .. _file uploader: https://uploadcare.com/docs/file-uploader/
-.. _@uploadcare/blocks: https://www.npmjs.com/package/@uploadcare/blocks
+.. _@uploadcare/file-uploader: https://www.npmjs.com/package/@uploadcare/file-uploader
 .. _changelog for version 5.0.0: https://github.com/uploadcare/pyuploadcare/blob/main/HISTORY.md#500---2023-12-28
