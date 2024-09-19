@@ -6,6 +6,11 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0](https://github.com/uploadcare/pyuploadcare/compare/v5.1.0...v6.0.0) - 2024-09-19
+
+### Changed
+- [File Uploader](https://github.com/uploadcare/file-uploader) have been updated to [v1](https://github.com/uploadcare/file-uploader/releases)
+
 ## [5.1.0](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.1.0) - 2024-04-09
 
 ### Added
