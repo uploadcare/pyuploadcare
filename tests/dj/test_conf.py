@@ -51,7 +51,7 @@ class GetWidgetAssetsTest(unittest.TestCase):
         self._original_widget = config["widget"]
         config["use_hosted_assets"] = True
         config["widget"] = {
-            "version": "latest",
+            "version": "1",
             "variant": "inline",
             "build": "",
             "options": {},
@@ -71,12 +71,14 @@ class GetWidgetAssetsTest(unittest.TestCase):
         config["use_hosted_assets"] = True
         self.assertEqual(
             get_widget_js_url(),
-            "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@latest/web/blocks.js",
+            "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1/web/file-uploader.min.js",
         )
 
     def test_local_js_url(self):
         config["use_hosted_assets"] = False
-        self.assertEqual(get_widget_js_url(), "uploadcare/blocks.js")
+        self.assertEqual(
+            get_widget_js_url(), "uploadcare/file-uploader.min.js"
+        )
 
     def test_override_js_url(self):
         config["widget"]["override_js_url"] = "https://example.com/blocks.js"
@@ -86,15 +88,15 @@ class GetWidgetAssetsTest(unittest.TestCase):
         config["use_hosted_assets"] = True
         self.assertEqual(
             get_widget_css_url("minimal"),
-            "https://cdn.jsdelivr.net/npm/@uploadcare/blocks@latest"
-            + "/web/lr-file-uploader-minimal.css",
+            "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@1"
+            + "/web/uc-file-uploader-minimal.min.css",
         )
 
     def test_local_css_url(self):
         config["use_hosted_assets"] = False
         self.assertEqual(
             get_widget_css_url("minimal"),
-            "uploadcare/lr-file-uploader-minimal.css",
+            "uploadcare/uc-file-uploader-minimal.min.css",
         )
 
     def test_override_css_url(self):

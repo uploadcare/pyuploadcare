@@ -16,32 +16,32 @@
 {% endif %}
 
 <div style="position: relative; display: flex;">
+    <link rel="stylesheet" href="{{ uploadcare_css }}" >
 
     <script type="module">
-        import * as LR from "{{ uploadcare_js }}";
-        LR.registerBlocks(LR);
+        import * as UC from "{{ uploadcare_js }}";
+        UC.defineComponents(UC);
     </script>
 
-    <lr-config
+    <uc-config
         ctx-name="{{ name }}"
         pubkey="{{ pub_key }}"
         {% for k, v in options.items %}
         {{ k|escape }}="{{ v|escape }}"{% endfor %}
-    ></lr-config>
+    ></uc-config>
 
-    <lr-upload-ctx-provider
+    <uc-upload-ctx-provider
         id="uploaderctx_{{ name }}"
         ctx-name="{{ name }}"
-    ></lr-upload-ctx-provider>
+    ></uc-upload-ctx-provider>
 
-    <lr-file-uploader-{{ variant }}
-        css-src="{{ uploadcare_css }}"
+    <uc-file-uploader-{{ variant }}
         ctx-name="{{ name }}"
     >
-        <lr-form-input
+        <uc-form-input
             ctx-name="{{ name }}"
-        ></lr-form-input>
-    </lr-file-uploader-{{ variant }}>
+        ></uc-form-input>
+    </uc-file-uploader-{{ variant }}>
 
 
 </div>
