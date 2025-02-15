@@ -196,3 +196,7 @@ jobs:
       - name: Test with pytest
         run: |
           make test-integration
+        env:
+          UPLOADCARE_PUBLIC_KEY: ${{ secrets.UPLOADCARE_PUBLIC_KEY }}
+          UPLOADCARE_SECRET_KEY: ${{ secrets.UPLOADCARE_SECRET_KEY }}
+

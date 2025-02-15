@@ -58,8 +58,8 @@ def big_file(temp_directory):
 
 @pytest.fixture(scope="session")
 def setup_settings():
-    conf.pub_key = "demopublickey"
-    conf.secret = "demosecretkey"
+    conf.pub_key = os.environ.get("UPLOADCARE_PUBLIC_KEY", "demopublickey")
+    conf.secret = os.environ.get("UPLOADCARE_SECRET_KEY", "demosecretkey")
     conf.api_version = "0.7"
     conf.api_base = "https://api.uploadcare.com/"
     conf.upload_base = "https://upload.uploadcare.com/"
@@ -88,9 +88,9 @@ def vcr_config():
 @pytest.fixture(scope="module")
 def uploadcare(setup_settings):
     uc = Uploadcare(
-        public_key="demopublickey",
-        secret_key="demosecretkey",
-        api_version=conf.api_version,
+        public_key=setup_settings.pub_key,
+        secret_key=setup_settings.secret,
+        api_version=setup_settings.api_version,
         multipart_min_file_size=setup_settings.multipart_min_file_size,
         multipart_chunk_size=setup_settings.multipart_chunk_size,
     )
