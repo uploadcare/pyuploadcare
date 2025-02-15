@@ -130,7 +130,7 @@ DetailsType = TypeVar(
 
 class ApplicationDataBase(Entity):
     data: Optional[Union[Dict[str, Any], ApllicationDataDetails]] = Field(
-        default_factory=dict
+        default_factory=lambda: {}
     )
     version: str
     datetime_created: datetime
