@@ -2,14 +2,15 @@
     <script>
         window.addEventListener('DOMContentLoaded', (e) => {
             const uploaderCtx = document.querySelector('#uploaderctx_{{ name }}');
+            const api = uploaderCtx.getAPI();
             {% if options.multiple == "true" %}
                 {# FileGroup #}
                 {% for file in value %}
-                    uploaderCtx.addFileFromCdnUrl("{{ file.cdn_url }}")
+                    api.addFileFromCdnUrl("{{ file.cdn_url }}")
                 {% endfor %}
             {% else %}
                 {# File #}
-                uploaderCtx.addFileFromCdnUrl("{{ value.cdn_url }}")
+                api.addFileFromCdnUrl("{{ value.cdn_url }}")
             {% endif %}
         });
     </script>
