@@ -36,7 +36,10 @@ Django = {version = ">=2.2", optional = true}
 [tool.poetry.extras]
 django = ["Django"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.4"
 black = "^24.3.0"
 isort = "^5.13.2"

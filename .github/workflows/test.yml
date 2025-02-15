@@ -32,7 +32,7 @@ jobs:
           virtualenvs-in-project: false
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --with dev
       - name: Run linters
         run: make lint
 
@@ -59,7 +59,7 @@ jobs:
           virtualenvs-in-project: false
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --with dev
       - name: Test with pytest
         run: |
           make test-functional
@@ -92,7 +92,7 @@ jobs:
           virtualenvs-in-project: false
       - name: install dependencies
         run: |
-          poetry install
+          poetry install --with dev
       - name: install specific django version
         run: |
           poetry run pip install django~=${{ matrix.django-version }}
@@ -133,7 +133,7 @@ jobs:
           virtualenvs-in-project: false
       - name: install dependencies
         run: |
-          poetry install
+          poetry install --with dev
       - name: install specific django version
         run: |
           poetry run pip install django~=${{ matrix.django-version }}
@@ -164,7 +164,7 @@ jobs:
           virtualenvs-in-project: false
       - name: install dependencies
         run: |
-          poetry install
+          poetry install --with dev
       - name: install specific django version
         run: |
           poetry run pip install django~=${{ matrix.django-version }}
@@ -192,7 +192,7 @@ jobs:
           virtualenvs-in-project: false
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --with dev
       - name: Test with pytest
         run: |
           make test-integration
