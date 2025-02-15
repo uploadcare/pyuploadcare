@@ -58,7 +58,7 @@ def test_sync_uuids(sync_path, uploadcare):
 
     main(
         arg_namespace(
-            f"--pub_key demopublickey --secret demosecretkey "
+            f"--pub_key {uploadcare.public_key} --secret {uploadcare.secret_key} "
             f"sync --no-input {sync_path} --uuids {' '.join(uuids)}"
         )
     )
@@ -84,7 +84,7 @@ def test_sync_patterns(sync_path, uploadcare):
 
     main(
         arg_namespace(
-            "--pub_key demopublickey --secret demosecretkey "
+            f"--pub_key {uploadcare.public_key} --secret {uploadcare.secret_key} "
             "sync --no-input {} --uuids {}".format(
                 sync_path + "/${uuid}_${ext}", " ".join(uuids)
             )
