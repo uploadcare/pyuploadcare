@@ -269,6 +269,10 @@ or you can use API directly to convert single or multiple files::
 
     document_convert_status = uploadcare.document_convert_api.status(document_convert_info.token)
 
+Determine the document format and possible conversion formats::
+
+    uuid = '740e1b8c-1ad8-4324-b7ec-112c79d8eac2'
+    uploadcare.document_convert_api.retrieve(uuid)
 
 File actions (addons)
 ---------------------
