@@ -25,7 +25,7 @@ classifiers = [
 ucare = 'pyuploadcare.ucare_cli.main:main'
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
+python = ">=3.9,<3.12.9"
 httpx = "^0.28.1"
 pydantic = {extras = ["email"], version = "^2.5.2"}
 python-dateutil = "^2.8.2"
@@ -51,7 +51,7 @@ coverage = "^7.3.3"
 pytest-cov = "^4.1.0"
 python-coveralls = "^2.9.3"
 types-python-dateutil = "^2.8.19.14"
-types-pytz = "^2023.3.1.1"
+types-pytz = "^2025.1.0.20250204"
 Sphinx = "^7.1.2"
 sphinx-argparse = "^0.4.0"
 types-dataclasses = "^0.6.6"
