@@ -29,7 +29,7 @@ python = "^3.8.1"
 httpx = "^0.28.1"
 pydantic = {extras = ["email"], version = "^2.5.2"}
 python-dateutil = "^2.8.2"
-pytz = "^2023.3.post1"
+pytz = "^2025.1"
 typing-extensions = "^4.9.0"
 Django = {version = ">=2.2", optional = true}
 
@@ -54,7 +54,10 @@ coverage = "^7.3.3"
 pytest-cov = "^4.1.0"
 python-coveralls = "^2.9.3"
 types-python-dateutil = "^2.8.19.14"
-types-pytz = "^2023.3.1.1"
+types-pytz = [
+  {version="^2024.2.0.20241221", python = ">=3.8,<3.9"},
+  {version="^2025.1.0.20250204", python = ">=3.9"},
+]
 Sphinx = "^7.1.2"
 sphinx-argparse = "^0.4.0"
 types-dataclasses = "^0.6.6"
