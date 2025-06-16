@@ -5,6 +5,7 @@ Configuration variables.
 """
 import os
 
+from pyuploadcare.api.utils import get_cname_prefix
 
 # Do not import vars from this module.
 # Instead import whole module and work with attributes.
@@ -21,7 +22,10 @@ api_base = os.getenv("UPLOADCARE_API_BASE", "https://api.uploadcare.com/")
 upload_base = os.getenv(
     "UPLOADCARE_UPLOAD_BASE", "https://upload.uploadcare.com/"
 )
-cdn_base = os.getenv("UPLOADCARE_CDN_BASE", "https://ucarecdn.com/")
+prefix = get_cname_prefix(pub_key)
+cdn_base = os.getenv("UPLOADCARE_CDN_BASE",
+                     f"https://{prefix}.ucarecd.net/")
+
 signed_uploads = True
 signed_uploads_ttl = 60
 
