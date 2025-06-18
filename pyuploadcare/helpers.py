@@ -1,28 +1,12 @@
+import string
+import hashlib
 import mimetypes
 import os
-from typing import IO, Any, Dict, Iterable, List, TypeVar, Union
-
-from pyuploadcare import File
+from typing import IO, Any, Dict, Iterable, List, TypeVar
 
 
 def get_file_size(file_object: IO) -> int:
     return os.fstat(file_object.fileno()).st_size
-
-
-def extracts_uuids(files: Iterable[Union[str, File]]) -> List[str]:
-    uuids: List[str] = []
-
-    for file_ in files:
-        if isinstance(file_, File):
-            uuids.append(file_.uuid)
-        elif isinstance(file_, str):
-            uuids.append(file_)
-        else:
-            raise ValueError(
-                "Invalid type for sequence item: {0}".format(type(file_))
-            )
-
-    return uuids
 
 
 T = TypeVar("T")
@@ -68,3 +52,36 @@ def deep_update(
             else:
                 updated_mapping[k] = v
     return updated_mapping
+
+
+def base36encode(number):
+    if number == 0:
+        return '0'
+    alphabet = string.digits + string.ascii_lowercase
+    base36 = ''
+    while number > 0:
+        number, i = divmod(number, 36)
+        base36 = alphabet[i] + base36
+    return base36
+
+
+def get_cname_prefix(pub_key: str):
+    CNAME_PREFIX_LEN = 10
+    sha256_hex = hashlib.sha256(pub_key.encode()).hexdigest()
+    sha256_base36 = base36encode(
+        number=int(sha256_hex, 16)
+    )
+    prefix = sha256_base36[:CNAME_PREFIX_LEN]
+    return prefix
+
+
+def get_cdn_base(pub_key: str, default: str, subdomains: bool) -> str:
+    cdn_base = os.getenv("UPLOADCARE_CDN_BASE")
+    if cdn_base is not None:
+        return cdn_base
+
+    if subdomains and pub_key:
+        prefix = get_cname_prefix(pub_key)
+        return f"https://{prefix}.ucarecd.net/"
+
+    return default

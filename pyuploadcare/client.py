@@ -34,7 +34,6 @@ from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import ProjectInfo, Webhook, WebhookEvent
 from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
-    extracts_uuids,
     get_file_size,
     guess_mime_type,
     iterate_over_batches,
@@ -605,8 +604,23 @@ class Uploadcare:
             file_ if isinstance(file_, File) else File(file_, self)
             for file_ in files
         )
-        uuids: List[str] = extracts_uuids(file_generator)
 
+        def __extracts_uuids(files: Iterable[Union[str, File]]) -> List[str]:
+            uuids: List[str] = []
+
+            for file_ in files:
+                if isinstance(file_, File):
+                    uuids.append(file_.uuid)
+                elif isinstance(file_, str):
+                    uuids.append(file_)
+                else:
+                    raise ValueError(
+                        "Invalid type for sequence item: {0}".format(type(file_))
+                    )
+
+            return uuids
+
+        uuids: List[str] = __extracts_uuids(file_generator)
         return uuids
 
     def store_files(self, files: Iterable[Union[str, UUID, "File"]]) -> None:

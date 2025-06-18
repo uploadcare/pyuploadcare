@@ -44,5 +44,3 @@ update_bundled_static:
 	curl "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@$${blocks_version}/web/uc-file-uploader-minimal.min.css" -o pyuploadcare/dj/static/uploadcare/uc-file-uploader-minimal.min.css; \
 	curl "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@$${blocks_version}/web/uc-file-uploader-regular.min.css" -o pyuploadcare/dj/static/uploadcare/uc-file-uploader-regular.min.css
 
-
-

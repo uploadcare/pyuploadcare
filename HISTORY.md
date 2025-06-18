@@ -6,6 +6,13 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.2.0](https://github.com/uploadcare/pyuploadcare/compare/v6.1.0...v6.2.0) - tbd
+
+### Added
+- Added support for subdomain CDN addressing.
+- Using subdomains is optional and defaults to `False`. The default will change in
+  the next major release.
+
 ## [6.1.0](https://github.com/uploadcare/pyuploadcare/compare/v6.0.0...v6.1.0) - 2025-02-15
 
 - Bumped the `httpx` dependency to `0.28.1` [#301](https://github.com/uploadcare/pyuploadcare/pull/301)
@@ -280,7 +287,7 @@ Now uses [REST API v0.7](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Ch
 ### Fixed
 
   - Akamai signed URL generation.
-  
+
 ## [3.1.0](https://github.com/uploadcare/pyuploadcare/compare/v3.0.1...v3.1.0) - 2022-10-24
 
 ### Changed
