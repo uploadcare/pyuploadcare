@@ -7,6 +7,7 @@ import os
 
 from pyuploadcare.helpers import get_cdn_base
 
+
 # Do not import vars from this module.
 # Instead import whole module and work with attributes.
 
@@ -26,11 +27,12 @@ api_version = "0.7"
 api_base = os.getenv("UPLOADCARE_API_BASE", DEFAULT_API_BASE)
 upload_base = os.getenv("UPLOADCARE_UPLOAD_BASE", DEFAULT_UPLOAD_BASE)
 
-use_subdomains = os.getenv("UPLOADCARE_USE_SUBDOMAINS",
-                           DEFAULT_USE_SUBDOMAINS).lower() in ("true", "yes")
-cdn_base = get_cdn_base(pub_key,
-                        default=DEFAULT_CDN_BASE,
-                        subdomains=use_subdomains)
+use_subdomains = os.getenv(
+    "UPLOADCARE_USE_SUBDOMAINS", DEFAULT_USE_SUBDOMAINS
+).lower() in ("true", "yes")
+cdn_base = get_cdn_base(
+    pub_key, default=DEFAULT_CDN_BASE, subdomains=use_subdomains
+)
 
 signed_uploads = True
 signed_uploads_ttl = 60

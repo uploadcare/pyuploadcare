@@ -1,8 +1,8 @@
 # coding: utf-8
 from __future__ import unicode_literals
-from urllib.parse import urlparse
 
 import unittest
+from urllib.parse import urlparse
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -88,9 +88,7 @@ class FileFieldURLTest(BaseFormFieldTest):
             "cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0"
         )
         path = urlparse(cdn_url).path
-        expected_path = (
-            "/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
-        )
+        expected_path = "/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
 
         self.assertEqual(path, expected_path)
 
@@ -99,9 +97,7 @@ class FileFieldURLTest(BaseFormFieldTest):
             "www.ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0"
         )
         path = urlparse(cdn_url).path
-        expected_path = (
-            "/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
-        )
+        expected_path = "/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
 
         self.assertEqual(path, expected_path)
 
@@ -121,9 +117,7 @@ class FileGroupFieldURLTest(BaseFormFieldTest):
         cdn_url = uc_forms.FileGroupField().clean(
             "0513dda0-582f-447d-846f-096e5df9e2bb~2"
         )
-        expected_cdn_url = (
-            "/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
-        )
+        expected_cdn_url = "/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
         path = urlparse(cdn_url).path
 
         self.assertEqual(path, expected_cdn_url)
@@ -133,9 +127,7 @@ class FileGroupFieldURLTest(BaseFormFieldTest):
             "ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
         )
         path = urlparse(cdn_url).path
-        expected_path = (
-            "/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
-        )
+        expected_path = "/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
 
         self.assertEqual(path, expected_path)
 

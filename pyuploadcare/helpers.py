@@ -1,8 +1,8 @@
-import string
 import hashlib
 import mimetypes
 import os
-from typing import IO, Any, Dict, Iterable, List, TypeVar
+import string
+from typing import IO, Any, Dict, Iterable, List, Optional, TypeVar
 
 
 def get_file_size(file_object: IO) -> int:
@@ -56,9 +56,9 @@ def deep_update(
 
 def base36encode(number):
     if number == 0:
-        return '0'
+        return "0"
     alphabet = string.digits + string.ascii_lowercase
-    base36 = ''
+    base36 = ""
     while number > 0:
         number, i = divmod(number, 36)
         base36 = alphabet[i] + base36
@@ -68,14 +68,14 @@ def base36encode(number):
 def get_cname_prefix(pub_key: str):
     CNAME_PREFIX_LEN = 10
     sha256_hex = hashlib.sha256(pub_key.encode()).hexdigest()
-    sha256_base36 = base36encode(
-        number=int(sha256_hex, 16)
-    )
+    sha256_base36 = base36encode(number=int(sha256_hex, 16))
     prefix = sha256_base36[:CNAME_PREFIX_LEN]
     return prefix
 
 
-def get_cdn_base(pub_key: str, default: str, subdomains: bool) -> str:
+def get_cdn_base(
+    pub_key: Optional[str], default: str, subdomains: bool
+) -> str:
     cdn_base = os.getenv("UPLOADCARE_CDN_BASE")
     if cdn_base is not None:
         return cdn_base
