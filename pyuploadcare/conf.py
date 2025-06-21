@@ -19,6 +19,7 @@ DEFAULT_API_BASE = "https://api.uploadcare.com/"
 DEFAULT_UPLOAD_BASE = "https://upload.uploadcare.com/"
 DEFAULT_CDN_BASE = "https://ucarecdn.com/"
 DEFAULT_USE_SUBDOMAINS = "no"
+DEFAULT_SUBDOMAIN_PATTERN = "https://{}.ucarecd.net/"
 
 pub_key = os.getenv("UPLOADCARE_PUBLIC_KEY")
 secret = os.getenv("UPLOADCARE_SECRET_KEY")
@@ -31,7 +32,10 @@ use_subdomains = os.getenv(
     "UPLOADCARE_USE_SUBDOMAINS", DEFAULT_USE_SUBDOMAINS
 ).lower() in ("true", "yes")
 cdn_base = get_cdn_base(
-    pub_key, default=DEFAULT_CDN_BASE, subdomains=use_subdomains
+    pub_key,
+    default=DEFAULT_CDN_BASE,
+    subdomains=use_subdomains,
+    subdomains_ptn=DEFAULT_SUBDOMAIN_PATTERN,
 )
 
 signed_uploads = True

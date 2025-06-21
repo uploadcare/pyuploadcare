@@ -74,7 +74,7 @@ def get_cname_prefix(pub_key: str):
 
 
 def get_cdn_base(
-    pub_key: Optional[str], default: str, subdomains: bool
+    pub_key: Optional[str], default: str, subdomains: bool, subdomains_ptn: str
 ) -> str:
     cdn_base = os.getenv("UPLOADCARE_CDN_BASE")
     if cdn_base is not None:
@@ -82,6 +82,5 @@ def get_cdn_base(
 
     if subdomains and pub_key:
         prefix = get_cname_prefix(pub_key)
-        return f"https://{prefix}.ucarecd.net/"
-
+        return subdomains_ptn.format(prefix)
     return default
