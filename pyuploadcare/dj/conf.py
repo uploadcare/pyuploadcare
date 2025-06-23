@@ -9,11 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from pyuploadcare import __version__ as library_version
-from pyuploadcare.conf import (
-    DEFAULT_CDN_BASE,
-    DEFAULT_SUBDOMAIN_PATTERN,
-    use_subdomains,
-)
+from pyuploadcare.conf import DEFAULT_CDN_BASE, DEFAULT_SUBDOMAIN_PATTERN
 from pyuploadcare.helpers import deep_update, get_cdn_base
 
 
@@ -105,7 +101,7 @@ if not config["cdn_base"]:
     config["cdn_base"] = get_cdn_base(
         config["pub_key"],
         default=DEFAULT_CDN_BASE,
-        subdomains=use_subdomains,
+        subdomains=config["subdomains"],
         subdomains_ptn=DEFAULT_SUBDOMAIN_PATTERN,
     )
 
