@@ -13,7 +13,6 @@ class BaseApiList:
     # ordering fields names which must be handled as datetime
     datetime_ordering_fields = ()
 
-    resource_api: ListCountMixin
     constructor_name: str
     resource_id_field: str
 
@@ -31,6 +30,10 @@ class BaseApiList:
         self.request_limit = request_limit
         self._count: Optional[int] = None
         self._client: "Uploadcare" = client
+
+    @property
+    def resource_api(self) -> ListCountMixin:
+        raise NotImplementedError
 
     @property
     def starting_point(self):

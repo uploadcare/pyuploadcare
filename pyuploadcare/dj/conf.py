@@ -9,7 +9,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from pyuploadcare import __version__ as library_version
-from pyuploadcare.helpers import deep_update
+from pyuploadcare.conf import DEFAULT_CDN_BASE, DEFAULT_SUBDOMAIN_PATTERN
+from pyuploadcare.helpers import deep_update, get_cdn_base
 
 
 __all__ = [
@@ -49,6 +50,7 @@ class LegacyWidgetSettingsType(typing_extensions.TypedDict):
 class SettingsType(typing_extensions.TypedDict):
     pub_key: str
     secret: str
+    subdomains: bool
     cdn_base: typing.Optional[str]
     upload_base_url: typing.Optional[str]
     signed_uploads: bool
@@ -61,6 +63,7 @@ class SettingsType(typing_extensions.TypedDict):
 DEFAULT_CONFIG: SettingsType = {
     "pub_key": "",
     "secret": "",
+    "subdomains": False,
     "cdn_base": None,
     "upload_base_url": None,
     "signed_uploads": False,
@@ -94,6 +97,13 @@ if not config["pub_key"]:
     raise ImproperlyConfigured("UPLOADCARE setting must have pub_key")
 if not config["secret"]:
     raise ImproperlyConfigured("UPLOADCARE setting must have secret")
+if not config["cdn_base"]:
+    config["cdn_base"] = get_cdn_base(
+        config["pub_key"],
+        default=DEFAULT_CDN_BASE,
+        subdomains=config["subdomains"],
+        subdomains_ptn=DEFAULT_SUBDOMAIN_PATTERN,
+    )
 
 
 user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
