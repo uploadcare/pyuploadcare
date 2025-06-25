@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.12]
+        python-version: [3.13]
 
     steps:
       - uses: actions/checkout@v4
@@ -146,10 +146,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
-        python-version: ["3.10", "3.11", "3.12"]
-        django-version: ["5.0"]
-
+        # https://docs.djangoproject.com/en/5.2/faq/install/#what-python-version-can-i-use-with-django
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        django-version: ["5.0", "5.1", "5.2"]
+        exclude:
+          - python-version: "3.13"
+            django-version: "5.0"
     steps:
       - uses: actions/checkout@v4
       - name: set up python ${{ matrix.python-version }}
@@ -199,4 +201,3 @@ jobs:
         env:
           UPLOADCARE_PUBLIC_KEY: ${{ secrets.UPLOADCARE_PUBLIC_KEY }}
           UPLOADCARE_SECRET_KEY: ${{ secrets.UPLOADCARE_SECRET_KEY }}
-

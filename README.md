@@ -8,11 +8,11 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://pyuploadcare.readthedocs.io/en/latest/">Package Docs</a> • 
-  <a href="https://uploadcare.com/docs/">Uploadcare Docs</a> • 
-  <a href="https://uploadcare.com/api-refs/upload-api/">Upload API Reference</a> • 
-  <a href="https://uploadcare.com/api-refs/rest-api/">REST API Reference</a> • 
-  <a href="https://uploadcare.com/api-refs/url-api/">URL API Reference</a> • 
+  <a href="https://pyuploadcare.readthedocs.io/en/latest/">Package Docs</a> •
+  <a href="https://uploadcare.com/docs/">Uploadcare Docs</a> •
+  <a href="https://uploadcare.com/api-refs/upload-api/">Upload API Reference</a> •
+  <a href="https://uploadcare.com/api-refs/rest-api/">REST API Reference</a> •
+  <a href="https://uploadcare.com/api-refs/url-api/">URL API Reference</a> •
   <a href="https://uploadcare.com/">Website</a>
 </p>
 
@@ -25,13 +25,17 @@
 
 Build file handling in minutes. Upload or accept user-generated content, store, transform, optimize, and deliver images, videos, and documents to billions of users.
 
-* [Description](#description)
-* [Documentation](#documentation)
-* [Installation](#installation)
-* [Requirements](#requirements)
-* [Usage](#usage)
-* [Testing](#testing)
-* [Demo app (Docker)](#demo-app)
+- [Python API client for Uploadcare](#python-api-client-for-uploadcare)
+  - [Description](#description)
+  - [Documentation](#documentation)
+  - [Installation](#installation)
+  - [Requirements](#requirements)
+  - [Usage](#usage)
+    - [Basic usage](#basic-usage)
+    - [Django integration](#django-integration)
+  - [Testing](#testing)
+  - [Demo app](#demo-app)
+  - [Suggestions and questions](#suggestions-and-questions)
 
 ## Description
 
@@ -64,7 +68,7 @@ pip install pyuploadcare[django]
 
 ## Requirements
 
-* Python 3.8, 3.9, 3.10, 3.11, 3.12
+* Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13
 
 To use pyuploadcare with Python 3.6 or 3.7 please install `pyuploadcare < 5.0`.
 
@@ -239,6 +243,6 @@ We've developed a demo app that showcases most of the features. You can install 
 
 ## Suggestions and questions
 
-[Contributing guide](https://github.com/uploadcare/.github/blob/master/CONTRIBUTING.md)  
-[Security policy](https://github.com/uploadcare/pyuploadcare/security/policy)  
-[Support](https://github.com/uploadcare/.github/blob/master/SUPPORT.md)  
+[Contributing guide](https://github.com/uploadcare/.github/blob/master/CONTRIBUTING.md)
+[Security policy](https://github.com/uploadcare/pyuploadcare/security/policy)
+[Support](https://github.com/uploadcare/.github/blob/master/SUPPORT.md)
