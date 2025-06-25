@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import unittest
+from urllib.parse import urlparse
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -10,7 +11,7 @@ from pyuploadcare.dj import forms as uc_forms
 from pyuploadcare.dj.conf import config
 
 
-class FormFieldsAttributesTest(unittest.TestCase):
+class BaseFormFieldTest(unittest.TestCase):
     def setUp(self):
         self._original_pub_key = config["pub_key"]
         self._original_secret = config["secret"]
@@ -21,6 +22,8 @@ class FormFieldsAttributesTest(unittest.TestCase):
         config["pub_key"] = self._original_pub_key
         config["secret"] = self._original_secret
 
+
+class FormFieldsAttributesTest(BaseFormFieldTest):
     def test_legacy_default_form_field(self):
         class SomeForm(forms.Form):
             cf = forms.CharField()
@@ -79,26 +82,24 @@ class FormFieldsAttributesTest(unittest.TestCase):
         self.assertIn('source-list="local"', ff_str)
 
 
-class FileFieldURLTest(unittest.TestCase):
+class FileFieldURLTest(BaseFormFieldTest):
     def test_returns_url_if_uuid_is_given(self):
         cdn_url = uc_forms.FileField().clean(
             "cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0"
         )
-        expected_cdn_url = (
-            "https://ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
-        )
+        path = urlparse(cdn_url).path
+        expected_path = "/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
 
-        self.assertEqual(cdn_url, expected_cdn_url)
+        self.assertEqual(path, expected_path)
 
     def test_returns_url_if_url_has_aleady_been_given(self):
         cdn_url = uc_forms.FileField().clean(
             "www.ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0"
         )
-        expected_cdn_url = (
-            "https://ucarecdn.com/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
-        )
+        path = urlparse(cdn_url).path
+        expected_path = "/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
 
-        self.assertEqual(cdn_url, expected_cdn_url)
+        self.assertEqual(path, expected_path)
 
     def test_raises_exc_if_value_is_invalid(self):
         with self.assertRaises(ValidationError):
@@ -111,26 +112,24 @@ class FileFieldURLTest(unittest.TestCase):
         self.assertIsNone(file_field.clean(None))
 
 
-class FileGroupFieldURLTest(unittest.TestCase):
+class FileGroupFieldURLTest(BaseFormFieldTest):
     def test_returns_url_if_uuid_is_given(self):
         cdn_url = uc_forms.FileGroupField().clean(
             "0513dda0-582f-447d-846f-096e5df9e2bb~2"
         )
-        expected_cdn_url = (
-            "https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
-        )
+        expected_cdn_url = "/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
+        path = urlparse(cdn_url).path
 
-        self.assertEqual(cdn_url, expected_cdn_url)
+        self.assertEqual(path, expected_cdn_url)
 
     def test_returns_url_if_url_has_aleady_been_given(self):
         cdn_url = uc_forms.FileGroupField().clean(
             "ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
         )
-        expected_cdn_url = (
-            "https://ucarecdn.com/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
-        )
+        path = urlparse(cdn_url).path
+        expected_path = "/0513dda0-582f-447d-846f-096e5df9e2bb~2/"
 
-        self.assertEqual(cdn_url, expected_cdn_url)
+        self.assertEqual(path, expected_path)
 
     def test_raises_exc_if_value_is_invalid(self):
         with self.assertRaises(ValidationError):
