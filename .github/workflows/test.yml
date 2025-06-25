@@ -37,8 +37,7 @@ jobs:
         run: make lint
 
   functional:
-    # temporary disabled lint requirement
-    # needs: lint
+    needs: lint
 
     runs-on: ${{ matrix.os }}
     strategy:
