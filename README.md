@@ -76,13 +76,16 @@ To use pyuploadcare with Python 2.7 please install `pyuploadcare < 3.0`.
 
 Django compatibility:
 
-| Py/Dj | 2.2 | 3.0 | 3.1 | 3.2 | 4.0 | 4.1 | 4.2 | 5.0 |
-| ----- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 3.8   | X   | X   | X   | X   | X   | X   | X   |     |
-| 3.9   | X   | X   | X   | X   | X   | X   | X   |     |
-| 3.10  |     |     |     | X   | X   | X   | X   | X   |
-| 3.11  |     |     |     |     |     | X   | X   | X   |
-| 3.12  |     |     |     |     |     |     | X   | X   |
+| Py/Dj | 2.2 | 3.0 | 3.1 | 3.2 | 4.0 | 4.1 | 4.2 | 5.0 | 5.1 | 5.2 |
+| ----- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3.8   | v   | v   | v   | v   | v   | v   | v   |     |     |     |
+| 3.9   | v   | v   | v   | v   | v   | v   | v   |     |     |     |
+| 3.10  |     |     |     | v   | v   | v   | v   | v   | v   | v   |
+| 3.11  |     |     |     |     |     | v   | v   | v   | v   | v   |
+| 3.12  |     |     |     |     |     |     | v   | v   | v   | v   |
+| 3.13  |     |     |     |     |     |     |     |     | v   | v   |
+
+*Note: See `.github/workflows/test.yml` for the exact tested matrix.*
 
 ## Usage
 
