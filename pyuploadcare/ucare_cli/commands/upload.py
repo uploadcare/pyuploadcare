@@ -38,7 +38,13 @@ def register_arguments(subparsers):
         help="Do not get uploaded file info",
     )
     subparser.add_argument(
-        "--cdnurl", action="store_true", help="Store file and get CDN url."
+        "--cdnurl", action="store_true", help="Store file and get CDN URL."
+    )
+    subparser.add_argument(
+        "--metadata",
+        nargs="*",
+        metavar="KEY=VALUE",
+        help="Attach metadata to the uploaded file as key=value pairs.",
     )
     return subparser
 
@@ -46,6 +52,17 @@ def register_arguments(subparsers):
 def upload(arg_namespace, client: Uploadcare):
     if not _check_upload_args(arg_namespace, client):
         return
+
+    metadata = None
+    if getattr(arg_namespace, "metadata", None):
+        metadata = {}
+        for item in arg_namespace.metadata:
+            if "=" not in item:
+                print(f"Invalid metadata format: {item}. Expected KEY=VALUE.")
+                continue
+            key, value = item.split("=", 1)
+            metadata[key] = value
+
     with open(arg_namespace.filename, "rb") as fh:
-        file_ = client.upload(fh)
+        file_ = client.upload(fh, metadata=metadata)
         _handle_uploaded_file(file_, arg_namespace)
