@@ -91,7 +91,8 @@ Django compatibility:
 
 After package [installation](#requirements-and-installation), you’ll need API keys: public and secret. Get them in [Uploadcare dashboard](https://app.uploadcare.com/projects/-/api-keys). If you don’t have an account yet, you can use demo keys, as in example. However, the files on demo account are regularly removed, so create an account as soon as Uploadcare catches your fancy.
 
-In these examples we’re going to use the aforementioned demo keys.
+In these examples we’re going to use the aforementioned demo keys and `ucarecdn.com` domain.
+Check your project's subdomain in the [Dashboard](https://app.uploadcare.com/projects/-/settings/#delivery).
 
 ### Basic usage
 
