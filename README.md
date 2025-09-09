@@ -91,7 +91,7 @@ Django compatibility:
 
 After package [installation](#requirements-and-installation), you’ll need API keys: public and secret. Get them in [Uploadcare dashboard](https://app.uploadcare.com/projects/-/api-keys). If you don’t have an account yet, you can use demo keys, as in example. However, the files on demo account are regularly removed, so create an account as soon as Uploadcare catches your fancy.
 
-In these examples we’re going to use the aforementioned demo keys and `ucarecdn.com` domain.
+In these examples we’re going to use the aforementioned demo keys and `demo.ucarecd.net` domain.
 Check your project's subdomain in the [Dashboard](https://app.uploadcare.com/projects/-/settings/#delivery).
 
 ### Basic usage
@@ -109,7 +109,7 @@ with open("sample-file.jpeg", "rb") as file_object:
 And your file is now uploaded to the Uploadcare CDN. But how do you access it from the web? It’s really simple:
 
 ```python
-print(ucare_file.cdn_url)  # file URL, e.g.: https://ucarecdn.com/640fe4b7-7352-42ca-8d87-0e4387957157/
+print(ucare_file.cdn_url)  # file URL, e.g.: https://demo.ucarecd.net/640fe4b7-7352-42ca-8d87-0e4387957157/
 ```
 
 And what about information about the file?
@@ -140,7 +140,7 @@ pprint(ucare_file.info)
 #  'is_ready': True,
 #  'metadata': {},
 #  'mime_type': 'image/jpeg',
-#  'original_file_url': 'https://ucarecdn.com/640fe4b7-7352-42ca-8d87-0e4387957157/samplefile.jpeg',
+#  'original_file_url': 'https://demo.ucarecd.net/640fe4b7-7352-42ca-8d87-0e4387957157/samplefile.jpeg',
 #  'original_filename': 'sample-file.jpeg',
 #  'size': 3518420,
 #  'source': None,
@@ -158,7 +158,7 @@ from pyuploadcare.transformations.image import ImageTransformation, ScaleCropMod
 ucare_file.set_effects("scale_crop/512x512/smart/")
 ucare_file.set_effects(ImageTransformation().scale_crop(512, 512, mode=ScaleCropMode.smart))
 
-print(ucare_file.cdn_url)  # https://ucarecdn.com/640fe4b7-7352-42ca-8d87-0e4387957157/-/scale_crop/512x512/smart/
+print(ucare_file.cdn_url)  # https://demo.ucarecd.net/640fe4b7-7352-42ca-8d87-0e4387957157/-/scale_crop/512x512/smart/
 ```
 
 There’s a lot more to uncover. For more information please refer to the [documentation](#documentation).
