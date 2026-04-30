@@ -1,0 +1,59 @@
+{
+  "url": "https://context7.com/uploadcare/pyuploadcare",
+  "public_key": "pk_WoigIc3LrHKMjLxnI0IA2",
+  "projectTitle": "PyUploadcare",
+  "description": "Python and Django SDK for Uploadcare Upload, REST, and URL APIs.",
+  "branch": "main",
+  "folders": [
+    "docs",
+    "pyuploadcare"
+  ],
+  "excludeFolders": [
+    ".*",
+    "build",
+    "dist",
+    "*.egg-info",
+    "htmlcov",
+    "tests",
+    "docs/_build",
+    "pyuploadcare/dj/static"
+  ],
+  "excludeFiles": [
+    "HISTORY.md",
+    "LICENSE",
+    "Makefile",
+    "lgtm.yml",
+    "mypy.ini",
+    "pytest.ini",
+    "uploadcare.ini.template"
+  ],
+  "rules": [
+    "Create clients with pyuploadcare.Uploadcare using Uploadcare public and secret API keys.",
+    "Keep Uploadcare secret keys in server-side code or environment-backed settings; never expose them to browsers.",
+    "Use pyuploadcare.dj with the UPLOADCARE Django setting when integrating File Uploader widgets or model fields.",
+    "Prefer resource methods on Uploadcare, File, and FileGroup for uploads, storage, deletion, metadata, conversions, and webhooks.",
+    "Use transformation builder classes from pyuploadcare.transformations instead of hand-writing CDN paths when possible."
+  ],
+  "previousVersions": [
+    {
+      "tag": "v6.2.0",
+      "title": "version 6.2.0"
+    },
+    {
+      "tag": "v5.1.0",
+      "title": "version 5.1.0"
+    },
+    {
+      "tag": "v4.3.0",
+      "title": "version 4.3.0"
+    },
+    {
+      "tag": "v3.2.0",
+      "title": "version 3.2.0"
+    },
+    {
+      "tag": "v2.7.0",
+      "title": "version 2.7.0"
+    }
+  ]
+}
