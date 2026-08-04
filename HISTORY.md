@@ -6,6 +6,29 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-08-03
+
+### Added
+
+- Support for [file tags](https://uploadcare.com/docs/file-tags/):
+  - `TagsAPI` (`uploadcare.tags_api`) with `get()`, `replace()` and `update()` methods, covering
+    `GET`, `PUT` and `PATCH` on `/files/{uuid}/tags/`.
+  - For `File`: a `tags` property plus `get_tags()`, `set_tags()` and `update_tags()` methods.
+  - A `tags` argument for `Uploadcare.upload()`, `Uploadcare.upload_files()` and
+    `Uploadcare.multipart_upload()`. Uploads from url do not support tags and raise
+    `InvalidParamError` instead of silently dropping them.
+  - `tags` in `FileInfo`.
+  - New `ucare` commands `get_file_tags`, `set_file_tags` and `update_file_tags`, and a `--tags`
+    option for `ucare upload`.
+  - `TagValidationError`, raised when tags exceed the API limits (50 tags per file, 100 characters
+    per tag, Latin letters, digits, `-`, `_` and `.` only).
+
+### Changed
+
+- `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key. It is
+  `None` for responses that do not report tags, such as upload responses, and `[]` for files
+  without tags.
+
 ## [6.2.1](https://github.com/uploadcare/pyuploadcare/compare/v6.2.0...v6.2.1) - 2025-09-02
 
 ### Added

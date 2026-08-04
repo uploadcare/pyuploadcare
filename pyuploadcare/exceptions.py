@@ -83,6 +83,12 @@ class MetadataValidationError(UploadcareException):
     """
 
 
+class TagValidationError(UploadcareException):
+    """
+    Raised when a tag did not satisfy the constraints
+    """
+
+
 class WebhookIsNotUnique(InvalidRequestError):
     """
     Raised while creating or updating webhook

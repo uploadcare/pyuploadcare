@@ -24,6 +24,7 @@ from pyuploadcare.api import (
     GroupsAPI,
     MetadataAPI,
     ProjectAPI,
+    TagsAPI,
     UploadAPI,
     VideoConvertAPI,
     WebhooksAPI,
@@ -180,6 +181,7 @@ class Uploadcare:
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
         self.metadata_api = MetadataAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.tags_api = TagsAPI(client=self.rest_client, **api_config)  # type: ignore
         self.addons_api = AddonsAPI(client=self.rest_client, **api_config)  # type: ignore
         self.url_api = URLAPI(client=self.cdn_client, **api_config)
 
@@ -250,6 +252,7 @@ class Uploadcare:
         size: Optional[int] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
         metadata: Optional[Dict] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> "File":
         """Uploads a file and returns ``File`` instance.
 
@@ -300,6 +303,12 @@ class Uploadcare:
                 Used for multipart uploading.
             - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
+            - tags (Optional[Iterable[str]]): Optional
+                `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
+                the uploaded file. Not supported for uploads from url; use
+                ``File.set_tags()`` for those. Note that the upload response
+                does not report tags back, so ``File.tags`` stays ``None``
+                until ``File.update_info()`` is called.
 
         Returns:
             ``File`` instance
@@ -308,6 +317,12 @@ class Uploadcare:
 
         # assume url is passed if str
         if isinstance(file_handle, str):
+            if tags is not None:
+                raise InvalidParamError(
+                    "tags are not supported for uploads from url. "
+                    "Use File.set_tags() after the upload instead"
+                )
+
             file_url: str = file_handle
             return self.upload_from_url_sync(
                 file_url,
@@ -324,7 +339,7 @@ class Uploadcare:
         # use direct upload for files less then multipart_min_file_size
         if size < self.multipart_min_file_size:
             files = self.upload_files(
-                [file_obj], store=store, common_metadata=metadata
+                [file_obj], store=store, common_metadata=metadata, tags=tags
             )
             if not files:
                 raise ValueError("Failed to get uploaded file from response")
@@ -341,6 +356,7 @@ class Uploadcare:
             size=size,
             callback=callback,
             metadata=metadata,
+            tags=tags,
         )
         return file
 
@@ -362,6 +378,7 @@ class Uploadcare:
         file_objects: List[IO],
         store: Optional[bool] = None,
         common_metadata: Optional[Dict] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> List["File"]:
         """Upload multiple files using direct upload.
 
@@ -379,6 +396,10 @@ class Uploadcare:
             - common_metadata:
                 Dict with keys and values are all strings with constraints
                 If presented it is set for each file from ``files`` collection
+            - tags (Optional[Iterable[str]]): Optional
+                `tags <https://uploadcare.com/docs/file-tags/>`_.
+                If presented they are set for each file from ``files``
+                collection.
 
         Returns:
             ``File`` instance
@@ -403,6 +424,7 @@ class Uploadcare:
             secure_upload=self.signed_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             common_metadata=common_metadata,
+            tags=tags,
         )
         ucare_files = [self.file(response[file_name]) for file_name in files]
         return ucare_files
@@ -415,6 +437,7 @@ class Uploadcare:
         mime_type: Optional[str] = None,
         callback: Optional[Callable[[UploadProgress], Any]] = None,
         metadata: Optional[Dict] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> "File":
         """Upload file straight to s3 by chunks.
 
@@ -436,6 +459,8 @@ class Uploadcare:
             - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
             - metadata (Optional[Dict]): Optional metadata
+            - tags (Optional[Iterable[str]]): Optional
+                `tags <https://uploadcare.com/docs/file-tags/>`_.
 
         Returns:
             ``File`` instance
@@ -455,6 +480,7 @@ class Uploadcare:
             secure_upload=self.signed_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             metadata=metadata,
+            tags=tags,
         )
 
         multipart_uuid = complete_response["uuid"]

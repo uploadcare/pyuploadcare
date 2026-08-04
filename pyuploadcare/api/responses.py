@@ -79,6 +79,19 @@ class GetAllMetadataResponse(RootModel, Entity):
     root: MetadataDict
 
 
+class GetFileTagsResponse(Response):
+    # https://uploadcare.com/docs/api/rest/file-tags/get-tags/
+    tags: List[str]
+
+
+class UpdateFileTagsResponse(Response):
+    # https://uploadcare.com/docs/api/rest/file-tags/put-tags/
+    # https://uploadcare.com/docs/api/rest/file-tags/patch-tags/
+    tags: List[str]
+    added: List[str]
+    deleted: List[str]
+
+
 class AddonResponseResult(Entity):
     pass
 

@@ -28,12 +28,14 @@ from pyuploadcare.api.base import (
 from pyuploadcare.exceptions import (
     APIError,
     DuplicateFileError,
+    InvalidParamError,
     InvalidRequestError,
     WebhookIsNotUnique,
 )
 
 from .entities import UUIDEntity
 from .metadata import validate_meta_key, validate_meta_value, validate_metadata
+from .tags import validate_tags
 from .utils import flatten_dict
 
 
@@ -271,6 +273,20 @@ class UploadAPI(API):
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
+    @staticmethod
+    def _set_tags(data: Dict[str, Any], tags: Optional[Iterable[str]]) -> None:
+        """Add the comma-separated `tags` form field to `data`, if any.
+
+        The field is omitted entirely when there is nothing to send.
+        """
+        if tags is None:
+            return
+
+        validated_tags = validate_tags(tags)
+
+        if validated_tags:
+            data["tags"] = ",".join(validated_tags)
+
     def upload(  # noqa: C901
         self,
         files: RequestFiles,
@@ -280,6 +296,7 @@ class UploadAPI(API):
         secret_key: Optional[str] = None,
         store: Optional[str] = "auto",
         expire: Optional[int] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> Dict[str, Any]:
         data = {}
 
@@ -291,6 +308,8 @@ class UploadAPI(API):
         if common_metadata is not None:
             validate_metadata(common_metadata)
             data.update(flatten_dict(common_metadata))
+
+        self._set_tags(data, tags)
 
         data["UPLOADCARE_PUB_KEY"] = public_key
 
@@ -318,6 +337,7 @@ class UploadAPI(API):
         store: Optional[str] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
+        tags: Optional[Iterable[str]] = None,
     ):
         data = {
             "filename": file_name,
@@ -332,6 +352,8 @@ class UploadAPI(API):
         if metadata is not None:
             validate_metadata(metadata)
             data.update(flatten_dict(metadata))
+
+        self._set_tags(data, tags)
 
         if secure_upload:
             expire = (
@@ -513,6 +535,86 @@ class MetadataAPI(API):
         json_response = self._client.get(url).json()
         response = self._parse_response(json_response, response_class).root  # type: ignore
         return cast(str, response)
+
+
+class TagsAPI(API):
+    """File tags.
+
+    https://uploadcare.com/docs/file-tags/
+    """
+
+    resource_type = "files"
+    response_classes = {
+        "get": responses.GetFileTagsResponse,
+        "replace": responses.UpdateFileTagsResponse,
+        "update": responses.UpdateFileTagsResponse,
+    }
+
+    @staticmethod
+    def _canonical_uuid(file_uuid: Union[UUID, str]) -> str:
+        """Return a canonical UUID string, rejecting anything else.
+
+        ``API._build_url`` joins the identifier with ``urljoin``, so a value
+        like ``"//example.com/x"`` or an absolute URL would replace the
+        configured API origin on an authenticated request.
+        """
+        try:
+            return str(UUID(str(file_uuid)))
+        except (AttributeError, TypeError, ValueError):
+            raise InvalidParamError(f"Invalid UUID: {file_uuid!s}")
+
+    def _tags_url(self, file_uuid: Union[UUID, str]) -> str:
+        return self._build_url(self._canonical_uuid(file_uuid), suffix="tags")
+
+    def get(self, file_uuid: Union[UUID, str]) -> List[str]:
+        """Return the tags of a file, an empty list if it has none."""
+        url = self._tags_url(file_uuid)
+        response_class = self._get_response_class("get")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.GetFileTagsResponse, response).tags
+
+    def replace(
+        self, file_uuid: Union[UUID, str], tags: Iterable[str]
+    ) -> responses.UpdateFileTagsResponse:
+        """Replace all tags of a file.
+
+        Passing an empty collection clears the tags.
+        """
+        url = self._tags_url(file_uuid)
+        data = {"tags": validate_tags(tags)}
+        response_class = self._get_response_class("replace")
+        json_response = self._client.put(url, json=data).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.UpdateFileTagsResponse, response)
+
+    def update(
+        self,
+        file_uuid: Union[UUID, str],
+        add: Optional[Iterable[str]] = None,
+        delete: Optional[Iterable[str]] = None,
+    ) -> responses.UpdateFileTagsResponse:
+        """Add and/or delete tags of a file atomically.
+
+        Both arguments are optional, matching the endpoint: calling this
+        without them sends an empty request and returns the current state.
+        """
+        data: Dict[str, List[str]] = {}
+
+        if add is not None:
+            data["add"] = validate_tags(add)
+
+        if delete is not None:
+            # No count limit here: `delete` is a list of candidates and tags
+            # that are not present are ignored, so it may legitimately be
+            # longer than the per-file storage limit.
+            data["delete"] = validate_tags(delete, max_count=None)
+
+        url = self._tags_url(file_uuid)
+        response_class = self._get_response_class("update")
+        json_response = self._client.patch(url, json=data).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.UpdateFileTagsResponse, response)
 
 
 class AddonsAPI(API):
