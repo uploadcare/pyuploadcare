@@ -264,6 +264,121 @@ Tags are available from the CLI as well::
 .. _file tags documentation: https://uploadcare.com/docs/file-tags/
 
 
+Searching files
+---------------
+
+A single search request (`file search documentation`_) can combine full-text search, exact
+matching, range filters and tag filters. At least one condition is required: ``query``,
+``phrase``, ``exact``, ``datetime_uploaded``, ``size``, ``is_image`` or ``tags``. ``fuzziness``
+and ``sort`` are modifiers and do not count as conditions::
+
+    from pyuploadcare import (
+        DatetimeRange,
+        FileSearchRequest,
+        SearchExact,
+        SearchPhrase,
+        SizeRange,
+        TagsFilter,
+    )
+
+    response = uploadcare.search_files(
+        FileSearchRequest(
+            query='sunset',
+            tags=TagsFilter(all_=['cat'], none_=['draft']),
+            size=SizeRange(gt=1024, lte=10 * 1024 * 1024),
+            is_image=True,
+            fuzziness=True,
+            sort=['-score', 'size'],
+        ),
+        limit=50,
+    )
+
+    print(response.total, response.per_page, response.next)
+
+    for file_info in response.results:
+        print(file_info.original_filename, file_info.tags)
+
+``query`` searches across all searchable fields and must be at least 4 characters. ``phrase``
+performs an ordered full-text match on a specific field, and ``exact`` matches values exactly::
+
+    request = FileSearchRequest(
+        phrase=SearchPhrase(original_filename='holiday photo'),
+        exact=SearchExact(detected_mime_type=['image/jpeg', 'image/png']),
+        datetime_uploaded=DatetimeRange(gte=datetime(2024, 1, 1)),
+    )
+
+A field cannot appear in both ``phrase`` and ``exact`` in the same request.
+
+``exact`` can also match metadata values. In the SDK this is a nested mapping, which is
+serialized into the ``metadata[<key>]`` keys the API expects::
+
+    SearchExact(metadata={'album': ['holiday'], 'color': ['red']})
+
+A request can equally be a plain dict, using the same shape::
+
+    response = uploadcare.search_files({
+        'exact': {'metadata': {'album': ['holiday']}},
+        'tags': {'all': ['cat']},
+    })
+
+``sort`` accepts 1 to 4 keys out of ``score``, ``datetime_uploaded``, ``size`` and
+``original_filename``, each optionally prefixed with ``-`` for descending order. Keys must be
+unique and the same key must not be given in both directions.
+
+Without ``sort``, results are ordered by relevance. A filter-only request has no ``query`` or
+``phrase`` to rank by, so its order is undefined — always give such a request an explicit
+``sort``.
+
+``search_files`` returns a single page. Its ``limit`` is the page size, 1 to 100, and the server
+defaults to 20; ``offset + limit`` must not exceed 1000. Search cannot reach past the first 1000
+results, so narrow the query instead of paging deeper.
+
+To walk pages, use ``iterate_search_files``. Its ``limit`` means something different: as elsewhere
+in the SDK, ``limit`` is the total number of results to yield and ``request_limit`` is the number
+retrieved per request. The iterator applies the 1000-result window itself, clamping each page so
+that no request exceeds it::
+
+    for file_info in uploadcare.iterate_search_files(
+        {'tags': {'all': ['cat']}, 'sort': ['-datetime_uploaded']}, limit=200
+    ):
+        print(file_info.uuid)
+
+.. warning::
+
+    Paging through a filter-only request without ``sort`` is unreliable: the order is undefined
+    between requests, so files may be skipped or repeated. ``iterate_search_files`` emits a
+    ``UserWarning`` in that case.
+
+Pass ``include_appdata=True`` to embed application data in every result::
+
+    response = uploadcare.search_files(request, include_appdata=True)
+    print(response.results[0].appdata)
+
+Each result carries a ``highlight`` with the matched tokens wrapped in ``<em>`` tags. It is
+present only for fields matched by a full-text condition and absent for filter-only matches::
+
+    highlight = response.results[0].highlight
+    if highlight:
+        print(highlight.original_filename)  # ['<em>sunset</em>-cat.jpg']
+        print(highlight.metadata)           # {'album': 'summer <em>sunset</em>'}
+
+.. warning::
+
+    ``highlight`` values contain user-controlled content (filenames, metadata) plus markup added
+    by the server. They are not trusted HTML — escape them before rendering.
+
+Search is available from the CLI as well. Because a descending sort key starts with a dash, pass
+it with ``--sort=`` so it is not read as another option::
+
+    ucare search_files --query sunset --tags_any cat dog --is_image true \
+        --size_gt 1024 --sort=-score --limit 50
+
+The CLI covers every condition except ``exact.metadata``, whose bracketed keys do not map onto a
+command line option; use the Python API for that.
+
+.. _file search documentation: https://uploadcare.com/docs/file-search/
+
+
 Video conversion
 ----------------
 

@@ -1,6 +1,7 @@
 import os
 import socket
 import ssl
+import warnings
 from time import time
 from typing import (
     IO,
@@ -8,6 +9,7 @@ from typing import (
     Callable,
     Dict,
     Iterable,
+    Iterator,
     List,
     Optional,
     Tuple,
@@ -29,10 +31,23 @@ from pyuploadcare.api import (
     VideoConvertAPI,
     WebhooksAPI,
 )
-from pyuploadcare.api.api import URLAPI
+from pyuploadcare.api.api import (
+    SEARCH_DEFAULT_LIMIT,
+    SEARCH_MAX_LIMIT,
+    SEARCH_MAX_WINDOW,
+    URLAPI,
+)
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
-from pyuploadcare.api.entities import ProjectInfo, Webhook, WebhookEvent
+from pyuploadcare.api.entities import (
+    FileSearchInfo,
+    ProjectInfo,
+    Webhook,
+    WebhookEvent,
+)
+from pyuploadcare.api.responses import FileSearchResponse
+from pyuploadcare.api.search_entities import FileSearchRequest
+from pyuploadcare.api.utils import require_optional_int, require_range
 from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
     get_file_size,
@@ -778,6 +793,202 @@ class Uploadcare:
             stored=stored,
             removed=removed,
         )
+
+    def search_files(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> FileSearchResponse:
+        """Search files, returning a single page of results.
+
+        One request can combine full-text search, exact matching, range
+        filters and tag filters. At least one condition is required.
+
+        Usage example::
+
+            >>> from pyuploadcare import FileSearchRequest, TagsFilter
+            >>> response = uploadcare.search_files(
+            ...     FileSearchRequest(
+            ...         query='sunset',
+            ...         tags=TagsFilter(all_=['cat']),
+            ...         sort=['-score'],
+            ...     ),
+            ...     limit=50,
+            ... )
+            >>> response.total
+            2
+            >>> for file_info in response.results:
+            ...     print(file_info.original_filename, file_info.tags)
+
+        The response is returned as is, because ``total``, ``per_page``,
+        ``next``, ``previous`` and the per-result ``highlight`` are all
+        meaningful. Use ``iterate_search_files`` to walk pages instead.
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+            - limit: results per page, 1 to 100. The server defaults to 20.
+            - offset: how many results to skip. ``offset + limit`` must not
+                exceed 1000.
+            - include_appdata: embed application data in every result.
+
+        Returns:
+            ``FileSearchResponse``
+
+        """
+        return self.files_api.search(
+            request,
+            limit=limit,
+            offset=offset,
+            include_appdata=include_appdata,
+        )
+
+    def iterate_search_files(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        request_limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> Iterator[FileSearchInfo]:
+        """Iterate over file search results, page by page.
+
+        Usage example::
+
+            >>> for file_info in uploadcare.iterate_search_files(
+            ...     {'tags': {'all': ['cat']}, 'sort': ['-datetime_uploaded']},
+            ...     limit=200,
+            ... ):
+            ...     print(file_info.uuid)
+
+        Always pass an explicit ``sort`` for a filter-only request, i.e. one
+        without ``query`` or ``phrase``. Such a request has no relevance to
+        rank by, so its order is undefined, and paging through an undefined
+        order can skip or repeat files. A ``UserWarning`` is emitted when that
+        happens.
+
+        Search is limited to the first 1000 results; narrow the query instead
+        of paging deeper.
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+            - limit: total number of results to yield. ``None`` yields
+                everything reachable.
+            - request_limit: number of results retrieved per request (page).
+                Usually, you don't need worry about this parameter.
+            - offset: how many results to skip before the first page.
+            - include_appdata: embed application data in every result.
+
+        """
+        require_optional_int("limit", limit)
+        require_optional_int("request_limit", request_limit)
+        require_optional_int("offset", offset)
+        require_range("limit", limit, minimum=0)
+        require_range(
+            "request_limit", request_limit, minimum=1, maximum=SEARCH_MAX_LIMIT
+        )
+        require_range("offset", offset, minimum=0, maximum=SEARCH_MAX_WINDOW)
+
+        # Validate the request here rather than inside the generator, so an
+        # invalid request is reported immediately instead of on first
+        # iteration. It also keeps every page from re-validating it.
+        search_request = (
+            request
+            if isinstance(request, FileSearchRequest)
+            else FileSearchRequest.model_validate(request)
+        )
+
+        if search_request.has_undefined_order():
+            warnings.warn(
+                "Paging through a filter-only search without `sort` is "
+                "unreliable: the result order is undefined, so files may be "
+                "skipped or repeated. Pass an explicit `sort`.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        return self._iterate_search_files(
+            search_request,
+            limit=limit,
+            request_limit=request_limit,
+            offset=offset,
+            include_appdata=include_appdata,
+        )
+
+    @staticmethod
+    def _search_page_size(
+        page_size: int, current_offset: int, remaining: Optional[int]
+    ) -> int:
+        """Page size for the next search request, or 0 when done.
+
+        Clamped to the search window, because a legal starting offset can
+        otherwise produce an illegal ``offset`` + ``limit`` combination, and to
+        what is left of the caller's total limit.
+        """
+        size = min(page_size, SEARCH_MAX_WINDOW - current_offset)
+
+        if remaining is not None:
+            size = min(size, remaining)
+
+        return max(size, 0)
+
+    def _iterate_search_files(  # noqa: C901
+        self,
+        request: FileSearchRequest,
+        limit: Optional[int],
+        request_limit: Optional[int],
+        offset: Optional[int],
+        include_appdata: bool,
+    ) -> Iterator[FileSearchInfo]:
+        """Walk search result pages.
+
+        The response's ``next`` URL is deliberately not requested: it is an
+        absolute, server-supplied URL, and the REST client attaches
+        credentials to whatever URL it is given. So ``next`` is used only as a
+        "there is more" signal and the next offset is computed locally.
+        """
+        page_size = (
+            SEARCH_DEFAULT_LIMIT if request_limit is None else request_limit
+        )
+        current_offset = 0 if offset is None else offset
+        remaining = limit
+
+        while True:
+            current_page_size = self._search_page_size(
+                page_size, current_offset, remaining
+            )
+
+            if not current_page_size:
+                return
+
+            response = self.files_api.search(
+                request,
+                limit=current_page_size,
+                offset=current_offset,
+                include_appdata=include_appdata,
+            )
+
+            if not response.results:
+                return
+
+            for file_info in response.results:
+                yield file_info
+
+                if remaining is not None:
+                    remaining -= 1
+                    if remaining <= 0:
+                        return
+
+            # Advance by the requested page size, not by how many results came
+            # back. This is offset pagination: a short page that still reports
+            # a `next` would otherwise make the following request overlap it.
+            current_offset += current_page_size
+
+            # `total` is not used as a stop condition: the API documents it as
+            # possibly approximate for very large result sets.
+            if response.next is None:
+                return
 
     def list_file_groups(
         self,

@@ -1,0 +1,30 @@
+interactions:
+- request:
+    body: '{"tags": {"all": ["cat"]}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+    method: POST
+    uri: https://api.uploadcare.com/files/search/?include=appdata
+  response:
+    content: '{"next":null,"previous":null,"total":1,"per_page":20,"results":[{"uuid":"a55d6b25-d03c-4038-9838-6e06bb7df598","original_filename":"cat.jpg","size":1024,"mime_type":"image/jpeg","is_image":true,"is_ready":true,"tags":["cat"],"metadata":{},"appdata":{"uc_clamav_virus_scan":{"version":"0.104.2","datetime_created":"2026-02-16T14:44:29.395043Z","datetime_updated":"2026-02-16T14:44:29.637342Z","data":{"infected":false}}}}]}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Server:
+      - nginx
+      Vary:
+      - Accept
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

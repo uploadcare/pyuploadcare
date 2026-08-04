@@ -33,6 +33,7 @@ Build file handling in minutes. Upload or accept user-generated content, store, 
   - [Usage](#usage)
     - [Basic usage](#basic-usage)
       - [File tags](#file-tags)
+      - [File search](#file-search)
     - [Django integration](#django-integration)
   - [Testing](#testing)
   - [Demo app](#demo-app)
@@ -194,6 +195,64 @@ with open("sample-file.jpeg", "rb") as file_object:
 
 Tags are lowercased, trimmed and deduplicated. A file can hold up to 50 tags of up to 100
 characters each, made of Latin letters, digits, `-`, `_` and `.`.
+
+#### File search
+
+A single [search](https://uploadcare.com/docs/file-search/) request can combine full-text search,
+exact matching, range filters and tag filters. At least one condition is required:
+
+```python
+from pyuploadcare import FileSearchRequest, SizeRange, TagsFilter
+
+response = uploadcare.search_files(
+    FileSearchRequest(
+        query="sunset",
+        tags=TagsFilter(all_=["cat"], none_=["draft"]),
+        size=SizeRange(gt=1024),
+        is_image=True,
+        fuzziness=True,
+        sort=["-score", "size"],
+    ),
+    limit=50,
+)
+
+print(response.total, response.per_page)
+
+for file_info in response.results:
+    print(file_info.original_filename, file_info.tags)
+    if file_info.highlight:
+        print(file_info.highlight.original_filename)  # ['<em>sunset</em>.jpg']
+```
+
+Requests can also be plain dicts:
+
+```python
+response = uploadcare.search_files({"tags": {"all": ["cat"]}})
+```
+
+`search_files()` returns a single page: `limit` is the page size (1–100, defaults to 20) and
+`offset + limit` must not exceed 1000.
+
+To walk pages, use `iterate_search_files()`. There, following the SDK's other list APIs, `limit` is
+the total number of results to yield and `request_limit` is the page size; the iterator stops on
+its own once it reaches the 1000-result window:
+
+```python
+request = {"tags": {"all": ["cat"]}, "sort": ["-datetime_uploaded"]}
+
+for file_info in uploadcare.iterate_search_files(request, limit=200):
+    print(file_info.uuid)
+```
+
+Always pass an explicit `sort` when paging through a filter-only request (one without `query` or
+`phrase`): there is no relevance to rank by, so the order is undefined and paging can skip or
+repeat files. The SDK emits a `UserWarning` if you don't.
+
+Either way, search reaches the first 1000 results only. Narrow the query rather than paging
+deeper.
+
+> `highlight` values contain your users' filenames and metadata wrapped in `<em>` tags by the
+> server. Treat them as untrusted text and escape them before rendering as HTML.
 
 ### Django integration
 

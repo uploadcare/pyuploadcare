@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: '{"query": "nothing-matches-this"}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+    method: POST
+    uri: https://api.uploadcare.com/files/search/
+  response:
+    content: '{"next":null,"previous":null,"total":0,"per_page":20,"results":[]}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '65'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Server:
+      - nginx
+      Vary:
+      - Accept
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

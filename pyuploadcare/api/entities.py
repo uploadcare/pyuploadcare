@@ -240,6 +240,31 @@ class FileInfo(UUIDEntity):
     appdata: Optional[ApplicationDataSet] = None
 
 
+class SearchHighlight(Entity):
+    """Matched tokens wrapped in ``<em>`` tags by the search backend.
+
+    Present only for fields matched by a full-text condition (``query`` or
+    ``phrase``), absent for filter-only matches.
+
+    The values contain user-controlled content (filenames, metadata) plus
+    markup added by the server. They are **not** trusted HTML: escape the
+    surrounding text before rendering them.
+    """
+
+    # OpenAPI: array of string
+    original_filename: Optional[List[str]] = None
+    # OpenAPI: array of string
+    detected_mime_type: Optional[List[str]] = None
+    # OpenAPI: object with additionalProperties of type string
+    metadata: Optional[Dict[str, str]] = None
+
+
+class FileSearchInfo(FileInfo):
+    """A file search result: file info plus the match highlight."""
+
+    highlight: Optional[SearchHighlight] = None
+
+
 class GroupInfo(Entity):
     id: str
     _fetched: Optional[bool] = PrivateAttr(default=False)

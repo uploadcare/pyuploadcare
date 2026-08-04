@@ -1,0 +1,31 @@
+interactions:
+- request:
+    body: '{"query": "sunset", "tags": {"all": ["cat"]}, "sort": ["-score"]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+    method: POST
+    uri: https://api.uploadcare.com/files/search/?limit=2
+  response:
+    content: '{"next":"https://api.uploadcare.com/files/search/?limit=2&offset=2","previous":null,"total":5,"per_page":2,"results":[{"uuid":"a55d6b25-d03c-4038-9838-6e06bb7df598","original_filename":"sunset-cat.jpg","size":3518420,"mime_type":"image/jpeg","is_image":true,"is_ready":true,"datetime_uploaded":"2026-02-16T14:44:29.395043Z","datetime_stored":"2026-02-16T14:44:29.637342Z","datetime_removed":null,"original_file_url":"https://ucarecdn.com/a55d6b25-d03c-4038-9838-6e06bb7df598/sunset-cat.jpg","url":"https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/","variations":null,"metadata":{"album":"holiday"},"tags":["cat","animal"],"highlight":{"original_filename":["<em>sunset</em>-cat.jpg"],"metadata":{"album":"summer
+      <em>sunset</em>"}}},{"uuid":"1a9c5240-7d9b-4473-851b-45fa4b0bed64","original_filename":"sunset.png","size":1024,"mime_type":"image/png","is_image":true,"is_ready":true,"datetime_uploaded":"2026-02-15T10:00:00Z","datetime_stored":null,"datetime_removed":null,"original_file_url":"https://ucarecdn.com/1a9c5240-7d9b-4473-851b-45fa4b0bed64/sunset.png","url":"https://api.uploadcare.com/files/1a9c5240-7d9b-4473-851b-45fa4b0bed64/","variations":null,"metadata":{},"tags":[],"highlight":{"original_filename":["<em>sunset</em>.png"]}}]}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Server:
+      - nginx
+      Vary:
+      - Accept
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1
