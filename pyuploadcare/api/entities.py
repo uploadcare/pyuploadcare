@@ -224,6 +224,9 @@ class FileInfo(UUIDEntity):
     datetime_stored: Optional[datetime] = None
     datetime_uploaded: Optional[datetime] = None
     metadata: Optional[MetadataDict] = None
+    # `[]` when the file has no tags. `None` when the endpoint does not report
+    # tags at all, e.g. upload responses.
+    tags: Optional[List[str]] = None
     is_image: Optional[bool] = None
     is_ready: Optional[bool] = None
     mime_type: Optional[str] = None

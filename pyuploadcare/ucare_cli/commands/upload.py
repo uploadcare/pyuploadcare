@@ -46,6 +46,12 @@ def register_arguments(subparsers):
         metavar="KEY=VALUE",
         help="Attach metadata to the uploaded file as key=value pairs.",
     )
+    subparser.add_argument(
+        "--tags",
+        nargs="+",
+        metavar="TAG",
+        help="Attach tags to the uploaded file.",
+    )
     return subparser
 
 
@@ -63,6 +69,8 @@ def upload(arg_namespace, client: Uploadcare):
             key, value = item.split("=", 1)
             metadata[key] = value
 
+    tags = getattr(arg_namespace, "tags", None)
+
     with open(arg_namespace.filename, "rb") as fh:
-        file_ = client.upload(fh, metadata=metadata)
+        file_ = client.upload(fh, metadata=metadata, tags=tags)
         _handle_uploaded_file(file_, arg_namespace)

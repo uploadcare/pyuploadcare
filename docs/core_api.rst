@@ -199,6 +199,75 @@ But you should better use a special attribute of `File.info`::
     file_metadata = file.info["metadata"]
 
 
+File tags
+---------
+
+Each file can carry a list of tags (`file tags documentation`_), which you can later use as a
+filter when searching files.
+
+Tags may be initially set while uploading::
+
+    with open('file.txt', 'rb') as file_object:
+        ucare_file: File = uploadcare.upload(file_object, tags=['cat', 'cute'])
+
+While uploading multiple files at once, the tags are applied to every file in the collection::
+
+    file1 = open('file1.txt', 'rb')
+    file2 = open('file2.txt', 'rb')
+    ucare_files: List[File] = uploadcare.upload_files([file1, file2], tags=['cat'])
+    # don't forget to close the files, of course
+
+Uploads from url do not support tags. Use ``File.set_tags()`` after such an upload instead.
+
+Read the current tags of a file::
+
+    file = uploadcare.file('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
+    tags: List[str] = file.get_tags()
+
+Or, if the file info is already loaded, without an extra request::
+
+    tags = file.tags
+
+``File.tags`` reads from the cached file info, fetching it first if nothing is cached yet. It is
+``[]`` when the file has no tags, and ``None`` only when the cached info came from a response that
+does not report tags at all. In practice that happens after a multipart upload, whose response is
+cached as the file info and carries no ``tags`` — call ``File.update_info()`` or
+``File.get_tags()`` there. A direct upload caches nothing, so reading ``File.tags`` after it
+fetches the info and returns the stored tags.
+
+Replace all tags of a file. Passing an empty list clears them::
+
+    response = file.set_tags(['cat', 'animal', 'cute'])
+    print(response.tags, response.added, response.deleted)
+
+    file.set_tags([])
+
+Add and/or delete tags atomically::
+
+    response = file.update_tags(add=['pet'], delete=['animal'])
+
+Both methods return a response carrying the resulting ``tags`` plus the ``added`` and ``deleted``
+tags. The same operations are available on the API directly::
+
+    uploadcare.tags_api.get(file_id)
+    uploadcare.tags_api.replace(file_id, ['cat', 'animal'])
+    uploadcare.tags_api.update(file_id, add=['pet'], delete=['animal'])
+
+Tags are normalized before being sent: they are lowercased, trimmed, deduplicated keeping the
+first occurrence, and empty ones are dropped. A file can hold up to 50 tags of up to 100
+characters each, containing Latin letters, digits, ``-``, ``_`` and ``.`` only. Anything else
+raises ``TagValidationError`` before a request is made.
+
+Tags are available from the CLI as well::
+
+    ucare get_file_tags 740e1b8c-1ad8-4324-b7ec-112c79d8eac2
+    ucare set_file_tags 740e1b8c-1ad8-4324-b7ec-112c79d8eac2 cat animal
+    ucare update_file_tags 740e1b8c-1ad8-4324-b7ec-112c79d8eac2 --add pet --delete animal
+    ucare upload file.txt --tags cat cute
+
+.. _file tags documentation: https://uploadcare.com/docs/file-tags/
+
+
 Video conversion
 ----------------
 

@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: '{"tags": ["cat", "animal"]}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.uploadcare.com
+    method: PUT
+    uri: https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/tags/
+  response:
+    content: '{"tags":["cat","animal"],"added":["animal"],"deleted":[]}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Server:
+      - nginx
+      Vary:
+      - Accept
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

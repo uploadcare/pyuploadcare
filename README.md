@@ -32,6 +32,7 @@ Build file handling in minutes. Upload or accept user-generated content, store, 
   - [Requirements](#requirements)
   - [Usage](#usage)
     - [Basic usage](#basic-usage)
+      - [File tags](#file-tags)
     - [Django integration](#django-integration)
   - [Testing](#testing)
   - [Demo app](#demo-app)
@@ -162,6 +163,37 @@ print(ucare_file.cdn_url)  # https://demo.ucarecd.net/640fe4b7-7352-42ca-8d87-0e
 ```
 
 There’s a lot more to uncover. For more information please refer to the [documentation](#documentation).
+
+#### File tags
+
+Files can carry a list of [tags](https://uploadcare.com/docs/file-tags/) you can later filter on:
+
+```python
+file_ = uploadcare.file("640fe4b7-7352-42ca-8d87-0e4387957157")
+
+file_.get_tags()                                     # ['cat', 'animal']
+file_.set_tags(["cat", "animal", "cute"])            # replace all tags
+file_.update_tags(add=["pet"], delete=["animal"])    # add and delete atomically
+file_.set_tags([])                                   # clear all tags
+```
+
+`set_tags()` and `update_tags()` return the resulting tag list along with what changed:
+
+```python
+response = file_.update_tags(add=["pet"], delete=["animal"])
+print(response.tags, response.added, response.deleted)
+# ['cat', 'cute', 'pet'] ['pet'] ['animal']
+```
+
+Tags can also be attached at upload time:
+
+```python
+with open("sample-file.jpeg", "rb") as file_object:
+    ucare_file = uploadcare.upload(file_object, tags=["cat", "cute"])
+```
+
+Tags are lowercased, trimmed and deduplicated. A file can hold up to 50 tags of up to 100
+characters each, made of Latin letters, digits, `-`, `_` and `.`.
 
 ### Django integration
 

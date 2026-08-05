@@ -1,7 +1,21 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+from pathlib import Path
 from tempfile import NamedTemporaryFile
+
+
+ASSETS_PATH = Path(__file__).parent / "assets"
+IMAGE_PATH = ASSETS_PATH / "img.png"
+
+
+def upload_image_file(uploadcare, tags=None):
+    """Upload the test image, optionally with tags.
+
+    Not stored, so the project's autostore setting cannot leave it behind.
+    """
+    with open(IMAGE_PATH, "rb") as fh:
+        return uploadcare.upload(fh, store=False, tags=tags)
 
 
 def upload_tmp_txt_file(uploadcare, content=""):

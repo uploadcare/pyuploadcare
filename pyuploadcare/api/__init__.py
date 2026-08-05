@@ -5,6 +5,7 @@ from pyuploadcare.api.api import (  # noqa: F401
     GroupsAPI,
     MetadataAPI,
     ProjectAPI,
+    TagsAPI,
     UploadAPI,
     VideoConvertAPI,
     WebhooksAPI,
