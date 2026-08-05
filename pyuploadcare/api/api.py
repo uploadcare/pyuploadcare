@@ -574,7 +574,7 @@ class TagsAPI(API):
         response = self._parse_response(json_response, response_class)
         return cast(responses.GetFileTagsResponse, response).tags
 
-    def replace(
+    def set(
         self, file_uuid: Union[UUID, str], tags: Iterable[str]
     ) -> responses.UpdateFileTagsResponse:
         """Replace all tags of a file.
