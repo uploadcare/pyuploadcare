@@ -338,7 +338,7 @@ class File:
         add: Optional[List[str]] = None,
         delete: Optional[List[str]] = None,
     ) -> UpdateFileTagsResponse:
-        """Adds and/or deletes file tags atomically::
+        """Update tags. Pass `add` and `delete` lists to be added and deleted respectively.
 
         >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
         >>> file_.update_tags(add=['cute'], delete=['animal'])
