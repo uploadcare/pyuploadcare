@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-08-03
+## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-08-04
 
 ### Added
 
@@ -22,6 +22,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     option for `ucare upload`.
   - `TagValidationError`, raised when tags exceed the API limits (50 tags per file, 100 characters
     per tag, Latin letters, digits, `-`, `_` and `.` only).
+- Support for [file search](https://uploadcare.com/docs/file-search/):
+  - `Uploadcare.search_files()`, returning one page of results, and
+    `Uploadcare.iterate_search_files()`, which walks pages. As with the other list APIs, `limit`
+    is the total number of results to yield and `request_limit` is the page size.
+  - `FilesAPI.search()` for `POST /files/search/`.
+  - Typed requests: `FileSearchRequest` with `query`, `phrase`, `exact`, `datetime_uploaded`,
+    `size`, `is_image` and `tags` conditions plus the `fuzziness` and `sort` modifiers, built from
+    `SearchPhrase`, `SearchExact`, `DatetimeRange`, `SizeRange`, `TagsFilter` and `SearchSort`.
+    A plain dict in the same shape is accepted too. Requests are validated locally against the
+    documented API constraints before a request is made.
+  - `FileSearchResponse` with `next`, `previous`, `total`, `per_page` and `results`, where each
+    result is a `FileSearchInfo` — file info plus a `SearchHighlight`.
+  - `iterate_search_files()` warns when asked to page through a filter-only request without
+    `sort`, whose result order the API leaves undefined.
+  - A new `ucare search_files` command.
 
 ### Changed
 

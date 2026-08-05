@@ -35,11 +35,19 @@ from pyuploadcare.exceptions import (
 
 from .entities import UUIDEntity
 from .metadata import validate_meta_key, validate_meta_value, validate_metadata
+from .search_entities import FileSearchRequest
 from .tags import validate_tags
-from .utils import flatten_dict
+from .utils import flatten_dict, require_optional_int, require_range
 
 
 logger = logging.getLogger("pyuploadcare")
+
+
+# File search pagination limits.
+# https://uploadcare.com/docs/api/rest/file/search-files/
+SEARCH_DEFAULT_LIMIT = 20  # the server default when `limit` is not sent
+SEARCH_MAX_LIMIT = 100
+SEARCH_MAX_WINDOW = 1000  # `offset` + `limit` must not exceed this
 
 
 class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
@@ -55,7 +63,69 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         "batch_delete": responses.BatchFileOperationResponse,
         "local_copy": responses.CreateLocalCopyResponse,
         "remote_copy": responses.CreateRemoteCopyResponse,
+        "search": responses.FileSearchResponse,
     }
+
+    def search(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> responses.FileSearchResponse:
+        """Search files, returning a single page of results.
+
+        https://uploadcare.com/docs/file-search/
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+                A dict uses the SDK's shape for ``exact.metadata``, i.e.
+                ``{"exact": {"metadata": {"color": ["red"]}}}``, not the wire
+                shape ``{"exact": {"metadata[color]": [...]}}``.
+            - limit: results per page, 1 to 100. The server defaults to 20.
+            - offset: how many results to skip. ``offset + limit`` must not
+                exceed 1000.
+            - include_appdata: embed application data in every result.
+        """
+        search_request = (
+            request
+            if isinstance(request, FileSearchRequest)
+            else FileSearchRequest.model_validate(request)
+        )
+
+        require_optional_int("limit", limit)
+        require_optional_int("offset", offset)
+        require_range("limit", limit, minimum=1, maximum=SEARCH_MAX_LIMIT)
+        require_range("offset", offset, minimum=0)
+
+        effective_limit = SEARCH_DEFAULT_LIMIT if limit is None else limit
+        effective_offset = 0 if offset is None else offset
+
+        if effective_offset + effective_limit > SEARCH_MAX_WINDOW:
+            raise InvalidParamError(
+                "`offset` + `limit` must not exceed "
+                f"{SEARCH_MAX_WINDOW}, got "
+                f"{effective_offset} + {effective_limit}. "
+                "Narrow the query instead of paging deeper"
+            )
+
+        query_parameters: Dict[str, Any] = {}
+        if limit is not None:
+            query_parameters["limit"] = limit
+        if offset is not None:
+            query_parameters["offset"] = offset
+        if include_appdata:
+            query_parameters["include"] = "appdata"
+
+        url = self._build_url(
+            suffix="search", query_parameters=query_parameters
+        )
+        response_class = self._get_response_class("search")
+        json_response = self._client.post(
+            url, json=search_request.to_payload()
+        ).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.FileSearchResponse, response)
 
     def store(self, file_uuid: Union[UUID, str]) -> entities.FileInfo:
         url = self._build_url(file_uuid, suffix="storage")
