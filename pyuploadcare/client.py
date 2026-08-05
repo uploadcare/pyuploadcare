@@ -323,7 +323,7 @@ class Uploadcare:
         if isinstance(file_handle, str):
             if tags is not None:
                 raise InvalidParamError(
-                    "tags are not supported for uploads from url. "
+                    "tags are not supported for uploads from URL. "
                     "Use File.set_tags() after the upload instead"
                 )
 
