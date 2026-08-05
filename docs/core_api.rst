@@ -228,8 +228,12 @@ Or, if the file info is already loaded, without an extra request::
 
     tags = file.tags
 
-Note that ``File.tags`` is ``None`` when the cached file info does not report tags at all — upload
-responses do not include them — and ``[]`` when the file genuinely has no tags.
+``File.tags`` reads from the cached file info, fetching it first if nothing is cached yet. It is
+``[]`` when the file has no tags, and ``None`` only when the cached info came from a response that
+does not report tags at all. In practice that happens after a multipart upload, whose response is
+cached as the file info and carries no ``tags`` — call ``File.update_info()`` or
+``File.get_tags()`` there. A direct upload caches nothing, so reading ``File.tags`` after it
+fetches the info and returns the stored tags.
 
 Replace all tags of a file. Passing an empty list clears them::
 
@@ -329,6 +333,9 @@ Without ``sort``, results are ordered by relevance. A filter-only request has no
 ``phrase`` to rank by, so its order is undefined — always give such a request an explicit
 ``sort``.
 
+Search indexing is asynchronous, so a file is not findable the instant it is uploaded — expect a
+delay on the order of seconds. Do not search for a file you have just uploaded without retrying.
+
 ``search_files`` returns a single page. Its ``limit`` is the page size, 1 to 100, and the server
 defaults to 20; ``offset + limit`` must not exceed 1000. Search cannot reach past the first 1000
 results, so narrow the query instead of paging deeper.
@@ -354,8 +361,9 @@ Pass ``include_appdata=True`` to embed application data in every result::
     response = uploadcare.search_files(request, include_appdata=True)
     print(response.results[0].appdata)
 
-Each result carries a ``highlight`` with the matched tokens wrapped in ``<em>`` tags. It is
-present only for fields matched by a full-text condition and absent for filter-only matches::
+Each result carries a ``highlight`` with the matched tokens wrapped in ``<em>`` tags. A field in it
+is populated only when that field matched a full-text condition, so a filter-only search
+highlights nothing — expect either no ``highlight`` at all or one whose every field is ``None``::
 
     highlight = response.results[0].highlight
     if highlight:

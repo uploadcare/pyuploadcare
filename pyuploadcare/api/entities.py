@@ -243,8 +243,10 @@ class FileInfo(UUIDEntity):
 class SearchHighlight(Entity):
     """Matched tokens wrapped in ``<em>`` tags by the search backend.
 
-    Present only for fields matched by a full-text condition (``query`` or
-    ``phrase``), absent for filter-only matches.
+    A field is populated only when it matched a full-text condition
+    (``query`` or ``phrase``). Without such a condition nothing is
+    highlighted: the API may then omit the object altogether, or send it
+    empty, in which case every field here is ``None``.
 
     The values contain user-controlled content (filenames, metadata) plus
     markup added by the server. They are **not** trusted HTML: escape the

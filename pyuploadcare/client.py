@@ -321,9 +321,13 @@ class Uploadcare:
             - tags (Optional[Iterable[str]]): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
                 the uploaded file. Not supported for uploads from url; use
-                ``File.set_tags()`` for those. Note that the upload response
-                does not report tags back, so ``File.tags`` stays ``None``
-                until ``File.update_info()`` is called.
+                ``File.set_tags()`` for those.
+                Upload responses do not report tags back. After a direct
+                upload nothing is cached, so reading ``File.tags`` fetches the
+                file info and returns the stored tags. After a multipart
+                upload the info from the upload response is cached, and that
+                response has no tags, so ``File.tags`` is ``None`` until
+                ``File.update_info()`` is called.
 
         Returns:
             ``File`` instance
