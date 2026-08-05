@@ -305,7 +305,7 @@ class Uploadcare:
                 accepting ``UploadProgress`` to track uploading progress.
             - tags (Optional[Iterable[str]]): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
-                the uploaded file. Not supported for uploads from url; use
+                the uploaded file. Not supported for uploads from URL; use
                 ``File.set_tags()`` for those.
                 Upload responses do not report tags back. After a direct
                 upload nothing is cached, so reading ``File.tags`` fetches the
