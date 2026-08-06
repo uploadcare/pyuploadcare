@@ -3,8 +3,7 @@ import hmac
 from datetime import datetime, timezone
 from typing import Generator, Union
 
-from httpx import Auth, Request, Response
-from httpx._utils import to_bytes, to_str
+from pyuploadcare.api._httpx import Auth, Request, Response, to_bytes, to_str
 
 
 class AuthBase(Auth): ...

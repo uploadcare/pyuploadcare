@@ -1,9 +1,9 @@
 from unittest import mock
 
-import httpx
 import pytest
 
 import pyuploadcare.api.client
+from pyuploadcare.api._httpx import httpx
 
 
 @pytest.fixture

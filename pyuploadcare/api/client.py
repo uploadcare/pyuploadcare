@@ -6,22 +6,22 @@ import time
 import typing
 from platform import python_implementation, python_version
 
-from httpx import USE_CLIENT_DEFAULT, HTTPStatusError, Response
-from httpx._client import Client as HTTPXClient
-from httpx._client import UseClientDefault
-from httpx._types import (
-    AuthTypes,
+from pyuploadcare import __version__
+from pyuploadcare.api._httpx import USE_CLIENT_DEFAULT, AuthTypes
+from pyuploadcare.api._httpx import Client as HTTPXClient
+from pyuploadcare.api._httpx import (
     CookieTypes,
     HeaderTypes,
+    HTTPStatusError,
     QueryParamTypes,
     RequestContent,
     RequestData,
     RequestFiles,
+    Response,
     TimeoutTypes,
     URLTypes,
+    UseClientDefault,
 )
-
-from pyuploadcare import __version__
 from pyuploadcare.exceptions import (
     APIError,
     AuthenticationError,

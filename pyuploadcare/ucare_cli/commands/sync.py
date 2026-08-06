@@ -7,9 +7,9 @@ import time
 from math import ceil
 
 from dateutil import parser
-from httpx import HTTPError
 
 from pyuploadcare import FileList, conf
+from pyuploadcare.api._httpx import HTTPError
 from pyuploadcare.api.client import Client
 from pyuploadcare.client import Uploadcare
 from pyuploadcare.ucare_cli.commands.helpers import (

@@ -2,10 +2,10 @@ from typing import Any, Dict, Optional, Type, Union, cast
 from urllib.parse import urlencode, urljoin
 from uuid import UUID
 
-from httpx._types import RequestFiles
 from pydantic import TypeAdapter
 from typing_extensions import Protocol, TypeVar
 
+from pyuploadcare.api._httpx import RequestFiles
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response

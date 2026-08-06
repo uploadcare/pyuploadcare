@@ -28,7 +28,10 @@ ucare = 'pyuploadcare.ucare_cli.main:main'
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.15"
-httpx = "^0.28.1"
+# TODO: once Python 3.8 and 3.9 support is dropped, remove the httpx entry and
+# the python marker on httpx2 (httpx2 requires Python 3.10+).
+httpx = {version = "^0.28.1", python = "<3.10"}
+httpx2 = {version = "^2.9.1", python = ">=3.10"}
 pydantic = [
   {extras = ["email"], version = "^2.13.4", python = ">=3.9"},
   {extras = ["email"], version = "^2.10.6", python = "<3.9"},
