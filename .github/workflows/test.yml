@@ -26,11 +26,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
-        run: pipx install poetry==2.4.1
+        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
+        with:
+          version: "2.4.1"
       - name: Install dependencies
-        run: |
-          poetry env use python
-          poetry install --with dev
+        run: poetry install --with dev
       - name: Run linters
         run: make lint
 
@@ -41,7 +41,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -50,14 +50,62 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
-        run: pipx install poetry==2.4.1
+        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
+        with:
+          version: "2.4.1"
       - name: Install dependencies
-        run: |
-          poetry env use python
-          poetry install --with dev
+        run: poetry install --with dev
       - name: Test with pytest
+        run: make test-functional
+
+  # Python 3.8 is handled separately: Poetry 2.x (required by the lock file)
+  # needs Python >=3.9, and modern virtualenv can no longer seed pip for 3.8.
+  py38-functional:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.8"
+      - name: Install Poetry and create the 3.8 virtualenv
         run: |
-          make test-functional
+          pipx install poetry==2.4.1
+          poetry config virtualenvs.create false
+          python -m venv .venv
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+          echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> "$GITHUB_ENV"
+      - name: Install dependencies
+        run: poetry install --with dev
+      - name: Test with pytest
+        run: make test-functional
+
+  py38-django:
+    needs: py38-functional
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        django-version: ["2.2", "3.0", "3.1", "3.2", "4.0", "4.1", "4.2"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.8"
+      - name: Install Poetry and create the 3.8 virtualenv
+        run: |
+          pipx install poetry==2.4.1
+          poetry config virtualenvs.create false
+          python -m venv .venv
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+          echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> "$GITHUB_ENV"
+      - name: Install dependencies
+        run: poetry install --with dev
+      - name: Install specific django version
+        run: poetry run pip install django~=${{ matrix.django-version }}
+      - name: Test with pytest
+        run: make test-django
 
   django-2-and-3:
     needs: functional
@@ -66,7 +114,7 @@ jobs:
       matrix:
         # https://docs.djangoproject.com/en/2.2/faq/install/#what-python-version-can-i-use-with-django
         # https://docs.djangoproject.com/en/3.2/faq/install/#what-python-version-can-i-use-with-django
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.9"]
         django-version: ["2.2", "3.0", "3.1", "3.2"]
 
         include:
@@ -80,17 +128,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: install poetry
-        run: pipx install poetry==2.4.1
+        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
+        with:
+          version: "2.4.1"
       - name: install dependencies
-        run: |
-          poetry env use python
-          poetry install --with dev
+        run: poetry install --with dev
       - name: install specific django version
-        run: |
-          poetry run pip install django~=${{ matrix.django-version }}
+        run: poetry run pip install django~=${{ matrix.django-version }}
       - name: test with pytest
-        run: |
-          make test-django
+        run: make test-django
 
   django-4:
     needs: functional
@@ -98,7 +144,7 @@ jobs:
     strategy:
       matrix:
         # https://docs.djangoproject.com/en/4.2/faq/install/#what-python-version-can-i-use-with-django
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.9", "3.10"]
         django-version: ["4.0", "4.1", "4.2"]
 
         include:
@@ -118,17 +164,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: install poetry
-        run: pipx install poetry==2.4.1
+        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
+        with:
+          version: "2.4.1"
       - name: install dependencies
-        run: |
-          poetry env use python
-          poetry install --with dev
+        run: poetry install --with dev
       - name: install specific django version
-        run: |
-          poetry run pip install django~=${{ matrix.django-version }}
+        run: poetry run pip install django~=${{ matrix.django-version }}
       - name: test with pytest
-        run: |
-          make test-django
+        run: make test-django
 
   django-5:
     needs: functional
@@ -148,17 +192,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: install poetry
-        run: pipx install poetry==2.4.1
+        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
+        with:
+          version: "2.4.1"
       - name: install dependencies
-        run: |
-          poetry env use python
-          poetry install --with dev
+        run: poetry install --with dev
       - name: install specific django version
-        run: |
-          poetry run pip install django~=${{ matrix.django-version }}
+        run: poetry run pip install django~=${{ matrix.django-version }}
       - name: test with pytest
-        run: |
-          make test-django
+        run: make test-django
 
   django-6:
     needs: functional
@@ -175,17 +217,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: install poetry
-        run: pipx install poetry==2.4.1
+        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
+        with:
+          version: "2.4.1"
       - name: install dependencies
-        run: |
-          poetry env use python
-          poetry install --with dev
+        run: poetry install --with dev
       - name: install specific django version
-        run: |
-          poetry run pip install django~=${{ matrix.django-version }}
+        run: poetry run pip install django~=${{ matrix.django-version }}
       - name: test with pytest
-        run: |
-          make test-django
+        run: make test-django
 
   integration:
     needs: functional
@@ -201,14 +241,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry
-        run: pipx install poetry==2.4.1
+        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
+        with:
+          version: "2.4.1"
       - name: Install dependencies
-        run: |
-          poetry env use python
-          poetry install --with dev
+        run: poetry install --with dev
       - name: Test with pytest
-        run: |
-          make test-integration
+        run: make test-integration
         env:
           UPLOADCARE_PUBLIC_KEY: ${{ secrets.UPLOADCARE_PUBLIC_KEY }}
           UPLOADCARE_SECRET_KEY: ${{ secrets.UPLOADCARE_SECRET_KEY }}
