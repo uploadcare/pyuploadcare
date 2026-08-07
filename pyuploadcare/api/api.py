@@ -546,7 +546,7 @@ class TagsAPI(API):
     resource_type = "files"
     response_classes = {
         "get": responses.GetFileTagsResponse,
-        "replace": responses.UpdateFileTagsResponse,
+        "set": responses.UpdateFileTagsResponse,
         "update": responses.UpdateFileTagsResponse,
     }
 
@@ -583,7 +583,7 @@ class TagsAPI(API):
         """
         url = self._tags_url(file_uuid)
         data = {"tags": validate_tags(tags)}
-        response_class = self._get_response_class("replace")
+        response_class = self._get_response_class("set")
         json_response = self._client.put(url, json=data).json()
         response = self._parse_response(json_response, response_class)
         return cast(responses.UpdateFileTagsResponse, response)

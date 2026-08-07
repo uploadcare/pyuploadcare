@@ -54,7 +54,7 @@ def test_replace_sends_normalized_tags(tags_api):
     with patch.object(
         tags_api._client, "put", return_value=_json_response(payload)
     ) as mocked_put:
-        response = tags_api.replace(FILE_UUID, [" Cat ", "ANIMAL", "cat"])
+        response = tags_api.set(FILE_UUID, [" Cat ", "ANIMAL", "cat"])
 
     mocked_put.assert_called_once_with(
         TAGS_URL, json={"tags": ["cat", "animal"]}
@@ -70,7 +70,7 @@ def test_replace_with_empty_list_clears_tags(tags_api):
     with patch.object(
         tags_api._client, "put", return_value=_json_response(payload)
     ) as mocked_put:
-        response = tags_api.replace(FILE_UUID, [])
+        response = tags_api.set(FILE_UUID, [])
 
     mocked_put.assert_called_once_with(TAGS_URL, json={"tags": []})
     assert response.deleted == ["cat"]
@@ -135,7 +135,7 @@ def test_replace_still_enforces_the_storage_limit(tags_api):
 
     with patch.object(tags_api._client, "put") as mocked_put:
         with pytest.raises(TagValidationError):
-            tags_api.replace(FILE_UUID, tags)
+            tags_api.set(FILE_UUID, tags)
 
     mocked_put.assert_not_called()
 
@@ -188,6 +188,6 @@ def test_invalid_uuid_is_rejected_before_any_request(tags_api, file_uuid):
 def test_invalid_tags_are_rejected_before_any_request(tags_api):
     with patch.object(tags_api._client, "put") as mocked_put:
         with pytest.raises(TagValidationError):
-            tags_api.replace(FILE_UUID, ["not valid"])
+            tags_api.set(FILE_UUID, ["not valid"])
 
     mocked_put.assert_not_called()

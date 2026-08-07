@@ -118,4 +118,4 @@ def test_update_tags_without_arguments_returns_the_current_state(
 def test_invalid_tags_are_rejected_locally(uploadcare, untagged_file):
     """Validation happens before the request, so the API never sees these."""
     with pytest.raises(TagValidationError):
-        uploadcare.tags_api.replace(untagged_file.uuid, ["not valid"])
+        uploadcare.tags_api.set(untagged_file.uuid, ["not valid"])
