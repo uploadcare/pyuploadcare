@@ -76,7 +76,7 @@ class UploadcareAuth(UploadcareSimpleAuth):
         formated_date_time: str = "",
     ) -> str:
         content_md5 = hashlib.md5(request.read()).hexdigest()
-        content_type = request.headers.get("Content-Type")
+        content_type = request.headers.get("Content-Type") or ""
         uri = to_str(request.url.raw_path)
         sign_string = "\n".join(
             [
