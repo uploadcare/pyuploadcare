@@ -12,6 +12,10 @@ on:
       - "feature/**"
       - "version-3.x/**"
 
+env:
+  POETRY_INSTALLER_ONLY_BINARY: ":all:"
+  POETRY_VERSION: "2.4.1"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -28,10 +32,8 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
         with:
-          version: "2.4.1"
+          version: ${{ env.POETRY_VERSION }}
       - name: Install dependencies
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
         run: poetry install --with dev
       - name: Run linters
         run: make lint
@@ -54,10 +56,8 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
         with:
-          version: "2.4.1"
+          version: ${{ env.POETRY_VERSION }}
       - name: Install dependencies
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
         run: poetry install --with dev
       - name: Test with pytest
         run: make test-functional
@@ -79,15 +79,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry and create the virtualenv
         run: |
-          pipx install poetry==2.4.1
+          pipx install poetry==${{ env.POETRY_VERSION }}
           poetry config virtualenvs.create false
           python -m venv .venv
           echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
           echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> "$GITHUB_ENV"
       - name: Install dependencies
         run: poetry install --with dev
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
       - name: Test with pytest
         run: make test-functional
 
@@ -106,15 +104,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Poetry and create the virtualenv
         run: |
-          pipx install poetry==2.4.1
+          pipx install poetry==${{ env.POETRY_VERSION }}
           poetry config virtualenvs.create false
           python -m venv .venv
           echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
           echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> "$GITHUB_ENV"
       - name: Install dependencies
         run: poetry install --with dev
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
       - name: Install specific django version
         run: poetry run pip install django~=${{ matrix.django-version }}
       - name: Test with pytest
@@ -139,11 +135,9 @@ jobs:
       - name: install poetry
         uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
         with:
-          version: "2.4.1"
+          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
         run: poetry install --with dev
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
       - name: install specific django version
         run: poetry run pip install django~=${{ matrix.django-version }}
       - name: test with pytest
@@ -177,10 +171,8 @@ jobs:
       - name: install poetry
         uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
         with:
-          version: "2.4.1"
+          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
         run: poetry install --with dev
       - name: install specific django version
         run: poetry run pip install django~=${{ matrix.django-version }}
@@ -207,10 +199,8 @@ jobs:
       - name: install poetry
         uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
         with:
-          version: "2.4.1"
+          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
         run: poetry install --with dev
       - name: install specific django version
         run: poetry run pip install django~=${{ matrix.django-version }}
@@ -234,10 +224,8 @@ jobs:
       - name: install poetry
         uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
         with:
-          version: "2.4.1"
+          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
         run: poetry install --with dev
       - name: install specific django version
         run: poetry run pip install django~=${{ matrix.django-version }}
@@ -260,10 +248,8 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
         with:
-          version: "2.4.1"
+          version: ${{ env.POETRY_VERSION }}
       - name: Install dependencies
-        env:
-          POETRY_INSTALLER_ONLY_BINARY: ":all:"
         run: poetry install --with dev
       - name: Test with pytest
         run: make test-integration
