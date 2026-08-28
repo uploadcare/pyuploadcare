@@ -342,8 +342,8 @@ results, so narrow the query instead of paging deeper.
 
 To walk pages, use ``iterate_search_files``. Its ``limit`` means something different: as elsewhere
 in the SDK, ``limit`` is the total number of results to yield and ``request_limit`` is the number
-retrieved per request. The iterator applies the 1000-result window itself, clamping each page so
-that no request exceeds it::
+retrieved per request. The iterator follows the server's ``next`` URL from page to page and clamps
+the first request to the 1000-result window::
 
     for file_info in uploadcare.iterate_search_files(
         {'tags': {'all': ['cat']}, 'sort': ['-datetime_uploaded']}, limit=200

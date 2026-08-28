@@ -4,7 +4,17 @@ import logging
 import warnings
 from json import JSONDecodeError
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Type,
+    Union,
+    cast,
+)
 from uuid import UUID
 
 from httpx._types import RequestFiles
@@ -24,6 +34,7 @@ from pyuploadcare.api.base import (
     ListMixin,
     RetrieveMixin,
     UpdateMixin,
+    _iterate_pages,
 )
 from pyuploadcare.exceptions import (
     APIError,
@@ -126,6 +137,71 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         ).json()
         response = self._parse_response(json_response, response_class)
         return cast(responses.FileSearchResponse, response)
+
+    def search_iterate(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        request_limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> Iterator[entities.FileSearchInfo]:
+        """Iterate over search results, page by page.
+
+        Pages are walked the same way ``ListMixin.list`` walks them — by
+        following the response's ``next`` URL, which points back at the
+        search endpoint with the ``limit``/``offset`` of the following page —
+        except that each page re-sends the search request as a ``POST`` body.
+
+        Only the first request is built here, and it is clamped to the search
+        window, because a legal starting ``offset`` can otherwise produce an
+        illegal ``offset`` + ``limit`` combination; from then on the server
+        computes ``next`` within the window.
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+            - limit: total number of results to yield. ``None`` yields
+                everything reachable.
+            - request_limit: number of results retrieved per request (page).
+            - offset: how many results to skip before the first page.
+            - include_appdata: embed application data in every result.
+        """
+        search_request = (
+            request
+            if isinstance(request, FileSearchRequest)
+            else FileSearchRequest.model_validate(request)
+        )
+
+        page_size = (
+            SEARCH_DEFAULT_LIMIT if request_limit is None else request_limit
+        )
+        start = 0 if offset is None else offset
+
+        first_page_size = min(page_size, SEARCH_MAX_WINDOW - start)
+        if limit is not None:
+            first_page_size = min(first_page_size, limit)
+        if first_page_size <= 0:
+            return iter(())
+
+        query_parameters: Dict[str, Any] = {
+            "limit": first_page_size,
+            "offset": start,
+        }
+        if include_appdata:
+            query_parameters["include"] = "appdata"
+
+        first_url = self._build_url(
+            suffix="search", query_parameters=query_parameters
+        )
+        response_class = self._get_response_class("search")
+        payload = search_request.to_payload()  # rendered once for all pages
+
+        return _iterate_pages(
+            first_url,
+            lambda url: self._client.post(url, json=payload).json(),
+            lambda raw: self._parse_response(raw, response_class),
+            limit=limit,
+        )
 
     def store(self, file_uuid: Union[UUID, str]) -> entities.FileInfo:
         url = self._build_url(file_uuid, suffix="storage")
