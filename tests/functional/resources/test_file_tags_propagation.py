@@ -147,3 +147,11 @@ def test_upload_from_url_without_tags_still_works(uploadcare):
         uploadcare.upload("https://example.com/file.jpg")
 
     mocked_upload.assert_called_once()
+
+
+def test_upload_from_url_accepts_an_empty_tags_collection(uploadcare):
+    """`tags=[]` carries no tags, so there is nothing to reject."""
+    with patch.object(uploadcare, "upload_from_url_sync") as mocked_upload:
+        uploadcare.upload("https://example.com/file.jpg", tags=[])
+
+    mocked_upload.assert_called_once()

@@ -331,7 +331,7 @@ class Uploadcare:
 
         # assume url is passed if str
         if isinstance(file_handle, str):
-            if tags is not None:
+            if tags:
                 raise InvalidParamError(
                     "tags are not supported for uploads from url. "
                     "Use File.set_tags() after the upload instead"
@@ -887,7 +887,9 @@ class Uploadcare:
         require_range(
             "request_limit", request_limit, minimum=1, maximum=SEARCH_MAX_LIMIT
         )
-        require_range("offset", offset, minimum=0, maximum=SEARCH_MAX_WINDOW)
+        require_range(
+            "offset", offset, minimum=0, maximum=SEARCH_MAX_WINDOW - 1
+        )
 
         # Validate the request here rather than inside the generator, so an
         # invalid request is reported immediately instead of on first

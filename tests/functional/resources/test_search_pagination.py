@@ -250,13 +250,12 @@ def test_first_page_is_clamped_to_the_search_window(
     )
 
 
-def test_offset_at_the_window_makes_no_request(uploadcare):
+def test_offset_at_the_window_raises(uploadcare):
+    """Consistent with `search_files`, which rejects the same offset."""
     with _patched_post(uploadcare, []) as mocked_post:
-        results = list(
+        with pytest.raises(InvalidParamError):
             uploadcare.iterate_search_files(REQUEST, offset=SEARCH_MAX_WINDOW)
-        )
 
-    assert results == []
     mocked_post.assert_not_called()
 
 
@@ -271,6 +270,7 @@ def test_offset_at_the_window_makes_no_request(uploadcare):
         {"request_limit": -1},
         {"request_limit": SEARCH_MAX_LIMIT + 1},
         {"offset": -1},
+        {"offset": SEARCH_MAX_WINDOW},
         {"offset": SEARCH_MAX_WINDOW + 1},
     ],
 )

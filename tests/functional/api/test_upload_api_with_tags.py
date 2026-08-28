@@ -56,17 +56,24 @@ def test_upload_omits_tags_when_not_given(upload_api, small_file):
     assert "tags" not in _sent_data(mocked_post)
 
 
-@pytest.mark.parametrize("tags", [[], ["", "   "]])
-def test_upload_omits_tags_when_they_normalize_to_empty(
-    upload_api, small_file, tags
-):
+def test_upload_omits_tags_when_none_are_given(upload_api, small_file):
     with patch.object(
         upload_api._client, "post", return_value=_upload_response()
     ) as mocked_post:
         with open(small_file.name, "rb") as fh:
-            upload_api.upload({"file.txt": fh}, tags=tags)
+            upload_api.upload({"file.txt": fh}, tags=[])
 
     assert "tags" not in _sent_data(mocked_post)
+
+
+def test_upload_rejects_tags_that_normalize_to_empty(upload_api, small_file):
+    """Raised, not silently dropped: the caller believes tags were set."""
+    with patch.object(upload_api._client, "post") as mocked_post:
+        with open(small_file.name, "rb") as fh:
+            with pytest.raises(TagValidationError):
+                upload_api.upload({"file.txt": fh}, tags=["", "   "])
+
+    mocked_post.assert_not_called()
 
 
 def test_upload_rejects_invalid_tags(upload_api, small_file):

@@ -177,6 +177,13 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         )
         start = 0 if offset is None else offset
 
+        if start >= SEARCH_MAX_WINDOW:
+            raise InvalidParamError(
+                f"`offset` must be less than {SEARCH_MAX_WINDOW}: search "
+                "cannot reach past the first "
+                f"{SEARCH_MAX_WINDOW} results"
+            )
+
         first_page_size = min(page_size, SEARCH_MAX_WINDOW - start)
         if limit is not None:
             first_page_size = min(first_page_size, limit)

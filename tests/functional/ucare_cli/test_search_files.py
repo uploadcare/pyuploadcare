@@ -42,6 +42,14 @@ def test_cli_search_files_without_conditions_raises(uploadcare):
         search_files(arg_namespace("search_files"), uploadcare)
 
 
+def test_cli_search_files_invalid_tag_raises_invalid_param(uploadcare):
+    """Tag validation errors route through the CLI handler like any other."""
+    with pytest.raises(InvalidParamError):
+        search_files(
+            arg_namespace("search_files --tags_any 'bad tag'"), uploadcare
+        )
+
+
 def test_cli_builds_nested_conditions():
     parsed = arg_namespace(
         "search_files"

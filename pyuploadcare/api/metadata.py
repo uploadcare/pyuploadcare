@@ -9,7 +9,9 @@ META_KEY_MAX_LEN = 64
 META_VALUE_MAX_LEN = 512
 
 LENGTH = f"{{1,{META_KEY_MAX_LEN}}}"
-key_matcher = re.compile(f"^{META_KEY_PATTERN}{LENGTH}$")
+# `\Z` rather than `$`, which would also match just before a trailing newline
+# and let `"key\n"` through.
+key_matcher = re.compile(rf"^{META_KEY_PATTERN}{LENGTH}\Z")
 
 
 def validate_meta_key(key):

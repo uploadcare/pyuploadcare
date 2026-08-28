@@ -15,7 +15,6 @@ from pyuploadcare.api.search_entities import (
     SizeRange,
     TagsFilter,
 )
-from pyuploadcare.exceptions import MetadataValidationError, TagValidationError
 
 
 # --- at least one condition -------------------------------------------------
@@ -101,10 +100,13 @@ def test_exact_rejects_empty_metadata_value_array():
         SearchExact(metadata={"color": []})
 
 
-def test_exact_rejects_invalid_metadata_key():
-    """A `[` or `]` in a key could forge a different wire key."""
-    with pytest.raises(MetadataValidationError):
-        SearchExact(metadata={"bad]key[": ["red"]})
+@pytest.mark.parametrize("key", ["bad]key[", "album\n"])
+def test_exact_rejects_invalid_metadata_key(key):
+    """A `[`, `]` or newline in a key could forge a different wire key."""
+    with pytest.raises(ValidationError) as excinfo:
+        SearchExact(metadata={key: ["red"]})
+
+    assert "is not valid" in str(excinfo.value)
 
 
 # --- phrase / exact overlap -------------------------------------------------
@@ -204,8 +206,10 @@ def test_tags_filter_normalizes_tags():
 
 
 def test_tags_filter_rejects_invalid_tags():
-    with pytest.raises(TagValidationError):
+    with pytest.raises(ValidationError) as excinfo:
         TagsFilter(any_=["not valid"])
+
+    assert "is not valid" in str(excinfo.value)
 
 
 def test_tags_filter_has_no_count_limit():

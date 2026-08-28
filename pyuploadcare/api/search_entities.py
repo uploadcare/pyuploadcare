@@ -51,56 +51,55 @@ class SearchRequestModel(BaseModel):
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
+    # The error to raise when no field is set. `None` disables the check,
+    # for models whose notion of "carries a condition" is more involved.
+    _at_least_one_error: ClassVar[Optional[str]] = None
+
     def _set_field_names(self) -> List[str]:
         """Names of the fields that carry an actual condition."""
         return [
             name for name, value in self.__dict__.items() if value is not None
         ]
 
+    @model_validator(mode="after")
+    def _require_at_least_one_field(self) -> "SearchRequestModel":
+        if self._at_least_one_error is not None:
+            if not self._set_field_names():
+                raise ValueError(self._at_least_one_error)
+        return self
+
 
 class DatetimeRange(SearchRequestModel):
+    _at_least_one_error: ClassVar[str] = (
+        "at least one of `gt`, `gte`, `lt` or `lte` is required"
+    )
+
     gt: Optional[datetime] = None
     gte: Optional[datetime] = None
     lt: Optional[datetime] = None
     lte: Optional[datetime] = None
 
-    @model_validator(mode="after")
-    def _at_least_one_bound(self) -> "DatetimeRange":
-        if not self._set_field_names():
-            raise ValueError(
-                "at least one of `gt`, `gte`, `lt` or `lte` is required"
-            )
-        return self
-
 
 class SizeRange(SearchRequestModel):
+    _at_least_one_error: ClassVar[str] = (
+        "at least one of `gt`, `gte`, `lt` or `lte` is required"
+    )
+
     # Strict, so `gt=True` is rejected instead of silently becoming `gt=1`.
     gt: Optional[StrictInt] = Field(None, ge=0)
     gte: Optional[StrictInt] = Field(None, ge=0)
     lt: Optional[StrictInt] = Field(None, ge=0)
     lte: Optional[StrictInt] = Field(None, ge=0)
 
-    @model_validator(mode="after")
-    def _at_least_one_bound(self) -> "SizeRange":
-        if not self._set_field_names():
-            raise ValueError(
-                "at least one of `gt`, `gte`, `lt` or `lte` is required"
-            )
-        return self
-
 
 class SearchPhrase(SearchRequestModel):
     """Ordered full-text match. Each value must be at least 4 characters."""
 
+    _at_least_one_error: ClassVar[str] = "`phrase` requires at least one field"
+
     original_filename: Optional[str] = Field(None, min_length=MIN_TERM_LENGTH)
     metadata: Optional[str] = Field(None, min_length=MIN_TERM_LENGTH)
     detected_mime_type: Optional[str] = Field(None, min_length=MIN_TERM_LENGTH)
-
-    @model_validator(mode="after")
-    def _at_least_one_field(self) -> "SearchPhrase":
-        if not self._set_field_names():
-            raise ValueError("`phrase` requires at least one field")
-        return self
 
 
 class SearchExact(SearchRequestModel):

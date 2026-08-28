@@ -94,15 +94,14 @@ def strict_bool(value):
 
     Unlike ``bool_or_none``, which silently maps unknown input to ``None``.
     """
-    mapping = {"true": True, "false": False}
-    normalized = str(value).strip().lower()
+    result = bool_or_none(str(value).strip().lower())
 
-    if normalized not in mapping:
+    if result is None:
         raise argparse.ArgumentTypeError(
             f"invalid boolean value: {value!r} (expected true or false)"
         )
 
-    return mapping[normalized]
+    return result
 
 
 def int_or_none(value):
