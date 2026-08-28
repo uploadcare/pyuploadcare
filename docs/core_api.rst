@@ -375,7 +375,9 @@ highlights nothing — expect either no ``highlight`` at all or one whose every 
     ``highlight`` values contain user-controlled content (filenames, metadata) plus markup added
     by the server. They are not trusted HTML — escape them before rendering.
 
-Search is available from the CLI as well. Because a descending sort key starts with a dash, pass
+Search is available from the CLI as well. As in ``list_files``, ``--limit`` is the total number
+of results to show (default 100) and ``--request_limit`` is the page size, which you seldom need
+to change. Because a descending sort key starts with a dash, pass
 it with ``--sort=`` so it is not read as another option::
 
     ucare search_files --query sunset --tags_any cat dog --is_image true \

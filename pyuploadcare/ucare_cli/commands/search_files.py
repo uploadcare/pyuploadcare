@@ -4,7 +4,11 @@ from pydantic import ValidationError
 from pyuploadcare.api.search_entities import FileSearchRequest, SearchSort
 from pyuploadcare.client import Uploadcare
 from pyuploadcare.exceptions import InvalidParamError
-from pyuploadcare.ucare_cli.commands.helpers import pprint, strict_bool
+from pyuploadcare.ucare_cli.commands.helpers import (
+    positive_int,
+    pprint,
+    strict_bool,
+)
 
 
 def register_arguments(subparsers):  # noqa: C901
@@ -81,13 +85,22 @@ def register_arguments(subparsers):  # noqa: C901
     )
     subparser.add_argument(
         "--limit",
-        type=int,
-        help="results per page, 1 to 100. Defaults to 20",
+        type=positive_int,
+        default=100,
+        help="total results to show. Defaults to 100; search cannot reach"
+        " past the first 1000 results",
+    )
+    subparser.add_argument(
+        "--request_limit",
+        type=positive_int,
+        default=20,
+        help="results per request, 1 to 100. Defaults to 20."
+        " You seldom need to change this",
     )
     subparser.add_argument(
         "--offset",
         type=int,
-        help="results to skip. `offset` + `limit` must not exceed 1000",
+        help="results to skip before the first one shown",
     )
     subparser.add_argument(
         "--include_appdata",
@@ -148,10 +161,11 @@ def search_files(arg_namespace, client: Uploadcare):
         # would surface as a traceback.
         raise InvalidParamError(str(error))
 
-    response = client.search_files(
+    results = client.iterate_search_files(
         request,
         limit=arg_namespace.limit,
+        request_limit=arg_namespace.request_limit,
         offset=arg_namespace.offset,
         include_appdata=arg_namespace.include_appdata,
     )
-    pprint(response.model_dump())
+    pprint([result.model_dump() for result in results])

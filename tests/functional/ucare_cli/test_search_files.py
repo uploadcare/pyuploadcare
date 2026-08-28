@@ -19,7 +19,8 @@ def test_cli_search_files(capsys, uploadcare):
     )
     captured = capsys.readouterr()
 
-    assert '"total": 1' in captured.out
+    # A list of results, like `list_files` — not the raw response envelope.
+    assert captured.out.lstrip().startswith("[")
     assert '"sunset-cat.jpg"' in captured.out
     assert '"<em>sunset</em>-cat.jpg"' in captured.out
 
@@ -48,6 +49,13 @@ def test_cli_search_files_invalid_tag_raises_invalid_param(uploadcare):
         search_files(
             arg_namespace("search_files --tags_any 'bad tag'"), uploadcare
         )
+
+
+@pytest.mark.parametrize("flag", ["--limit", "--request_limit"])
+@pytest.mark.parametrize("value", ["0", "-1", "none", "1.5", "ten"])
+def test_cli_pagination_flags_require_a_positive_integer(flag, value):
+    with pytest.raises(SystemExit):
+        arg_namespace(["search_files", "--query", "sunset", flag, value])
 
 
 def test_cli_builds_nested_conditions():
