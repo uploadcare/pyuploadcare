@@ -52,10 +52,18 @@ def test_cli_search_files_invalid_tag_raises_invalid_param(uploadcare):
 
 
 @pytest.mark.parametrize("flag", ["--limit", "--request_limit"])
-@pytest.mark.parametrize("value", ["0", "-1", "none", "1.5", "ten"])
-def test_cli_pagination_flags_require_a_positive_integer(flag, value):
+@pytest.mark.parametrize("value", ["1.5", "ten"])
+def test_cli_pagination_flags_require_an_integer(flag, value):
     with pytest.raises(SystemExit):
         arg_namespace(["search_files", "--query", "sunset", flag, value])
+
+
+@pytest.mark.parametrize("flag", ["--limit", "--request_limit"])
+def test_cli_pagination_flags_accept_none(flag):
+    parsed = arg_namespace(
+        ["search_files", "--query", "sunset", flag, "none"]
+    )
+    assert getattr(parsed, flag.lstrip("-")) is None
 
 
 def test_cli_builds_nested_conditions():

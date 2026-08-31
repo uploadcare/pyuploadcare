@@ -108,23 +108,6 @@ def int_or_none(value):
     return None if value.lower() == "none" else int(value)
 
 
-def positive_int(value):
-    """Parse a positive integer, erroring out on anything else."""
-    try:
-        number = int(value)
-    except ValueError:
-        raise argparse.ArgumentTypeError(
-            f"invalid positive integer: {value!r}"
-        )
-
-    if number <= 0:
-        raise argparse.ArgumentTypeError(
-            f"invalid positive integer: {value!r}"
-        )
-
-    return number
-
-
 def promt(text, default="y"):
     return (input("{0} [y/n]: ".format(text)) or default) == "y"
 

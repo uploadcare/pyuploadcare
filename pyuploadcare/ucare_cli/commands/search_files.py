@@ -5,7 +5,7 @@ from pyuploadcare.api.search_entities import FileSearchRequest, SearchSort
 from pyuploadcare.client import Uploadcare
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.ucare_cli.commands.helpers import (
-    positive_int,
+    int_or_none,
     pprint,
     strict_bool,
 )
@@ -85,14 +85,14 @@ def register_arguments(subparsers):  # noqa: C901
     )
     subparser.add_argument(
         "--limit",
-        type=positive_int,
+        type=int_or_none,
         default=100,
         help="total results to show. Defaults to 100; search cannot reach"
         " past the first 1000 results",
     )
     subparser.add_argument(
         "--request_limit",
-        type=positive_int,
+        type=int_or_none,
         default=20,
         help="results per request, 1 to 100. Defaults to 20."
         " You seldom need to change this",
