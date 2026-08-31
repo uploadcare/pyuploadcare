@@ -115,6 +115,68 @@ def test_next_url_is_requested_verbatim(uploadcare):
     assert _urls(mocked_post)[1] == next_url
 
 
+def test_include_appdata_is_reapplied_to_every_page(uploadcare):
+    """The server's `next` does not echo `include`, so the engine must."""
+    pages = [
+        # `next` as the server sends it: no `include` parameter.
+        _page(2, next_url=_next_url(2, 2), total=4),
+        _page(2, next_url=None, total=4, offset=2),
+    ]
+
+    with _patched_post(uploadcare, pages) as mocked_post:
+        list(
+            uploadcare.iterate_search_files(
+                REQUEST, request_limit=2, include_appdata=True
+            )
+        )
+
+    for url in _urls(mocked_post):
+        assert parse_qs(urlsplit(url).query)["include"] == ["appdata"]
+
+
+@pytest.mark.parametrize(
+    "next_url",
+    [
+        "HTTPS://API.UPLOADCARE.COM/files/search/?limit=2&offset=2",
+        "https://api.uploadcare.com:443/files/search/?limit=2&offset=2",
+        "/files/search/?limit=2&offset=2",
+    ],
+    ids=["uppercase", "explicit-default-port", "relative"],
+)
+def test_equivalent_origin_next_is_followed(uploadcare, next_url):
+    """Origin comparison is not textual: case, an explicit default port and
+    a relative URL are all the origin of the search endpoint."""
+    pages = [
+        _page(2, next_url=next_url, total=4),
+        _page(2, next_url=None, total=4, offset=2),
+    ]
+
+    with _patched_post(uploadcare, pages) as mocked_post:
+        results = list(
+            uploadcare.iterate_search_files(REQUEST, request_limit=2)
+        )
+
+    assert len(results) == 4
+    assert mocked_post.call_count == 2
+
+
+def test_same_host_other_scheme_next_is_refused(uploadcare):
+    """A scheme downgrade is a different origin, even on the same host."""
+    pages = [
+        _page(
+            2,
+            next_url="http://api.uploadcare.com/files/search/?limit=2&offset=2",
+            total=4,
+        )
+    ]
+
+    with _patched_post(uploadcare, pages):
+        iterator = uploadcare.iterate_search_files(REQUEST, request_limit=2)
+
+        with pytest.raises(InvalidRequestError, match="refusing to follow"):
+            list(iterator)
+
+
 def test_foreign_next_is_refused(uploadcare):
     """`next` is only followed within the origin of the search endpoint."""
     pages = [_page(2, next_url=HOSTILE_NEXT, total=4)]

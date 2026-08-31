@@ -215,6 +215,9 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
             lambda url: self._client.post(url, json=payload).json(),
             lambda raw: self._parse_response(raw, response_class),
             limit=limit,
+            # The server's `next` does not echo `include`, so it has to be
+            # re-applied to every page.
+            carry_query={"include": "appdata"} if include_appdata else None,
         )
 
     def store(self, file_uuid: Union[UUID, str]) -> entities.FileInfo:

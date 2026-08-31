@@ -112,6 +112,7 @@ def test_search_files(capsys, keys):
         )
     )
 
-    response = _output(capsys)
-    assert isinstance(response["total"], int)
-    assert len(response["results"]) <= 1
+    results = _output(capsys)
+    assert isinstance(results, list)
+    assert len(results) <= 1
+    assert all("uuid" in result for result in results)

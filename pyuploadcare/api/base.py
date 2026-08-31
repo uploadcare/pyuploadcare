@@ -1,5 +1,15 @@
-from typing import Any, Callable, Dict, Iterator, Optional, Type, Union, cast
-from urllib.parse import urlencode, urljoin, urlsplit
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
+from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 from uuid import UUID
 
 from pydantic import TypeAdapter
@@ -177,11 +187,44 @@ class RetrieveMixin(APIProtocol):
         return self._parse_response(json_response, response_class)
 
 
+_DEFAULT_PORTS = {"http": 80, "https": 443}
+
+
+def _origin(url: str) -> Tuple[str, str, Optional[int]]:
+    """The (scheme, host, port) origin of ``url``, normalized for comparison.
+
+    Scheme and host are case-insensitive, and an explicit default port is the
+    same origin as no port at all.
+    """
+    split = urlsplit(url)
+    scheme = split.scheme.lower()
+
+    try:
+        port = split.port
+    except ValueError:
+        # An unparsable port matches nothing but its own verbatim netloc.
+        return scheme, split.netloc.lower(), None
+
+    if port == _DEFAULT_PORTS.get(scheme):
+        port = None
+
+    return scheme, (split.hostname or "").lower(), port
+
+
+def _merge_query(url: str, params: Dict[str, str]) -> str:
+    """Return ``url`` with ``params`` merged into its query string."""
+    split = urlsplit(url)
+    query = dict(parse_qsl(split.query))
+    query.update(params)
+    return urlunsplit(split._replace(query=urlencode(query)))
+
+
 def _iterate_pages(  # noqa: C901
     first_url: str,
     fetch_page: Callable[[str], Dict[str, Any]],
     parse: Callable[[Dict[str, Any]], Any],
     limit: Optional[int] = None,
+    carry_query: Optional[Dict[str, str]] = None,
 ) -> Iterator[Any]:
     """Walk a paginated endpoint, yielding up to ``limit`` results.
 
@@ -193,12 +236,20 @@ def _iterate_pages(  # noqa: C901
     ``next`` is only followed within the origin of ``first_url``: the HTTP
     client attaches credentials to whatever URL it is given, so a foreign
     ``next`` (a compromised or misbehaving server) fails loudly instead of
-    leaking them.
+    leaking them. A relative ``next`` is resolved against the page that
+    supplied it.
+
+    ``carry_query`` parameters are re-applied to every followed ``next``
+    URL: the server does not echo request decorations such as
+    ``include=appdata``, so following ``next`` verbatim would silently drop
+    them after the first page. ``first_url`` is expected to carry them
+    already.
     """
-    origin = urlsplit(first_url)[:2]
+    origin = _origin(first_url)
     next_: Optional[str] = first_url
 
     while next_:
+        page_url = next_
         response = parse(fetch_page(next_))
         results = getattr(response, "results", response)
 
@@ -220,10 +271,16 @@ def _iterate_pages(  # noqa: C901
             break
 
         next_ = getattr(response, "next", None)
-        if next_ and urlsplit(next_)[:2] != origin:
-            raise InvalidRequestError(
-                f"refusing to follow `next` outside {origin[1]}: {next_}"
-            )
+        if next_:
+            # A relative `next` resolves against the page that supplied it,
+            # so it is same-origin by construction.
+            next_ = urljoin(page_url, next_)
+            if _origin(next_) != origin:
+                raise InvalidRequestError(
+                    f"refusing to follow `next` outside {origin[1]}: {next_}"
+                )
+            if carry_query:
+                next_ = _merge_query(next_, carry_query)
 
 
 class ListMixin(APIProtocol):

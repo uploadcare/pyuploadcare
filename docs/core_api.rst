@@ -217,7 +217,9 @@ While uploading multiple files at once, the tags are applied to every file in th
     ucare_files: List[File] = uploadcare.upload_files([file1, file2], tags=['cat'])
     # don't forget to close the files, of course
 
-Uploads from URL do not support tags. Use ``File.set_tags()`` after such an upload instead.
+Uploads from URL accept tags the same way::
+
+    ucare_file: File = uploadcare.upload('https://example.com/file.jpg', tags=['cat'])
 
 Read the current tags of a file::
 
