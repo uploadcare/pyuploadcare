@@ -315,8 +315,7 @@ class Uploadcare:
                 accepting ``UploadProgress`` to track uploading progress.
             - tags (Optional[Iterable[str]]): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
-                the uploaded file. Not supported for uploads from url; use
-                ``File.set_tags()`` for those.
+                the uploaded file.
                 Upload responses do not report tags back. After a direct
                 upload nothing is cached, so reading ``File.tags`` fetches the
                 file info and returns the stored tags. After a multipart
@@ -331,18 +330,13 @@ class Uploadcare:
 
         # assume url is passed if str
         if isinstance(file_handle, str):
-            if tags:
-                raise InvalidParamError(
-                    "tags are not supported for uploads from url. "
-                    "Use File.set_tags() after the upload instead"
-                )
-
             file_url: str = file_handle
             return self.upload_from_url_sync(
                 file_url,
                 store=store,
                 callback=callback,
                 metadata=metadata,
+                tags=tags,
             )
 
         file_obj: IO = file_handle
@@ -526,6 +520,7 @@ class Uploadcare:
         metadata=None,
         check_duplicates: Optional[bool] = None,
         save_duplicates: Optional[bool] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> FileFromUrl:
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
@@ -545,6 +540,9 @@ class Uploadcare:
                 previously uploaded this method will raise DuplicateFileError.
             - save_duplicates (Optional[bool]): Indicates if the URL should be
                 stored by Uploadcare future check_duplicates usages.
+            - tags (Optional[Iterable[str]]): Optional
+                `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
+                the uploaded file.
 
         Returns:
             ``FileFromUrl`` instance
@@ -566,6 +564,7 @@ class Uploadcare:
             expire=int(time()) + self.signed_uploads_ttl,
             check_duplicates=check_duplicates,
             save_duplicates=save_duplicates,
+            tags=tags,
         )
         file_from_url = FileFromUrl(token, self)
         return file_from_url
@@ -582,6 +581,7 @@ class Uploadcare:
         callback: Optional[Callable[[UploadProgress], Any]] = None,
         check_duplicates: Optional[bool] = None,
         save_duplicates: Optional[bool] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> File:
         """Uploads file from given url and returns ``File`` instance.
 
@@ -610,6 +610,9 @@ class Uploadcare:
                 uploaded file.
             - save_duplicates (Optional[bool]): Indicates if the URL should be
                 stored by Uploadcare future check_duplicates usages.
+            - tags (Optional[Iterable[str]]): Optional
+                `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
+                the uploaded file.
 
         Returns:
             ``File`` instance
@@ -626,6 +629,7 @@ class Uploadcare:
                 metadata=metadata,
                 check_duplicates=check_duplicates,
                 save_duplicates=save_duplicates,
+                tags=tags,
             )
             return ffu.wait(
                 timeout=timeout,

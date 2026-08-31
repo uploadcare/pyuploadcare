@@ -555,6 +555,7 @@ class UploadAPI(API):
         expire: Optional[int] = None,
         check_duplicates: Optional[bool] = None,
         save_duplicates: Optional[bool] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> str:
         data = {
             "source_url": source_url,
@@ -567,6 +568,8 @@ class UploadAPI(API):
         if metadata is not None:
             validate_metadata(metadata)
             data.update(flatten_dict(metadata))
+
+        self._set_tags(data, tags)
 
         if secure_upload:
             expire = (
