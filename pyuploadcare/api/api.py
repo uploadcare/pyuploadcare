@@ -172,8 +172,12 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         )
 
         require_optional_int("limit", limit)
+        require_optional_int("request_limit", request_limit)
         require_optional_int("offset", offset)
-        require_range("limit", limit, minimum=1, maximum=SEARCH_MAX_LIMIT)
+        require_range("limit", limit, minimum=0)
+        require_range(
+            "request_limit", request_limit, minimum=1, maximum=SEARCH_MAX_LIMIT
+        )
         require_range("offset", offset, minimum=0)
         page_size = (
             SEARCH_DEFAULT_LIMIT if request_limit is None else request_limit
