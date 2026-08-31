@@ -172,6 +172,10 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
             else FileSearchRequest.model_validate(request)
         )
 
+        require_optional_int("limit", limit)
+        require_optional_int("offset", offset)
+        require_range("limit", limit, minimum=1, maximum=SEARCH_MAX_LIMIT)
+        require_range("offset", offset, minimum=0)
         page_size = (
             SEARCH_DEFAULT_LIMIT if request_limit is None else request_limit
         )
