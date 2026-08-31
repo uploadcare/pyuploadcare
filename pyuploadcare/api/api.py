@@ -17,9 +17,8 @@ from typing import (
 )
 from uuid import UUID
 
-from httpx._types import RequestFiles
-
 from pyuploadcare.api import entities, responses
+from pyuploadcare.api._httpx import RequestFiles
 from pyuploadcare.api.addon_entities import (
     AddonExecutionGeneralRequestData,
     AddonExecutionParams,

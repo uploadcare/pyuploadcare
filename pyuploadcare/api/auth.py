@@ -3,8 +3,7 @@ import hmac
 from datetime import datetime, timezone
 from typing import Generator, Union
 
-from httpx import Auth, Request, Response
-from httpx._utils import to_bytes, to_str
+from pyuploadcare.api._httpx import Auth, Request, Response, to_bytes, to_str
 
 
 class AuthBase(Auth): ...
@@ -77,7 +76,7 @@ class UploadcareAuth(UploadcareSimpleAuth):
         formated_date_time: str = "",
     ) -> str:
         content_md5 = hashlib.md5(request.read()).hexdigest()
-        content_type = request.headers.get("Content-Type")
+        content_type = request.headers.get("Content-Type") or ""
         uri = to_str(request.url.raw_path)
         sign_string = "\n".join(
             [
