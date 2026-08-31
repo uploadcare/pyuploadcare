@@ -103,3 +103,15 @@ def test_upload_with_tags(capsys, keys, uploadcare):
         assert uploadcare.tags_api.get(file_.uuid) == ["cli-test"]
     finally:
         file_.delete()
+
+
+def test_search_files(capsys, keys):
+    main(
+        arg_namespace(
+            [*keys, "search_files", "--is_image", "true", "--limit", "1"]
+        )
+    )
+
+    response = _output(capsys)
+    assert isinstance(response["total"], int)
+    assert len(response["results"]) <= 1

@@ -2,9 +2,7 @@
 
 from unittest.mock import patch
 
-import pytest
-
-from pyuploadcare.exceptions import InvalidParamError
+from pyuploadcare.resources.file import FileFromUrl
 
 
 TAGS = ["cat", "animal"]
@@ -133,17 +131,27 @@ def test_file_tags_after_multipart_upload_is_none(uploadcare, memo_file):
     assert file_.tags is None
 
 
-def test_upload_from_url_rejects_tags(uploadcare):
-    """`/from_url/` does not support tags, so they must not be dropped."""
+def test_upload_from_url_forwards_tags(uploadcare):
     with patch.object(uploadcare, "upload_from_url_sync") as mocked_upload:
-        with pytest.raises(InvalidParamError):
-            uploadcare.upload("https://example.com/file.jpg", tags=TAGS)
+        uploadcare.upload("https://example.com/file.jpg", tags=TAGS)
 
-    mocked_upload.assert_not_called()
+    assert mocked_upload.call_args.kwargs["tags"] == TAGS
 
 
-def test_upload_from_url_without_tags_still_works(uploadcare):
+def test_upload_from_url_sync_forwards_tags_to_upload_api(uploadcare):
+    with patch.object(
+        uploadcare.upload_api, "upload_from_url"
+    ) as mocked_upload:
+        with patch.object(FileFromUrl, "wait"):
+            uploadcare.upload_from_url_sync(
+                "https://example.com/file.jpg", tags=TAGS
+            )
+
+    assert mocked_upload.call_args.kwargs["tags"] == TAGS
+
+
+def test_upload_from_url_omits_tags_when_not_given(uploadcare):
     with patch.object(uploadcare, "upload_from_url_sync") as mocked_upload:
         uploadcare.upload("https://example.com/file.jpg")
 
-    mocked_upload.assert_called_once()
+    assert mocked_upload.call_args.kwargs["tags"] is None

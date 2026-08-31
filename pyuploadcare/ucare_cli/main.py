@@ -22,6 +22,7 @@ from pyuploadcare.ucare_cli.commands import (
     list_files,
     list_groups,
     list_webhooks,
+    search_files,
     set_file_tags,
     store_files,
     sync,
@@ -64,6 +65,7 @@ def ucare_argparser():
     get_file_tags.register_arguments(subparsers)
     set_file_tags.register_arguments(subparsers)
     update_file_tags.register_arguments(subparsers)
+    search_files.register_arguments(subparsers)
 
     # common arguments
     parser.add_argument(

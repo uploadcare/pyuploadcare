@@ -1,6 +1,7 @@
 import os
 import socket
 import ssl
+import warnings
 from time import time
 from typing import (
     IO,
@@ -8,6 +9,7 @@ from typing import (
     Callable,
     Dict,
     Iterable,
+    Iterator,
     List,
     Optional,
     Tuple,
@@ -29,10 +31,18 @@ from pyuploadcare.api import (
     VideoConvertAPI,
     WebhooksAPI,
 )
-from pyuploadcare.api.api import URLAPI
+from pyuploadcare.api.api import SEARCH_MAX_LIMIT, SEARCH_MAX_WINDOW, URLAPI
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
-from pyuploadcare.api.entities import ProjectInfo, Webhook, WebhookEvent
+from pyuploadcare.api.entities import (
+    FileSearchInfo,
+    ProjectInfo,
+    Webhook,
+    WebhookEvent,
+)
+from pyuploadcare.api.responses import FileSearchResponse
+from pyuploadcare.api.search_entities import FileSearchRequest
+from pyuploadcare.api.utils import require_optional_int, require_range
 from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
     get_file_size,
@@ -305,8 +315,7 @@ class Uploadcare:
                 accepting ``UploadProgress`` to track uploading progress.
             - tags (Optional[Iterable[str]]): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
-                the uploaded file. Not supported for uploads from URL; use
-                ``File.set_tags()`` for those.
+                the uploaded file.
                 Upload responses do not report tags back. After a direct
                 upload nothing is cached, so reading ``File.tags`` fetches the
                 file info and returns the stored tags. After a multipart
@@ -321,18 +330,13 @@ class Uploadcare:
 
         # assume url is passed if str
         if isinstance(file_handle, str):
-            if tags is not None:
-                raise InvalidParamError(
-                    "tags are not supported for uploads from URL. "
-                    "Use File.set_tags() after the upload instead"
-                )
-
             file_url: str = file_handle
             return self.upload_from_url_sync(
                 file_url,
                 store=store,
                 callback=callback,
                 metadata=metadata,
+                tags=tags,
             )
 
         file_obj: IO = file_handle
@@ -516,6 +520,7 @@ class Uploadcare:
         metadata=None,
         check_duplicates: Optional[bool] = None,
         save_duplicates: Optional[bool] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> FileFromUrl:
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
@@ -535,6 +540,9 @@ class Uploadcare:
                 previously uploaded this method will raise DuplicateFileError.
             - save_duplicates (Optional[bool]): Indicates if the URL should be
                 stored by Uploadcare future check_duplicates usages.
+            - tags (Optional[Iterable[str]]): Optional
+                `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
+                the uploaded file.
 
         Returns:
             ``FileFromUrl`` instance
@@ -556,6 +564,7 @@ class Uploadcare:
             expire=int(time()) + self.signed_uploads_ttl,
             check_duplicates=check_duplicates,
             save_duplicates=save_duplicates,
+            tags=tags,
         )
         file_from_url = FileFromUrl(token, self)
         return file_from_url
@@ -572,6 +581,7 @@ class Uploadcare:
         callback: Optional[Callable[[UploadProgress], Any]] = None,
         check_duplicates: Optional[bool] = None,
         save_duplicates: Optional[bool] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> File:
         """Uploads file from given url and returns ``File`` instance.
 
@@ -600,6 +610,9 @@ class Uploadcare:
                 uploaded file.
             - save_duplicates (Optional[bool]): Indicates if the URL should be
                 stored by Uploadcare future check_duplicates usages.
+            - tags (Optional[Iterable[str]]): Optional
+                `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
+                the uploaded file.
 
         Returns:
             ``File`` instance
@@ -616,6 +629,7 @@ class Uploadcare:
                 metadata=metadata,
                 check_duplicates=check_duplicates,
                 save_duplicates=save_duplicates,
+                tags=tags,
             )
             return ffu.wait(
                 timeout=timeout,
@@ -781,6 +795,130 @@ class Uploadcare:
             request_limit=request_limit,
             stored=stored,
             removed=removed,
+        )
+
+    def search_files(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> FileSearchResponse:
+        """Search files, returning a single page of results.
+
+        One request can combine full-text search, exact matching, range
+        filters and tag filters. At least one condition is required.
+
+        Usage example::
+
+            >>> from pyuploadcare import FileSearchRequest, TagsFilter
+            >>> response = uploadcare.search_files(
+            ...     FileSearchRequest(
+            ...         query='sunset',
+            ...         tags=TagsFilter(all_=['cat']),
+            ...         sort=['-score'],
+            ...     ),
+            ...     limit=50,
+            ... )
+            >>> response.total
+            2
+            >>> for file_info in response.results:
+            ...     print(file_info.original_filename, file_info.tags)
+
+        The response is returned as is, because ``total``, ``per_page``,
+        ``next``, ``previous`` and the per-result ``highlight`` are all
+        meaningful. Use ``iterate_search_files`` to walk pages instead.
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+            - limit: results per page, 1 to 100. The server defaults to 20.
+            - offset: how many results to skip. ``offset + limit`` must not
+                exceed 1000.
+            - include_appdata: embed application data in every result.
+
+        Returns:
+            ``FileSearchResponse``
+
+        """
+        return self.files_api.search(
+            request,
+            limit=limit,
+            offset=offset,
+            include_appdata=include_appdata,
+        )
+
+    def iterate_search_files(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        request_limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> Iterator[FileSearchInfo]:
+        """Iterate over file search results, page by page.
+
+        Usage example::
+
+            >>> for file_info in uploadcare.iterate_search_files(
+            ...     {'tags': {'all': ['cat']}, 'sort': ['-datetime_uploaded']},
+            ...     limit=200,
+            ... ):
+            ...     print(file_info.uuid)
+
+        Always pass an explicit ``sort`` for a filter-only request, i.e. one
+        without ``query`` or ``phrase``. Such a request has no relevance to
+        rank by, so its order is undefined, and paging through an undefined
+        order can skip or repeat files. A ``UserWarning`` is emitted when that
+        happens.
+
+        Search is limited to the first 1000 results; narrow the query instead
+        of paging deeper.
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+            - limit: total number of results to yield. ``None`` yields
+                everything reachable.
+            - request_limit: number of results retrieved per request (page).
+                Usually, you don't need worry about this parameter.
+            - offset: how many results to skip before the first page.
+            - include_appdata: embed application data in every result.
+
+        """
+        require_optional_int("limit", limit)
+        require_optional_int("request_limit", request_limit)
+        require_optional_int("offset", offset)
+        require_range("limit", limit, minimum=0)
+        require_range(
+            "request_limit", request_limit, minimum=1, maximum=SEARCH_MAX_LIMIT
+        )
+        require_range(
+            "offset", offset, minimum=0, maximum=SEARCH_MAX_WINDOW - 1
+        )
+
+        # Validate the request here rather than inside the generator, so an
+        # invalid request is reported immediately instead of on first
+        # iteration. It also keeps every page from re-validating it.
+        search_request = (
+            request
+            if isinstance(request, FileSearchRequest)
+            else FileSearchRequest.model_validate(request)
+        )
+
+        if search_request.has_undefined_order():
+            warnings.warn(
+                "Paging through a filter-only search without `sort` is "
+                "unreliable: the result order is undefined, so files may be "
+                "skipped or repeated. Pass an explicit `sort`.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        return self.files_api.search_iterate(
+            search_request,
+            limit=limit,
+            request_limit=request_limit,
+            offset=offset,
+            include_appdata=include_appdata,
         )
 
     def list_file_groups(

@@ -83,7 +83,14 @@ def validate_tags(
           ``MAX_TAGS_PER_FILE`` is a limit on tags stored on a single file;
           pass ``None`` where no such limit applies, e.g. for search filters.
     """
+    tags = tags if isinstance(tags, str) else list(tags)
     normalized = normalize_tags(tags)
+
+    if tags and not normalized:
+        raise TagValidationError(
+            "All given tags are empty after normalization. To clear the "
+            "tags of a file, pass an empty collection instead"
+        )
 
     for tag in normalized:
         validate_tag(tag)

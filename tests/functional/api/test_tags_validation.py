@@ -86,6 +86,25 @@ def test_validate_tag_rejects_non_string():
         validate_tag(42)  # type: ignore[arg-type]
 
 
+def test_validate_tags_rejects_tags_that_normalize_to_nothing():
+    """`set_tags(["  "])` must not silently clear every tag on the file."""
+    with pytest.raises(TagValidationError, match="empty after normalization"):
+        validate_tags(["  "])
+
+    with pytest.raises(TagValidationError, match="empty after normalization"):
+        validate_tags(["", "\t"])
+
+
+def test_validate_tags_accepts_an_empty_collection():
+    """An empty collection is the documented way to clear tags."""
+    assert validate_tags([]) == []
+    assert validate_tags(()) == []
+
+
+def test_validate_tags_still_drops_empty_items_among_valid_ones():
+    assert validate_tags(["cat", "  "]) == ["cat"]
+
+
 def test_validate_tags_accepts_max_length_tag():
     tag = "a" * TAG_MAX_LEN
     assert validate_tags([tag]) == [tag]

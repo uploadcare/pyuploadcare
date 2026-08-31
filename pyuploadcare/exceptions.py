@@ -77,13 +77,13 @@ class DefaultResponseClassNotDefined(Exception):
         super().__init__("Need define default response class for API.")
 
 
-class MetadataValidationError(UploadcareException):
+class MetadataValidationError(InvalidParamError):
     """
     Raised when a 'key' or 'value' of metadata did not satisfy the constraints
     """
 
 
-class TagValidationError(UploadcareException):
+class TagValidationError(InvalidParamError):
     """
     Raised when a tag did not satisfy the constraints
     """
