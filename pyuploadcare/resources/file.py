@@ -320,16 +320,18 @@ class File:
         return tags
 
     def set_tags(self, tags: List[str]) -> UpdateFileTagsResponse:
-        """Replaces all file tags by requesting Uploadcare API.
+        """Replace the file's entire tag set with ``tags``.
 
-        Passing an empty list clears the tags::
+        Any current tag not in ``tags`` is removed; an empty list clears them
+        all. The response reports the resulting ``tags`` plus the ``added``
+        and ``deleted`` deltas the server computed::
 
             >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
             >>> file_.set_tags(['cat', 'animal'])
             UpdateFileTagsResponse(tags=['cat', 'animal'], added=['cat', 'animal'], deleted=[])
 
         """
-        response = self._client.tags_api.replace(self.uuid, tags)
+        response = self._client.tags_api.set(self.uuid, tags)
         self._cache_tags(response.tags)
         return response
 
@@ -338,7 +340,7 @@ class File:
         add: Optional[List[str]] = None,
         delete: Optional[List[str]] = None,
     ) -> UpdateFileTagsResponse:
-        """Adds and/or deletes file tags atomically::
+        """Update tags. Pass `add` and `delete` lists to be added and deleted respectively.
 
         >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
         >>> file_.update_tags(add=['cute'], delete=['animal'])

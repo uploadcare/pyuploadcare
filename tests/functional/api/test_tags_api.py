@@ -25,9 +25,7 @@ def test_get_empty_file_tags(uploadcare):
 
 @pytest.mark.vcr
 def test_replace_file_tags(uploadcare):
-    response = uploadcare.tags_api.replace(
-        FILE_UUID, ["cat", "animal", "cute"]
-    )
+    response = uploadcare.tags_api.set(FILE_UUID, ["cat", "animal", "cute"])
 
     assert isinstance(response, UpdateFileTagsResponse)
     assert response.tags == ["cat", "animal", "cute"]
