@@ -60,9 +60,7 @@ def test_cli_pagination_flags_require_an_integer(flag, value):
 
 @pytest.mark.parametrize("flag", ["--limit", "--request_limit"])
 def test_cli_pagination_flags_accept_none(flag):
-    parsed = arg_namespace(
-        ["search_files", "--query", "sunset", flag, "none"]
-    )
+    parsed = arg_namespace(["search_files", "--query", "sunset", flag, "none"])
     assert getattr(parsed, flag.lstrip("-")) is None
 
 
