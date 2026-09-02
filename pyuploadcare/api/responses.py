@@ -8,6 +8,7 @@ from pyuploadcare.api.entities import (
     DocumentConvertInfo,
     Entity,
     FileInfo,
+    FileSearchInfo,
     GroupInfo,
     MetadataDict,
     VideoConvertInfo,
@@ -31,6 +32,11 @@ class PaginatedResponse(EntityListResponse):
 class FileListResponse(PaginatedResponse):
     # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesList
     results: List[FileInfo]  # type: ignore
+
+
+class FileSearchResponse(PaginatedResponse):
+    # https://uploadcare.com/docs/api/rest/file/search-files/
+    results: List[FileSearchInfo]  # type: ignore
 
 
 class GroupListResponse(PaginatedResponse):
@@ -77,6 +83,19 @@ class DeleteMetadataKeyResponse(Entity):
 
 class GetAllMetadataResponse(RootModel, Entity):
     root: MetadataDict
+
+
+class GetFileTagsResponse(Response):
+    # https://uploadcare.com/docs/api/rest/file-tags/get-tags/
+    tags: List[str]
+
+
+class UpdateFileTagsResponse(Response):
+    # https://uploadcare.com/docs/api/rest/file-tags/put-tags/
+    # https://uploadcare.com/docs/api/rest/file-tags/patch-tags/
+    tags: List[str]
+    added: List[str]
+    deleted: List[str]
 
 
 class AddonResponseResult(Entity):

@@ -4,7 +4,17 @@ import logging
 import warnings
 from json import JSONDecodeError
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Type,
+    Union,
+    cast,
+)
 from uuid import UUID
 
 from pyuploadcare.api import entities, responses
@@ -23,20 +33,31 @@ from pyuploadcare.api.base import (
     ListMixin,
     RetrieveMixin,
     UpdateMixin,
+    _iterate_pages,
 )
 from pyuploadcare.exceptions import (
     APIError,
     DuplicateFileError,
+    InvalidParamError,
     InvalidRequestError,
     WebhookIsNotUnique,
 )
 
 from .entities import UUIDEntity
 from .metadata import validate_meta_key, validate_meta_value, validate_metadata
-from .utils import flatten_dict
+from .search_entities import FileSearchRequest
+from .tags import validate_tags
+from .utils import flatten_dict, require_optional_int, require_range
 
 
 logger = logging.getLogger("pyuploadcare")
+
+
+# File search pagination limits.
+# https://uploadcare.com/docs/api/rest/file/search-files/
+SEARCH_DEFAULT_LIMIT = 20  # the server default when `limit` is not sent
+SEARCH_MAX_LIMIT = 100
+SEARCH_MAX_WINDOW = 1000  # `offset` + `limit` must not exceed this
 
 
 class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
@@ -52,7 +73,152 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         "batch_delete": responses.BatchFileOperationResponse,
         "local_copy": responses.CreateLocalCopyResponse,
         "remote_copy": responses.CreateRemoteCopyResponse,
+        "search": responses.FileSearchResponse,
     }
+
+    def search(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> responses.FileSearchResponse:
+        """Search files, returning a single page of results.
+
+        https://uploadcare.com/docs/file-search/
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+                A dict uses the SDK's shape for ``exact.metadata``, i.e.
+                ``{"exact": {"metadata": {"color": ["red"]}}}``, not the wire
+                shape ``{"exact": {"metadata[color]": [...]}}``.
+            - limit: results per page, 1 to 100. The server defaults to 20.
+            - offset: how many results to skip. ``offset + limit`` must not
+                exceed 1000.
+            - include_appdata: embed application data in every result.
+        """
+        search_request = (
+            request
+            if isinstance(request, FileSearchRequest)
+            else FileSearchRequest.model_validate(request)
+        )
+
+        require_optional_int("limit", limit)
+        require_optional_int("offset", offset)
+        require_range("limit", limit, minimum=1, maximum=SEARCH_MAX_LIMIT)
+        require_range("offset", offset, minimum=0)
+
+        effective_limit = SEARCH_DEFAULT_LIMIT if limit is None else limit
+        effective_offset = 0 if offset is None else offset
+
+        if effective_offset + effective_limit > SEARCH_MAX_WINDOW:
+            raise InvalidParamError(
+                "`offset` + `limit` must not exceed "
+                f"{SEARCH_MAX_WINDOW}, got "
+                f"{effective_offset} + {effective_limit}. "
+                "Narrow the query instead of paging deeper"
+            )
+
+        query_parameters: Dict[str, Any] = {}
+        if limit is not None:
+            query_parameters["limit"] = limit
+        if offset is not None:
+            query_parameters["offset"] = offset
+        if include_appdata:
+            query_parameters["include"] = "appdata"
+
+        url = self._build_url(
+            suffix="search", query_parameters=query_parameters
+        )
+        response_class = self._get_response_class("search")
+        json_response = self._client.post(
+            url, json=search_request.to_payload()
+        ).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.FileSearchResponse, response)
+
+    def search_iterate(
+        self,
+        request: Union[FileSearchRequest, Dict[str, Any]],
+        limit: Optional[int] = None,
+        request_limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_appdata: bool = False,
+    ) -> Iterator[entities.FileSearchInfo]:
+        """Iterate over search results, page by page.
+
+        Pages are walked the same way ``ListMixin.list`` walks them — by
+        following the response's ``next`` URL, which points back at the
+        search endpoint with the ``limit``/``offset`` of the following page —
+        except that each page re-sends the search request as a ``POST`` body.
+
+        Only the first request is built here, and it is clamped to the search
+        window, because a legal starting ``offset`` can otherwise produce an
+        illegal ``offset`` + ``limit`` combination; from then on the server
+        computes ``next`` within the window.
+
+        Args:
+            - request: a ``FileSearchRequest`` or a dict in the same shape.
+            - limit: total number of results to yield. ``None`` yields
+                everything reachable.
+            - request_limit: number of results retrieved per request (page).
+            - offset: how many results to skip before the first page.
+            - include_appdata: embed application data in every result.
+        """
+        search_request = (
+            request
+            if isinstance(request, FileSearchRequest)
+            else FileSearchRequest.model_validate(request)
+        )
+
+        require_optional_int("limit", limit)
+        require_optional_int("request_limit", request_limit)
+        require_optional_int("offset", offset)
+        require_range("limit", limit, minimum=0)
+        require_range(
+            "request_limit", request_limit, minimum=1, maximum=SEARCH_MAX_LIMIT
+        )
+        require_range("offset", offset, minimum=0)
+        page_size = (
+            SEARCH_DEFAULT_LIMIT if request_limit is None else request_limit
+        )
+        start = 0 if offset is None else offset
+
+        if start >= SEARCH_MAX_WINDOW:
+            raise InvalidParamError(
+                f"`offset` must be less than {SEARCH_MAX_WINDOW}: search "
+                "cannot reach past the first "
+                f"{SEARCH_MAX_WINDOW} results"
+            )
+
+        first_page_size = min(page_size, SEARCH_MAX_WINDOW - start)
+        if limit is not None:
+            first_page_size = min(first_page_size, limit)
+        if first_page_size <= 0:
+            return iter(())
+
+        query_parameters: Dict[str, Any] = {
+            "limit": first_page_size,
+            "offset": start,
+        }
+        if include_appdata:
+            query_parameters["include"] = "appdata"
+
+        first_url = self._build_url(
+            suffix="search", query_parameters=query_parameters
+        )
+        response_class = self._get_response_class("search")
+        payload = search_request.to_payload()  # rendered once for all pages
+
+        return _iterate_pages(
+            first_url,
+            lambda url: self._client.post(url, json=payload).json(),
+            lambda raw: self._parse_response(raw, response_class),
+            limit=limit,
+            # The server's `next` does not echo `include`, so it has to be
+            # re-applied to every page.
+            carry_query={"include": "appdata"} if include_appdata else None,
+        )
 
     def store(self, file_uuid: Union[UUID, str]) -> entities.FileInfo:
         url = self._build_url(file_uuid, suffix="storage")
@@ -270,6 +436,20 @@ class UploadAPI(API):
             secret.encode("utf-8"), str(expire).encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
+    @staticmethod
+    def _set_tags(data: Dict[str, Any], tags: Optional[Iterable[str]]) -> None:
+        """Add the comma-separated `tags` form field to `data`, if any.
+
+        The field is omitted entirely when there is nothing to send.
+        """
+        if tags is None:
+            return
+
+        validated_tags = validate_tags(tags)
+
+        if validated_tags:
+            data["tags"] = ",".join(validated_tags)
+
     def upload(  # noqa: C901
         self,
         files: RequestFiles,
@@ -279,6 +459,7 @@ class UploadAPI(API):
         secret_key: Optional[str] = None,
         store: Optional[str] = "auto",
         expire: Optional[int] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> Dict[str, Any]:
         data = {}
 
@@ -290,6 +471,8 @@ class UploadAPI(API):
         if common_metadata is not None:
             validate_metadata(common_metadata)
             data.update(flatten_dict(common_metadata))
+
+        self._set_tags(data, tags)
 
         data["UPLOADCARE_PUB_KEY"] = public_key
 
@@ -317,6 +500,7 @@ class UploadAPI(API):
         store: Optional[str] = None,
         secure_upload: bool = False,
         expire: Optional[int] = None,
+        tags: Optional[Iterable[str]] = None,
     ):
         data = {
             "filename": file_name,
@@ -331,6 +515,8 @@ class UploadAPI(API):
         if metadata is not None:
             validate_metadata(metadata)
             data.update(flatten_dict(metadata))
+
+        self._set_tags(data, tags)
 
         if secure_upload:
             expire = (
@@ -375,6 +561,7 @@ class UploadAPI(API):
         expire: Optional[int] = None,
         check_duplicates: Optional[bool] = None,
         save_duplicates: Optional[bool] = None,
+        tags: Optional[Iterable[str]] = None,
     ) -> str:
         data = {
             "source_url": source_url,
@@ -387,6 +574,8 @@ class UploadAPI(API):
         if metadata is not None:
             validate_metadata(metadata)
             data.update(flatten_dict(metadata))
+
+        self._set_tags(data, tags)
 
         if secure_upload:
             expire = (
@@ -512,6 +701,86 @@ class MetadataAPI(API):
         json_response = self._client.get(url).json()
         response = self._parse_response(json_response, response_class).root  # type: ignore
         return cast(str, response)
+
+
+class TagsAPI(API):
+    """File tags.
+
+    https://uploadcare.com/docs/file-tags/
+    """
+
+    resource_type = "files"
+    response_classes = {
+        "get": responses.GetFileTagsResponse,
+        "set": responses.UpdateFileTagsResponse,
+        "update": responses.UpdateFileTagsResponse,
+    }
+
+    @staticmethod
+    def _canonical_uuid(file_uuid: Union[UUID, str]) -> str:
+        """Return a canonical UUID string, rejecting anything else.
+
+        ``API._build_url`` joins the identifier with ``urljoin``, so a value
+        like ``"//example.com/x"`` or an absolute URL would replace the
+        configured API origin on an authenticated request.
+        """
+        try:
+            return str(UUID(str(file_uuid)))
+        except (AttributeError, TypeError, ValueError):
+            raise InvalidParamError(f"Invalid UUID: {file_uuid!s}")
+
+    def _tags_url(self, file_uuid: Union[UUID, str]) -> str:
+        return self._build_url(self._canonical_uuid(file_uuid), suffix="tags")
+
+    def get(self, file_uuid: Union[UUID, str]) -> List[str]:
+        """Return the tags of a file, an empty list if it has none."""
+        url = self._tags_url(file_uuid)
+        response_class = self._get_response_class("get")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.GetFileTagsResponse, response).tags
+
+    def set(
+        self, file_uuid: Union[UUID, str], tags: Iterable[str]
+    ) -> responses.UpdateFileTagsResponse:
+        """Replace all tags of a file.
+
+        Passing an empty collection clears the tags.
+        """
+        url = self._tags_url(file_uuid)
+        data = {"tags": validate_tags(tags)}
+        response_class = self._get_response_class("set")
+        json_response = self._client.put(url, json=data).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.UpdateFileTagsResponse, response)
+
+    def update(
+        self,
+        file_uuid: Union[UUID, str],
+        add: Optional[Iterable[str]] = None,
+        delete: Optional[Iterable[str]] = None,
+    ) -> responses.UpdateFileTagsResponse:
+        """Add and/or delete tags of a file atomically.
+
+        Both arguments are optional, matching the endpoint: calling this
+        without them sends an empty request and returns the current state.
+        """
+        data: Dict[str, List[str]] = {}
+
+        if add is not None:
+            data["add"] = validate_tags(add)
+
+        if delete is not None:
+            # No count limit here: `delete` is a list of candidates and tags
+            # that are not present are ignored, so it may legitimately be
+            # longer than the per-file storage limit.
+            data["delete"] = validate_tags(delete, max_count=None)
+
+        url = self._tags_url(file_uuid)
+        response_class = self._get_response_class("update")
+        json_response = self._client.patch(url, json=data).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(responses.UpdateFileTagsResponse, response)
 
 
 class AddonsAPI(API):

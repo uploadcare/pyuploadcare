@@ -1,0 +1,30 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.uploadcare.com
+    method: GET
+    uri: https://api.uploadcare.com/files/1a9c5240-7d9b-4473-851b-45fa4b0bed64/tags/
+  response:
+    content: '{"tags":[]}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '11'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Server:
+      - nginx
+      Vary:
+      - Accept
+    http_version: HTTP/1.1
+    status_code: 200
+version: 1

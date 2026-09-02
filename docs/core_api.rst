@@ -199,6 +199,198 @@ But you should better use a special attribute of `File.info`::
     file_metadata = file.info["metadata"]
 
 
+File tags
+---------
+
+Each file can carry a list of tags (`file tags documentation`_), which you can later use as a
+filter when searching files.
+
+Tags may be initially set while uploading::
+
+    with open('file.txt', 'rb') as file_object:
+        ucare_file: File = uploadcare.upload(file_object, tags=['cat', 'cute'])
+
+While uploading multiple files at once, the tags are applied to every file in the collection::
+
+    file1 = open('file1.txt', 'rb')
+    file2 = open('file2.txt', 'rb')
+    ucare_files: List[File] = uploadcare.upload_files([file1, file2], tags=['cat'])
+    # don't forget to close the files, of course
+
+Uploads from URL accept tags the same way::
+
+    ucare_file: File = uploadcare.upload('https://example.com/file.jpg', tags=['cat'])
+
+Read the current tags of a file::
+
+    file = uploadcare.file('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
+    tags: List[str] = file.get_tags()
+
+Or, if the file info is already loaded, without an extra request::
+
+    tags = file.tags
+
+``File.tags`` reads from the cached file info, fetching it first if nothing is cached yet. It is
+``[]`` when the file has no tags, and ``None`` only when the cached info came from a response that
+does not report tags at all. In practice that happens after a multipart upload, whose response is
+cached as the file info and carries no ``tags`` — call ``File.update_info()`` or
+``File.get_tags()`` there. A direct upload caches nothing, so reading ``File.tags`` after it
+fetches the info and returns the stored tags.
+
+Replace all tags of a file. Passing an empty list clears them::
+
+    response = file.set_tags(['cat', 'animal', 'cute'])
+    print(response.tags, response.added, response.deleted)
+
+    file.set_tags([])
+
+Add and/or delete tags atomically::
+
+    response = file.update_tags(add=['pet'], delete=['animal'])
+
+Both methods return a response carrying the resulting ``tags`` plus the ``added`` and ``deleted``
+tags. The same operations are available on the API directly::
+
+    uploadcare.tags_api.get(file_id)
+    uploadcare.tags_api.replace(file_id, ['cat', 'animal'])
+    uploadcare.tags_api.update(file_id, add=['pet'], delete=['animal'])
+
+Tags are normalized before being sent: they are lowercased, trimmed, deduplicated keeping the
+first occurrence, and empty ones are dropped. A file can hold up to 50 tags of up to 100
+characters each, containing Latin letters, digits, ``-``, ``_`` and ``.`` only. Anything else
+raises ``TagValidationError`` before a request is made.
+
+Tags are available from the CLI as well::
+
+    ucare get_file_tags 740e1b8c-1ad8-4324-b7ec-112c79d8eac2
+    ucare set_file_tags 740e1b8c-1ad8-4324-b7ec-112c79d8eac2 cat animal
+    ucare update_file_tags 740e1b8c-1ad8-4324-b7ec-112c79d8eac2 --add pet --delete animal
+    ucare upload file.txt --tags cat cute
+
+.. _file tags documentation: https://uploadcare.com/docs/file-tags/
+
+
+Searching files
+---------------
+
+A single search request (`file search documentation`_) can combine full-text search, exact
+matching, range filters and tag filters. At least one condition is required: ``query``,
+``phrase``, ``exact``, ``datetime_uploaded``, ``size``, ``is_image`` or ``tags``. ``fuzziness``
+and ``sort`` are modifiers and do not count as conditions::
+
+    from pyuploadcare import (
+        DatetimeRange,
+        FileSearchRequest,
+        SearchExact,
+        SearchPhrase,
+        SizeRange,
+        TagsFilter,
+    )
+
+    response = uploadcare.search_files(
+        FileSearchRequest(
+            query='sunset',
+            tags=TagsFilter(all_=['cat'], none_=['draft']),
+            size=SizeRange(gt=1024, lte=10 * 1024 * 1024),
+            is_image=True,
+            fuzziness=True,
+            sort=['-score', 'size'],
+        ),
+        limit=50,
+    )
+
+    print(response.total, response.per_page, response.next)
+
+    for file_info in response.results:
+        print(file_info.original_filename, file_info.tags)
+
+``query`` searches across all searchable fields and must be at least 4 characters. ``phrase``
+performs an ordered full-text match on a specific field, and ``exact`` matches values exactly::
+
+    request = FileSearchRequest(
+        phrase=SearchPhrase(original_filename='holiday photo'),
+        exact=SearchExact(detected_mime_type=['image/jpeg', 'image/png']),
+        datetime_uploaded=DatetimeRange(gte=datetime(2024, 1, 1)),
+    )
+
+A field cannot appear in both ``phrase`` and ``exact`` in the same request.
+
+``exact`` can also match metadata values. In the SDK this is a nested mapping, which is
+serialized into the ``metadata[<key>]`` keys the API expects::
+
+    SearchExact(metadata={'album': ['holiday'], 'color': ['red']})
+
+A request can equally be a plain dict, using the same shape::
+
+    response = uploadcare.search_files({
+        'exact': {'metadata': {'album': ['holiday']}},
+        'tags': {'all': ['cat']},
+    })
+
+``sort`` accepts 1 to 4 keys out of ``score``, ``datetime_uploaded``, ``size`` and
+``original_filename``, each optionally prefixed with ``-`` for descending order. Keys must be
+unique and the same key must not be given in both directions.
+
+Without ``sort``, results are ordered by relevance. A filter-only request has no ``query`` or
+``phrase`` to rank by, so its order is undefined — always give such a request an explicit
+``sort``.
+
+Search indexing is asynchronous, so a file is not findable the instant it is uploaded — expect a
+delay on the order of seconds. Do not search for a file you have just uploaded without retrying.
+
+``search_files`` returns a single page. Its ``limit`` is the page size, 1 to 100, and the server
+defaults to 20; ``offset + limit`` must not exceed 1000. Search cannot reach past the first 1000
+results, so narrow the query instead of paging deeper.
+
+To walk pages, use ``iterate_search_files``. Its ``limit`` means something different: as elsewhere
+in the SDK, ``limit`` is the total number of results to yield and ``request_limit`` is the number
+retrieved per request. The iterator follows the server's ``next`` URL from page to page and clamps
+the first request to the 1000-result window::
+
+    for file_info in uploadcare.iterate_search_files(
+        {'tags': {'all': ['cat']}, 'sort': ['-datetime_uploaded']}, limit=200
+    ):
+        print(file_info.uuid)
+
+.. warning::
+
+    Paging through a filter-only request without ``sort`` is unreliable: the order is undefined
+    between requests, so files may be skipped or repeated. ``iterate_search_files`` emits a
+    ``UserWarning`` in that case.
+
+Pass ``include_appdata=True`` to embed application data in every result::
+
+    response = uploadcare.search_files(request, include_appdata=True)
+    print(response.results[0].appdata)
+
+Each result carries a ``highlight`` with the matched tokens wrapped in ``<em>`` tags. A field in it
+is populated only when that field matched a full-text condition, so a filter-only search
+highlights nothing — expect either no ``highlight`` at all or one whose every field is ``None``::
+
+    highlight = response.results[0].highlight
+    if highlight:
+        print(highlight.original_filename)  # ['<em>sunset</em>-cat.jpg']
+        print(highlight.metadata)           # {'album': 'summer <em>sunset</em>'}
+
+.. warning::
+
+    ``highlight`` values contain user-controlled content (filenames, metadata) plus markup added
+    by the server. They are not trusted HTML — escape them before rendering.
+
+Search is available from the CLI as well. As in ``list_files``, ``--limit`` is the total number
+of results to show (default 100) and ``--request_limit`` is the page size, which you seldom need
+to change. Because a descending sort key starts with a dash, pass
+it with ``--sort=`` so it is not read as another option::
+
+    ucare search_files --query sunset --tags_any cat dog --is_image true \
+        --size_gt 1024 --sort=-score --limit 50
+
+The CLI covers every condition except ``exact.metadata``, whose bracketed keys do not map onto a
+command line option; use the Python API for that.
+
+.. _file search documentation: https://uploadcare.com/docs/file-search/
+
+
 Video conversion
 ----------------
 

@@ -17,12 +17,16 @@ from pyuploadcare.ucare_cli.commands import (
     delete_files,
     delete_webhook,
     get_file,
+    get_file_tags,
     get_project,
     list_files,
     list_groups,
     list_webhooks,
+    search_files,
+    set_file_tags,
     store_files,
     sync,
+    update_file_tags,
     update_webhook,
     upload,
     upload_from_url,
@@ -58,6 +62,10 @@ def ucare_argparser():
     delete_webhook.register_arguments(subparsers)
     create_webhook.register_arguments(subparsers)
     update_webhook.register_arguments(subparsers)
+    get_file_tags.register_arguments(subparsers)
+    set_file_tags.register_arguments(subparsers)
+    update_file_tags.register_arguments(subparsers)
+    search_files.register_arguments(subparsers)
 
     # common arguments
     parser.add_argument(

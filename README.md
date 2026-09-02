@@ -32,6 +32,8 @@ Build file handling in minutes. Upload or accept user-generated content, store, 
   - [Requirements](#requirements)
   - [Usage](#usage)
     - [Basic usage](#basic-usage)
+      - [File tags](#file-tags)
+      - [File search](#file-search)
     - [Django integration](#django-integration)
   - [Testing](#testing)
   - [Demo app](#demo-app)
@@ -163,6 +165,95 @@ print(ucare_file.cdn_url)  # https://demo.ucarecd.net/640fe4b7-7352-42ca-8d87-0e
 ```
 
 There’s a lot more to uncover. For more information please refer to the [documentation](#documentation).
+
+#### File tags
+
+Files can carry a list of [tags](https://uploadcare.com/docs/file-tags/) you can later filter on:
+
+```python
+file_ = uploadcare.file("640fe4b7-7352-42ca-8d87-0e4387957157")
+
+file_.get_tags()                                     # ['cat', 'animal']
+file_.set_tags(["cat", "animal", "cute"])            # replace all tags
+file_.update_tags(add=["pet"], delete=["animal"])    # add and delete atomically
+file_.set_tags([])                                   # clear all tags
+```
+
+`set_tags()` and `update_tags()` return the resulting tag list along with what changed:
+
+```python
+response = file_.update_tags(add=["pet"], delete=["animal"])
+print(response.tags, response.added, response.deleted)
+# ['cat', 'cute', 'pet'] ['pet'] ['animal']
+```
+
+Tags can also be attached at upload time:
+
+```python
+with open("sample-file.jpeg", "rb") as file_object:
+    ucare_file = uploadcare.upload(file_object, tags=["cat", "cute"])
+```
+
+Tags are lowercased, trimmed and deduplicated. A file can hold up to 50 tags of up to 100
+characters each, made of Latin letters, digits, `-`, `_` and `.`.
+
+#### File search
+
+A single [search](https://uploadcare.com/docs/file-search/) request can combine full-text search,
+exact matching, range filters and tag filters. At least one condition is required:
+
+```python
+from pyuploadcare import FileSearchRequest, SizeRange, TagsFilter
+
+response = uploadcare.search_files(
+    FileSearchRequest(
+        query="sunset",
+        tags=TagsFilter(all_=["cat"], none_=["draft"]),
+        size=SizeRange(gt=1024),
+        is_image=True,
+        fuzziness=True,
+        sort=["-score", "size"],
+    ),
+    limit=50,
+)
+
+print(response.total, response.per_page)
+
+for file_info in response.results:
+    print(file_info.original_filename, file_info.tags)
+    if file_info.highlight:
+        print(file_info.highlight.original_filename)  # ['<em>sunset</em>.jpg']
+```
+
+Requests can also be plain dicts:
+
+```python
+response = uploadcare.search_files({"tags": {"all": ["cat"]}})
+```
+
+`search_files()` returns a single page: `limit` is the page size (1–100, defaults to 20) and
+`offset + limit` must not exceed 1000.
+
+To walk pages, use `iterate_search_files()`. There, following the SDK's other list APIs, `limit` is
+the total number of results to yield and `request_limit` is the page size; the iterator stops on
+its own once it reaches the 1000-result window:
+
+```python
+request = {"tags": {"all": ["cat"]}, "sort": ["-datetime_uploaded"]}
+
+for file_info in uploadcare.iterate_search_files(request, limit=200):
+    print(file_info.uuid)
+```
+
+Always pass an explicit `sort` when paging through a filter-only request (one without `query` or
+`phrase`): there is no relevance to rank by, so the order is undefined and paging can skip or
+repeat files. The SDK emits a `UserWarning` if you don't.
+
+Either way, search reaches the first 1000 results only. Narrow the query rather than paging
+deeper.
+
+> `highlight` values contain your users' filenames and metadata wrapped in `<em>` tags by the
+> server. Treat them as untrusted text and escape them before rendering as HTML.
 
 ### Django integration
 

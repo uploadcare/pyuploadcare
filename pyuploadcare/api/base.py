@@ -1,5 +1,15 @@
-from typing import Any, Dict, Optional, Type, Union, cast
-from urllib.parse import urlencode, urljoin
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
+from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 from uuid import UUID
 
 from pydantic import TypeAdapter
@@ -9,7 +19,10 @@ from pyuploadcare.api._httpx import RequestFiles
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response
-from pyuploadcare.exceptions import DefaultResponseClassNotDefined
+from pyuploadcare.exceptions import (
+    DefaultResponseClassNotDefined,
+    InvalidRequestError,
+)
 
 
 ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Union[Response, Entity])
@@ -174,8 +187,104 @@ class RetrieveMixin(APIProtocol):
         return self._parse_response(json_response, response_class)
 
 
+_DEFAULT_PORTS = {"http": 80, "https": 443}
+
+
+def _origin(url: str) -> Tuple[str, str, Optional[int]]:
+    """The (scheme, host, port) origin of ``url``, normalized for comparison.
+
+    Scheme and host are case-insensitive, and an explicit default port is the
+    same origin as no port at all.
+    """
+    split = urlsplit(url)
+    scheme = split.scheme.lower()
+
+    try:
+        port = split.port
+    except ValueError:
+        # An unparsable port matches nothing but its own verbatim netloc.
+        return scheme, split.netloc.lower(), None
+
+    if port == _DEFAULT_PORTS.get(scheme):
+        port = None
+
+    return scheme, (split.hostname or "").lower(), port
+
+
+def _merge_query(url: str, params: Dict[str, str]) -> str:
+    """Return ``url`` with ``params`` merged into its query string."""
+    split = urlsplit(url)
+    query = dict(parse_qsl(split.query))
+    query.update(params)
+    return urlunsplit(split._replace(query=urlencode(query)))
+
+
+def _iterate_pages(  # noqa: C901
+    first_url: str,
+    fetch_page: Callable[[str], Dict[str, Any]],
+    parse: Callable[[Dict[str, Any]], Any],
+    limit: Optional[int] = None,
+    carry_query: Optional[Dict[str, str]] = None,
+) -> Iterator[Any]:
+    """Walk a paginated endpoint, yielding up to ``limit`` results.
+
+    Fetching is delegated to ``fetch_page`` so that endpoints paged with a
+    ``GET`` and endpoints paged by re-sending a ``POST`` body share the same
+    engine: the loop only decides *which* URL to request, following the
+    response's ``next`` URL until it runs out.
+
+    ``next`` is only followed within the origin of ``first_url``: the HTTP
+    client attaches credentials to whatever URL it is given, so a foreign
+    ``next`` (a compromised or misbehaving server) fails loudly instead of
+    leaking them. A relative ``next`` is resolved against the page that
+    supplied it.
+
+    ``carry_query`` parameters are re-applied to every followed ``next``
+    URL: the server does not echo request decorations such as
+    ``include=appdata``, so following ``next`` verbatim would silently drop
+    them after the first page. ``first_url`` is expected to carry them
+    already.
+    """
+    origin = _origin(first_url)
+    next_: Optional[str] = first_url
+
+    while next_:
+        page_url = next_
+        response = parse(fetch_page(next_))
+        results = getattr(response, "results", response)
+
+        for item in results:
+            if limit is not None and limit <= 0:
+                break
+
+            yield item
+
+            if limit is not None:
+                limit -= 1
+
+        if limit is not None and limit <= 0:
+            break
+
+        # An empty page cannot get any fuller further on; stop even if the
+        # server claims there is more.
+        if not results:
+            break
+
+        next_ = getattr(response, "next", None)
+        if next_:
+            # A relative `next` resolves against the page that supplied it,
+            # so it is same-origin by construction.
+            next_ = urljoin(page_url, next_)
+            if _origin(next_) != origin:
+                raise InvalidRequestError(
+                    f"refusing to follow `next` outside {origin[1]}: {next_}"
+                )
+            if carry_query:
+                next_ = _merge_query(next_, carry_query)
+
+
 class ListMixin(APIProtocol):
-    def list(  # noqa: C901
+    def list(
         self,
         limit=None,
         request_limit=None,
@@ -186,35 +295,14 @@ class ListMixin(APIProtocol):
         if request_limit is not None:
             query_parameters["limit"] = request_limit
 
-        next_: Optional[str] = self._build_url(
-            query_parameters=query_parameters
+        first_url = self._build_url(query_parameters=query_parameters)
+
+        return _iterate_pages(
+            first_url,
+            lambda url: self._client.get(url).json(),
+            lambda raw: self._parse_response(raw, response_class),
+            limit=limit,
         )
-
-        while next_:
-            document = self._client.get(next_)
-            json_response = document.json()
-            response = self._parse_response(json_response, response_class)
-
-            if hasattr(response, "results"):
-                results = response.results
-            else:
-                results = response
-
-            for item in results:
-                if limit is not None and limit <= 0:
-                    break
-
-                yield item
-
-                if limit is not None:
-                    limit -= 1
-
-            if limit is not None and limit <= 0:
-                break
-
-            next_ = None
-            if hasattr(response, "next"):
-                next_ = response.next
 
 
 class CountMixin(APIProtocol):

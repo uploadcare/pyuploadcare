@@ -11,6 +11,7 @@ from pyuploadcare.api.entities import (
     Face,
     VideoConvertInfo,
 )
+from pyuploadcare.api.responses import UpdateFileTagsResponse
 from pyuploadcare.exceptions import (
     InvalidParamError,
     InvalidRequestError,
@@ -284,6 +285,73 @@ class File:
 
         """
         return self.info.get("mime_type")
+
+    @property
+    def tags(self) -> Optional[List[str]]:
+        """Returns the file `tags`_, e.g. ``["cat", "animal"]``.
+
+        ``[]`` when the file has no tags, ``None`` when the cached file info
+        does not report tags at all (upload responses do not include them).
+
+        It might do API request once because it depends on ``info``.
+
+        .. _tags: https://uploadcare.com/docs/file-tags/
+        """
+        return self.info.get("tags")
+
+    def _cache_tags(self, tags: List[str]) -> None:
+        """Keep the ``tags`` property in sync after a tags mutation.
+
+        Only touches an existing cache, so it never triggers a file info
+        request on its own.
+        """
+        if self._info_cache is not None:
+            self._info_cache["tags"] = tags
+
+    def get_tags(self) -> List[str]:
+        """Returns the file `tags`_ by requesting Uploadcare API.
+
+        Unlike the ``tags`` property this always performs a request.
+
+        .. _tags: https://uploadcare.com/docs/file-tags/
+        """
+        tags = self._client.tags_api.get(self.uuid)
+        self._cache_tags(tags)
+        return tags
+
+    def set_tags(self, tags: List[str]) -> UpdateFileTagsResponse:
+        """Replace the file's entire tag set with ``tags``.
+
+        Any current tag not in ``tags`` is removed; an empty list clears them
+        all. The response reports the resulting ``tags`` plus the ``added``
+        and ``deleted`` deltas the server computed::
+
+            >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
+            >>> file_.set_tags(['cat', 'animal'])
+            UpdateFileTagsResponse(tags=['cat', 'animal'], added=['cat', 'animal'], deleted=[])
+
+        """
+        response = self._client.tags_api.set(self.uuid, tags)
+        self._cache_tags(response.tags)
+        return response
+
+    def update_tags(
+        self,
+        add: Optional[List[str]] = None,
+        delete: Optional[List[str]] = None,
+    ) -> UpdateFileTagsResponse:
+        """Update tags. Pass `add` and `delete` lists to be added and deleted respectively.
+
+        >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
+        >>> file_.update_tags(add=['cute'], delete=['animal'])
+        UpdateFileTagsResponse(tags=['cat', 'cute'], added=['cute'], deleted=['animal'])
+
+        """
+        response = self._client.tags_api.update(
+            self.uuid, add=add, delete=delete
+        )
+        self._cache_tags(response.tags)
+        return response
 
     def store(self):
         """Stores file by requesting Uploadcare API.

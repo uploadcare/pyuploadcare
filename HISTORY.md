@@ -8,8 +8,40 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Support for [file tags](https://uploadcare.com/docs/file-tags/):
+  - `TagsAPI` (`uploadcare.tags_api`) with `get()`, `replace()` and `update()` methods, covering
+    `GET`, `PUT` and `PATCH` on `/files/{uuid}/tags/`.
+  - For `File`: a `tags` property plus `get_tags()`, `set_tags()` and `update_tags()` methods.
+  - A `tags` argument for `Uploadcare.upload()`, `Uploadcare.upload_files()` and
+    `Uploadcare.multipart_upload()`. Uploads from url do not support tags and raise
+    `InvalidParamError` instead of silently dropping them.
+  - `tags` in `FileInfo`.
+  - New `ucare` commands `get_file_tags`, `set_file_tags` and `update_file_tags`, and a `--tags`
+    option for `ucare upload`.
+  - `TagValidationError`, raised when tags exceed the API limits (50 tags per file, 100 characters
+    per tag, Latin letters, digits, `-`, `_` and `.` only).
+- Support for [file search](https://uploadcare.com/docs/file-search/):
+  - `Uploadcare.search_files()`, returning one page of results, and
+    `Uploadcare.iterate_search_files()`, which walks pages. As with the other list APIs, `limit`
+    is the total number of results to yield and `request_limit` is the page size.
+  - `FilesAPI.search()` for `POST /files/search/`.
+  - Typed requests: `FileSearchRequest` with `query`, `phrase`, `exact`, `datetime_uploaded`,
+    `size`, `is_image` and `tags` conditions plus the `fuzziness` and `sort` modifiers, built from
+    `SearchPhrase`, `SearchExact`, `DatetimeRange`, `SizeRange`, `TagsFilter` and `SearchSort`.
+    A plain dict in the same shape is accepted too. Requests are validated locally against the
+    documented API constraints before a request is made.
+  - `FileSearchResponse` with `next`, `previous`, `total`, `per_page` and `results`, where each
+    result is a `FileSearchInfo` — file info plus a `SearchHighlight`.
+  - `iterate_search_files()` warns when asked to page through a filter-only request without
+    `sort`, whose result order the API leaves undefined.
+  - A new `ucare search_files` command.
 ### Changed
 - Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
+- `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key. It is
+  `None` for responses that do not report tags, such as upload responses, and `[]` for files
+  without tags.
 
 ## [6.2.1](https://github.com/uploadcare/pyuploadcare/compare/v6.2.0...v6.2.1) - 2025-09-02
 

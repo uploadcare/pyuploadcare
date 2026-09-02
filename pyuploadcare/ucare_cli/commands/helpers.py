@@ -1,3 +1,4 @@
+import argparse
 import json
 import sys
 import time
@@ -86,6 +87,21 @@ def pprint(value):
 
 def bool_or_none(value):
     return {"true": True, "false": False}.get(value)
+
+
+def strict_bool(value):
+    """Parse a boolean, erroring out on anything unrecognised.
+
+    Unlike ``bool_or_none``, which silently maps unknown input to ``None``.
+    """
+    result = bool_or_none(str(value).strip().lower())
+
+    if result is None:
+        raise argparse.ArgumentTypeError(
+            f"invalid boolean value: {value!r} (expected true or false)"
+        )
+
+    return result
 
 
 def int_or_none(value):
