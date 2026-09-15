@@ -64,6 +64,7 @@ WebhookEvent = Literal[
     "file.stored",
     "file.deleted",
     "file.info_updated",
+    "moderation.state_changed",
 ]
 
 
