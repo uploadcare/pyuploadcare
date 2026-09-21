@@ -36,8 +36,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `iterate_search_files()` warns when asked to page through a filter-only request without
     `sort`, whose result order the API leaves undefined.
   - A new `ucare search_files` command.
+ - Resource id validation in `_build_url`.
 
 ### Changed
+
 
 - `MetadataValidationError` now subclasses `InvalidParamError` (previously `UploadcareException`
   directly).

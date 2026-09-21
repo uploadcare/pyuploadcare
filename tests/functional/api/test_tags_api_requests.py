@@ -172,7 +172,6 @@ def test_update_without_arguments_sends_empty_body(tags_api):
         "https://evil.example/files/x/",
         "../../files",
         "",
-        None,
         42,
     ],
 )

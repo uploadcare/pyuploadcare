@@ -5,6 +5,7 @@ import time
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 from uuid import UUID
 
+from pyuploadcare.api.base import UUID_PATTERN
 from pyuploadcare.api.entities import (
     DocumentConvertFormatInfo,
     DocumentConvertInfo,
@@ -34,13 +35,12 @@ if TYPE_CHECKING:
 logger = logging.getLogger("pyuploadcare")
 
 
-RE_UUID = "[a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}"
-RE_UUID_REGEX = re.compile(f"^{RE_UUID}$")
+RE_UUID_REGEX = re.compile(f"^{UUID_PATTERN}$")
 RE_EFFECTS = "(?:[^/]+/)+"  # -/resize/(200x300/)*
 UUID_WITH_EFFECTS_REGEX = re.compile(
     f"""
     /?
-    (?P<uuid>{RE_UUID})  # required
+    (?P<uuid>{UUID_PATTERN})  # required
     (?:
         /
         (?:-/(?P<effects>{RE_EFFECTS}))?

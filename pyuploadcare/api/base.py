@@ -1,9 +1,12 @@
+import re
 from typing import (
     Any,
     Callable,
+    ClassVar,
     Dict,
     Iterator,
     Optional,
+    Pattern,
     Tuple,
     Type,
     Union,
@@ -21,16 +24,34 @@ from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response
 from pyuploadcare.exceptions import (
     DefaultResponseClassNotDefined,
+    InvalidParamError,
     InvalidRequestError,
 )
 
 
 ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Union[Response, Entity])
 
+UUID_PATTERN = r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}"
+
+RE_UUID_RESOURCE_ID: Pattern[str] = re.compile(
+    UUID_PATTERN + r"\Z", re.IGNORECASE
+)
+RE_GROUP_RESOURCE_ID: Pattern[str] = re.compile(
+    UUID_PATTERN + r"~[0-9]+\Z", re.IGNORECASE
+)
+RE_NUMERIC_RESOURCE_ID: Pattern[str] = re.compile(r"[0-9]+\Z")
+
+# One opaque path segment: anything that could splice extra path components,
+# a query, or a whole new origin into the request URL is out.
+RE_SAFE_RESOURCE_ID: Pattern[str] = re.compile(r"[a-zA-Z0-9~_-]+\Z")
+
 
 class API:
     resource_type: str
     response_classes: Dict[str, Union[Type[Response], Type[Entity]]]
+    # The shape of a valid resource id for this endpoint; subclasses narrow
+    # it (file UUID, group id, numeric webhook id, etc).
+    resource_id_pattern: ClassVar[Pattern[str]] = RE_SAFE_RESOURCE_ID
     _client: Client
 
     def __init__(
@@ -52,6 +73,14 @@ class API:
     ) -> ResponseOrEntity:
         return TypeAdapter(response_class).validate_python(raw_resource)
 
+    def _validate_resource_id(self, resource_id: str) -> None:
+        """Reject a resource id that does not match this endpoint's shape."""
+        if not self.resource_id_pattern.match(resource_id):
+            label = f"{self.resource_type} " if self.resource_type else ""
+            raise InvalidParamError(
+                f"Invalid {label}resource id: {resource_id}"
+            )
+
     def _build_url(  # noqa: C901
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
@@ -66,7 +95,9 @@ class API:
         if resource_uuid is not None:
             if isinstance(resource_uuid, UUIDEntity):
                 resource_uuid = resource_uuid.uuid
-            url = urljoin(url, str(resource_uuid)) + "/"
+            resource_id = str(resource_uuid)
+            self._validate_resource_id(resource_id)
+            url = urljoin(url, resource_id) + "/"
         if suffix:
             url = urljoin(url, suffix) + "/"
         if query_parameters:

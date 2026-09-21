@@ -25,7 +25,7 @@ def test_exception_wrapping_on_webhook_update():
     )
 
     with pytest.raises(WebhookIsNotUnique):
-        wh_api.update("uuid", data={})
+        wh_api.update("42", data={})
 
 
 def test_exception_wrapping_on_webhook_create():
