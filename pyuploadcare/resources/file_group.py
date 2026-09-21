@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional
 
 import dateutil.parser
 
+from pyuploadcare.api.base import UUID_PATTERN
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.resources.utils import (
     coerce_to_optional_datetime,
@@ -18,11 +19,11 @@ if TYPE_CHECKING:
 
 
 GROUP_ID_REGEX = re.compile(
-    r"""
+    rf"""
     (?P<group_id>
-        [a-z0-9]{8}-(?:[a-z0-9]{4}-){3}[a-z0-9]{12}
+        {UUID_PATTERN}
         ~
-        (?P<files_qty>\d+)
+        (?P<files_qty>[0-9]+)
     )
 """,
     re.VERBOSE,

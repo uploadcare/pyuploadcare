@@ -31,13 +31,15 @@ from pyuploadcare.exceptions import (
 
 ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Union[Response, Entity])
 
+UUID_PATTERN = r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}"
+
 RE_UUID_RESOURCE_ID: Pattern[str] = re.compile(
-    r"[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}\Z", re.IGNORECASE
+    UUID_PATTERN + r"\Z", re.IGNORECASE
 )
 RE_GROUP_RESOURCE_ID: Pattern[str] = re.compile(
-    r"[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}~\d+\Z", re.IGNORECASE
+    UUID_PATTERN + r"~[0-9]+\Z", re.IGNORECASE
 )
-RE_NUMERIC_RESOURCE_ID: Pattern[str] = re.compile(r"\d+\Z")
+RE_NUMERIC_RESOURCE_ID: Pattern[str] = re.compile(r"[0-9]+\Z")
 
 # One opaque path segment: anything that could splice extra path components,
 # a query, or a whole new origin into the request URL is out.
@@ -71,6 +73,14 @@ class API:
     ) -> ResponseOrEntity:
         return TypeAdapter(response_class).validate_python(raw_resource)
 
+    def _validate_resource_id(self, resource_id: str) -> None:
+        """Reject a resource id that does not match this endpoint's shape."""
+        if not self.resource_id_pattern.match(resource_id):
+            label = f"{self.resource_type} " if self.resource_type else ""
+            raise InvalidParamError(
+                f"Invalid {label}resource id: {resource_id}"
+            )
+
     def _build_url(  # noqa: C901
         self,
         resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
@@ -86,11 +96,7 @@ class API:
             if isinstance(resource_uuid, UUIDEntity):
                 resource_uuid = resource_uuid.uuid
             resource_id = str(resource_uuid)
-            if not self.resource_id_pattern.match(resource_id):
-                raise InvalidParamError(
-                    f"Invalid {self.resource_type} resource id:"
-                    f" {resource_id}"
-                )
+            self._validate_resource_id(resource_id)
             url = urljoin(url, resource_id) + "/"
         if suffix:
             url = urljoin(url, suffix) + "/"
