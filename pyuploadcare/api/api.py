@@ -97,8 +97,6 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
                 exceed 1000.
             - include_appdata: embed application data in every result.
         """
-        # For a `FileSearchRequest` instance this is a no-op returning the
-        # same object (`revalidate_instances` defaults to "never").
         search_request = FileSearchRequest.model_validate(request)
 
         require_optional_int("limit", limit)

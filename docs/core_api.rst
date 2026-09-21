@@ -319,10 +319,12 @@ performs an ordered full-text match on a specific field, and ``exact`` matches v
 
 A field cannot appear in both ``phrase`` and ``exact`` in the same request.
 
-Pass timezone-aware datetimes in ``DatetimeRange``. A naive datetime is sent
-without a UTC offset and its interpretation is left to the server, so the
-range boundary can silently shift for callers not working in that timezone.
-A future major release will reject naive datetimes.
+.. warning::
+
+    Pass timezone-aware datetimes in ``DatetimeRange``. A naive datetime is
+    sent without a UTC offset and its interpretation is left to the server, so
+    the range boundary can silently shift for callers not working in that
+    timezone. A future major release will reject naive datetimes.
 
 ``exact`` can also match metadata values. In the SDK this is a nested mapping, which is
 serialized into the ``metadata[<key>]`` keys the API expects::

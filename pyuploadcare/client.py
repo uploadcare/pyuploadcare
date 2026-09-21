@@ -883,10 +883,6 @@ class Uploadcare:
             - include_appdata: embed application data in every result.
 
         """
-        # `search_iterate` validates all pagination arguments eagerly; the
-        # request is coerced here only for the `sort` check below. For a
-        # `FileSearchRequest` instance this is a no-op returning the same
-        # object.
         search_request = FileSearchRequest.model_validate(request)
 
         if search_request.has_undefined_order():
