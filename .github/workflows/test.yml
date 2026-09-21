@@ -235,6 +235,9 @@ jobs:
   integration:
     needs: functional
     runs-on: ubuntu-latest
+    concurrency:
+      group: integration-live-api
+      cancel-in-progress: false
     strategy:
       matrix:
         python-version: [3.12]
