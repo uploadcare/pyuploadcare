@@ -7,3 +7,4 @@ per-file-ignores =
     tests/**: S101
     **/tests/**: S101
     pyuploadcare/ucare_cli/**: T003,T001,T004,T201,T203,T204
+    scripts/**: T201,C901
