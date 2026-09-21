@@ -115,11 +115,11 @@ def test_next_url_is_requested_verbatim(uploadcare):
     assert _urls(mocked_post)[1] == next_url
 
 
-def test_include_appdata_is_reapplied_to_every_page(uploadcare):
-    """The server's `next` does not echo `include`, so the engine must."""
+def test_next_is_followed_verbatim(uploadcare):
+    """The server echoes `include` in `next`; the engine follows it as-is."""
+    server_next = f"{_next_url(2, 2)}&include=appdata"
     pages = [
-        # `next` as the server sends it: no `include` parameter.
-        _page(2, next_url=_next_url(2, 2), total=4),
+        _page(2, next_url=server_next, total=4),
         _page(2, next_url=None, total=4, offset=2),
     ]
 
@@ -130,8 +130,9 @@ def test_include_appdata_is_reapplied_to_every_page(uploadcare):
             )
         )
 
-    for url in _urls(mocked_post):
-        assert parse_qs(urlsplit(url).query)["include"] == ["appdata"]
+    urls = _urls(mocked_post)
+    assert parse_qs(urlsplit(urls[0]).query)["include"] == ["appdata"]
+    assert urls[1] == server_next
 
 
 @pytest.mark.parametrize(
