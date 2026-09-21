@@ -70,6 +70,15 @@ class SearchRequestModel(BaseModel):
 
 
 class DatetimeRange(SearchRequestModel):
+    """Bounds for ``datetime_uploaded``.
+
+    Pass timezone-aware datetimes. A naive datetime is serialized without a
+    UTC offset (e.g. ``2024-01-01T00:00:00``) and its interpretation is left
+    to the server, so unless the caller's local time is what the server
+    assumes, the range boundary silently shifts. A future major release will
+    reject naive datetimes.
+    """
+
     _at_least_one_error: ClassVar[str] = (
         "at least one of `gt`, `gte`, `lt` or `lte` is required"
     )

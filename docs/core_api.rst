@@ -278,6 +278,8 @@ matching, range filters and tag filters. At least one condition is required: ``q
 ``phrase``, ``exact``, ``datetime_uploaded``, ``size``, ``is_image`` or ``tags``. ``fuzziness``
 and ``sort`` are modifiers and do not count as conditions::
 
+    from datetime import datetime, timezone
+
     from pyuploadcare import (
         DatetimeRange,
         FileSearchRequest,
@@ -310,10 +312,19 @@ performs an ordered full-text match on a specific field, and ``exact`` matches v
     request = FileSearchRequest(
         phrase=SearchPhrase(original_filename='holiday photo'),
         exact=SearchExact(detected_mime_type=['image/jpeg', 'image/png']),
-        datetime_uploaded=DatetimeRange(gte=datetime(2024, 1, 1)),
+        datetime_uploaded=DatetimeRange(
+            gte=datetime(2024, 1, 1, tzinfo=timezone.utc)
+        ),
     )
 
 A field cannot appear in both ``phrase`` and ``exact`` in the same request.
+
+.. warning::
+
+    Pass timezone-aware datetimes in ``DatetimeRange``. A naive datetime is
+    sent without a UTC offset and its interpretation is left to the server, so
+    the range boundary can silently shift for callers not working in that
+    timezone. A future major release will reject naive datetimes.
 
 ``exact`` can also match metadata values. In the SDK this is a nested mapping, which is
 serialized into the ``metadata[<key>]`` keys the API expects::

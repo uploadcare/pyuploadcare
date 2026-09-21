@@ -14,9 +14,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `TagsAPI` (`uploadcare.tags_api`) with `get()`, `replace()` and `update()` methods, covering
     `GET`, `PUT` and `PATCH` on `/files/{uuid}/tags/`.
   - For `File`: a `tags` property plus `get_tags()`, `set_tags()` and `update_tags()` methods.
-  - A `tags` argument for `Uploadcare.upload()`, `Uploadcare.upload_files()` and
-    `Uploadcare.multipart_upload()`. Uploads from url do not support tags and raise
-    `InvalidParamError` instead of silently dropping them.
+  - A `tags` argument for `Uploadcare.upload()`, `Uploadcare.upload_files()`,
+    `Uploadcare.multipart_upload()` and uploads from URL.
   - `tags` in `FileInfo`.
   - New `ucare` commands `get_file_tags`, `set_file_tags` and `update_file_tags`, and a `--tags`
     option for `ucare upload`.
@@ -41,6 +40,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+
+- `MetadataValidationError` now subclasses `InvalidParamError` (previously `UploadcareException`
+  directly).
 - Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
 - `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key. It is
   `None` for responses that do not report tags, such as upload responses, and `[]` for files
