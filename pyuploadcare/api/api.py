@@ -26,6 +26,9 @@ from pyuploadcare.api.addon_entities import (
 )
 from pyuploadcare.api.base import (
     API,
+    RE_GROUP_RESOURCE_ID,
+    RE_NUMERIC_RESOURCE_ID,
+    RE_UUID_RESOURCE_ID,
     CreateMixin,
     DeleteMixin,
     DeleteWithResponseMixin,
@@ -62,6 +65,7 @@ SEARCH_MAX_WINDOW = 1000  # `offset` + `limit` must not exceed this
 
 class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
     resource_type = "files"
+    resource_id_pattern = RE_UUID_RESOURCE_ID
     response_classes = {
         "retrieve": entities.FileInfo,
         "list": responses.FileListResponse,
@@ -279,6 +283,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
 
 class GroupsAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
     resource_type = "groups"
+    resource_id_pattern = RE_GROUP_RESOURCE_ID
     entity_class = entities.GroupInfo
 
     response_classes = {
@@ -307,6 +312,7 @@ class ProjectAPI(API, RetrieveMixin):
 
 class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
     resource_type = "webhooks"
+    resource_id_pattern = RE_NUMERIC_RESOURCE_ID
     entity_class = entities.Webhook
     response_classes = {
         "create": entities.Webhook,
@@ -345,6 +351,7 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
 
 class DocumentConvertAPI(API, RetrieveMixin):
     resource_type = "convert/document"
+    resource_id_pattern = RE_UUID_RESOURCE_ID
     entity_class = entities.DocumentConvertInfo
 
     response_classes = {
@@ -653,6 +660,7 @@ class UploadAPI(API):
 
 class MetadataAPI(API):
     resource_type = "files"
+    resource_id_pattern = RE_UUID_RESOURCE_ID
     response_classes = {
         "update": responses.UpdateMetadataKeyResponse,
         "get_all": responses.GetAllMetadataResponse,
@@ -710,27 +718,15 @@ class TagsAPI(API):
     """
 
     resource_type = "files"
+    resource_id_pattern = RE_UUID_RESOURCE_ID
     response_classes = {
         "get": responses.GetFileTagsResponse,
         "set": responses.UpdateFileTagsResponse,
         "update": responses.UpdateFileTagsResponse,
     }
 
-    @staticmethod
-    def _canonical_uuid(file_uuid: Union[UUID, str]) -> str:
-        """Return a canonical UUID string, rejecting anything else.
-
-        ``API._build_url`` joins the identifier with ``urljoin``, so a value
-        like ``"//example.com/x"`` or an absolute URL would replace the
-        configured API origin on an authenticated request.
-        """
-        try:
-            return str(UUID(str(file_uuid)))
-        except (AttributeError, TypeError, ValueError):
-            raise InvalidParamError(f"Invalid UUID: {file_uuid!s}")
-
     def _tags_url(self, file_uuid: Union[UUID, str]) -> str:
-        return self._build_url(self._canonical_uuid(file_uuid), suffix="tags")
+        return self._build_url(file_uuid, suffix="tags")
 
     def get(self, file_uuid: Union[UUID, str]) -> List[str]:
         """Return the tags of a file, an empty list if it has none."""
@@ -846,6 +842,7 @@ class AddonsAPI(API):
 
 class URLAPI(API):
     resource_type = ""
+    resource_id_pattern = RE_UUID_RESOURCE_ID
     response_classes = {
         "detect_faces": entities.ImageInfoWithFaces,
     }

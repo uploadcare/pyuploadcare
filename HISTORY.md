@@ -37,7 +37,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `iterate_search_files()` warns when asked to page through a filter-only request without
     `sort`, whose result order the API leaves undefined.
   - A new `ucare search_files` command.
+ - Resource id validation in `_build_url`.
+
 ### Changed
+
 - Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
 - `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key. It is
   `None` for responses that do not report tags, such as upload responses, and `[]` for files

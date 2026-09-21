@@ -1,9 +1,12 @@
+import re
 from typing import (
     Any,
     Callable,
+    ClassVar,
     Dict,
     Iterator,
     Optional,
+    Pattern,
     Tuple,
     Type,
     Union,
@@ -21,16 +24,32 @@ from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response
 from pyuploadcare.exceptions import (
     DefaultResponseClassNotDefined,
+    InvalidParamError,
     InvalidRequestError,
 )
 
 
 ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Union[Response, Entity])
 
+RE_UUID_RESOURCE_ID: Pattern[str] = re.compile(
+    r"[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}\Z", re.IGNORECASE
+)
+RE_GROUP_RESOURCE_ID: Pattern[str] = re.compile(
+    r"[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}~\d+\Z", re.IGNORECASE
+)
+RE_NUMERIC_RESOURCE_ID: Pattern[str] = re.compile(r"\d+\Z")
+
+# One opaque path segment: anything that could splice extra path components,
+# a query, or a whole new origin into the request URL is out.
+RE_SAFE_RESOURCE_ID: Pattern[str] = re.compile(r"[a-zA-Z0-9~_-]+\Z")
+
 
 class API:
     resource_type: str
     response_classes: Dict[str, Union[Type[Response], Type[Entity]]]
+    # The shape of a valid resource id for this endpoint; subclasses narrow
+    # it (file UUID, group id, numeric webhook id, etc).
+    resource_id_pattern: ClassVar[Pattern[str]] = RE_SAFE_RESOURCE_ID
     _client: Client
 
     def __init__(
@@ -66,7 +85,13 @@ class API:
         if resource_uuid is not None:
             if isinstance(resource_uuid, UUIDEntity):
                 resource_uuid = resource_uuid.uuid
-            url = urljoin(url, str(resource_uuid)) + "/"
+            resource_id = str(resource_uuid)
+            if not self.resource_id_pattern.match(resource_id):
+                raise InvalidParamError(
+                    f"Invalid {self.resource_type} resource id:"
+                    f" {resource_id}"
+                )
+            url = urljoin(url, resource_id) + "/"
         if suffix:
             url = urljoin(url, suffix) + "/"
         if query_parameters:
