@@ -456,3 +456,40 @@ def test_uuid_extraction(uploadcare, input_collection, expected_uuids):
 def test_corrupted_uuid_extraction(uploadcare):
     with pytest.raises(InvalidParamError, match="Couldn't find UUID"):
         uploadcare._extract_uuids(["456"])
+
+
+def test_next_urls_need_no_rebuilding(uploadcare):
+    """The server's ``next`` echoes ``include=appdata`` and works verbatim.
+
+    The paging engine follows ``next`` as the server sends it, so request
+    decorations must survive in the URL itself. Followed verbatim — with no
+    client-side query rebuilding — pages two and three must carry the same
+    appdata as a direct ``retrieve`` with ``include_appdata``. The same
+    ``next`` contract backs search pagination.
+    """
+    files_api = uploadcare.files_api
+    response_class = files_api._get_response_class("list")
+
+    def fetch(url):
+        raw = files_api._client.get(url).json()
+        return files_api._parse_response(raw, response_class)
+
+    page = fetch(
+        files_api._build_url(
+            query_parameters={"limit": 1, "include": "appdata"}
+        )
+    )
+
+    if page.total < 3:
+        pytest.skip("needs at least three files for three pages")
+
+    for _hop in (2, 3):
+        assert page.next is not None
+        assert "include=appdata" in page.next
+
+        # Followed verbatim: no client-side query rebuilding.
+        page = fetch(page.next)
+
+        (result,) = page.results
+        direct = files_api.retrieve(result.uuid, include_appdata=True)
+        assert result.appdata == direct.appdata
