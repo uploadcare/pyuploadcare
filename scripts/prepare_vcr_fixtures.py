@@ -40,6 +40,7 @@ import os
 import sys
 from io import BytesIO
 from pathlib import Path
+from uuid import UUID
 
 from pyuploadcare import Uploadcare
 from pyuploadcare.api.addon_entities import AddonLabels
@@ -47,6 +48,12 @@ from pyuploadcare.exceptions import UploadcareException
 
 
 MANIFEST = Path(__file__).parent / "vcr_fixtures.json"
+
+
+def _as_uuid(value: object) -> str:
+    """Canonical UUID string, or ValueError — sanitizes ids before file writes."""
+    return str(UUID(str(value)))
+
 
 # The UUIDs currently hard-coded in the test modules, to be replaced.
 PLACEHOLDER_MAIN = "a55d6b25-d03c-4038-9838-6e06bb7df598"
@@ -127,7 +134,11 @@ def apply_substitutions(old_uuids: dict, new_uuids: dict) -> None:
         new = new_uuids.get(key)
         if not new:
             continue
-        for old in {PLACEHOLDERS[key], old_uuids.get(key)}:
+        new = _as_uuid(new)
+        candidates = {PLACEHOLDERS[key]}
+        if old_uuids.get(key):
+            candidates.add(_as_uuid(old_uuids[key]))
+        for old in candidates:
             if old and old != new:
                 replacements[old] = new
 
@@ -166,8 +177,11 @@ def main() -> int:
         )
         return 1
 
-    old_uuids = dict(manifest.get("files", {}))
-    uuids = manifest.get("files", {})
+    old_uuids = {
+        key: _as_uuid(value)
+        for key, value in manifest.get("files", {}).items()
+    }
+    uuids = dict(old_uuids)
     for key, filename, store, tags, metadata in FIXTURES:
         if key in uuids and file_exists(uploadcare, uuids[key]):
             print(f"{key}: exists, {uuids[key]} ({filename})")
@@ -180,8 +194,8 @@ def main() -> int:
             metadata=metadata,
             tags=tags,
         )
-        uuids[key] = str(file.uuid)
-        print(f"{key}: uploaded {file.uuid} ({filename})")
+        uuids[key] = _as_uuid(file.uuid)
+        print(f"{key}: uploaded {uuids[key]} ({filename})")
 
     # The tags mutation tests are recorded against the main fixture; make
     # sure its tags are at the baseline the read-only tests assert.
