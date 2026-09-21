@@ -97,11 +97,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
                 exceed 1000.
             - include_appdata: embed application data in every result.
         """
-        search_request = (
-            request
-            if isinstance(request, FileSearchRequest)
-            else FileSearchRequest.model_validate(request)
-        )
+        search_request = FileSearchRequest.model_validate(request)
 
         require_optional_int("limit", limit)
         require_optional_int("offset", offset)
@@ -165,11 +161,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
             - offset: how many results to skip before the first page.
             - include_appdata: embed application data in every result.
         """
-        search_request = (
-            request
-            if isinstance(request, FileSearchRequest)
-            else FileSearchRequest.model_validate(request)
-        )
+        search_request = FileSearchRequest.model_validate(request)
 
         require_optional_int("limit", limit)
         require_optional_int("request_limit", request_limit)

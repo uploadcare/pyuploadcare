@@ -31,7 +31,7 @@ from pyuploadcare.api import (
     VideoConvertAPI,
     WebhooksAPI,
 )
-from pyuploadcare.api.api import SEARCH_MAX_LIMIT, SEARCH_MAX_WINDOW, URLAPI
+from pyuploadcare.api.api import URLAPI
 from pyuploadcare.api.auth import UploadcareAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import (
@@ -42,7 +42,6 @@ from pyuploadcare.api.entities import (
 )
 from pyuploadcare.api.responses import FileSearchResponse
 from pyuploadcare.api.search_entities import FileSearchRequest
-from pyuploadcare.api.utils import require_optional_int, require_range
 from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
     get_file_size,
@@ -884,25 +883,7 @@ class Uploadcare:
             - include_appdata: embed application data in every result.
 
         """
-        require_optional_int("limit", limit)
-        require_optional_int("request_limit", request_limit)
-        require_optional_int("offset", offset)
-        require_range("limit", limit, minimum=0)
-        require_range(
-            "request_limit", request_limit, minimum=1, maximum=SEARCH_MAX_LIMIT
-        )
-        require_range(
-            "offset", offset, minimum=0, maximum=SEARCH_MAX_WINDOW - 1
-        )
-
-        # Validate the request here rather than inside the generator, so an
-        # invalid request is reported immediately instead of on first
-        # iteration. It also keeps every page from re-validating it.
-        search_request = (
-            request
-            if isinstance(request, FileSearchRequest)
-            else FileSearchRequest.model_validate(request)
-        )
+        search_request = FileSearchRequest.model_validate(request)
 
         if search_request.has_undefined_order():
             warnings.warn(
