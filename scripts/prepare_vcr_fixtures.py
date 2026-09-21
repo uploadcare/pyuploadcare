@@ -122,38 +122,48 @@ def file_exists(uploadcare: Uploadcare, uuid: str) -> bool:
 PLACEHOLDERS = {"main": PLACEHOLDER_MAIN, "no_tags": PLACEHOLDER_NO_TAGS}
 
 
-def apply_substitutions(old_uuids: dict, new_uuids: dict) -> None:
-    """Point the test modules at the current fixture UUIDs.
-
-    Replaces both the original placeholder and any previously recorded UUID
-    (from the prior manifest) with the current one, so the substitution is
-    idempotent and also survives fixtures being recreated with new UUIDs.
-    """
+def _fixture_replacements(old_uuids: dict, new_uuids: dict) -> dict:
+    """Map each stale UUID (placeholder or prior manifest) to the current one."""
     replacements = {}
-    for key in PLACEHOLDERS:
+    for key, placeholder in PLACEHOLDERS.items():
         new = new_uuids.get(key)
         if not new:
             continue
         new = _as_uuid(new)
-        candidates = {PLACEHOLDERS[key]}
+        sources = {placeholder}
         if old_uuids.get(key):
-            candidates.add(_as_uuid(old_uuids[key]))
-        for old in candidates:
-            if old and old != new:
+            sources.add(_as_uuid(old_uuids[key]))
+        for old in sources:
+            if old != new:
                 replacements[old] = new
+    return replacements
 
+
+def _rewrite(path: str, replacements: dict) -> None:
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    updated = text
+    for old, new in replacements.items():
+        updated = updated.replace(old, new)
+    if updated != text:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(updated)
+        print(f"substituted UUIDs in {path}")
+
+
+def apply_substitutions(old_uuids: dict, new_uuids: dict) -> None:
+    """Point the test modules at the current fixture UUIDs (idempotent)."""
+    replacements = _fixture_replacements(old_uuids, new_uuids)
     if not replacements:
         return
 
-    tests_dir = MANIFEST.parent.parent / "tests" / "functional"
-    for path in tests_dir.rglob("*.py"):
-        text = path.read_text()
-        updated = text
-        for old, new in replacements.items():
-            updated = updated.replace(old, new)
-        if updated != text:
-            path.write_text(updated)
-            print(f"substituted UUIDs in {path}")
+    tests_dir = os.path.realpath(
+        MANIFEST.parent.parent / "tests" / "functional"
+    )
+    for candidate in Path(tests_dir).rglob("*.py"):
+        path = os.path.realpath(candidate)
+        if path.startswith(tests_dir + os.sep):
+            _rewrite(path, replacements)
 
 
 def main() -> int:
