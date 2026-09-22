@@ -13,7 +13,7 @@ from pyuploadcare.api.tags import MAX_TAGS_PER_FILE
 from pyuploadcare.exceptions import InvalidParamError, TagValidationError
 
 
-FILE_UUID = "a55d6b25-d03c-4038-9838-6e06bb7df598"
+FILE_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
 TAGS_URL = f"https://api.uploadcare.com/files/{FILE_UUID}/tags/"
 
 

@@ -15,7 +15,7 @@ import pytest
 from pyuploadcare.exceptions import InvalidParamError
 
 
-FILE_UUID = "a55d6b25-d03c-4038-9838-6e06bb7df598"
+FILE_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
 GROUP_ID = f"{FILE_UUID}~12"
 
 INJECTION_IDS = [

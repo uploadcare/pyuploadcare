@@ -28,36 +28,47 @@ def test_search_files(uploadcare):
     assert len(response.results) == 2
 
 
-def test_search_files_parses_file_info(uploadcare, vcr):
-    with vcr.use_cassette("test_search_files"):
-        response = uploadcare.search_files(
+MAIN_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
+
+
+def _search_all_fixtures(uploadcare, vcr):
+    """All five sunset+cat fixtures on one page.
+
+    Every fixture filename matches ``sunset`` equally well, so the
+    relevance order is arbitrary — tests locate results by identity
+    instead of rank.
+    """
+    with vcr.use_cassette("test_search_files_all"):
+        return uploadcare.search_files(
             FileSearchRequest(
                 query="sunset", tags=TagsFilter(all_=["cat"]), sort=["-score"]
             ),
-            limit=2,
+            limit=5,
         )
 
-    first = response.results[0]
 
-    assert isinstance(first, FileSearchInfo)
-    assert str(first.uuid) == "a55d6b25-d03c-4038-9838-6e06bb7df598"
-    assert first.original_filename == "sunset-cat.jpg"
-    assert first.size == 3518420
-    assert first.is_image is True
-    assert first.tags == ["cat", "animal"]
-    assert first.metadata == {"album": "holiday"}
+def test_search_files_parses_file_info(uploadcare, vcr):
+    response = _search_all_fixtures(uploadcare, vcr)
+
+    main = next(
+        result for result in response.results if str(result.uuid) == MAIN_UUID
+    )
+
+    assert isinstance(main, FileSearchInfo)
+    assert main.original_filename == "sunset-cat.jpg"
+    assert main.size is not None and main.size > 0
+    assert main.is_image is True
+    assert sorted(main.tags or []) == ["animal", "cat"]
+    assert main.metadata == {"album": "summer sunset"}
 
 
 def test_search_files_parses_highlight(uploadcare, vcr):
-    with vcr.use_cassette("test_search_files"):
-        response = uploadcare.search_files(
-            FileSearchRequest(
-                query="sunset", tags=TagsFilter(all_=["cat"]), sort=["-score"]
-            ),
-            limit=2,
-        )
+    response = _search_all_fixtures(uploadcare, vcr)
 
-    highlight = response.results[0].highlight
+    main = next(
+        result for result in response.results if str(result.uuid) == MAIN_UUID
+    )
+    highlight = main.highlight
 
     assert highlight is not None
     assert highlight.original_filename == ["<em>sunset</em>-cat.jpg"]
@@ -67,23 +78,20 @@ def test_search_files_parses_highlight(uploadcare, vcr):
     assert highlight.detected_mime_type is None
 
 
-def test_search_files_handles_a_result_without_tags_or_highlight(
-    uploadcare, vcr
-):
-    with vcr.use_cassette("test_search_files"):
-        response = uploadcare.search_files(
-            FileSearchRequest(
-                query="sunset", tags=TagsFilter(all_=["cat"]), sort=["-score"]
-            ),
-            limit=2,
-        )
+def test_search_files_handles_a_result_without_metadata(uploadcare, vcr):
+    response = _search_all_fixtures(uploadcare, vcr)
 
-    second = response.results[1]
+    # The one fixture uploaded with `store=False` and no metadata.
+    beach = next(
+        result
+        for result in response.results
+        if result.original_filename == "sunset-beach.jpg"
+    )
 
-    assert second.tags == []
-    assert second.datetime_stored is None
-    assert second.highlight is not None
-    assert second.highlight.metadata is None
+    assert beach.tags == ["cat"]
+    assert beach.datetime_stored is None
+    assert beach.highlight is not None
+    assert beach.highlight.metadata is None
 
 
 @pytest.mark.vcr
@@ -104,7 +112,12 @@ def test_search_files_with_appdata(uploadcare):
         include_appdata=True,
     )
 
-    appdata = response.results[0].appdata
+    # A filter-only search has an undefined order and the unstored fixture
+    # carries no scan, so locate the ClamAV-scanned main fixture directly.
+    main = next(
+        result for result in response.results if str(result.uuid) == MAIN_UUID
+    )
+    appdata = main.appdata
 
     assert appdata is not None
     assert appdata.uc_clamav_virus_scan is not None
