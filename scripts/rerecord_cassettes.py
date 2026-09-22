@@ -1,6 +1,6 @@
 """Re-record the file-tags and file-search VCR cassettes in one go.
 
-These cassettes are recorded against fixture files in a dedicated project
+These cassettes are recorded against fixture files in a throwaway project
 (see ``prepare_vcr_fixtures.py``). Doing it by hand is error prone in three
 specific ways, which this script removes:
 
@@ -78,7 +78,7 @@ def main(argv: List[str]) -> int:
     if len(argv) != 2 or not argv[1] or argv[1] == "demopublickey":
         print(
             f"usage: {Path(argv[0]).name} <public_key>\n\n"
-            "Pass the dedicated VCR project's public key (not the demo "
+            "Pass the throwaway VCR project's public key (not the demo "
             "project) and export its UPLOADCARE_SECRET_KEY before recording."
         )
         return 1

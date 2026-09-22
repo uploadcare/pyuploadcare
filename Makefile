@@ -27,7 +27,7 @@ test-django:
 test-integration:
 	poetry run pytest tests/integration --cov=pyuploadcare
 
-# Re-record the file-tags / file-search cassettes against the dedicated VCR
+# Re-record the file-tags / file-search cassettes against a throwaway VCR
 # project. Needs real keys exported; the script strips them for the final
 # replay verification so the signature tests keep using demosecretkey.
 rerecord-cassettes: check-env-UPLOADCARE_PUBLIC_KEY check-env-UPLOADCARE_SECRET_KEY

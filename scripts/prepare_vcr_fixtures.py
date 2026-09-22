@@ -1,9 +1,10 @@
-"""Create the permanent fixture files the VCR cassettes are recorded against.
+"""Create the fixture files the VCR cassettes are recorded against.
 
 The functional-test cassettes reference files by hard-coded UUIDs. This
-script uploads those fixtures into a dedicated, long-lived test project and
-prints the UUID substitutions for the test modules, so cassettes can be
-re-recorded against the same files from then on (`--vcr-record=all`).
+script uploads those fixtures into a throwaway test project and rewrites the
+UUID references in the test modules, so cassettes can be re-recorded against
+them (`--vcr-record=all`). The project is only needed while recording; delete
+it afterwards, and create a fresh one next time.
 
 The created state mirrors what the tests assert:
 
@@ -18,17 +19,16 @@ The created state mirrors what the tests assert:
   with ``store=False``: the second search result is asserted to have
   ``datetime_stored is None``.
 
-Run it against the dedicated project (never the demo project), passing its
+Run it against a throwaway project (never the demo project), passing its
 public key as the only argument and the secret key via the environment:
 
     UPLOADCARE_SECRET_KEY=... \
         poetry run python scripts/prepare_vcr_fixtures.py <public_key>
 
-The resulting UUIDs are written to ``scripts/vcr_fixtures.json``; on later
-runs only missing or removed files are recreated. The files only matter while
-recording: the cassettes replay without them, and only ``main`` and
-``no_tags`` are referenced from the test modules (those references are
-rewritten when the UUIDs change).
+The resulting UUIDs are written to ``scripts/vcr_fixtures.json``; within one
+recording session only missing or removed files are recreated. Only ``main``
+and ``no_tags`` are referenced from the test modules, and those references
+are rewritten whenever the UUIDs change.
 
 NOTE: recording live also means the tags mutation tests (set/update) see
 real state transitions, and two assertions encode states a real server
@@ -175,14 +175,14 @@ def main(argv: List[str]) -> int:
     if len(argv) != 2 or not argv[1] or argv[1] == "demopublickey":
         print(
             f"usage: {Path(argv[0]).name} <public_key>\n\n"
-            "Pass the dedicated VCR project's public key (not the demo "
+            "Pass the throwaway VCR project's public key (not the demo "
             "project) and export its UPLOADCARE_SECRET_KEY."
         )
         return 1
     pub_key = argv[1]
     secret_key = os.environ.get("UPLOADCARE_SECRET_KEY", "")
     if not secret_key:
-        print("Export UPLOADCARE_SECRET_KEY for the dedicated VCR project.")
+        print("Export UPLOADCARE_SECRET_KEY for the VCR project.")
         return 1
 
     uploadcare = Uploadcare(public_key=pub_key, secret_key=secret_key)
