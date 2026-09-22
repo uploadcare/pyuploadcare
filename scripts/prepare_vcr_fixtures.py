@@ -18,15 +18,17 @@ The created state mirrors what the tests assert:
   with ``store=False``: the second search result is asserted to have
   ``datetime_stored is None``.
 
-Run it once against the dedicated project (never the demo project):
+Run it against the dedicated project (never the demo project), passing its
+public key as the only argument and the secret key via the environment:
 
-    UPLOADCARE_PUBLIC_KEY=... UPLOADCARE_SECRET_KEY=... \
-        poetry run python scripts/prepare_vcr_fixtures.py
+    UPLOADCARE_SECRET_KEY=... \
+        poetry run python scripts/prepare_vcr_fixtures.py <public_key>
 
-The resulting UUIDs are written to ``scripts/vcr_fixtures.json``. On later
-runs the manifest is checked first and only missing files are recreated, so
-the UUIDs — and therefore the cassettes — stay stable. Keep the manifest
-committed and never delete the fixture files from the project.
+The resulting UUIDs are written to ``scripts/vcr_fixtures.json``; on later
+runs only missing or removed files are recreated. The files only matter while
+recording: the cassettes replay without them, and only ``main`` and
+``no_tags`` are referenced from the test modules (those references are
+rewritten when the UUIDs change).
 
 NOTE: recording live also means the tags mutation tests (set/update) see
 real state transitions, and two assertions encode states a real server
@@ -40,11 +42,12 @@ import os
 import sys
 from io import BytesIO
 from pathlib import Path
+from typing import List
 from uuid import UUID
 
 from pyuploadcare import Uploadcare
 from pyuploadcare.api.addon_entities import AddonLabels
-from pyuploadcare.exceptions import UploadcareException
+from pyuploadcare.exceptions import InvalidRequestError, UploadcareException
 
 
 MANIFEST = Path(__file__).parent / "vcr_fixtures.json"
@@ -112,10 +115,12 @@ def upload(uploadcare: Uploadcare, filename: str, **kwargs):
 
 def file_exists(uploadcare: Uploadcare, uuid: str) -> bool:
     try:
-        uploadcare.files_api.retrieve(uuid)
-        return True
-    except UploadcareException:
-        return False
+        info = uploadcare.files_api.retrieve(uuid)
+    except InvalidRequestError as exc:
+        if "not found" in str(exc).lower():
+            return False
+        raise
+    return info.datetime_removed is None
 
 
 # Which manifest key each placeholder UUID stands for in the test modules.
@@ -166,27 +171,23 @@ def apply_substitutions(old_uuids: dict, new_uuids: dict) -> None:
             _rewrite(path, replacements)
 
 
-def main() -> int:
-    pub_key = os.environ.get("UPLOADCARE_PUBLIC_KEY", "")
-    secret_key = os.environ.get("UPLOADCARE_SECRET_KEY", "")
-    if not pub_key or not secret_key or pub_key == "demopublickey":
+def main(argv: List[str]) -> int:
+    if len(argv) != 2 or not argv[1] or argv[1] == "demopublickey":
         print(
-            "Set UPLOADCARE_PUBLIC_KEY/UPLOADCARE_SECRET_KEY to the "
-            "dedicated VCR test project (not the demo project)."
+            f"usage: {Path(argv[0]).name} <public_key>\n\n"
+            "Pass the dedicated VCR project's public key (not the demo "
+            "project) and export its UPLOADCARE_SECRET_KEY."
         )
+        return 1
+    pub_key = argv[1]
+    secret_key = os.environ.get("UPLOADCARE_SECRET_KEY", "")
+    if not secret_key:
+        print("Export UPLOADCARE_SECRET_KEY for the dedicated VCR project.")
         return 1
 
     uploadcare = Uploadcare(public_key=pub_key, secret_key=secret_key)
 
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
-    if manifest.get("pub_key", pub_key) != pub_key:
-        print(
-            f"Manifest was recorded against project "
-            f"{manifest['pub_key']!r}, but the environment points at "
-            f"{pub_key!r}. Refusing to mix projects."
-        )
-        return 1
-
     old_uuids = {
         key: _as_uuid(value)
         for key, value in manifest.get("files", {}).items()
@@ -221,9 +222,7 @@ def main() -> int:
             except UploadcareException as exc:
                 print(f"{key}: ClamAV scan failed: {exc}")
 
-    MANIFEST.write_text(
-        json.dumps({"pub_key": pub_key, "files": uuids}, indent=2) + "\n"
-    )
+    MANIFEST.write_text(json.dumps({"files": uuids}, indent=2) + "\n")
     print(f"\nManifest written to {MANIFEST}")
 
     apply_substitutions(old_uuids, uuids)
@@ -236,4 +235,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv))

@@ -1,8 +1,8 @@
 """Re-record the file-tags and file-search VCR cassettes in one go.
 
-These cassettes are recorded against permanent fixture files in a dedicated
-project (see ``prepare_vcr_fixtures.py``). Doing it by hand is error prone in
-three specific ways, which this script removes:
+These cassettes are recorded against fixture files in a dedicated project
+(see ``prepare_vcr_fixtures.py``). Doing it by hand is error prone in three
+specific ways, which this script removes:
 
 1. The tag-mutation tests drift the fixture's tags, so every module must be
    recorded starting from the ``[cat, animal]`` baseline. The fixture script
@@ -14,12 +14,14 @@ three specific ways, which this script removes:
    the wrong secret. The final verification pass runs with the keys removed
    from the environment, falling back to ``demosecretkey``.
 
-Recording needs real keys; verification must not have them. Run:
+Recording needs real keys; verification must not have them. The public key
+is passed as the only argument, the secret key via the environment:
 
-    UPLOADCARE_PUBLIC_KEY=... UPLOADCARE_SECRET_KEY=... \
-        poetry run python scripts/rerecord_cassettes.py
+    UPLOADCARE_SECRET_KEY=... \
+        poetry run python scripts/rerecord_cassettes.py <public_key>
 
-or ``make rerecord-cassettes``.
+or ``UPLOADCARE_PUBLIC_KEY=... UPLOADCARE_SECRET_KEY=... make
+rerecord-cassettes``.
 
 Recording happens before a test's assertions, so a module can be recorded
 successfully even while its expectations still mismatch. The verification
@@ -28,97 +30,74 @@ expected values and re-run.
 """
 
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import Dict, List, Optional, Set
 
 
 ROOT = Path(__file__).resolve().parent.parent
 PREPARE = Path(__file__).resolve().parent / "prepare_vcr_fixtures.py"
 
-# Each module and the cassettes it owns (deleted before recording so they are
-# rewritten clean rather than appended to).
+# Test modules to record; each owns the cassettes in its sibling
+# ``cassettes/`` directory.
 MODULES = [
-    (
-        "tests/functional/api/test_tags_api.py",
-        "tests/functional/api/cassettes",
-        [
-            "test_get_file_tags",
-            "test_get_empty_file_tags",
-            "test_replace_file_tags",
-            "test_update_file_tags",
-        ],
-    ),
-    (
-        "tests/functional/api/test_search_api.py",
-        "tests/functional/api/cassettes",
-        [
-            "test_search_files_all",
-            "test_search_files_empty_result",
-            "test_search_files_with_appdata",
-        ],
-    ),
-    (
-        "tests/functional/resources/test_file_tags.py",
-        "tests/functional/resources/cassettes",
-        [
-            "test_file_get_tags",
-            "test_file_set_tags",
-            "test_file_update_tags",
-        ],
-    ),
-    (
-        "tests/functional/ucare_cli/test_file_tags.py",
-        "tests/functional/ucare_cli/cassettes",
-        [
-            "test_cli_get_file_tags",
-            "test_cli_set_file_tags",
-            "test_cli_update_file_tags",
-        ],
-    ),
-    (
-        "tests/functional/ucare_cli/test_search_files.py",
-        "tests/functional/ucare_cli/cassettes",
-        ["test_cli_search_files"],
-    ),
+    "tests/functional/api/test_tags_api.py",
+    "tests/functional/api/test_search_api.py",
+    "tests/functional/resources/test_file_tags.py",
+    "tests/functional/ucare_cli/test_file_tags.py",
+    "tests/functional/ucare_cli/test_search_files.py",
 ]
 
+TEST_NAME = re.compile(r"^(?:async\s+)?def\s+(test_\w+)\s*\(", re.MULTILINE)
+CASSETTE_NAME = re.compile(r"use_cassette\(\s*['\"]([^'\"]+)['\"]")
 
-def run(cmd, env=None):
+
+def cassette_names(module: Path) -> Set[str]:
+    source = module.read_text(encoding="utf-8")
+    return set(TEST_NAME.findall(source)) | set(CASSETTE_NAME.findall(source))
+
+
+def delete_cassettes(module: Path) -> None:
+    cassette_dir = module.parent / "cassettes"
+    for name in cassette_names(module):
+        (cassette_dir / f"{name}.yaml").unlink(missing_ok=True)
+
+
+def run(cmd: List[str], env: Optional[Dict[str, str]] = None) -> int:
     print(f"\n$ {' '.join(cmd)}", flush=True)
     return subprocess.run(cmd, cwd=ROOT, env=env).returncode
 
 
-def prepare_fixtures():
-    return run([sys.executable, str(PREPARE)])
+def prepare_fixtures(pub_key: str) -> int:
+    return run([sys.executable, str(PREPARE), pub_key])
 
 
-def main():
-    pub_key = os.environ.get("UPLOADCARE_PUBLIC_KEY", "")
-    if not pub_key or pub_key == "demopublickey":
+def main(argv: List[str]) -> int:
+    if len(argv) != 2 or not argv[1] or argv[1] == "demopublickey":
         print(
-            "Export the dedicated VCR project's real "
-            "UPLOADCARE_PUBLIC_KEY/UPLOADCARE_SECRET_KEY (not the demo "
-            "project) before recording."
+            f"usage: {Path(argv[0]).name} <public_key>\n\n"
+            "Pass the dedicated VCR project's public key (not the demo "
+            "project) and export its UPLOADCARE_SECRET_KEY before recording."
         )
         return 1
-
-    print("== Preparing fixtures and applying UUID substitutions ==")
-    if prepare_fixtures() != 0:
-        print("Fixture preparation failed; aborting.")
+    pub_key = argv[1]
+    if not os.environ.get("UPLOADCARE_SECRET_KEY"):
+        print("Export UPLOADCARE_SECRET_KEY before recording.")
         return 1
 
-    for module, cassette_dir, names in MODULES:
+    record_env = dict(os.environ, UPLOADCARE_PUBLIC_KEY=pub_key)
+
+    for module in MODULES:
         print(f"\n== Recording {module} ==")
 
         # Reset the fixture's tags to baseline before each module.
-        if prepare_fixtures() != 0:
+        if prepare_fixtures(pub_key) != 0:
             print("Fixture reset failed; aborting.")
             return 1
 
-        # Delete this module's cassettes so recording writes them clean.
-        for name in names:
-            (ROOT / cassette_dir / f"{name}.yaml").unlink(missing_ok=True)
+        delete_cassettes(ROOT / module)
 
         run(
             [
@@ -128,7 +107,8 @@ def main():
                 "--vcr-record=all",
                 "-q",
                 module,
-            ]
+            ],
+            env=record_env,
         )
 
     print(
@@ -168,4 +148,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv))

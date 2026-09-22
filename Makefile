@@ -31,7 +31,7 @@ test-integration:
 # project. Needs real keys exported; the script strips them for the final
 # replay verification so the signature tests keep using demosecretkey.
 rerecord-cassettes: check-env-UPLOADCARE_PUBLIC_KEY check-env-UPLOADCARE_SECRET_KEY
-	poetry run python scripts/rerecord_cassettes.py
+	poetry run python scripts/rerecord_cassettes.py $(UPLOADCARE_PUBLIC_KEY)
 
 test_with_github_actions:
 	act -W .github/workflows/test.yml --container-architecture linux/amd64
