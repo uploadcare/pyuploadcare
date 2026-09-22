@@ -1,32 +1,58 @@
 interactions:
 - request:
-    body: '{"query": "nothing-matches-this"}'
+    body: '{"query":"nothing-matches-this"}'
     headers:
       accept:
-      - '*/*'
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
-      - gzip, deflate
+      - gzip, deflate, zstd
+      authorization:
+      - DUMMY
       connection:
       - keep-alive
+      content-length:
+      - '32'
       content-type:
       - application/json
+      date:
+      - Tue, 22 Sep 2026, 15:47:41 GMT
       host:
       - api.uploadcare.com
+      user-agent:
+      - DUMMY
     method: POST
     uri: https://api.uploadcare.com/files/search/
   response:
-    content: '{"next":null,"previous":null,"total":0,"per_page":20,"results":[]}'
+    body:
+      string: '{"next":null,"previous":null,"total":0,"per_page":20,"results":[]}'
     headers:
-      Connection:
+      access-control-allow-origin:
+      - https://uploadcare.com
+      allow:
+      - OPTIONS, POST
+      connection:
       - keep-alive
-      Content-Length:
-      - '65'
-      Content-Type:
+      content-length:
+      - '66'
+      content-type:
       - application/vnd.uploadcare-v0.7+json
-      Server:
+      date:
+      - Tue, 22 Sep 2026 15:47:41 GMT
+      server:
       - nginx
-      Vary:
+      vary:
       - Accept
-    http_version: HTTP/1.1
-    status_code: 200
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - noindex, nofollow, nosnippet, noarchive
+      x-uploadcare-request-id:
+      - 7ad3cb56-acac-4ae9-a3ad-24d3f80738db
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1

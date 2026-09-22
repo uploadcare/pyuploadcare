@@ -1,32 +1,114 @@
 interactions:
 - request:
-    body: '{"tags": ["cat", "cute"]}'
+    body: '{"tags":["cat","cute"]}'
     headers:
       accept:
-      - '*/*'
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
-      - gzip, deflate
+      - gzip, deflate, zstd
+      authorization:
+      - DUMMY
       connection:
       - keep-alive
+      content-length:
+      - '23'
       content-type:
       - application/json
+      date:
+      - Tue, 22 Sep 2026, 15:47:46 GMT
       host:
       - api.uploadcare.com
+      user-agent:
+      - DUMMY
     method: PUT
-    uri: https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/tags/
+    uri: https://api.uploadcare.com/files/cdc00a7a-366f-4e0b-a942-9a7141b4004b/tags/
   response:
-    content: '{"tags":["cat","cute"],"added":["cute"],"deleted":["animal"]}'
+    body:
+      string: '{"tags":["cat","cute"],"added":["cute"],"deleted":["animal"]}'
     headers:
-      Connection:
+      access-control-allow-origin:
+      - https://uploadcare.com
+      allow:
+      - GET, HEAD, OPTIONS, PATCH, PUT
+      connection:
       - keep-alive
-      Content-Length:
-      - '60'
-      Content-Type:
+      content-length:
+      - '61'
+      content-type:
       - application/vnd.uploadcare-v0.7+json
-      Server:
+      date:
+      - Tue, 22 Sep 2026 15:47:46 GMT
+      server:
       - nginx
-      Vary:
+      vary:
       - Accept
-    http_version: HTTP/1.1
-    status_code: 200
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - noindex, nofollow, nosnippet, noarchive
+      x-uploadcare-request-id:
+      - 9d8f004a-268a-452b-9c93-497b97ab364f
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"tags":["cat","cute"]}'
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.7+json
+      accept-encoding:
+      - gzip, deflate, zstd
+      authorization:
+      - DUMMY
+      connection:
+      - keep-alive
+      content-length:
+      - '23'
+      content-type:
+      - application/json
+      date:
+      - Tue, 22 Sep 2026, 15:47:46 GMT
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - DUMMY
+    method: PUT
+    uri: https://api.uploadcare.com/files/cdc00a7a-366f-4e0b-a942-9a7141b4004b/tags/
+  response:
+    body:
+      string: '{"tags":["cat","cute"],"added":[],"deleted":[]}'
+    headers:
+      access-control-allow-origin:
+      - https://uploadcare.com
+      allow:
+      - GET, HEAD, OPTIONS, PATCH, PUT
+      connection:
+      - keep-alive
+      content-length:
+      - '47'
+      content-type:
+      - application/vnd.uploadcare-v0.7+json
+      date:
+      - Tue, 22 Sep 2026 15:47:46 GMT
+      server:
+      - nginx
+      vary:
+      - Accept
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - noindex, nofollow, nosnippet, noarchive
+      x-uploadcare-request-id:
+      - 6f6e8e05-4bb4-4c99-abba-d513e5b812cf
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1

@@ -1,31 +1,58 @@
 interactions:
 - request:
-    body: '{"query": "sunset", "tags": {"all": ["cat"]}, "sort": ["-score"]}'
+    body: '{"query":"sunset","tags":{"all":["cat"]},"sort":["-score"]}'
     headers:
       accept:
-      - '*/*'
+      - application/vnd.uploadcare-v0.7+json
       accept-encoding:
-      - gzip, deflate
+      - gzip, deflate, zstd
+      authorization:
+      - DUMMY
       connection:
       - keep-alive
+      content-length:
+      - '59'
       content-type:
       - application/json
+      date:
+      - Tue, 22 Sep 2026, 15:47:39 GMT
       host:
       - api.uploadcare.com
+      user-agent:
+      - DUMMY
     method: POST
     uri: https://api.uploadcare.com/files/search/?limit=2
   response:
-    content: '{"next":"https://api.uploadcare.com/files/search/?limit=2&offset=2","previous":null,"total":5,"per_page":2,"results":[{"uuid":"a55d6b25-d03c-4038-9838-6e06bb7df598","original_filename":"sunset-cat.jpg","size":3518420,"mime_type":"image/jpeg","is_image":true,"is_ready":true,"datetime_uploaded":"2026-02-16T14:44:29.395043Z","datetime_stored":"2026-02-16T14:44:29.637342Z","datetime_removed":null,"original_file_url":"https://ucarecdn.com/a55d6b25-d03c-4038-9838-6e06bb7df598/sunset-cat.jpg","url":"https://api.uploadcare.com/files/a55d6b25-d03c-4038-9838-6e06bb7df598/","variations":null,"metadata":{"album":"holiday"},"tags":["cat","animal"],"highlight":{"original_filename":["<em>sunset</em>-cat.jpg"],"metadata":{"album":"summer
-      <em>sunset</em>"}}},{"uuid":"1a9c5240-7d9b-4473-851b-45fa4b0bed64","original_filename":"sunset.png","size":1024,"mime_type":"image/png","is_image":true,"is_ready":true,"datetime_uploaded":"2026-02-15T10:00:00Z","datetime_stored":null,"datetime_removed":null,"original_file_url":"https://ucarecdn.com/1a9c5240-7d9b-4473-851b-45fa4b0bed64/sunset.png","url":"https://api.uploadcare.com/files/1a9c5240-7d9b-4473-851b-45fa4b0bed64/","variations":null,"metadata":{},"tags":[],"highlight":{"original_filename":["<em>sunset</em>.png"]}}]}'
+    body:
+      string: '{"next":"https://api.uploadcare.com/files/search/?limit=2&offset=2","previous":null,"total":5,"per_page":2,"results":[{"datetime_removed":null,"datetime_stored":null,"datetime_uploaded":"2026-09-22T15:44:13.329706Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/f255e81d-27b2-44d2-a4e1-d497caec304a/sunsetbeach.jpg","original_filename":"sunset-beach.jpg","size":332,"url":"https://api.uploadcare.com/files/f255e81d-27b2-44d2-a4e1-d497caec304a/","uuid":"f255e81d-27b2-44d2-a4e1-d497caec304a","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-beach.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:04.692010Z","datetime_uploaded":"2026-09-21T12:44:04.546220Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/cf05d23e-06c1-4a51-8357-7be85664aaf3/sunsetpier.jpg","original_filename":"sunset-pier.jpg","size":332,"url":"https://api.uploadcare.com/files/cf05d23e-06c1-4a51-8357-7be85664aaf3/","uuid":"cf05d23e-06c1-4a51-8357-7be85664aaf3","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-pier.jpg"]}}]}'
     headers:
-      Connection:
+      access-control-allow-origin:
+      - https://uploadcare.com
+      allow:
+      - OPTIONS, POST
+      connection:
       - keep-alive
-      Content-Type:
+      content-length:
+      - '1685'
+      content-type:
       - application/vnd.uploadcare-v0.7+json
-      Server:
+      date:
+      - Tue, 22 Sep 2026 15:47:40 GMT
+      server:
       - nginx
-      Vary:
+      vary:
       - Accept
-    http_version: HTTP/1.1
-    status_code: 200
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - noindex, nofollow, nosnippet, noarchive
+      x-uploadcare-request-id:
+      - f558a0c0-2cd5-4b11-ba39-82abc632f9bd
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
 version: 1
