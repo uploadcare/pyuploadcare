@@ -6,7 +6,7 @@ from pyuploadcare.resources.file import FileFromUrl
 
 
 TAGS = ["cat", "animal"]
-UPLOADED_UUID = "a55d6b25-d03c-4038-9838-6e06bb7df598"
+UPLOADED_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
 
 
 def test_upload_files_forwards_tags(uploadcare, small_file):

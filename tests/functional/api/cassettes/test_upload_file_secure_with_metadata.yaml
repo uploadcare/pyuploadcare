@@ -29,7 +29,7 @@ interactions:
     method: POST
     uri: https://upload.uploadcare.com/base/
   response:
-    content: '{"file851.txt":"a55d6b25-d03c-4038-9838-6e06bb7df598"}'
+    content: '{"file851.txt":"cdc00a7a-366f-4e0b-a942-9a7141b4004b"}'
     headers:
       Access-Control-Allow-Credentials:
       - 'true'

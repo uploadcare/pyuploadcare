@@ -1,0 +1,176 @@
+interactions:
+- request:
+    body: '{"query":"sunset","tags":{"all":["cat"]},"sort":["-score"]}'
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.7+json
+      accept-encoding:
+      - gzip, deflate, zstd
+      authorization:
+      - DUMMY
+      connection:
+      - keep-alive
+      content-length:
+      - '59'
+      content-type:
+      - application/json
+      date:
+      - Tue, 22 Sep 2026, 15:47:40 GMT
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - DUMMY
+    method: POST
+    uri: https://api.uploadcare.com/files/search/?limit=5
+  response:
+    body:
+      string: '{"next":null,"previous":null,"total":5,"per_page":5,"results":[{"datetime_removed":null,"datetime_stored":null,"datetime_uploaded":"2026-09-22T15:44:13.329706Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/f255e81d-27b2-44d2-a4e1-d497caec304a/sunsetbeach.jpg","original_filename":"sunset-beach.jpg","size":332,"url":"https://api.uploadcare.com/files/f255e81d-27b2-44d2-a4e1-d497caec304a/","uuid":"f255e81d-27b2-44d2-a4e1-d497caec304a","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-beach.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:04.692010Z","datetime_uploaded":"2026-09-21T12:44:04.546220Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/cf05d23e-06c1-4a51-8357-7be85664aaf3/sunsetpier.jpg","original_filename":"sunset-pier.jpg","size":332,"url":"https://api.uploadcare.com/files/cf05d23e-06c1-4a51-8357-7be85664aaf3/","uuid":"cf05d23e-06c1-4a51-8357-7be85664aaf3","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-pier.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:04.314403Z","datetime_uploaded":"2026-09-21T12:44:03.986081Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/82f88125-216e-4bd3-b84f-134c0de1d047/sunsethill.jpg","original_filename":"sunset-hill.jpg","size":332,"url":"https://api.uploadcare.com/files/82f88125-216e-4bd3-b84f-134c0de1d047/","uuid":"82f88125-216e-4bd3-b84f-134c0de1d047","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-hill.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:05.018117Z","datetime_uploaded":"2026-09-21T12:44:04.894454Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/6d8f0b99-3016-4460-a1f6-c890e03961fd/sunsetlake.jpg","original_filename":"sunset-lake.jpg","size":332,"url":"https://api.uploadcare.com/files/6d8f0b99-3016-4460-a1f6-c890e03961fd/","uuid":"6d8f0b99-3016-4460-a1f6-c890e03961fd","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-lake.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:03.045110Z","datetime_uploaded":"2026-09-21T12:44:02.902248Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/cdc00a7a-366f-4e0b-a942-9a7141b4004b/sunsetcat.jpg","original_filename":"sunset-cat.jpg","size":332,"url":"https://api.uploadcare.com/files/cdc00a7a-366f-4e0b-a942-9a7141b4004b/","uuid":"cdc00a7a-366f-4e0b-a942-9a7141b4004b","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{"album":"summer
+        sunset"},"tags":["cat","animal"],"highlight":{"metadata":{"album":"summer
+        <em>sunset</em>"},"original_filename":["<em>sunset</em>-cat.jpg"]}}]}'
+    headers:
+      access-control-allow-origin:
+      - https://uploadcare.com
+      allow:
+      - OPTIONS, POST
+      connection:
+      - keep-alive
+      content-length:
+      - '4087'
+      content-type:
+      - application/vnd.uploadcare-v0.7+json
+      date:
+      - Tue, 22 Sep 2026 15:47:40 GMT
+      server:
+      - nginx
+      vary:
+      - Accept
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - noindex, nofollow, nosnippet, noarchive
+      x-uploadcare-request-id:
+      - 30ec8471-43cd-41a3-877f-306f16d716ad
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"query":"sunset","tags":{"all":["cat"]},"sort":["-score"]}'
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.7+json
+      accept-encoding:
+      - gzip, deflate, zstd
+      authorization:
+      - DUMMY
+      connection:
+      - keep-alive
+      content-length:
+      - '59'
+      content-type:
+      - application/json
+      date:
+      - Tue, 22 Sep 2026, 15:47:40 GMT
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - DUMMY
+    method: POST
+    uri: https://api.uploadcare.com/files/search/?limit=5
+  response:
+    body:
+      string: '{"next":null,"previous":null,"total":5,"per_page":5,"results":[{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:04.692010Z","datetime_uploaded":"2026-09-21T12:44:04.546220Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/cf05d23e-06c1-4a51-8357-7be85664aaf3/sunsetpier.jpg","original_filename":"sunset-pier.jpg","size":332,"url":"https://api.uploadcare.com/files/cf05d23e-06c1-4a51-8357-7be85664aaf3/","uuid":"cf05d23e-06c1-4a51-8357-7be85664aaf3","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-pier.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:04.314403Z","datetime_uploaded":"2026-09-21T12:44:03.986081Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/82f88125-216e-4bd3-b84f-134c0de1d047/sunsethill.jpg","original_filename":"sunset-hill.jpg","size":332,"url":"https://api.uploadcare.com/files/82f88125-216e-4bd3-b84f-134c0de1d047/","uuid":"82f88125-216e-4bd3-b84f-134c0de1d047","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-hill.jpg"]}},{"datetime_removed":null,"datetime_stored":null,"datetime_uploaded":"2026-09-22T15:44:13.329706Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/f255e81d-27b2-44d2-a4e1-d497caec304a/sunsetbeach.jpg","original_filename":"sunset-beach.jpg","size":332,"url":"https://api.uploadcare.com/files/f255e81d-27b2-44d2-a4e1-d497caec304a/","uuid":"f255e81d-27b2-44d2-a4e1-d497caec304a","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-beach.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:05.018117Z","datetime_uploaded":"2026-09-21T12:44:04.894454Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/6d8f0b99-3016-4460-a1f6-c890e03961fd/sunsetlake.jpg","original_filename":"sunset-lake.jpg","size":332,"url":"https://api.uploadcare.com/files/6d8f0b99-3016-4460-a1f6-c890e03961fd/","uuid":"6d8f0b99-3016-4460-a1f6-c890e03961fd","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-lake.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:03.045110Z","datetime_uploaded":"2026-09-21T12:44:02.902248Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/cdc00a7a-366f-4e0b-a942-9a7141b4004b/sunsetcat.jpg","original_filename":"sunset-cat.jpg","size":332,"url":"https://api.uploadcare.com/files/cdc00a7a-366f-4e0b-a942-9a7141b4004b/","uuid":"cdc00a7a-366f-4e0b-a942-9a7141b4004b","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{"album":"summer
+        sunset"},"tags":["cat","animal"],"highlight":{"metadata":{"album":"summer
+        <em>sunset</em>"},"original_filename":["<em>sunset</em>-cat.jpg"]}}]}'
+    headers:
+      access-control-allow-origin:
+      - https://uploadcare.com
+      allow:
+      - OPTIONS, POST
+      connection:
+      - keep-alive
+      content-length:
+      - '4087'
+      content-type:
+      - application/vnd.uploadcare-v0.7+json
+      date:
+      - Tue, 22 Sep 2026 15:47:40 GMT
+      server:
+      - nginx
+      vary:
+      - Accept
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - noindex, nofollow, nosnippet, noarchive
+      x-uploadcare-request-id:
+      - 91df394f-cbd0-4399-9754-5548848229a4
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"query":"sunset","tags":{"all":["cat"]},"sort":["-score"]}'
+    headers:
+      accept:
+      - application/vnd.uploadcare-v0.7+json
+      accept-encoding:
+      - gzip, deflate, zstd
+      authorization:
+      - DUMMY
+      connection:
+      - keep-alive
+      content-length:
+      - '59'
+      content-type:
+      - application/json
+      date:
+      - Tue, 22 Sep 2026, 15:47:40 GMT
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - DUMMY
+    method: POST
+    uri: https://api.uploadcare.com/files/search/?limit=5
+  response:
+    body:
+      string: '{"next":null,"previous":null,"total":5,"per_page":5,"results":[{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:04.692010Z","datetime_uploaded":"2026-09-21T12:44:04.546220Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/cf05d23e-06c1-4a51-8357-7be85664aaf3/sunsetpier.jpg","original_filename":"sunset-pier.jpg","size":332,"url":"https://api.uploadcare.com/files/cf05d23e-06c1-4a51-8357-7be85664aaf3/","uuid":"cf05d23e-06c1-4a51-8357-7be85664aaf3","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-pier.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:04.314403Z","datetime_uploaded":"2026-09-21T12:44:03.986081Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/82f88125-216e-4bd3-b84f-134c0de1d047/sunsethill.jpg","original_filename":"sunset-hill.jpg","size":332,"url":"https://api.uploadcare.com/files/82f88125-216e-4bd3-b84f-134c0de1d047/","uuid":"82f88125-216e-4bd3-b84f-134c0de1d047","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-hill.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:05.018117Z","datetime_uploaded":"2026-09-21T12:44:04.894454Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/6d8f0b99-3016-4460-a1f6-c890e03961fd/sunsetlake.jpg","original_filename":"sunset-lake.jpg","size":332,"url":"https://api.uploadcare.com/files/6d8f0b99-3016-4460-a1f6-c890e03961fd/","uuid":"6d8f0b99-3016-4460-a1f6-c890e03961fd","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-lake.jpg"]}},{"datetime_removed":null,"datetime_stored":null,"datetime_uploaded":"2026-09-22T15:44:13.329706Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/f255e81d-27b2-44d2-a4e1-d497caec304a/sunsetbeach.jpg","original_filename":"sunset-beach.jpg","size":332,"url":"https://api.uploadcare.com/files/f255e81d-27b2-44d2-a4e1-d497caec304a/","uuid":"f255e81d-27b2-44d2-a4e1-d497caec304a","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{},"tags":["cat"],"highlight":{"original_filename":["<em>sunset</em>-beach.jpg"]}},{"datetime_removed":null,"datetime_stored":"2026-09-21T12:44:03.045110Z","datetime_uploaded":"2026-09-21T12:44:02.902248Z","is_image":true,"is_ready":true,"mime_type":"image/jpeg","original_file_url":"https://ucarecdn.com/cdc00a7a-366f-4e0b-a942-9a7141b4004b/sunsetcat.jpg","original_filename":"sunset-cat.jpg","size":332,"url":"https://api.uploadcare.com/files/cdc00a7a-366f-4e0b-a942-9a7141b4004b/","uuid":"cdc00a7a-366f-4e0b-a942-9a7141b4004b","variations":null,"content_info":{"mime":{"mime":"image/jpeg","type":"image","subtype":"jpeg"},"image":{"dpi":null,"width":1,"format":"JPEG","height":1,"sequence":false,"color_mode":"L","orientation":null,"geo_location":null,"datetime_original":null}},"metadata":{"album":"summer
+        sunset"},"tags":["cat","animal"],"highlight":{"metadata":{"album":"summer
+        <em>sunset</em>"},"original_filename":["<em>sunset</em>-cat.jpg"]}}]}'
+    headers:
+      access-control-allow-origin:
+      - https://uploadcare.com
+      allow:
+      - OPTIONS, POST
+      connection:
+      - keep-alive
+      content-length:
+      - '4087'
+      content-type:
+      - application/vnd.uploadcare-v0.7+json
+      date:
+      - Tue, 22 Sep 2026 15:47:41 GMT
+      server:
+      - nginx
+      vary:
+      - Accept
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - noindex, nofollow, nosnippet, noarchive
+      x-uploadcare-request-id:
+      - 1340be4e-640b-48b6-9b8d-7b586d446781
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

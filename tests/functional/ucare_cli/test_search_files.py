@@ -13,8 +13,11 @@ from pyuploadcare.ucare_cli.main import main
 
 @pytest.mark.vcr
 def test_cli_search_files(capsys, uploadcare):
+    # All fixtures match `sunset` equally well and the relevance order is
+    # arbitrary, so ask for a page large enough to contain every one of
+    # them instead of pinning what ranks first.
     search_files(
-        arg_namespace("search_files --query sunset --tags_any cat --limit 1"),
+        arg_namespace("search_files --query sunset --tags_any cat --limit 5"),
         uploadcare,
     )
     captured = capsys.readouterr()

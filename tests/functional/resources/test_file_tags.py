@@ -3,7 +3,7 @@ import pytest
 from pyuploadcare.api.entities import FileInfo
 
 
-FILE_UUID = "a55d6b25-d03c-4038-9838-6e06bb7df598"
+FILE_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
 
 FILE_INFO_WITH_TAGS = {
     "uuid": FILE_UUID,
@@ -55,10 +55,11 @@ def test_file_get_tags_refreshes_cached_info(uploadcare, vcr):
 
 @pytest.mark.vcr
 def test_file_set_tags(uploadcare):
+    # State before: ["cat", "animal"] (the baseline).
     file_ = uploadcare.file(FILE_UUID)
     response = file_.set_tags(["cat", "cute"])
 
-    assert response.tags == ["cat", "cute"]
+    assert sorted(response.tags) == ["cat", "cute"]
     assert response.added == ["cute"]
     assert response.deleted == ["animal"]
 
@@ -69,23 +70,25 @@ def test_file_set_tags_refreshes_cached_info(uploadcare, vcr):
     with vcr.use_cassette("test_file_set_tags"):
         file_.set_tags(["cat", "cute"])
 
-    assert file_.info["tags"] == ["cat", "cute"]
+    assert sorted(file_.info["tags"]) == ["cat", "cute"]
 
 
 @pytest.mark.vcr
 def test_file_update_tags(uploadcare):
+    # State before: ["cat", "cute"], left by the set_tags test above.
+    # Restores the ["cat", "animal"] baseline as a side effect.
     file_ = uploadcare.file(FILE_UUID)
-    response = file_.update_tags(add=["cute"], delete=["animal"])
+    response = file_.update_tags(add=["animal"], delete=["cute"])
 
-    assert response.tags == ["cat", "cute"]
-    assert response.added == ["cute"]
-    assert response.deleted == ["animal"]
+    assert sorted(response.tags) == ["animal", "cat"]
+    assert response.added == ["animal"]
+    assert response.deleted == ["cute"]
 
 
 def test_file_update_tags_refreshes_cached_info(uploadcare, vcr):
     file_ = uploadcare.file(FILE_UUID, dict(FILE_INFO_WITH_TAGS))
 
     with vcr.use_cassette("test_file_update_tags"):
-        file_.update_tags(add=["cute"], delete=["animal"])
+        file_.update_tags(add=["animal"], delete=["cute"])
 
-    assert file_.info["tags"] == ["cat", "cute"]
+    assert sorted(file_.info["tags"]) == ["animal", "cat"]

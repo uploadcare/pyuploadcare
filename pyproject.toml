@@ -63,7 +63,11 @@ flake8 = [
 mypy = "^1.7.1"
 flake8-print = "^5.0.0"
 pytest-vcr = "^1.0.2"
-vcrpy = "^5.1.0"
+vcrpy = [
+    {version = "^8.0", markers = "python_version >= '3.10'"},
+    {version = "^7.0", markers = "python_version >= '3.9' and python_version < '3.10'"},
+    {version = "^6.0", markers = "python_version < '3.9'"},
+]
 yarl = "^1.9.4"
 Django = "^4.2.8"
 coverage = "^7.3.3"

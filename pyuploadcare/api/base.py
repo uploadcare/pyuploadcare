@@ -12,7 +12,7 @@ from typing import (
     Union,
     cast,
 )
-from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
+from urllib.parse import urlencode, urljoin, urlsplit
 from uuid import UUID
 
 from pydantic import TypeAdapter
@@ -242,20 +242,11 @@ def _origin(url: str) -> Tuple[str, str, Optional[int]]:
     return scheme, (split.hostname or "").lower(), port
 
 
-def _merge_query(url: str, params: Dict[str, str]) -> str:
-    """Return ``url`` with ``params`` merged into its query string."""
-    split = urlsplit(url)
-    query = dict(parse_qsl(split.query))
-    query.update(params)
-    return urlunsplit(split._replace(query=urlencode(query)))
-
-
 def _iterate_pages(  # noqa: C901
     first_url: str,
     fetch_page: Callable[[str], Dict[str, Any]],
     parse: Callable[[Dict[str, Any]], Any],
     limit: Optional[int] = None,
-    carry_query: Optional[Dict[str, str]] = None,
 ) -> Iterator[Any]:
     """Walk a paginated endpoint, yielding up to ``limit`` results.
 
@@ -269,12 +260,6 @@ def _iterate_pages(  # noqa: C901
     ``next`` (a compromised or misbehaving server) fails loudly instead of
     leaking them. A relative ``next`` is resolved against the page that
     supplied it.
-
-    ``carry_query`` parameters are re-applied to every followed ``next``
-    URL: the server does not echo request decorations such as
-    ``include=appdata``, so following ``next`` verbatim would silently drop
-    them after the first page. ``first_url`` is expected to carry them
-    already.
     """
     origin = _origin(first_url)
     next_: Optional[str] = first_url
@@ -310,8 +295,6 @@ def _iterate_pages(  # noqa: C901
                 raise InvalidRequestError(
                     f"refusing to follow `next` outside {origin[1]}: {next_}"
                 )
-            if carry_query:
-                next_ = _merge_query(next_, carry_query)
 
 
 class ListMixin(APIProtocol):

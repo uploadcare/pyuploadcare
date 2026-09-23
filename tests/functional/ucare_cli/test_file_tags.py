@@ -8,7 +8,7 @@ from pyuploadcare.ucare_cli.commands.update_file_tags import update_file_tags
 from pyuploadcare.ucare_cli.main import main
 
 
-FILE_UUID = "a55d6b25-d03c-4038-9838-6e06bb7df598"
+FILE_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
 
 
 @pytest.mark.vcr

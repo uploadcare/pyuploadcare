@@ -13,7 +13,7 @@ interactions:
       user-agent:
       - PyUploadcare/3.0.0/demopublickey (CPython/3.8.9)
     method: GET
-    uri: https://api.uploadcare.com/files/1a9c5240-7d9b-4473-851b-45fa4b0bed64/metadata/
+    uri: https://api.uploadcare.com/files/41a56ce7-48a4-486e-b8ed-4fd5f4051e08/metadata/
   response:
     content: '{}'
     headers:

@@ -124,7 +124,7 @@ def test_field_cannot_be_in_both_phrase_and_exact(field):
 def test_different_fields_in_phrase_and_exact_are_allowed():
     FileSearchRequest(
         phrase=SearchPhrase(original_filename="sunset"),
-        exact=SearchExact(uuid=["a55d6b25-d03c-4038-9838-6e06bb7df598"]),
+        exact=SearchExact(uuid=["cdc00a7a-366f-4e0b-a942-9a7141b4004b"]),
     )
 
 

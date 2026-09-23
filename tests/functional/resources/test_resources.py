@@ -373,7 +373,7 @@ def test_list_files(uploadcare):
 
 @pytest.mark.vcr
 def test_retrieve_fileinfo_with_metadata(uploadcare):
-    file_ = uploadcare.file("a55d6b25-d03c-4038-9838-6e06bb7df598")
+    file_ = uploadcare.file("cdc00a7a-366f-4e0b-a942-9a7141b4004b")
     assert isinstance(file_, File)
     assert file_.info
 
