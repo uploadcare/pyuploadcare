@@ -477,10 +477,21 @@ or you can use API directly to convert single or multiple files::
 
     document_convert_status = uploadcare.document_convert_api.status(document_convert_info.token)
 
-Determine the document format and possible conversion formats::
+Get `document info`_: the detected source format, the formats it can be converted to,
+and the file groups already produced by ``save_in_group`` conversions::
 
-    uuid = '740e1b8c-1ad8-4324-b7ec-112c79d8eac2'
-    uploadcare.document_convert_api.retrieve(uuid)
+    info = uploadcare.document_convert_api.retrieve('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
+
+    info.format.name                                    # 'pdf'
+    [f.name for f in info.format.conversion_formats]    # ['doc', 'docx', 'jpg', 'png', ...]
+    info.format.converted_groups                        # {'jpg': 'f56f1e80-...-690861252070~4'}
+    info.error                                          # None, or an error message
+
+``converted_groups`` maps a target format to the UUID of the group holding the converted
+pages. ``File.get_converted_document_group()`` is a shortcut that reads this mapping and
+returns the group as a ``FileGroup``.
+
+.. _document info: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo
 
 File actions (addons)
 ---------------------
