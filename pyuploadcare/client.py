@@ -759,7 +759,8 @@ class Uploadcare:
               It is reflects a ``from`` parameter from REST API.
             - ``ordering`` -- a string with name of the field what must be used
               for sorting files. The actual list of supported fields you can find in
-              documentation: http://uploadcare.com/documentation/rest/#file-files
+              documentation:
+              https://uploadcare.com/docs/api/rest/file/files-list/#request.query.ordering
             - ``limit`` -- a total number of objects to be iterated.
               If not specified, all available objects are iterated;
             - ``request_limit`` -- a number of objects retrieved per request (page).

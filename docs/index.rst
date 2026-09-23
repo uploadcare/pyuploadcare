@@ -100,8 +100,8 @@ Indices and tables
 * :ref:`search`
 
 .. _Uploadcare: https://uploadcare.com
-.. _simple steps: https://pyuploadcare.readthedocs.org/en/latest/quickstart.html
-.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
-.. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _simple steps: https://pyuploadcare.readthedocs.io/en/latest/quickstart.html
+.. _REST: https://uploadcare.com/docs/api/rest/?utm_source=github&utm_campaign=pyuploadcare
+.. _Upload: https://uploadcare.com/docs/api/upload/?utm_source=github&utm_campaign=pyuploadcare
 .. _widget: https://uploadcare.com/docs/uploads/file-uploader/
 .. _here: https://github.com/uploadcare/pyuploadcare-example

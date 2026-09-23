@@ -416,7 +416,7 @@ class File:
                 `${uuid}/${filename}${effects}${ext}`.
 
         For more information on each of the options above please refer to
-        REST API docs https://uploadcare.com/docs/api_reference/rest/accessing_files/.
+        REST API docs https://uploadcare.com/docs/api/rest/file/files-list/.
 
         Following example copies a file to custom storage named ``samplefs``:
 

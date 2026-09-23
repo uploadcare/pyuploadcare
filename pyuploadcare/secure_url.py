@@ -29,7 +29,7 @@ class BaseSecureUrlBuilder(ABC):
 class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
     """Akamai secure url builder.
 
-    See https://uploadcare.com/docs/security/secure_delivery/
+    See https://uploadcare.com/docs/security/secure-delivery/
     for more details.
     """
 

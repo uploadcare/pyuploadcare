@@ -177,7 +177,7 @@ If you have signed uploads enabled in your Uploadcare project, widget-based uplo
 Model Fields
 ------------
 
-.. _Uploadcare widget: https://uploadcare.com/docs/uploads/widget/
+.. _Uploadcare widget: https://uploadcare.com/docs/uploads/file-uploader/
 
 As you will see, with Uploadcare, adding and working with a file field is
 just as simple as with a `TextField`_. To attach Uploadcare files to a model,

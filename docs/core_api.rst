@@ -491,7 +491,7 @@ and the file groups already produced by ``save_in_group`` conversions::
 pages. ``File.get_converted_document_group()`` is a shortcut that reads this mapping and
 returns the group as a ``FileGroup``.
 
-.. _document info: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Conversion/operation/documentConvertInfo
+.. _document info: https://uploadcare.com/docs/api/rest/conversion/document-convert-info/
 
 File actions (addons)
 ---------------------
@@ -672,12 +672,12 @@ Useful links
 - `Django app example`_
 
 .. _Uploadcare documentation: https://uploadcare.com/docs/?utm_source=github&utm_campaign=pyuploadcare
-.. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
-.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
-.. _URL: https://uploadcare.com/api-refs/url-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _Upload: https://uploadcare.com/docs/api/upload/?utm_source=github&utm_campaign=pyuploadcare
+.. _REST: https://uploadcare.com/docs/api/rest/?utm_source=github&utm_campaign=pyuploadcare
+.. _URL: https://uploadcare.com/docs/api/url/?utm_source=github&utm_campaign=pyuploadcare
 .. _Django app example: https://github.com/uploadcare/pyuploadcare-example
 .. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
-.. _addons documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Add-Ons
-.. _metadata documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-metadata
+.. _addons documentation: https://uploadcare.com/docs/api/rest/add-ons/
+.. _metadata documentation: https://uploadcare.com/docs/api/rest/file-metadata/
 .. _file uploader: https://uploadcare.com/products/file-uploader/?utm_source=github&utm_campaign=pyuploadcare
 .. _ImageTransformation: https://github.com/uploadcare/pyuploadcare/blob/main/pyuploadcare/transformations/image.py
