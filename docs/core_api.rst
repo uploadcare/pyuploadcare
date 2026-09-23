@@ -14,6 +14,11 @@ your project keys to ``Uploadcare`` client::
         secret_key='<your private key>'
     )
 
+By default file URLs use ``https://ucarecdn.com/``. To use your project's
+CDN subdomain (``https://<prefix>.ucarecd.net/``) instead, set
+``UPLOADCARE_USE_SUBDOMAINS=yes`` in the environment, or pass ``cdn_base``
+explicitly. Subdomains will become the default in the next major release.
+
 
 Uploading files
 ---------------

@@ -30,6 +30,7 @@ Below is the full default configuration:
     UPLOADCARE = {
         "pub_key": "",
         "secret": "",
+        "subdomains": False,
         "cdn_base": None,
         "upload_base_url": None,
         "signed_uploads": False,
@@ -53,6 +54,10 @@ Below is the full default configuration:
             "override_js_url": None,
         },
     }
+
+Set ``subdomains`` to ``True`` to serve files from your project's CDN
+subdomain (``https://<prefix>.ucarecd.net/``) instead of ``ucarecdn.com``.
+``cdn_base`` overrides both.
 
 PyUploadcare takes assets from CDN by default, e.g.:
 
