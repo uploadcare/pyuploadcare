@@ -40,7 +40,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-
+- [File Uploader](https://github.com/uploadcare/file-uploader) bundled with the Django widget has been
+  updated to [v1.34.0](https://github.com/uploadcare/file-uploader/releases/tag/v1.34.0).
 - `MetadataValidationError` now subclasses `InvalidParamError` (previously `UploadcareException`
   directly).
 - Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
