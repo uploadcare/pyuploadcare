@@ -284,7 +284,7 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
     def store(self, file_uuid: Union[UUID, str]) -> Dict[str, Any]:
         warnings.warn(
             "/groups/:uuid/storage/ endpoint has been removed from REST API v0.7"
-            "https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Changelog",
+            "https://uploadcare.com/docs/api/rest/changelog/",
             DeprecationWarning,
         )
         url = self._build_url(file_uuid, suffix="storage")

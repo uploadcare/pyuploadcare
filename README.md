@@ -10,9 +10,9 @@
 <p align="center">
   <a href="https://pyuploadcare.readthedocs.io/en/latest/">Package Docs</a> •
   <a href="https://uploadcare.com/docs/">Uploadcare Docs</a> •
-  <a href="https://uploadcare.com/api-refs/upload-api/">Upload API Reference</a> •
-  <a href="https://uploadcare.com/api-refs/rest-api/">REST API Reference</a> •
-  <a href="https://uploadcare.com/api-refs/url-api/">URL API Reference</a> •
+  <a href="https://uploadcare.com/docs/api/upload/">Upload API Reference</a> •
+  <a href="https://uploadcare.com/docs/api/rest/">REST API Reference</a> •
+  <a href="https://uploadcare.com/docs/api/url/">URL API Reference</a> •
   <a href="https://uploadcare.com/">Website</a>
 </p>
 
@@ -41,18 +41,18 @@ Build file handling in minutes. Upload or accept user-generated content, store, 
 
 ## Description
 
-This library consists of the APIs interface and a couple of Django goodies, 100% covering [Upload](https://uploadcare.com/api-refs/upload-api/), [REST](https://uploadcare.com/api-refs/rest-api/) and [URL](https://uploadcare.com/api-refs/url-api/) Uploadcare APIs.
+This library consists of the APIs interface and a couple of Django goodies, 100% covering [Upload](https://uploadcare.com/docs/api/upload/), [REST](https://uploadcare.com/docs/api/rest/) and [URL](https://uploadcare.com/docs/api/url/) Uploadcare APIs.
 
 * [Upload](https://uploadcare.com/docs/uploads/) files from anywhere via API or ready-made File Uploader
 * [Manage](https://uploadcare.com/docs/start/file-management/) stored files and perform various actions and conversions with them
-* [Optimize](https://uploadcare.com/docs/transformations/image/compression/) and [transform](https://uploadcare.com/docs/transformations/image/) images on the fly
+* [Optimize](https://uploadcare.com/docs/compression/) and [transform](https://uploadcare.com/docs/transformations/image/) images on the fly
 * [Deliver](https://uploadcare.com/docs/delivery/) files fast and secure
 
 ## Documentation
 
 Detailed specification of this library is available [on RTD](https://pyuploadcare.readthedocs.io/en/latest/).
 
-Please note that this package uses Uploadcare [API keys](https://app.uploadcare.com/projects/-/api-keys) and is intended to be used in server-side code only.
+Please note that this package uses Uploadcare [API keys](https://app.uploadcare.com/projects/-/api-keys/) and is intended to be used in server-side code only.
 
 ## Installation
 
@@ -92,7 +92,7 @@ Django compatibility:
 
 ## Usage
 
-After package [installation](#requirements-and-installation), you’ll need API keys: public and secret. Get them in [Uploadcare dashboard](https://app.uploadcare.com/projects/-/api-keys). If you don’t have an account yet, you can use demo keys, as in example. However, the files on demo account are regularly removed, so create an account as soon as Uploadcare catches your fancy.
+After package [installation](#requirements-and-installation), you’ll need API keys: public and secret. Get them in [Uploadcare dashboard](https://app.uploadcare.com/projects/-/api-keys/). If you don’t have an account yet, you can use demo keys, as in example. However, the files on demo account are regularly removed, so create an account as soon as Uploadcare catches your fancy.
 
 In these examples we’re going to use the aforementioned demo keys and `demo.ucarecd.net` domain.
 Check your project's subdomain in the [Dashboard](https://app.uploadcare.com/projects/-/settings/#delivery).

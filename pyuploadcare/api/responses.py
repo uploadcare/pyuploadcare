@@ -30,7 +30,7 @@ class PaginatedResponse(EntityListResponse):
 
 
 class FileListResponse(PaginatedResponse):
-    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesList
+    # https://uploadcare.com/docs/api/rest/file/files-list/
     results: List[FileInfo]  # type: ignore
 
 
@@ -40,25 +40,25 @@ class FileSearchResponse(PaginatedResponse):
 
 
 class GroupListResponse(PaginatedResponse):
-    # https://uploadcare.com/api-refs/rest-api/v0.5.0/#operation/groupsList
+    # https://uploadcare.com/docs/api/rest/group/groups-list/
     results: List[GroupInfo]  # type: ignore
 
 
 class BatchFileOperationResponse(Response):
-    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/filesStoring
+    # https://uploadcare.com/docs/api/rest/file/files-storing/
     status: str
     problems: Optional[Dict[str, Any]] = None
     result: Optional[List[FileInfo]] = None
 
 
 class CreateLocalCopyResponse(Response):
-    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/createLocalCopy
+    # https://uploadcare.com/docs/api/rest/file/create-local-copy/
     type: str
     result: FileInfo
 
 
 class CreateRemoteCopyResponse(Response):
-    # https://uploadcare.com/api-refs/rest-api/v0.6.0/#operation/createRemoteCopy
+    # https://uploadcare.com/docs/api/rest/file/create-remote-copy/
     type: str
     result: str
 
