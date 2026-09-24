@@ -384,6 +384,9 @@ class File:
                 be deleted in 24 hour period after the upload.
                 Works only if `autostore` is enabled in the project.
 
+        For more information on each of the options above please refer to
+        REST API docs https://uploadcare.com/docs/api/rest/file/create-local-copy/.
+
         """
         effects = self._build_effects(effects)
         response = self._client.files_api.local_copy(
@@ -416,7 +419,7 @@ class File:
                 `${uuid}/${filename}${effects}${ext}`.
 
         For more information on each of the options above please refer to
-        REST API docs https://uploadcare.com/docs/api/rest/file/files-list/.
+        REST API docs https://uploadcare.com/docs/api/rest/file/create-remote-copy/.
 
         Following example copies a file to custom storage named ``samplefs``:
 
