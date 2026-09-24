@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-09-24
 
 ### Added
 
@@ -36,31 +36,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `iterate_search_files()` warns when asked to page through a filter-only request without
     `sort`, whose result order the API leaves undefined.
   - A new `ucare search_files` command.
- - Resource id validation in `_build_url`.
+- Python 3.14 and Django 6.0 to the supported versions.
+- Resource ids are validated before a REST API URL is built.
 
 ### Changed
 
+- `TagValidationError` and `MetadataValidationError` subclass `InvalidParamError`
+- Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
+- `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key.
 - [File Uploader](https://github.com/uploadcare/file-uploader) bundled with the Django widget has been
   updated to [v1.34.0](https://github.com/uploadcare/file-uploader/releases/tag/v1.34.0).
-- `MetadataValidationError` now subclasses `InvalidParamError` (previously `UploadcareException`
-  directly).
-- Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
-- `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key. It is
-  `None` for responses that do not report tags, such as upload responses, and `[]` for files
-  without tags.
+- Documentation: added the `subdomains` setting
 
 ## [6.2.1](https://github.com/uploadcare/pyuploadcare/compare/v6.2.0...v6.2.1) - 2025-09-02
 
 ### Added
+
 - Adding metadata during upload via `ucare upload`
 
 ### Changed
+
 - Updated documentation on subdomains
 - Removed redundant dependency from `pyproject.toml`
 
 ## [6.2.0](https://github.com/uploadcare/pyuploadcare/compare/v6.1.0...v6.2.0) - 2025-06-30
 
 ### Added
+
 - Added support for subdomain CDN addressing.
 - Using subdomains is optional and defaults to `False`. The default will change in
   the next major release.
@@ -72,6 +74,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [6.0.0](https://github.com/uploadcare/pyuploadcare/compare/v5.1.0...v6.0.0) - 2024-09-19
 
 ### Changed
+
 - [File Uploader](https://github.com/uploadcare/file-uploader) have been updated to [v1](https://github.com/uploadcare/file-uploader/releases)
 
 ## [5.1.0](https://github.com/uploadcare/pyuploadcare/compare/v5.0.1...v5.1.0) - 2024-04-09
