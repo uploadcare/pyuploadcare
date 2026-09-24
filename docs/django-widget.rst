@@ -30,6 +30,7 @@ Below is the full default configuration:
     UPLOADCARE = {
         "pub_key": "",
         "secret": "",
+        "subdomains": False,
         "cdn_base": None,
         "upload_base_url": None,
         "signed_uploads": False,
@@ -53,6 +54,10 @@ Below is the full default configuration:
             "override_js_url": None,
         },
     }
+
+Set ``subdomains`` to ``True`` to serve files from your project's CDN
+subdomain (``https://<prefix>.ucarecd.net/``) instead of ``ucarecdn.com``.
+``cdn_base`` overrides both.
 
 PyUploadcare takes assets from CDN by default, e.g.:
 
@@ -172,7 +177,7 @@ If you have signed uploads enabled in your Uploadcare project, widget-based uplo
 Model Fields
 ------------
 
-.. _Uploadcare widget: https://uploadcare.com/docs/uploads/widget/
+.. _Uploadcare widget: https://uploadcare.com/docs/uploads/file-uploader/
 
 As you will see, with Uploadcare, adding and working with a file field is
 just as simple as with a `TextField`_. To attach Uploadcare files to a model,

@@ -85,7 +85,7 @@ def register_arguments(subparsers):
             "apply effects for synced images."
             "Note that effects will apply to images only."
             "For more information look at: "
-            "https://uploadcare.com/docs/processing/image/  "
+            "https://uploadcare.com/docs/transformations/image/  "
             "Example: --effects=resize/200x/-/rotate/90/"
         ),
     )

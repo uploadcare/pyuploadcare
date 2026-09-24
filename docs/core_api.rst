@@ -14,6 +14,11 @@ your project keys to ``Uploadcare`` client::
         secret_key='<your private key>'
     )
 
+By default file URLs use ``https://ucarecdn.com/``. To use your project's
+CDN subdomain (``https://<prefix>.ucarecd.net/``) instead, set
+``UPLOADCARE_USE_SUBDOMAINS=yes`` in the environment, or pass ``cdn_base``
+explicitly. Subdomains will become the default in the next major release.
+
 
 Uploading files
 ---------------
@@ -472,10 +477,21 @@ or you can use API directly to convert single or multiple files::
 
     document_convert_status = uploadcare.document_convert_api.status(document_convert_info.token)
 
-Determine the document format and possible conversion formats::
+Get `document info`_: the detected source format, the formats it can be converted to,
+and the file groups already produced by ``save_in_group`` conversions::
 
-    uuid = '740e1b8c-1ad8-4324-b7ec-112c79d8eac2'
-    uploadcare.document_convert_api.retrieve(uuid)
+    info = uploadcare.document_convert_api.retrieve('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
+
+    info.format.name                                    # 'pdf'
+    [f.name for f in info.format.conversion_formats]    # ['doc', 'docx', 'jpg', 'png', ...]
+    info.format.converted_groups                        # {'jpg': 'f56f1e80-...-690861252070~4'}
+    info.error                                          # None, or an error message
+
+``converted_groups`` maps a target format to the UUID of the group holding the converted
+pages. ``File.get_converted_document_group()`` is a shortcut that reads this mapping and
+returns the group as a ``FileGroup``.
+
+.. _document info: https://uploadcare.com/docs/api/rest/conversion/document-convert-info/
 
 File actions (addons)
 ---------------------
@@ -656,12 +672,12 @@ Useful links
 - `Django app example`_
 
 .. _Uploadcare documentation: https://uploadcare.com/docs/?utm_source=github&utm_campaign=pyuploadcare
-.. _Upload: https://uploadcare.com/api-refs/upload-api/?utm_source=github&utm_campaign=pyuploadcare
-.. _REST: https://uploadcare.com/api-refs/rest-api/?utm_source=github&utm_campaign=pyuploadcare
-.. _URL: https://uploadcare.com/api-refs/url-api/?utm_source=github&utm_campaign=pyuploadcare
+.. _Upload: https://uploadcare.com/docs/api/upload/?utm_source=github&utm_campaign=pyuploadcare
+.. _REST: https://uploadcare.com/docs/api/rest/?utm_source=github&utm_campaign=pyuploadcare
+.. _URL: https://uploadcare.com/docs/api/url/?utm_source=github&utm_campaign=pyuploadcare
 .. _Django app example: https://github.com/uploadcare/pyuploadcare-example
 .. _original documentation: https://uploadcare.com/docs/security/secure-delivery/?utm_source=github&utm_campaign=pyuploadcare
-.. _addons documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/Add-Ons
-.. _metadata documentation: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-metadata
+.. _addons documentation: https://uploadcare.com/docs/api/rest/add-ons/
+.. _metadata documentation: https://uploadcare.com/docs/api/rest/file-metadata/
 .. _file uploader: https://uploadcare.com/products/file-uploader/?utm_source=github&utm_campaign=pyuploadcare
 .. _ImageTransformation: https://github.com/uploadcare/pyuploadcare/blob/main/pyuploadcare/transformations/image.py

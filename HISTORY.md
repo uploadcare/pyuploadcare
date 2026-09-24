@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-09-23
+## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-09-24
 
 ### Added
 
@@ -44,6 +44,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `TagValidationError` and `MetadataValidationError` subclass `InvalidParamError`
 - Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+. Python 3.8 and 3.9 keep
   using `httpx`.
+- [File Uploader](https://github.com/uploadcare/file-uploader) bundled with the Django widget has been
+  updated to [v1.34.0](https://github.com/uploadcare/file-uploader/releases/tag/v1.34.0).
+- `MetadataValidationError` now subclasses `InvalidParamError` (previously `UploadcareException`
+  directly).
+- Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
 - `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key. It is
   `None` for responses that do not report tags, such as upload responses, and `[]` for files
   without tags.

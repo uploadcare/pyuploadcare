@@ -33,7 +33,7 @@ class ScaleCropMode(StrEnum):
 
 class ImageFormat(StrEnum):
     """
-    https://uploadcare.com/docs/transformations/image/compression/#operation-format
+    https://uploadcare.com/docs/compression/#operation-format
     """
 
     jpeg = "jpeg"
@@ -301,7 +301,7 @@ class ImageTransformation(BaseTransformation):
 
     def strip_meta(self, mode: StripMetaMode) -> "ImageTransformation":
         """
-        https://uploadcare.com/docs/transformations/image/compression/#meta-information-control
+        https://uploadcare.com/docs/compression/#meta-information-control
         """
         self.set("strip_meta", [mode])
         return self
@@ -576,7 +576,7 @@ class ImageTransformation(BaseTransformation):
         self, font_size: Optional[int], font_color: Optional[str]
     ) -> "ImageTransformation":
         """
-        https://uploadcare.com/docs/transformations/image/overlay/#font-size-and-color
+        https://uploadcare.com/docs/transformations/image/overlay/#font-properties
         """
         parameters: List[str] = []
         if font_size:
