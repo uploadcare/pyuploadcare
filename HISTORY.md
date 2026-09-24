@@ -6,6 +6,14 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/uploadcare/pyuploadcare/compare/v6.3.0...HEAD)
+
+### Removed
+
+- **Breaking**: dropped support for Python 3.8 and 3.9.
+  Use `pyuploadcare < 7.0` on older Pythons.
+
+
 ## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-09-24
 
 ### Added

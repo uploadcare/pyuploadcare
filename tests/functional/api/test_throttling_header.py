@@ -2,8 +2,8 @@ from typing import Optional, Union
 from unittest.mock import MagicMock
 
 import pytest
+from httpx2 import Headers
 
-from pyuploadcare.api._httpx import Headers
 from pyuploadcare.exceptions import DEFAULT_RETRY_AFTER, ThrottledRequestError
 
 
