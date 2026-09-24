@@ -42,16 +42,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - `TagValidationError` and `MetadataValidationError` subclass `InvalidParamError`
-- Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+. Python 3.8 and 3.9 keep
-  using `httpx`.
+- Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
+- `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key.
 - [File Uploader](https://github.com/uploadcare/file-uploader) bundled with the Django widget has been
   updated to [v1.34.0](https://github.com/uploadcare/file-uploader/releases/tag/v1.34.0).
-- `MetadataValidationError` now subclasses `InvalidParamError` (previously `UploadcareException`
-  directly).
-- Migrated the HTTP client from `httpx` to `httpx2` on Python 3.10+.
-- `FileInfo.model_dump()`, and therefore `File.info`, now always contains a `tags` key. It is
-  `None` for responses that do not report tags, such as upload responses, and `[]` for files
-  without tags.
+- Documentation: added the `subdomains` setting
 
 ## [6.2.1](https://github.com/uploadcare/pyuploadcare/compare/v6.2.0...v6.2.1) - 2025-09-02
 
