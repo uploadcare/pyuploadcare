@@ -13,6 +13,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Breaking**: dropped support for Python 3.8 and 3.9.
   Use `pyuploadcare < 7.0` on older Pythons.
 
+### Changed
+
+- Project tooling migrated from Poetry to [uv](https://docs.astral.sh/uv/).
+
 
 ## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-09-24
 
