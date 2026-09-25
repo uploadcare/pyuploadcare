@@ -13,8 +13,7 @@ on:
       - "version-3.x/**"
 
 env:
-  POETRY_INSTALLER_ONLY_BINARY: ":all:"
-  POETRY_VERSION: "2.4.1"
+  UV_VERSION: "0.12.17"
 
 jobs:
   lint:
@@ -25,16 +24,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: Set up uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
-        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
-        with:
-          version: ${{ env.POETRY_VERSION }}
       - name: Install dependencies
-        run: poetry install --with dev
+        run: uv sync --python ${{ matrix.python-version }} --group dev
       - name: Run linters
         run: make lint
 
@@ -49,16 +45,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: Set up uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
-        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
-        with:
-          version: ${{ env.POETRY_VERSION }}
       - name: Install dependencies
-        run: poetry install --with dev
+        run: uv sync --python ${{ matrix.python-version }} --group dev
       - name: Test with pytest
         run: make test-functional
 
@@ -70,21 +63,21 @@ jobs:
         # https://docs.djangoproject.com/en/3.2/faq/install/#what-python-version-can-i-use-with-django
         python-version: ["3.10"]
         django-version: ["3.2"]
+    env:
+      # keep the pinned Django below from being reverted by `uv run`
+      UV_NO_SYNC: "1"
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: set up uv and python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: ${{ matrix.python-version }}
-      - name: install poetry
-        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
-        with:
-          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
-        run: poetry install --with dev
+        run: uv sync --python ${{ matrix.python-version }} --group dev
       - name: install specific django version
-        run: poetry run pip install django~=${{ matrix.django-version }}
+        run: uv pip install "django~=${{ matrix.django-version }}"
       - name: test with pytest
         run: make test-django
 
@@ -106,21 +99,20 @@ jobs:
 
           - python-version: "3.12"
             django-version: "4.2"
+    env:
+      UV_NO_SYNC: "1"
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: set up uv and python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: ${{ matrix.python-version }}
-      - name: install poetry
-        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
-        with:
-          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
-        run: poetry install --with dev
+        run: uv sync --python ${{ matrix.python-version }} --group dev
       - name: install specific django version
-        run: poetry run pip install django~=${{ matrix.django-version }}
+        run: uv pip install "django~=${{ matrix.django-version }}"
       - name: test with pytest
         run: make test-django
 
@@ -138,20 +130,20 @@ jobs:
         include:
           - python-version: "3.14"
             django-version: "5.2"
+    env:
+      UV_NO_SYNC: "1"
+
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: set up uv and python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: ${{ matrix.python-version }}
-      - name: install poetry
-        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
-        with:
-          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
-        run: poetry install --with dev
+        run: uv sync --python ${{ matrix.python-version }} --group dev
       - name: install specific django version
-        run: poetry run pip install django~=${{ matrix.django-version }}
+        run: uv pip install "django~=${{ matrix.django-version }}"
       - name: test with pytest
         run: make test-django
 
@@ -163,20 +155,20 @@ jobs:
         # https://docs.djangoproject.com/en/6.0/faq/install/#what-python-version-can-i-use-with-django
         python-version: ["3.12", "3.13", "3.14"]
         django-version: ["6.0"]
+    env:
+      UV_NO_SYNC: "1"
+
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: set up uv and python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: ${{ matrix.python-version }}
-      - name: install poetry
-        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
-        with:
-          version: ${{ env.POETRY_VERSION }}
       - name: install dependencies
-        run: poetry install --with dev
+        run: uv sync --python ${{ matrix.python-version }} --group dev
       - name: install specific django version
-        run: poetry run pip install django~=${{ matrix.django-version }}
+        run: uv pip install "django~=${{ matrix.django-version }}"
       - name: test with pytest
         run: make test-django
 
@@ -192,16 +184,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: Set up uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
+          version: ${{ env.UV_VERSION }}
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
-        uses: snok/install-poetry@a783c322200f0519c7926aa6faa857c4e23e9263 # v1.4.2
-        with:
-          version: ${{ env.POETRY_VERSION }}
       - name: Install dependencies
-        run: poetry install --with dev
+        run: uv sync --python ${{ matrix.python-version }} --group dev
       - name: Test with pytest
         run: make test-integration
         env:

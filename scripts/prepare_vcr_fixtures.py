@@ -23,7 +23,7 @@ Run it against a throwaway project (never the demo project), passing its
 public key as the only argument and the secret key via the environment:
 
     UPLOADCARE_SECRET_KEY=... \
-        poetry run python scripts/prepare_vcr_fixtures.py <public_key>
+        uv run python scripts/prepare_vcr_fixtures.py <public_key>
 
 The resulting UUIDs are written to ``scripts/vcr_fixtures.json``; within one
 recording session only missing or removed files are recreated. Only ``main``
