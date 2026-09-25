@@ -15,10 +15,10 @@ from typing import (
 from urllib.parse import urlencode, urljoin, urlsplit
 from uuid import UUID
 
+from httpx2._types import RequestFiles
 from pydantic import TypeAdapter
 from typing_extensions import Protocol, TypeVar
 
-from pyuploadcare.api._httpx import RequestFiles
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
 from pyuploadcare.api.responses import PaginatedResponse, Response

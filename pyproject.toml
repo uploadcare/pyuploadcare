@@ -10,8 +10,6 @@ classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
@@ -27,21 +25,12 @@ classifiers = [
 ucare = 'pyuploadcare.ucare_cli.main:main'
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.15"
-# TODO: once Python 3.8 and 3.9 support is dropped, remove the httpx entry and
-# the python marker on httpx2 (httpx2 requires Python 3.10+).
-httpx = {version = "^0.28.1", markers = "python_version < '3.10'"}
-httpx2 = {version = "^2.9.1", markers = "python_version >= '3.10'"}
-pydantic = [
-  {extras = ["email"], version = "^2.13.4", python = ">=3.9"},
-  {extras = ["email"], version = "^2.10.6", python = "<3.9"},
-]
+python = ">=3.10,<3.15"
+httpx2 = "^2.9.1"
+pydantic = {extras = ["email"], version = "^2.13.4"}
 python-dateutil = "^2.8.2"
-typing-extensions = [
-  {version = "^4.14.1", python = ">=3.9"},
-  {version = "^4.9.0", python = "<3.9"},
-]
-Django = {version = ">=2.2", optional = true}
+typing-extensions = "^4.14.1"
+Django = {version = ">=3.2", optional = true}
 
 [tool.poetry.extras]
 django = ["Django"]
@@ -52,32 +41,19 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4"
 black = "^24.3.0"
-isort = [
-  {version="^6.0.1", python = ">=3.9"},
-  {version="^5.13.2", python = "<3.9"},
-]
-flake8 = [
-  {version="^6.1.0", python = ">=3.8.1"},
-  {version="^5.0.4", python = "<3.8.1"},
-]
+isort = "^6.0.1"
+flake8 = "^6.1.0"
 mypy = "^1.7.1"
 flake8-print = "^5.0.0"
 pytest-vcr = "^1.0.2"
-vcrpy = [
-    {version = "^8.0", markers = "python_version >= '3.10'"},
-    {version = "^7.0", markers = "python_version >= '3.9' and python_version < '3.10'"},
-    {version = "^6.0", markers = "python_version < '3.9'"},
-]
+vcrpy = "^8.0"
 yarl = "^1.9.4"
 Django = "^4.2.8"
 coverage = "^7.3.3"
 pytest-cov = "^4.1.0"
 python-coveralls = "^2.9.3"
 types-python-dateutil = "^2.8.19.14"
-types-pytz = [
-  {version="^2024.2.0.20241221", python = ">=3.8,<3.9"},
-  {version="^2025.1.0.20250204", python = ">=3.9"},
-]
+types-pytz = "^2025.1.0.20250204"
 Sphinx = "^7.1.2"
 sphinx-argparse = "^0.4.0"
 types-dataclasses = "^0.6.6"
@@ -89,7 +65,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 79
-target-version = ['py38']
+target-version = ['py310']
 exclude = '''
 (
   \.eggs
