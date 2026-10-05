@@ -18,7 +18,7 @@ Recording needs real keys; verification must not have them. The public key
 is passed as the only argument, the secret key via the environment:
 
     UPLOADCARE_SECRET_KEY=... \
-        poetry run python scripts/rerecord_cassettes.py <public_key>
+        uv run python scripts/rerecord_cassettes.py <public_key>
 
 or ``UPLOADCARE_PUBLIC_KEY=... UPLOADCARE_SECRET_KEY=... make
 rerecord-cassettes``.

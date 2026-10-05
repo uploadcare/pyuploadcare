@@ -1,67 +1,69 @@
-[tool.poetry]
+[project]
 name = "pyuploadcare"
 version = "6.3.0"
 description = "Python library for Uploadcare.com"
-authors = ["Uploadcare Inc <hello@uploadcare.com>"]
 readme = "README.md"
-homepage = "https://uploadcare.com"
-repository = "https://github.com/uploadcare/pyuploadcare"
+requires-python = ">=3.10,<3.15"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Uploadcare Inc", email = "hello@uploadcare.com" }]
 classifiers = [
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Programming Language :: Python :: 3.13',
-        'Programming Language :: Python :: 3.14',
-        'License :: OSI Approved :: MIT License',
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "httpx2>=2.9.1,<3",
+    "pydantic[email]>=2.13.4,<3",
+    "python-dateutil>=2.8.2,<3",
+    "typing-extensions>=4.14.1,<5",
 ]
 
-[tool.poetry.urls]
+[project.optional-dependencies]
+django = ["Django>=3.2"]
+
+[project.scripts]
+ucare = "pyuploadcare.ucare_cli.main:main"
+
+[project.urls]
+Homepage = "https://uploadcare.com"
+Repository = "https://github.com/uploadcare/pyuploadcare"
 "Bug Tracker" = "https://github.com/uploadcare/pyuploadcare/issues"
 
-[tool.poetry.scripts]
-ucare = 'pyuploadcare.ucare_cli.main:main'
-
-[tool.poetry.dependencies]
-python = ">=3.10,<3.15"
-httpx2 = "^2.9.1"
-pydantic = {extras = ["email"], version = "^2.13.4"}
-python-dateutil = "^2.8.2"
-typing-extensions = "^4.14.1"
-Django = {version = ">=3.2", optional = true}
-
-[tool.poetry.extras]
-django = ["Django"]
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.4"
-black = "^24.3.0"
-isort = "^6.0.1"
-flake8 = "^6.1.0"
-mypy = "^1.7.1"
-flake8-print = "^5.0.0"
-pytest-vcr = "^1.0.2"
-vcrpy = "^8.0"
-yarl = "^1.9.4"
-Django = "^4.2.8"
-coverage = "^7.3.3"
-pytest-cov = "^4.1.0"
-python-coveralls = "^2.9.3"
-types-python-dateutil = "^2.8.19.14"
-types-pytz = "^2025.1.0.20250204"
-Sphinx = "^7.1.2"
-sphinx-argparse = "^0.4.0"
-types-dataclasses = "^0.6.6"
-pytest-freezer = "^0.4.8"
+[dependency-groups]
+dev = [
+    "pytest>=7.4,<8",
+    "black>=24.3.0,<25",
+    "isort>=6.0.1,<7",
+    "flake8>=6.1.0,<7",
+    "mypy>=1.7.1,<2",
+    "flake8-print>=5.0.0,<6",
+    "pytest-vcr>=1.0.2,<2",
+    "vcrpy>=8.0,<9",
+    "yarl>=1.9.4,<2",
+    "Django>=4.2.8,<5",
+    "coverage>=7.3.3,<8",
+    "pytest-cov>=4.1.0,<5",
+    "python-coveralls>=2.9.3,<3",
+    "types-python-dateutil>=2.8.19.14,<3",
+    "types-pytz>=2025.1.0.20250204,<2026",
+    "Sphinx>=7.1.2,<8",
+    "sphinx-argparse>=0.4.0,<0.5",
+    "types-dataclasses>=0.6.6,<0.7",
+    "pytest-freezer>=0.4.8,<0.5",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
 
 [tool.black]
 line-length = 79
