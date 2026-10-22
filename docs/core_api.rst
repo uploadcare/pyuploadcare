@@ -560,6 +560,13 @@ Create a webhook with a signing secret::
         signing_secret="7kMVZivndx0ErgvhRKAr",
     )
 
+Create a webhook for moderation state changes::
+
+    webhook = uploadcare.create_webhook(
+        target_url="https://path/to/webhook",
+        event="moderation.state_changed",
+    )
+
 List webhooks::
 
     webhooks: List[Webhook] = list(uploadcare.list_webhooks(limit=10))
