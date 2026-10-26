@@ -8,6 +8,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/uploadcare/pyuploadcare/compare/v6.3.0...HEAD)
 
+### Added
+
+- Python 3.15 and Django 6.1 to the supported versions.
+
 ### Removed
 
 - **Breaking**: dropped support for Python 3.8 and 3.9.

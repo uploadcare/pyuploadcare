@@ -55,7 +55,7 @@ Features
 Requirements
 ============
 
-``pyuploadcare`` requires Python 3.10, 3.11, 3.12, 3.13, 3.14
+``pyuploadcare`` requires Python 3.10, 3.11, 3.12, 3.13, 3.14, 3.15
 
 To use ``pyuploadcare`` with Python 3.8 or 3.9 please install ``pyuploadcare < 7.0``.
 
@@ -69,12 +69,13 @@ If you're using ``pyuploadcare`` with Django, refer the following compatibility 
    :header-rows: 1
    :align: center
 
-    Py/Dj,3.2,4.0,4.1,4.2,5.0,5.1,5.2,6.0
-    3.10,X,X,X,X,X,X,X,
-    3.11,,,X,X,X,X,X,
-    3.12,,,,X,X,X,X,X
-    3.13,,,,,,X,X,X
-    3.14,,,,,,,X,X
+    Py/Dj,3.2,4.0,4.1,4.2,5.0,5.1,5.2,6.0,6.1
+    3.10,X,X,X,X,X,X,X,,
+    3.11,,,X,X,X,X,X,,
+    3.12,,,,X,X,X,X,X,
+    3.13,,,,,,X,X,X,
+    3.14,,,,,,,X,X,
+    3.15,,,,,,,,,X
 
 
 Contents
