@@ -172,7 +172,8 @@ jobs:
       - name: test with pytest
         run: make test-django
 
-  django-6.1:
+  django-61:
+    name: "django-6.1"
     needs: functional
     runs-on: ubuntu-latest
     strategy:
