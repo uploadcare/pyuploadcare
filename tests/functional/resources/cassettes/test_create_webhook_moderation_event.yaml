@@ -1,0 +1,50 @@
+interactions:
+- request:
+    body: target_url=https%3A%2F%2Fwebhook.site%2F699ba5a4-b178-41c7-b416-5d1b6739d052&event=moderation.state_changed&is_active=true
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '124'
+      content-type:
+      - application/x-www-form-urlencoded
+      host:
+      - api.uploadcare.com
+      user-agent:
+      - PyUploadcare/6.3.0/demopublickey (CPython/3.9.6)
+    method: POST
+    uri: https://api.uploadcare.com/webhooks/
+  response:
+    content: '{"id":865716,"created":"2026-09-15T11:47:28.365251Z","updated":"2026-09-15T11:47:28.365271Z","event":"moderation.state_changed","target_url":"https://webhook.site/699ba5a4-b178-41c7-b416-5d1b6739d052","project":159,"is_active":true,"signing_secret":null}'
+    headers:
+      Access-Control-Allow-Origin:
+      - https://uploadcare.com
+      Allow:
+      - GET, HEAD, OPTIONS, POST
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '261'
+      Content-Type:
+      - application/vnd.uploadcare-v0.7+json
+      Date:
+      - Tue, 15 Sep 2026 11:47:28 GMT
+      Server:
+      - nginx
+      Vary:
+      - Accept
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow, nosnippet, noarchive
+      X-XSS-Protection:
+      - 1; mode=block
+    http_version: HTTP/1.1
+    status_code: 201
+version: 1
