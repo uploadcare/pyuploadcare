@@ -70,9 +70,9 @@ pip install pyuploadcare[django]
 
 ## Requirements
 
-* Python 3.10, 3.11, 3.12, 3.13, 3.14, 3.15
+* Python 3.11, 3.12, 3.13, 3.14, 3.15
 
-To use pyuploadcare with Python 3.8 or 3.9 please install `pyuploadcare < 7.0`.
+To use pyuploadcare with Python 3.8, 3.9, or 3.10 please install `pyuploadcare < 7.0`.
 
 To use pyuploadcare with Python 3.6 or 3.7 please install `pyuploadcare < 5.0`.
 
@@ -80,14 +80,13 @@ To use pyuploadcare with Python 2.7 please install `pyuploadcare < 3.0`.
 
 Django compatibility:
 
-| Py/Dj | 3.2 | 4.0 | 4.1 | 4.2 | 5.0 | 5.1 | 5.2 | 6.0 | 6.1 |
-| ----- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 3.10  | v   | v   | v   | v   | v   | v   | v   |     |     |
-| 3.11  |     |     | v   | v   | v   | v   | v   |     |     |
-| 3.12  |     |     |     | v   | v   | v   | v   | v   |     |
-| 3.13  |     |     |     |     |     | v   | v   | v   |     |
-| 3.14  |     |     |     |     |     |     | v   | v   |     |
-| 3.15  |     |     |     |     |     |     |     |     | v   |
+| Py/Dj | 5.2 | 6.0 | 6.1 |
+| ----- | --- | --- | --- |
+| 3.11  | v   |     |     |
+| 3.12  | v   | v   |     |
+| 3.13  | v   | v   |     |
+| 3.14  | v   | v   |     |
+| 3.15  |     |     | v   |
 
 *Note: See `.github/workflows/test.yml` for the exact tested matrix.*
 

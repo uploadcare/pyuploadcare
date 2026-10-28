@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/uploadcare/pyuploadcare/compare/v6.3.0...HEAD)
+## [7.0.0](https://github.com/uploadcare/pyuploadcare/compare/v6.3.0...v7.0.0) - 2026-10-29
 
 ### Added
 
@@ -14,8 +14,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Removed
 
-- **Breaking**: dropped support for Python 3.8 and 3.9.
-  Use `pyuploadcare < 7.0` on older Pythons.
+- **Breaking**: dropped support for Python 3.8, 3.9, and 3.10.
+  Use `pyuploadcare < 7.0` on those versions.
+- **Breaking**: dropped support for Django older than 5.2.
+  Supported Django versions are 5.2, 6.0, and 6.1.
 
 ### Changed
 
