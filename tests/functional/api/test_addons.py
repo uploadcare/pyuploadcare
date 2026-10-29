@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import pytest
+from pydantic import ValidationError
 
 from pyuploadcare.api.addon_entities import (
     AddonClamAVExecutionParams,
@@ -19,8 +20,9 @@ def test_request_payload(addons_api):
     file_uuid = uuid4()
 
     params = AddonRemoveBGExecutionParams(
-        crop=True,  # should be present
-        scale=None,  # should be left out
+        crop=True,
+        bg_color="81d4fa77",
+        channels="alpha",
     )
 
     request_data = addons_api._get_request_data(str(file_uuid), params)
@@ -28,8 +30,31 @@ def test_request_payload(addons_api):
         "target": str(file_uuid),
         "params": {
             "crop": True,
+            "bg_color": "81d4fa77",
+            "channels": "alpha",
         },
     }
+
+    params = AddonRemoveBGExecutionParams(
+        crop=True,
+        bg_color=None,  # should be left out
+    )
+    request_data = addons_api._get_request_data(str(file_uuid), params)
+    assert request_data == {
+        "target": str(file_uuid),
+        "params": {
+            "crop": True,
+        },
+    }
+
+
+def test_remove_bg_params_reject_legacy_and_invalid_values():
+    with pytest.raises(ValidationError):
+        AddonRemoveBGExecutionParams(crop_margin="20px")
+    with pytest.raises(ValidationError):
+        AddonRemoveBGExecutionParams(bg_color="#81d4fa")
+    with pytest.raises(ValidationError):
+        AddonRemoveBGExecutionParams(channels="rgb")
 
 
 @pytest.mark.vcr
@@ -94,7 +119,7 @@ def test_clam_av_status(uploadcare):
 def test_remove_bg_execute(uploadcare):
     params = AddonRemoveBGExecutionParams(
         crop=True,
-        add_shadow=True,
+        bg_color="81d4fa",
     )
     result = uploadcare.addons_api.execute(
         "485f5c0e-3567-46b1-a5c9-96a8ffc45713", AddonLabels.REMOVE_BG, params
