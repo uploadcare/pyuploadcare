@@ -83,10 +83,10 @@ Django compatibility:
 | Py/Dj | 5.2 | 6.0 | 6.1 |
 | ----- | --- | --- | --- |
 | 3.11  | v   |     |     |
-| 3.12  | v   | v   |     |
-| 3.13  | v   | v   |     |
-| 3.14  | v   | v   |     |
-| 3.15  |     |     | v   |
+| 3.12  | v   | v   | v   |
+| 3.13  | v   | v   | v   |
+| 3.14  | v   | v   | v   |
+| 3.15  |     |     |     |
 
 *Note: See `.github/workflows/test.yml` for the exact tested matrix.*
 
