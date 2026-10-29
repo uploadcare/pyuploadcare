@@ -11,6 +11,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Python 3.15 and Django 6.1 to the supported versions.
+- Account-level Project API client (``AccountProjectsAPI``) for projects, secrets, moderation, usage, MIME types, and partner authorization. REST ``GET /project/`` is unchanged.
 
 ### Removed
 
