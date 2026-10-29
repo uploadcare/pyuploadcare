@@ -20,6 +20,7 @@ from uuid import UUID
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
+    AccountProjectsAPI,
     AddonsAPI,
     DocumentConvertAPI,
     FilesAPI,
@@ -82,6 +83,7 @@ class Uploadcare:
         - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         - auth_class: Authentication class to use for API.
         - secure_url_builder: URL builder for secure delivery.
+        - account_api_token: Bearer token for the account Project API.
 
     """
 
@@ -105,6 +107,7 @@ class Uploadcare:
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: Type[UploadcareAuth] = UploadcareAuth,
         secure_url_builder: Optional[BaseSecureUrlBuilder] = None,
+        account_api_token: Optional[str] = None,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -189,6 +192,21 @@ class Uploadcare:
         )
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
+        self.account_api_token = account_api_token
+        self.account_projects_api: Optional[AccountProjectsAPI] = None
+        if account_api_token:
+            self.account_projects_api = AccountProjectsAPI(
+                token=account_api_token,
+                api_base=api_base,
+                verify=(
+                    DEFAULT_SSL_CONTEXT
+                    if verify_api_ssl is True
+                    else verify_api_ssl
+                ),
+                timeout=self.timeout,
+                retry_throttled=retry_throttled,
+                user_agent_extension=user_agent_extension,
+            )
         self.metadata_api = MetadataAPI(client=self.rest_client, **api_config)  # type: ignore
         self.tags_api = TagsAPI(client=self.rest_client, **api_config)  # type: ignore
         self.addons_api = AddonsAPI(client=self.rest_client, **api_config)  # type: ignore

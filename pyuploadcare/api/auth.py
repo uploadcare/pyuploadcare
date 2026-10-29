@@ -93,3 +93,19 @@ class UploadcareAuth(UploadcareSimpleAuth):
         ).hexdigest()
         credentials = f"{public_key!s}:{signature!s}"
         return f"Uploadcare {credentials}"
+
+
+class BearerTokenAuth(AuthBase):
+    """Project API bearer token. Not REST Uploadcare HMAC."""
+
+    def __init__(self, token: str) -> None:
+        if not token:
+            raise ValueError("token is required")
+        self.token = token
+
+    def auth_flow(
+        self, request: Request
+    ) -> Generator[Request, Response, None]:
+        request.headers["Authorization"] = f"Bearer {self.token}"
+        request.headers["Accept"] = "application/json"
+        yield request
