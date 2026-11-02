@@ -19,6 +19,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **Breaking**: `AddonRemoveBGExecutionParams` now matches the PhotoRoom API
+  (`crop`, `bg_color`, and `channels`). The old remove.bg fields are no longer
+  accepted.
 - Project tooling migrated from Poetry to [uv](https://docs.astral.sh/uv/).
 
 
