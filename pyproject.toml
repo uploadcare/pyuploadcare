@@ -3,7 +3,7 @@ name = "pyuploadcare"
 version = "7.0.0"
 description = "Python library for Uploadcare.com"
 readme = "README.md"
-requires-python = ">=3.11,<3.16"
+requires-python = ">=3.10,<3.16"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Uploadcare Inc", email = "hello@uploadcare.com" }]
@@ -11,6 +11,7 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -67,7 +68,7 @@ module-root = ""
 
 [tool.black]
 line-length = 79
-target-version = ['py311']
+target-version = ['py310']
 exclude = '''
 (
   \.eggs

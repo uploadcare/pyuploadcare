@@ -14,8 +14,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Removed
 
-- **Breaking**: dropped support for Python 3.8, 3.9, and 3.10.
-  Use `pyuploadcare < 7.0` on those versions.
+- **Breaking**: dropped support for Python 3.8 and 3.9.
+  Use `pyuploadcare < 7.0` on older Pythons.
 - **Breaking**: dropped support for Django older than 5.2.
   Supported Django versions are 5.2, 6.0, and 6.1.
 
