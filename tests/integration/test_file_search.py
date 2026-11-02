@@ -7,10 +7,13 @@ uploaded poll through ``wait_until_searchable``. Everything that only needs
 *some* indexed content searches over what the project already holds.
 """
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
 from pyuploadcare.api.entities import FileSearchInfo
 from pyuploadcare.api.search_entities import (
+    DatetimeRange,
     FileSearchRequest,
     SearchExact,
     SearchPhrase,
@@ -30,6 +33,12 @@ from .utils import (
 # order-sensitive carries an explicit sort.
 BY_NEWEST = ["-datetime_uploaded"]
 
+# Integration tests upload and delete files while this module runs, and the
+# index catches up asynchronously, so the newest results can change between
+# two requests. Pagination tests compare requests, so they search only files
+# uploaded well before the run.
+SETTLED_AGE = timedelta(hours=1)
+
 
 @pytest.fixture(scope="module")
 def indexed_file(uploadcare):
@@ -40,6 +49,21 @@ def indexed_file(uploadcare):
         pytest.skip("the project has no files to search")
 
     return files[0]
+
+
+@pytest.fixture(scope="module")
+def settled_images():
+    """Images uploaded before this run, newest first.
+
+    The bound is fixed once, so every request in a test sees the same window.
+    """
+    return FileSearchRequest(
+        is_image=True,
+        datetime_uploaded=DatetimeRange(
+            lt=datetime.now(timezone.utc) - SETTLED_AGE
+        ),
+        sort=BY_NEWEST,
+    )
 
 
 @pytest.fixture(scope="module")
@@ -208,12 +232,12 @@ def test_appdata_is_absent_without_the_flag(uploadcare):
     assert response.results[0].appdata is None
 
 
-def test_pagination_yields_no_duplicates(uploadcare):
+def test_pagination_yields_no_duplicates(uploadcare, settled_images):
     """Each page is requested at a locally computed offset."""
     uuids = [
         str(result.uuid)
         for result in uploadcare.iterate_search_files(
-            FileSearchRequest(is_image=True, sort=BY_NEWEST),
+            settled_images,
             limit=5,
             request_limit=2,
         )
@@ -223,8 +247,8 @@ def test_pagination_yields_no_duplicates(uploadcare):
     assert len(uuids) == len(set(uuids))
 
 
-def test_pagination_matches_a_single_page(uploadcare):
-    request = FileSearchRequest(is_image=True, sort=BY_NEWEST)
+def test_pagination_matches_a_single_page(uploadcare, settled_images):
+    request = settled_images
 
     page = uploadcare.search_files(request, limit=4)
     iterated = list(uploadcare.iterate_search_files(request, limit=4, request_limit=2))
