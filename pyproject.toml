@@ -26,7 +26,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-django = ["Django>=5.2"]
+django = ["Django>=3.2"]
 
 [project.scripts]
 ucare = "pyuploadcare.ucare_cli.main:main"

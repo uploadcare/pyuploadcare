@@ -69,13 +69,13 @@ If you're using ``pyuploadcare`` with Django, refer the following compatibility 
    :header-rows: 1
    :align: center
 
-    Py/Dj,5.2,6.0,6.1
-    3.10,X,,
-    3.11,X,,
-    3.12,X,X,
-    3.13,X,X,
-    3.14,X,X,
-    3.15,,,X
+    Py/Dj,3.2,4.0,4.1,4.2,5.0,5.1,5.2,6.0,6.1
+    3.10,X,X,X,X,X,X,X,,
+    3.11,,,X,X,X,X,X,,
+    3.12,,,,X,X,X,X,X,X
+    3.13,,,,,,X,X,X,X
+    3.14,,,,,,,X,X,X
+    3.15,,,,,,,,,X
 
 
 Contents
