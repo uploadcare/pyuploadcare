@@ -84,9 +84,9 @@ Django compatibility:
 | ----- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 3.10  | v   | v   | v   | v   | v   | v   | v   |     |     |
 | 3.11  |     |     | v   | v   | v   | v   | v   |     |     |
-| 3.12  |     |     |     | v   | v   | v   | v   | v   |     |
-| 3.13  |     |     |     |     |     | v   | v   | v   |     |
-| 3.14  |     |     |     |     |     |     | v   | v   |     |
+| 3.12  |     |     |     | v   | v   | v   | v   | v   | v   |
+| 3.13  |     |     |     |     |     | v   | v   | v   | v   |
+| 3.14  |     |     |     |     |     |     | v   | v   | v   |
 | 3.15  |     |     |     |     |     |     |     |     | v   |
 
 *Note: See `.github/workflows/test.yml` for the exact tested matrix.*
