@@ -10,5 +10,5 @@ docs/_build
 .cache/
 .pytest_cache/
 .vscode
-poetry.lock
+uv.lock
 .coverage
