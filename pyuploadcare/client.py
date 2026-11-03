@@ -756,7 +756,8 @@ class Uploadcare:
 
         Args:
             - ``starting_point`` -- a starting point for filtering files.
-              It is reflects a ``from`` parameter from REST API.
+              It is reflects a ``from`` parameter from REST API. Must be a timezone-aware
+              ``datetime``; a plain ``date`` is taken as midnight UTC.
             - ``ordering`` -- a string with name of the field what must be used
               for sorting files. The actual list of supported fields you can find in
               documentation:
@@ -916,7 +917,8 @@ class Uploadcare:
 
         Args:
             - ``starting_point`` -- a starting point for filtering groups.
-              It is reflects a ``from`` parameter from the REST API.
+              It is reflects a ``from`` parameter from the REST API. Must be a timezone-aware
+              ``datetime``; a plain ``date`` is taken as midnight UTC.
             - ``ordering`` -- a string with name of the field what must be used
               for sorting files. The actual list of supported fields you can find in
               documentation.
@@ -927,8 +929,8 @@ class Uploadcare:
 
         Usage example::
 
-            >>> from datetime import datetime, timedelta
-            >>> last_week = datetime.now() - timedelta(weeks=1)
+            >>> from datetime import datetime, timedelta, timezone
+            >>> last_week = datetime.now(timezone.utc) - timedelta(weeks=1)
             >>> for f in uploadcare.list_file_groups(starting_point=last_week):
             >>>     print(f.datetime_created)
 

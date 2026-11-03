@@ -37,7 +37,11 @@ def test_modifiers_alone_are_not_a_condition():
         {"query": "sunset"},
         {"phrase": SearchPhrase(original_filename="sunset")},
         {"exact": SearchExact(original_filename=["sunset.jpg"])},
-        {"datetime_uploaded": DatetimeRange(gt=datetime(2024, 1, 1))},
+        {
+            "datetime_uploaded": DatetimeRange(
+                gt=datetime(2024, 1, 1, tzinfo=timezone.utc)
+            )
+        },
         {"size": SizeRange(gt=1000)},
         {"is_image": True},
         {"is_image": False},
@@ -230,6 +234,12 @@ def test_range_requires_at_least_one_bound(model):
 def test_size_range_rejects_negative_values():
     with pytest.raises(ValidationError):
         SizeRange(gt=-1)
+
+
+@pytest.mark.parametrize("bound", ["gt", "gte", "lt", "lte"])
+def test_datetime_range_rejects_naive_datetime(bound):
+    with pytest.raises(ValidationError):
+        DatetimeRange(**{bound: datetime(2024, 1, 1)})
 
 
 # --- strict scalars ---------------------------------------------------------

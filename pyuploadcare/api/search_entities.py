@@ -4,11 +4,11 @@ https://uploadcare.com/docs/file-search/
 https://uploadcare.com/docs/api/rest/file/search-files/
 """
 
-from datetime import datetime
 from enum import Enum
 from typing import Any, ClassVar, Dict, List, Optional, Tuple
 
 from pydantic import (
+    AwareDatetime,
     BaseModel,
     ConfigDict,
     Field,
@@ -72,21 +72,18 @@ class SearchRequestModel(BaseModel):
 class DatetimeRange(SearchRequestModel):
     """Bounds for ``datetime_uploaded``.
 
-    Pass timezone-aware datetimes. A naive datetime is serialized without a
-    UTC offset (e.g. ``2024-01-01T00:00:00``) and its interpretation is left
-    to the server, so unless the caller's local time is what the server
-    assumes, the range boundary silently shifts. A future major release will
-    reject naive datetimes.
+    Only timezone-aware datetimes are accepted; a naive datetime raises
+    ``ValidationError``.
     """
 
     _at_least_one_error: ClassVar[str] = (
         "at least one of `gt`, `gte`, `lt` or `lte` is required"
     )
 
-    gt: Optional[datetime] = None
-    gte: Optional[datetime] = None
-    lt: Optional[datetime] = None
-    lte: Optional[datetime] = None
+    gt: Optional[AwareDatetime] = None
+    gte: Optional[AwareDatetime] = None
+    lt: Optional[AwareDatetime] = None
+    lte: Optional[AwareDatetime] = None
 
 
 class SizeRange(SearchRequestModel):

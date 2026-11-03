@@ -8,6 +8,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/uploadcare/pyuploadcare/compare/v6.3.0...HEAD)
 
+### Changed
+
+- **Breaking**: naive (timezone-unaware) datetimes are rejected in user input.
+  `DatetimeRange` raises `ValidationError` and `starting_point` in `list_files()`
+  and `list_file_groups()` raises `ValueError`. A plain `date` passed as
+  `starting_point` is taken as midnight UTC.
+- `ucare` CLI datetime arguments (`--starting_point`, `--uploaded_*`) without
+  a UTC offset are treated as UTC.
+
 ### Removed
 
 - **Breaking**: dropped support for Python 3.8 and 3.9.

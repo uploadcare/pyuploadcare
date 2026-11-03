@@ -1,4 +1,3 @@
-from dateutil import parser as datetime_parser
 from pydantic import ValidationError
 
 from pyuploadcare.api.search_entities import FileSearchRequest, SearchSort
@@ -6,6 +5,7 @@ from pyuploadcare.client import Uploadcare
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.ucare_cli.commands.helpers import (
     int_or_none,
+    parse_datetime,
     pprint,
     strict_bool,
 )
@@ -55,9 +55,9 @@ def register_arguments(subparsers):  # noqa: C901
         )
         subparser.add_argument(
             f"--uploaded_{bound}",
-            type=datetime_parser.parse,
+            type=parse_datetime,
             metavar="DATETIME",
-            help=f"upload datetime {bound} filter",
+            help=f"upload datetime {bound} filter, UTC unless an offset is given",
         )
 
     subparser.add_argument(
