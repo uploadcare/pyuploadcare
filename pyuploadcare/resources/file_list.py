@@ -9,7 +9,8 @@ class FileList(BaseApiList):
     You can specify:
 
     - ``starting_point`` -- a starting point for filtering files.
-      It is reflects a ``from`` parameter from REST API.
+      It is reflects a ``from`` parameter from REST API. Must be a timezone-aware
+      ``datetime``; a naive ``datetime`` or a plain ``date`` raises ``ValueError``.
     - ``ordering`` -- a string with name of the field what must be used
       for sorting files. The actual list of supported fields you can find in
       documentation: https://uploadcare.com/docs/api/rest/file/files-list/#request.query.ordering

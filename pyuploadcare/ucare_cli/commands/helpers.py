@@ -2,7 +2,7 @@ import argparse
 import json
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from uuid import UUID
 
@@ -12,12 +12,20 @@ from pyuploadcare.client import Uploadcare
 from pyuploadcare.exceptions import TimeoutError
 
 
+def parse_datetime(value: str) -> datetime:
+    """Parse a CLI datetime string; input without a UTC offset is UTC."""
+    parsed = parser.parse(value)
+    if parsed.utcoffset() is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
 def _list(api_list_method, arg_namespace, **extra):
     """A common function for building methods of the "list showing"."""
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
         if ordering_field in ("", "datetime_uploaded", "datetime_created"):
-            arg_namespace.starting_point = parser.parse(
+            arg_namespace.starting_point = parse_datetime(
                 arg_namespace.starting_point
             )
 

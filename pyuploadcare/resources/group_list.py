@@ -7,7 +7,8 @@ class GroupList(BaseApiList):
     This class provides iteration over all groups for project. You can specify:
 
     - ``starting_point`` -- a starting point for filtering groups.
-      It is reflects a ``from`` parameter from the REST API.
+      It is reflects a ``from`` parameter from the REST API. Must be a timezone-aware
+      ``datetime``; a naive ``datetime`` or a plain ``date`` raises ``ValueError``.
     - ``ordering`` -- a string with name of the field what must be used
       for sorting files. The actual list of supported fields you can find in
       documentation: https://uploadcare.com/docs/api/rest/group/groups-list/#request.query.ordering
@@ -18,8 +19,8 @@ class GroupList(BaseApiList):
 
     Usage example::
 
-        >>> from datetime import datetime, timedelta
-        >>> last_week = datetime.now() - timedelta(weeks=1)
+        >>> from datetime import datetime, timedelta, timezone
+        >>> last_week = datetime.now(timezone.utc) - timedelta(weeks=1)
         >>> for f in uploadcare.list_file_groups(starting_point=last_week):
         >>>     print(f.datetime_created)
 

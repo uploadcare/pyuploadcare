@@ -1,8 +1,8 @@
 import itertools
-from datetime import date, datetime
 from typing import TYPE_CHECKING, Optional
 
 from pyuploadcare.api.base import ListCountMixin
+from pyuploadcare.helpers import ensure_aware_datetime
 
 
 if TYPE_CHECKING:
@@ -45,9 +45,12 @@ class BaseApiList:
         datetime_fields = self.datetime_ordering_fields
 
         if value and ordering_field in datetime_fields:
-            if not isinstance(value, (datetime, date)):
-                raise ValueError("The starting_point must be a datetime")
-            value = value.isoformat()
+            try:
+                value = ensure_aware_datetime(value).isoformat()
+            except ValueError:
+                raise ValueError(
+                    "The starting_point must be a timezone-aware datetime"
+                ) from None
 
         self._starting_point = value
 
