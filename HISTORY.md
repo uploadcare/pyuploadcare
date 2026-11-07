@@ -14,21 +14,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- **Breaking**: naive (timezone-unaware) datetimes are rejected in user input.
-  `DatetimeRange` raises `ValidationError` and `starting_point` in `list_files()`
-  and `list_file_groups()` raises `ValueError`. A plain `date` passed as
-  `starting_point` is taken as midnight UTC.
+- **Breaking**: naive (timezone-unaware) datetimes and plain `date` objects
+  are rejected in library input.
+  See [Update to version 7.0](https://pyuploadcare.readthedocs.io/en/latest/install.html#update-to-version-7-0).
 - `ucare` CLI datetime arguments (`--starting_point`, `--uploaded_*`) without
   a UTC offset are treated as UTC.
+- Project tooling migrated from Poetry to [uv](https://docs.astral.sh/uv/).
 
 ### Removed
 
 - **Breaking**: dropped support for Python 3.8 and 3.9.
   Use `pyuploadcare < 7.0` on older Pythons.
-
-### Changed
-
-- Project tooling migrated from Poetry to [uv](https://docs.astral.sh/uv/).
 
 
 ## [6.3.0](https://github.com/uploadcare/pyuploadcare/compare/v6.2.1...v6.3.0) - 2026-09-24

@@ -2,11 +2,23 @@ import hashlib
 import mimetypes
 import os
 import string
+from datetime import datetime
 from typing import IO, Any, Dict, Iterable, List, Optional, TypeVar
 
 
 def get_file_size(file_object: IO) -> int:
     return os.fstat(file_object.fileno()).st_size
+
+
+def ensure_aware_datetime(value: datetime) -> datetime:
+    """Return ``value`` if it is a timezone-aware ``datetime``.
+
+    Raise ``ValueError`` for anything else, including a naive ``datetime``
+    and a plain ``date``.
+    """
+    if not isinstance(value, datetime) or value.utcoffset() is None:
+        raise ValueError("Expected a timezone-aware datetime")
+    return value
 
 
 T = TypeVar("T")

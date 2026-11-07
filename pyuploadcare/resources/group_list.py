@@ -8,7 +8,7 @@ class GroupList(BaseApiList):
 
     - ``starting_point`` -- a starting point for filtering groups.
       It is reflects a ``from`` parameter from the REST API. Must be a timezone-aware
-      ``datetime``; a plain ``date`` is taken as midnight UTC.
+      ``datetime``; a naive ``datetime`` or a plain ``date`` raises ``ValueError``.
     - ``ordering`` -- a string with name of the field what must be used
       for sorting files. The actual list of supported fields you can find in
       documentation: https://uploadcare.com/docs/api/rest/group/groups-list/#request.query.ordering

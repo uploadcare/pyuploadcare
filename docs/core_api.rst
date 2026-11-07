@@ -327,9 +327,10 @@ A field cannot appear in both ``phrase`` and ``exact`` in the same request.
 .. note::
 
     ``DatetimeRange`` accepts only timezone-aware datetimes; a naive datetime
-    raises ``ValidationError``. The same applies to ``starting_point`` in
-    ``list_files()`` and ``list_file_groups()``. The ``ucare`` CLI treats a
-    datetime given without a UTC offset as UTC.
+    or a plain ``date`` raises ``ValidationError``. The same rule applies to
+    ``starting_point`` in ``list_files()`` and ``list_file_groups()``, which
+    raise ``ValueError``. Only the ``ucare`` CLI is lenient: a datetime given
+    on the command line without a UTC offset is treated as UTC.
 
 ``exact`` can also match metadata values. In the SDK this is a nested mapping, which is
 serialized into the ``metadata[<key>]`` keys the API expects::

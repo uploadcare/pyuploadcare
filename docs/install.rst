@@ -130,3 +130,40 @@ Additionally, please take note that some settings have been renamed in this upda
 .. _file uploader: https://uploadcare.com/docs/file-uploader/
 .. _@uploadcare/file-uploader: https://www.npmjs.com/package/@uploadcare/file-uploader
 .. _changelog for version 5.0.0: https://github.com/uploadcare/pyuploadcare/blob/main/HISTORY.md#500---2023-12-28
+
+
+Update to version 7.0
+---------------------
+
+Version 7.0 drops support for Python 3.8 and 3.9. Stay on ``pyuploadcare < 7.0``
+if you still run one of those.
+
+Datetimes passed to the library must now be timezone-aware. Naive ``datetime``
+objects and plain ``date`` objects are rejected:
+
+* ``DatetimeRange`` in ``FileSearchRequest`` raises ``ValidationError``.
+* ``starting_point`` in ``list_files()`` and ``list_file_groups()`` raises ``ValueError``.
+
+Previously a naive datetime was sent as-is and interpreted by the server, and a
+plain ``date`` was silently expanded to midnight UTC. To migrate, attach a
+timezone explicitly:
+
+.. code-block:: python
+
+    from datetime import date, datetime, timezone
+
+    # before
+    uploadcare.list_files(starting_point=datetime(2024, 1, 1))
+    uploadcare.list_files(starting_point=date(2024, 1, 1))
+
+    # after
+    uploadcare.list_files(
+        starting_point=datetime(2024, 1, 1, tzinfo=timezone.utc)
+    )
+
+The ``ucare`` CLI is unchanged in spirit: a datetime given on the command line
+without a UTC offset (``--starting_point=2024-01-01``) is treated as UTC.
+
+See the `changelog for version 7.0.0`_ for the full list of changes.
+
+.. _changelog for version 7.0.0: https://github.com/uploadcare/pyuploadcare/blob/main/HISTORY.md#700---2026-10-29
