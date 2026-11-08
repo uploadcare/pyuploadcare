@@ -50,7 +50,7 @@ def test_request_payload(addons_api):
 
 def test_remove_bg_params_reject_legacy_and_invalid_values():
     with pytest.raises(ValidationError):
-        AddonRemoveBGExecutionParams(crop_margin="20px")
+        AddonRemoveBGExecutionParams.model_validate({"crop_margin": "20px"})
     with pytest.raises(ValidationError):
         AddonRemoveBGExecutionParams(bg_color="#81d4fa")
     with pytest.raises(ValidationError):
