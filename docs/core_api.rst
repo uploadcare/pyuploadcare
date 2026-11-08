@@ -503,8 +503,8 @@ For example, AWS Rekognition addon has no params to setup::
     from pyuploadcare.api.addon_entities import AddonRemoveBGExecutionParams
     remove_bg_params = AddonRemoveBGExecutionParams(
         crop=True,
-        crop_margin="20px",
-        scale="15%"
+        bg_color="81d4fa",
+        channels="rgba",
     )
 
     from pyuploadcare.api.addon_entities import AddonClamAVExecutionParams
