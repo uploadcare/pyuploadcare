@@ -69,7 +69,8 @@ class Uploadcare:
         - upload_base: Upload API base url.
         - cdn_base: CDN base url.
         - api_version: API version.
-        - signed_uploads: Enable signed uploads.
+        - signed_uploads: Enable signed uploads. Ignored when ``oauth_token``
+          is set: the token authorizes uploads instead of a signature.
         - signed_uploads_ttl: Signed uploads signature timeout in seconds.
         - verify_api_ssl: Verify Rest API SSL certificate.
         - verify_upload_ssl: Verify Upload API SSL certificate.
@@ -86,8 +87,9 @@ class Uploadcare:
         - oauth_token: OAuth access token. When set, REST and Upload API
           requests are authorized with it (``Authorization: Bearer``, plus
           the public key in ``X-Uploadcare-Pub-Key``) instead of the project
-          key pair; replace it with ``set_access_token()``. CDN requests
-          never carry it.
+          key pair; replace it with ``set_access_token()``. Uploads are not
+          signed, so ``secret_key`` is not needed. CDN requests never carry
+          the token.
 
     """
 
@@ -395,6 +397,11 @@ class Uploadcare:
         )
         return file
 
+    @property
+    def _sign_uploads(self) -> bool:
+        # An OAuth token authorizes uploads in place of a signature.
+        return bool(self.signed_uploads) and self.oauth is None
+
     @staticmethod
     def _format_store(store: Optional[bool]) -> str:
         values_map: Dict[Any, str] = {
@@ -456,7 +463,7 @@ class Uploadcare:
         response = self.upload_api.upload(
             files=files,
             store=self._format_store(store),
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             common_metadata=common_metadata,
             tags=tags,
@@ -512,7 +519,7 @@ class Uploadcare:
             file_size=size,
             content_type=mime_type,
             store=self._format_store(store),
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             metadata=metadata,
             tags=tags,
@@ -587,7 +594,7 @@ class Uploadcare:
             store=store,
             filename=filename,
             metadata=metadata,
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             check_duplicates=check_duplicates,
             save_duplicates=save_duplicates,
@@ -762,7 +769,7 @@ class Uploadcare:
         file_urls = [str(file_) for file_ in files]
         group_info = self.upload_api.create_group(
             files=file_urls,
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
         )
 

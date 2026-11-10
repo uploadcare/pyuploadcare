@@ -1,3 +1,4 @@
+import io
 import os
 import subprocess
 import sys
@@ -118,6 +119,8 @@ class RecordingTransport:
             )
         if request.url.path == "/from_url/status/":
             return httpx2.Response(200, json={"status": "progress"})
+        if request.url.path == "/base/":
+            return httpx2.Response(200, json={"file.txt": FILE_UUID})
         if request.url.path.startswith("/files/"):
             return httpx2.Response(200, json={"tags": []})
         return httpx2.Response(200, json={})
@@ -282,3 +285,59 @@ def test_uploadcare_key_pair_mode_sends_no_public_key_header():
     uploadcare.tags_api.get(FILE_UUID)
 
     assert "X-Uploadcare-Pub-Key" not in transport.requests[0].headers
+
+
+def upload_one(uploadcare: Uploadcare) -> None:
+    file_object = io.BytesIO(b"content")
+    file_object.name = "file.txt"
+    uploadcare.upload_files([file_object])
+
+
+@pytest.mark.parametrize("secret_key", ["demosecretkey", None])
+def test_uploadcare_oauth_uploads_are_not_signed(secret_key):
+    transport = RecordingTransport()
+    uploadcare = Uploadcare(
+        public_key="demopublickey",
+        secret_key=secret_key,
+        signed_uploads=True,
+        oauth_token="token",
+    )
+    uploadcare.upload_client._transport = httpx2.MockTransport(transport)
+
+    upload_one(uploadcare)
+
+    request = transport.requests[0]
+    body = request.content.decode()
+    assert request.headers["Authorization"] == "Bearer token"
+    assert 'name="signature"' not in body
+    assert 'name="expire"' not in body
+    assert 'name="UPLOADCARE_PUB_KEY"' in body
+
+
+def test_uploadcare_key_pair_uploads_are_still_signed():
+    transport = RecordingTransport()
+    uploadcare = Uploadcare(
+        public_key="demopublickey",
+        secret_key="demosecretkey",
+        signed_uploads=True,
+        oauth_token=None,
+    )
+    uploadcare.upload_client._transport = httpx2.MockTransport(transport)
+
+    upload_one(uploadcare)
+
+    body = transport.requests[0].content.decode()
+    assert 'name="signature"' in body
+    assert 'name="expire"' in body
+
+
+def test_uploadcare_rest_api_needs_no_secret_key_with_oauth():
+    transport = RecordingTransport()
+    uploadcare = Uploadcare(
+        public_key="demopublickey", secret_key=None, oauth_token="token"
+    )
+    uploadcare.rest_client._transport = httpx2.MockTransport(transport)
+
+    uploadcare.tags_api.get(FILE_UUID)
+
+    assert transport.requests[0].headers["Authorization"] == "Bearer token"
