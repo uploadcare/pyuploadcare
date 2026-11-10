@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -370,6 +370,35 @@ def test_list_files(uploadcare):
     files = file_list[0:2]
     assert len(files) == 2
     assert isinstance(files[0], File)
+
+
+def test_list_files_starting_point_rejects_naive_datetime(uploadcare):
+    with pytest.raises(ValueError, match="timezone-aware"):
+        uploadcare.list_files(starting_point=datetime(2024, 1, 1))
+
+
+def test_list_files_starting_point_keeps_aware_datetime(uploadcare):
+    file_list = uploadcare.list_files(
+        starting_point=datetime(2024, 1, 1, tzinfo=timezone.utc)
+    )
+    assert file_list.starting_point == "2024-01-01T00:00:00+00:00"
+
+
+def test_list_files_starting_point_rejects_plain_date(uploadcare):
+    with pytest.raises(ValueError, match="timezone-aware"):
+        uploadcare.list_files(starting_point=date(2024, 1, 1))
+
+
+def test_list_file_groups_starting_point_rejects_naive_datetime(uploadcare):
+    with pytest.raises(ValueError, match="timezone-aware"):
+        uploadcare.list_file_groups(starting_point=datetime(2024, 1, 1))
+
+
+def test_list_file_groups_starting_point_keeps_aware_datetime(uploadcare):
+    group_list = uploadcare.list_file_groups(
+        starting_point=datetime(2024, 1, 1, tzinfo=timezone.utc)
+    )
+    assert group_list.starting_point == "2024-01-01T00:00:00+00:00"
 
 
 @pytest.mark.vcr

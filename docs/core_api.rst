@@ -324,12 +324,13 @@ performs an ordered full-text match on a specific field, and ``exact`` matches v
 
 A field cannot appear in both ``phrase`` and ``exact`` in the same request.
 
-.. warning::
+.. note::
 
-    Pass timezone-aware datetimes in ``DatetimeRange``. A naive datetime is
-    sent without a UTC offset and its interpretation is left to the server, so
-    the range boundary can silently shift for callers not working in that
-    timezone. A future major release will reject naive datetimes.
+    ``DatetimeRange`` accepts only timezone-aware datetimes; a naive datetime
+    or a plain ``date`` raises ``ValidationError``. The same rule applies to
+    ``starting_point`` in ``list_files()`` and ``list_file_groups()``, which
+    raise ``ValueError``. Only the ``ucare`` CLI is lenient: a datetime given
+    on the command line without a UTC offset is treated as UTC.
 
 ``exact`` can also match metadata values. In the SDK this is a nested mapping, which is
 serialized into the ``metadata[<key>]`` keys the API expects::

@@ -6,7 +6,6 @@ import socket
 import time
 from math import ceil
 
-from dateutil import parser
 from httpx2 import HTTPError
 
 from pyuploadcare import FileList, conf
@@ -16,6 +15,7 @@ from pyuploadcare.ucare_cli.commands.helpers import (
     bar,
     bool_or_none,
     int_or_none,
+    parse_datetime,
     pprint,
     promt,
 )
@@ -102,7 +102,7 @@ def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
         if ordering_field in ("", "datetime_uploaded"):
-            arg_namespace.starting_point = parser.parse(
+            arg_namespace.starting_point = parse_datetime(
                 arg_namespace.starting_point
             )
 

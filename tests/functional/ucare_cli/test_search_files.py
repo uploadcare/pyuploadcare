@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from tests.functional.ucare_cli.helpers import arg_namespace
@@ -85,7 +85,9 @@ def test_cli_builds_nested_conditions():
         "phrase": {"original_filename": "sunset"},
         "exact": {"detected_mime_type": ["image/jpeg", "image/png"]},
         "size": {"gt": 1000, "lte": 5000},
-        "datetime_uploaded": {"gte": datetime(2024, 1, 2)},
+        "datetime_uploaded": {
+            "gte": datetime(2024, 1, 2, tzinfo=timezone.utc)
+        },
         "tags": {"any": ["cat", "dog"], "none": ["old"]},
     }
 
@@ -127,3 +129,13 @@ def test_cli_is_image_rejects_other_values(value):
 def test_cli_uploaded_bound_rejects_unparsable_datetime():
     with pytest.raises(SystemExit):
         arg_namespace("search_files --uploaded_gte not-a-date")
+
+
+def test_cli_uploaded_bound_keeps_explicit_offset():
+    parsed = arg_namespace(
+        "search_files --uploaded_gte 2024-01-02T03:04:05+02:00"
+    )
+
+    assert parsed.uploaded_gte == datetime(
+        2024, 1, 2, 3, 4, 5, tzinfo=timezone(timedelta(hours=2))
+    )
