@@ -7,7 +7,17 @@ the user's OAuth access token (``pyuploadcare.api.auth.UploadcareOAuth``).
 
 import re
 from datetime import date, datetime, timezone
-from typing import Any, Dict, Iterator, Optional, Pattern, Union, cast
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Pattern,
+    Union,
+    cast,
+)
 
 from pydantic import ValidationError
 
@@ -15,6 +25,8 @@ from pyuploadcare.api.base import API, _iterate_pages
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
     CombinedUsage,
+    ModerationThreshold,
+    ModerationThresholdsResponse,
     Project,
     ProjectListResponse,
     UsageMetric,
@@ -92,6 +104,17 @@ def _to_date(name: str, value: DateLike) -> date:
             f"`{name}` must be a date or an ISO 8601 date string "
             f"(YYYY-MM-DD), got {value!r}"
         )
+
+
+def _validate_threshold(
+    item: Union[ModerationThreshold, Dict[str, Any]],
+) -> ModerationThreshold:
+    try:
+        return ModerationThreshold.model_validate(item, extra="forbid")
+    except ValidationError as exc:
+        raise InvalidParamError(
+            f"Invalid moderation threshold {item!r}: {exc}"
+        ) from exc
 
 
 def _check_page_limits(
@@ -293,3 +316,63 @@ class ProjectUsageAPI(ProjectAPIBase):
         json_response = self._client.get(url).json()
         response = self._parse_response(json_response, response_class)
         return cast(UsageMetric, response)
+
+
+class ProjectModerationAPI(ProjectAPIBase):
+    """Content moderation thresholds of a project.
+
+    Requires the unsafe content detection feature on the owner's plan.
+    """
+
+    response_classes = {
+        "get": ModerationThresholdsResponse,
+        "set": ModerationThresholdsResponse,
+    }
+
+    _SUFFIX = "moderation/thresholds"
+
+    @staticmethod
+    def _thresholds_payload(
+        thresholds: Iterable[Union[ModerationThreshold, Dict[str, Any]]],
+    ) -> List[Dict[str, Any]]:
+        if isinstance(thresholds, (dict, str, bytes)):
+            raise InvalidParamError(
+                "`thresholds` must be a collection of thresholds"
+            )
+
+        payload: List[Dict[str, Any]] = []
+        seen = set()
+        for item in thresholds:
+            threshold = _validate_threshold(item)
+            key = (threshold.category_id, threshold.file_type)
+            if key in seen:
+                raise InvalidParamError(
+                    f"Duplicate (category_id, file_type) combination: {key}"
+                )
+            seen.add(key)
+            payload.append(threshold.to_payload())
+        return payload
+
+    def get(self, project: ProjectOrPubKey) -> List[ModerationThreshold]:
+        url = self._project_url(project, suffix=self._SUFFIX)
+        response_class = self._get_response_class("get")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(ModerationThresholdsResponse, response).thresholds
+
+    def set(
+        self,
+        project: ProjectOrPubKey,
+        thresholds: Iterable[Union[ModerationThreshold, Dict[str, Any]]],
+    ) -> List[ModerationThreshold]:
+        """Replace all moderation thresholds of a project.
+
+        Thresholds not included are deleted, so an empty collection clears
+        them all.
+        """
+        payload = self._thresholds_payload(thresholds)
+        url = self._project_url(project, suffix=self._SUFFIX)
+        response_class = self._get_response_class("set")
+        json_response = self._client.put(url, json=payload).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(ModerationThresholdsResponse, response).thresholds

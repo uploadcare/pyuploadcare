@@ -6,6 +6,7 @@ the tests check URLs, methods, headers, bodies and error handling as sent.
 
 import json
 from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlsplit
 
@@ -17,6 +18,7 @@ from pyuploadcare import (
     AdaptiveBitrateStreamingProfile,
     AdaptiveBitrateStreamingProfiles,
     AdaptiveBitrateStreamingResolution,
+    ModerationThreshold,
     Project,
     ProjectAPIClient,
     ProjectFeature,
@@ -534,3 +536,101 @@ def test_usage_aware_datetimes_use_utc_date(client, server):
     )
 
     assert query(server.last) == {"from": ["2025-03-01"], "to": ["2025-03-02"]}
+
+
+# Moderation
+
+THRESHOLDS_JSON = {
+    "thresholds": [
+        {
+            "category_id": 4,
+            "file_type": "image",
+            "threshold_percentage": "37.00",
+            "created_at": "2024-12-30T11:24:28.604307Z",
+            "updated_at": "2024-12-30T12:14:02.028743Z",
+        }
+    ]
+}
+
+
+def test_get_moderation_thresholds(client, server):
+    server.respond(payload=THRESHOLDS_JSON)
+
+    thresholds = client.get_moderation_thresholds(PUB_KEY)
+
+    assert server.last.method == "GET"
+    assert str(server.last.url) == (
+        f"{API_BASE}projects/{PUB_KEY}/moderation/thresholds/"
+    )
+    assert thresholds[0].category_id == 4
+    assert thresholds[0].threshold_percentage == Decimal("37.00")
+    assert isinstance(thresholds[0].created_at, datetime)
+
+
+def test_set_moderation_thresholds(client, server):
+    server.respond(payload=THRESHOLDS_JSON)
+
+    thresholds = client.set_moderation_thresholds(
+        PUB_KEY,
+        [
+            ModerationThreshold(category_id=4, threshold_percentage="30.5"),
+            {
+                "category_id": 5,
+                "file_type": "image",
+                "threshold_percentage": Decimal("100"),
+            },
+            {"category_id": 6, "threshold_percentage": 45},
+        ],
+    )
+
+    assert server.last.method == "PUT"
+    assert str(server.last.url) == (
+        f"{API_BASE}projects/{PUB_KEY}/moderation/thresholds/"
+    )
+    assert server.last_json() == [
+        {
+            "category_id": 4,
+            "file_type": "image",
+            "threshold_percentage": "30.5",
+        },
+        {
+            "category_id": 5,
+            "file_type": "image",
+            "threshold_percentage": "100",
+        },
+        {
+            "category_id": 6,
+            "file_type": "image",
+            "threshold_percentage": "45",
+        },
+    ]
+    assert len(thresholds) == 1
+
+
+def test_set_empty_moderation_thresholds_clears_them(client, server):
+    server.respond(payload={"thresholds": []})
+
+    assert client.set_moderation_thresholds(PUB_KEY, []) == []
+    assert server.last_json() == []
+
+
+@pytest.mark.parametrize(
+    "thresholds",
+    [
+        [{"category_id": 4, "threshold_percentage": "100.01"}],
+        [{"category_id": 4, "threshold_percentage": "-1"}],
+        [{"category_id": 4, "threshold_percentage": "1.234"}],
+        [{"category_id": 4, "threshold_percentage": "1", "extra": 1}],
+        [{"threshold_percentage": "1"}],
+        [
+            {"category_id": 4, "threshold_percentage": "1"},
+            {"category_id": 4, "threshold_percentage": "2"},
+        ],
+        {"category_id": 4, "threshold_percentage": "1"},  # not a list
+    ],
+)
+def test_set_moderation_thresholds_validates(client, server, thresholds):
+    with pytest.raises(InvalidParamError):
+        client.set_moderation_thresholds(PUB_KEY, thresholds)
+
+    assert server.requests == []

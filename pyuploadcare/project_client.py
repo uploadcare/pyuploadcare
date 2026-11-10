@@ -1,12 +1,13 @@
 import socket
 import ssl
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
 
 from pyuploadcare import conf
 from pyuploadcare.api.auth import UploadcareOAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_api import (
     DateLike,
+    ProjectModerationAPI,
     ProjectOrPubKey,
     ProjectsAPI,
     ProjectUsageAPI,
@@ -14,6 +15,7 @@ from pyuploadcare.api.project_api import (
 )
 from pyuploadcare.api.project_entities import (
     CombinedUsage,
+    ModerationThreshold,
     Project,
     ProjectFeatures,
     UsageMetric,
@@ -92,6 +94,7 @@ class ProjectAPIClient:
 
         self.projects_api = ProjectsAPI(client=self.http_client)
         self.usage_api = ProjectUsageAPI(client=self.http_client)
+        self.moderation_api = ProjectModerationAPI(client=self.http_client)
 
     def set_access_token(self, token: str) -> str:
         """Replace the access token used for the following requests."""
@@ -220,3 +223,25 @@ class ProjectAPIClient:
     ) -> UsageMetric:
         """Daily usage of one metric: traffic, storage or operations."""
         return self.usage_api.metric(project, metric, date_from, date_to)
+
+    def get_moderation_thresholds(
+        self, project: ProjectOrPubKey
+    ) -> List[ModerationThreshold]:
+        """Content moderation thresholds of a project."""
+        return self.moderation_api.get(project)
+
+    def set_moderation_thresholds(
+        self,
+        project: ProjectOrPubKey,
+        thresholds: Iterable[Union[ModerationThreshold, Dict[str, Any]]],
+    ) -> List[ModerationThreshold]:
+        """Replace all content moderation thresholds of a project.
+
+        Thresholds not included are deleted::
+
+            >>> projects.set_moderation_thresholds(pub_key, [
+            ...     ModerationThreshold(category_id=4,
+            ...                         threshold_percentage="30.5"),
+            ... ])
+        """
+        return self.moderation_api.set(project, thresholds)

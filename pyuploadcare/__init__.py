@@ -22,6 +22,7 @@ from pyuploadcare.api.project_entities import (  # noqa: F401
     AdaptiveBitrateStreamingResolution,
     AutoModeration,
     MimeTypeFilteringFeature,
+    ModerationThreshold,
     Project,
     ProjectFeature,
     ProjectFeatures,
