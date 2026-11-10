@@ -6,18 +6,10 @@ the user's OAuth access token (``pyuploadcare.api.auth.UploadcareOAuth``).
 """
 
 import re
+from collections.abc import Iterable, Iterator
 from datetime import date, datetime, timezone
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Pattern,
-    Union,
-    cast,
-)
+from re import Pattern
+from typing import Any, cast
 
 from pydantic import ValidationError
 
@@ -44,12 +36,12 @@ from pyuploadcare.helpers import ensure_aware_datetime
 PROJECT_API_MAX_PAGE_SIZE = 100
 
 # Characters the server accepts in a project public key.
-RE_PUB_KEY: Pattern[str] = re.compile(r"[a-zA-Z0-9_]+\Z")
+RE_PUB_KEY: Pattern[str] = re.compile(r"\w+\Z", re.ASCII)
 
 
-ProjectOrPubKey = Union[Project, str]
-ProjectPayload = Union[Project, Dict[str, Any]]
-DateLike = Union[date, datetime, str]
+ProjectOrPubKey = Project | str
+ProjectPayload = Project | dict[str, Any]
+DateLike = date | datetime | str
 
 
 def _pub_key(project: ProjectOrPubKey) -> str:
@@ -79,7 +71,7 @@ def validate_project_data(data: ProjectPayload) -> Project:
         raise InvalidParamError(f"Invalid project data: {exc}") from exc
 
 
-def _project_payload(data: ProjectPayload) -> Dict[str, Any]:
+def _project_payload(data: ProjectPayload) -> dict[str, Any]:
     return validate_project_data(data).to_payload()
 
 
@@ -110,7 +102,7 @@ def _to_date(name: str, value: DateLike) -> date:
 
 
 def _validate_threshold(
-    item: Union[ModerationThreshold, Dict[str, Any]],
+    item: ModerationThreshold | dict[str, Any],
 ) -> ModerationThreshold:
     try:
         return ModerationThreshold.model_validate(item, extra="forbid")
@@ -120,9 +112,7 @@ def _validate_threshold(
         ) from exc
 
 
-def _check_page_limits(
-    limit: Optional[int], request_limit: Optional[int]
-) -> None:
+def _check_page_limits(limit: int | None, request_limit: int | None) -> None:
     require_optional_int("limit", limit)
     require_optional_int("request_limit", request_limit)
     require_range("limit", limit, minimum=0)
@@ -150,8 +140,8 @@ class ProjectAPIBase(API):
     def _project_url(
         self,
         project: ProjectOrPubKey,
-        suffix: Optional[str] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        suffix: str | None = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> str:
         return self._build_url(
             _pub_key(project),
@@ -163,7 +153,7 @@ class ProjectAPIBase(API):
         self,
         first_url: str,
         action: str,
-        limit: Optional[int] = None,
+        limit: int | None = None,
     ) -> Iterator[Any]:
         response_class = self._get_response_class(action)
         return _iterate_pages(
@@ -174,7 +164,7 @@ class ProjectAPIBase(API):
         )
 
     @staticmethod
-    def _page_query(request_limit: Optional[int]) -> Dict[str, Any]:
+    def _page_query(request_limit: int | None) -> dict[str, Any]:
         if request_limit is None:
             return {}
         return {"limit": request_limit}
@@ -192,8 +182,8 @@ class ProjectsAPI(ProjectAPIBase):
 
     def list(
         self,
-        limit: Optional[int] = None,
-        request_limit: Optional[int] = None,
+        limit: int | None = None,
+        request_limit: int | None = None,
     ) -> Iterator[Project]:
         """Iterate over the projects available to the token's user.
 
@@ -264,7 +254,7 @@ class ProjectUsageAPI(ProjectAPIBase):
     }
 
     @staticmethod
-    def _date_range(date_from: DateLike, date_to: DateLike) -> Dict[str, str]:
+    def _date_range(date_from: DateLike, date_to: DateLike) -> dict[str, str]:
         from_ = _to_date("date_from", date_from)
         to = _to_date("date_to", date_to)
         if from_ > to:
@@ -293,7 +283,7 @@ class ProjectUsageAPI(ProjectAPIBase):
     def metric(
         self,
         project: ProjectOrPubKey,
-        metric: Union[UsageMetricName, str],
+        metric: UsageMetricName | str,
         date_from: DateLike,
         date_to: DateLike,
     ) -> UsageMetric:
@@ -336,14 +326,14 @@ class ProjectModerationAPI(ProjectAPIBase):
 
     @staticmethod
     def _thresholds_payload(
-        thresholds: Iterable[Union[ModerationThreshold, Dict[str, Any]]],
-    ) -> List[Dict[str, Any]]:
+        thresholds: Iterable[ModerationThreshold | dict[str, Any]],
+    ) -> list[dict[str, Any]]:
         if isinstance(thresholds, (dict, str, bytes)):
             raise InvalidParamError(
                 "`thresholds` must be a collection of thresholds"
             )
 
-        payload: List[Dict[str, Any]] = []
+        payload: list[dict[str, Any]] = []
         seen = set()
         for item in thresholds:
             threshold = _validate_threshold(item)
@@ -356,7 +346,7 @@ class ProjectModerationAPI(ProjectAPIBase):
             payload.append(threshold.to_payload())
         return payload
 
-    def get(self, project: ProjectOrPubKey) -> List[ModerationThreshold]:
+    def get(self, project: ProjectOrPubKey) -> list[ModerationThreshold]:
         url = self._project_url(project, suffix=self._SUFFIX)
         response_class = self._get_response_class("get")
         json_response = self._client.get(url).json()
@@ -366,8 +356,8 @@ class ProjectModerationAPI(ProjectAPIBase):
     def set(
         self,
         project: ProjectOrPubKey,
-        thresholds: Iterable[Union[ModerationThreshold, Dict[str, Any]]],
-    ) -> List[ModerationThreshold]:
+        thresholds: Iterable[ModerationThreshold | dict[str, Any]],
+    ) -> list[ModerationThreshold]:
         """Replace all moderation thresholds of a project.
 
         Thresholds not included are deleted, so an empty collection clears
@@ -390,7 +380,7 @@ class ProjectMetaAPI(ProjectAPIBase):
         "moderation_categories": ModerationCategoriesResponse,
     }
 
-    def mime_types(self) -> List[str]:
+    def mime_types(self) -> list[str]:
         """MIME types accepted by ``mime_type_filtering``, sorted."""
         url = self._build_url(suffix="mime/types")
         response_class = self._get_response_class("mime_types")
@@ -398,7 +388,7 @@ class ProjectMetaAPI(ProjectAPIBase):
         response = self._parse_response(json_response, response_class)
         return cast(MimeTypesResponse, response).mime_types
 
-    def moderation_categories(self) -> List[ModerationCategory]:
+    def moderation_categories(self) -> list[ModerationCategory]:
         """The moderation category tree, flattened.
 
         Category ids are what ``ModerationThreshold.category_id`` takes;
