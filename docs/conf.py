@@ -48,7 +48,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "PyUploadcare"
-copyright = "2011-2025, Uploadcare Inc"
+copyright = "2011-2026, Uploadcare Inc"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
