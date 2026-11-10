@@ -27,6 +27,7 @@ from pyuploadcare.api.project_entities import (  # noqa: F401
     ProjectFeatures,
     UnsafeContentDetectionFeature,
     UploadsFeature,
+    UsageMetricName,
 )
 from pyuploadcare.client import Uploadcare  # noqa: F401
 from pyuploadcare.project_client import ProjectAPIClient  # noqa: F401

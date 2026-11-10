@@ -5,6 +5,7 @@ the tests check URLs, methods, headers, bodies and error handling as sent.
 """
 
 import json
+from datetime import date, datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlsplit
 
@@ -21,6 +22,7 @@ from pyuploadcare import (
     ProjectFeature,
     ProjectFeatures,
     UploadsFeature,
+    UsageMetricName,
 )
 from pyuploadcare.exceptions import (
     APIError,
@@ -439,3 +441,96 @@ def test_delete_project(client, server):
 
     assert server.last.method == "DELETE"
     assert str(server.last.url) == f"{API_BASE}projects/{PUB_KEY}/"
+
+
+# Usage
+
+
+def test_get_usage(client, server):
+    server.respond(
+        payload={
+            "units": {
+                "traffic": "bytes",
+                "storage": "bytes",
+                "operations": "operations",
+            },
+            "data": [
+                {
+                    "date": "2025-03-01",
+                    "traffic": 123456,
+                    "storage": 2048,
+                    "operations": 10,
+                }
+            ],
+        }
+    )
+
+    usage = client.get_usage(PUB_KEY, date(2025, 3, 1), "2025-03-02")
+
+    assert url_without_query(server.last) == (
+        f"{API_BASE}projects/{PUB_KEY}/usage/"
+    )
+    assert query(server.last) == {"from": ["2025-03-01"], "to": ["2025-03-02"]}
+    assert usage.units["traffic"] == "bytes"
+    assert usage.data[0].date == date(2025, 3, 1)
+    assert usage.data[0].traffic == 123456
+
+
+@pytest.mark.parametrize(
+    "metric", [UsageMetricName.TRAFFIC, "traffic"], ids=["enum", "str"]
+)
+def test_get_usage_metric(client, server, metric):
+    server.respond(
+        payload={
+            "metric": "traffic",
+            "unit": "bytes",
+            "data": [{"date": "2025-03-01", "value": 123456}],
+        }
+    )
+
+    usage = client.get_usage_metric(
+        PUB_KEY,
+        metric,
+        datetime(2025, 3, 1, 12, 0, tzinfo=timezone.utc),
+        date(2025, 3, 1),
+    )
+
+    assert url_without_query(server.last) == (
+        f"{API_BASE}projects/{PUB_KEY}/usage/traffic/"
+    )
+    assert query(server.last) == {"from": ["2025-03-01"], "to": ["2025-03-01"]}
+    assert usage.unit == "bytes"
+    assert usage.data[0].value == 123456
+
+
+@pytest.mark.parametrize(
+    "metric,date_from,date_to",
+    [
+        ("bandwidth", "2025-03-01", "2025-03-02"),
+        ("traffic", "2025-03-02", "2025-03-01"),  # from after to
+        ("traffic", "03/01/2025", "2025-03-02"),
+        ("traffic", None, "2025-03-02"),
+        ("traffic", datetime(2025, 3, 1), "2025-03-02"),  # naive
+    ],
+)
+def test_get_usage_metric_validates_arguments(
+    client, server, metric, date_from, date_to
+):
+    with pytest.raises(InvalidParamError):
+        client.get_usage_metric(PUB_KEY, metric, date_from, date_to)
+
+    assert server.requests == []
+
+
+def test_usage_aware_datetimes_use_utc_date(client, server):
+    server.respond(payload={"units": {}, "data": []})
+    moscow = timezone(timedelta(hours=3))
+
+    client.get_usage(
+        PUB_KEY,
+        # 2025-03-01 22:00 UTC
+        datetime(2025, 3, 2, 1, 0, tzinfo=moscow),
+        datetime(2025, 3, 2, 12, 0, tzinfo=moscow),
+    )
+
+    assert query(server.last) == {"from": ["2025-03-01"], "to": ["2025-03-02"]}

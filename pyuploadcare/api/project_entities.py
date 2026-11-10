@@ -10,6 +10,7 @@ server later does not break parsing; the enums below list the known values
 and can be passed wherever such a field is set.
 """
 
+from datetime import date
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -25,6 +26,12 @@ PROJECT_READ_ONLY_FIELDS: Dict[str, Any] = {
     "is_shared_project": True,
     "features": {"team_members": True},
 }
+
+
+class UsageMetricName(str, Enum):
+    TRAFFIC = "traffic"
+    STORAGE = "storage"
+    OPERATIONS = "operations"
 
 
 class AutoModeration(str, Enum):
@@ -132,3 +139,27 @@ class Project(Entity):
 
 class ProjectListResponse(PaginatedResponse):
     results: List[Project]  # type: ignore
+
+
+class UsageDataPoint(Entity):
+    date: date
+    value: int
+
+
+class UsageMetric(Entity):
+    metric: str
+    unit: str
+    data: List[UsageDataPoint]
+
+
+class CombinedUsageDataPoint(Entity):
+    date: date
+    traffic: int = 0
+    storage: int = 0
+    operations: int = 0
+
+
+class CombinedUsage(Entity):
+    # Metric name to its unit, e.g. ``{"traffic": "bytes"}``.
+    units: Dict[str, str]
+    data: List[CombinedUsageDataPoint]

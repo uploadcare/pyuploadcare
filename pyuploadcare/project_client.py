@@ -6,11 +6,19 @@ from pyuploadcare import conf
 from pyuploadcare.api.auth import UploadcareOAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_api import (
+    DateLike,
     ProjectOrPubKey,
     ProjectsAPI,
+    ProjectUsageAPI,
     validate_project_data,
 )
-from pyuploadcare.api.project_entities import Project, ProjectFeatures
+from pyuploadcare.api.project_entities import (
+    CombinedUsage,
+    Project,
+    ProjectFeatures,
+    UsageMetric,
+    UsageMetricName,
+)
 from pyuploadcare.exceptions import InvalidParamError
 
 
@@ -83,6 +91,7 @@ class ProjectAPIClient:
         )
 
         self.projects_api = ProjectsAPI(client=self.http_client)
+        self.usage_api = ProjectUsageAPI(client=self.http_client)
 
     def set_access_token(self, token: str) -> str:
         """Replace the access token used for the following requests."""
@@ -188,3 +197,26 @@ class ProjectAPIClient:
     def delete_project(self, project: ProjectOrPubKey) -> None:
         """Delete a project. Only the project owner can do this."""
         self.projects_api.delete(project)
+
+    def get_usage(
+        self,
+        project: ProjectOrPubKey,
+        date_from: DateLike,
+        date_to: DateLike,
+    ) -> CombinedUsage:
+        """Daily traffic, storage and operations usage of a project.
+
+        Only complete days of the last 90 days in UTC are available:
+        ``date_to`` must be before today. Datetimes must be timezone-aware.
+        """
+        return self.usage_api.combined(project, date_from, date_to)
+
+    def get_usage_metric(
+        self,
+        project: ProjectOrPubKey,
+        metric: Union[UsageMetricName, str],
+        date_from: DateLike,
+        date_to: DateLike,
+    ) -> UsageMetric:
+        """Daily usage of one metric: traffic, storage or operations."""
+        return self.usage_api.metric(project, metric, date_from, date_to)
