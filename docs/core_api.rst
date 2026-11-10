@@ -19,6 +19,23 @@ CDN subdomain (``https://<prefix>.ucarecd.net/``) instead, set
 ``UPLOADCARE_USE_SUBDOMAINS=yes`` in the environment, or pass ``cdn_base``
 explicitly. Subdomains will become the default in the next major release.
 
+Requests can be authorized with an OAuth access token instead of the project
+key pair. It applies to the REST and Upload APIs, which also get the public key
+in the ``X-Uploadcare-Pub-Key`` header; CDN requests never carry the token.
+The token can also be set with the ``UPLOADCARE_OAUTH_TOKEN`` environment
+variable::
+
+    uploadcare = Uploadcare(
+        public_key='<your public key>',
+        oauth_token='<access token>',
+    )
+
+The public key is still needed: uploads and CDN URLs carry it. Obtaining and
+refreshing the token is up to you; pass the new one to the client and the
+following REST and Upload API requests use it::
+
+    uploadcare.set_access_token('<new access token>')
+
 
 Uploading files
 ---------------
