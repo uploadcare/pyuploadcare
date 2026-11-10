@@ -15,4 +15,18 @@ from pyuploadcare.api.search_entities import (  # noqa: F401
     SizeRange,
     TagsFilter,
 )
+from pyuploadcare.api.project_entities import (  # noqa: F401
+    AdaptiveBitrateStreamingFeature,
+    AdaptiveBitrateStreamingProfile,
+    AdaptiveBitrateStreamingProfiles,
+    AdaptiveBitrateStreamingResolution,
+    AutoModeration,
+    MimeTypeFilteringFeature,
+    Project,
+    ProjectFeature,
+    ProjectFeatures,
+    UnsafeContentDetectionFeature,
+    UploadsFeature,
+)
 from pyuploadcare.client import Uploadcare  # noqa: F401
+from pyuploadcare.project_client import ProjectAPIClient  # noqa: F401

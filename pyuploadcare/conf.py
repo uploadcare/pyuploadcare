@@ -17,6 +17,7 @@ __all__ = []
 DEFAULT = object()
 DEFAULT_API_BASE = "https://api.uploadcare.com/"
 DEFAULT_UPLOAD_BASE = "https://upload.uploadcare.com/"
+DEFAULT_PROJECT_API_BASE = "https://api.uploadcare.com/"
 DEFAULT_CDN_BASE = "https://ucarecdn.com/"
 DEFAULT_USE_SUBDOMAINS = "no"
 DEFAULT_SUBDOMAIN_PATTERN = "https://{prefix}.ucarecd.net/"
@@ -28,9 +29,13 @@ api_version = "0.7"
 api_base = os.getenv("UPLOADCARE_API_BASE", DEFAULT_API_BASE)
 upload_base = os.getenv("UPLOADCARE_UPLOAD_BASE", DEFAULT_UPLOAD_BASE)
 
-# OAuth access token. When set, it authorizes the REST and Upload APIs
-# instead of the project key pair.
+# OAuth access token for the Project API and, when set, for the REST and
+# Upload APIs instead of the project key pair.
 oauth_token = os.getenv("UPLOADCARE_OAUTH_TOKEN")
+
+project_api_base = os.getenv(
+    "UPLOADCARE_PROJECT_API_BASE", DEFAULT_PROJECT_API_BASE
+)
 _forced_cdn_base = os.getenv("UPLOADCARE_CDN_BASE")
 
 if _forced_cdn_base:
