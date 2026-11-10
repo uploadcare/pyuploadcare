@@ -117,14 +117,14 @@ class UploadcareOAuth(AuthBase):
 
     def __init__(
         self,
-        access_token: Union[str, bytes],
-        public_key: Optional[str] = None,
+        access_token: str | bytes,
+        public_key: str | None = None,
     ) -> None:
         self._access_token = self._validate_token(access_token)
         self.public_key = public_key
 
     @staticmethod
-    def _validate_token(access_token: Union[str, bytes, None]) -> str:
+    def _validate_token(access_token: str | bytes | None) -> str:
         if isinstance(access_token, bytes):
             access_token = to_str(access_token)
         if not isinstance(access_token, str) or not access_token.strip():
@@ -135,7 +135,7 @@ class UploadcareOAuth(AuthBase):
     def access_token(self) -> str:
         return self._access_token
 
-    def set_access_token(self, access_token: Union[str, bytes]) -> str:
+    def set_access_token(self, access_token: str | bytes) -> str:
         """Replace the access token and return the new one.
 
         Requests already in flight keep the token they were sent with.
