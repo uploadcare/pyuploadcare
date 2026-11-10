@@ -1,6 +1,6 @@
 [project]
 name = "pyuploadcare"
-version = "7.0.0"
+version = "7.0.1"
 description = "Python library for Uploadcare.com"
 readme = "README.md"
 requires-python = ">=3.10,<3.16"
