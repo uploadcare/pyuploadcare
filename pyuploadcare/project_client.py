@@ -7,6 +7,7 @@ from pyuploadcare.api.auth import UploadcareOAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_api import (
     DateLike,
+    ProjectMetaAPI,
     ProjectModerationAPI,
     ProjectOrPubKey,
     ProjectsAPI,
@@ -15,6 +16,7 @@ from pyuploadcare.api.project_api import (
 )
 from pyuploadcare.api.project_entities import (
     CombinedUsage,
+    ModerationCategory,
     ModerationThreshold,
     Project,
     ProjectFeatures,
@@ -95,6 +97,7 @@ class ProjectAPIClient:
         self.projects_api = ProjectsAPI(client=self.http_client)
         self.usage_api = ProjectUsageAPI(client=self.http_client)
         self.moderation_api = ProjectModerationAPI(client=self.http_client)
+        self.meta_api = ProjectMetaAPI(client=self.http_client)
 
     def set_access_token(self, token: str) -> str:
         """Replace the access token used for the following requests."""
@@ -245,3 +248,14 @@ class ProjectAPIClient:
             ... ])
         """
         return self.moderation_api.set(project, thresholds)
+
+    def list_moderation_categories(self) -> List[ModerationCategory]:
+        """Available content moderation categories.
+
+        Their ids are what ``ModerationThreshold.category_id`` takes.
+        """
+        return self.meta_api.moderation_categories()
+
+    def list_mime_types(self) -> List[str]:
+        """MIME types accepted by MIME type filtering."""
+        return self.meta_api.mime_types()

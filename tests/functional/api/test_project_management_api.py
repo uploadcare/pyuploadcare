@@ -634,3 +634,60 @@ def test_set_moderation_thresholds_validates(client, server, thresholds):
         client.set_moderation_thresholds(PUB_KEY, thresholds)
 
     assert server.requests == []
+
+
+# Meta
+
+
+def test_list_moderation_categories(client, server):
+    server.respond(
+        payload={
+            "categories": [
+                {
+                    "id": 7,
+                    "parent_id": None,
+                    "name": "Alcohol",
+                    "description": "",
+                    "level": 1,
+                },
+                {
+                    "id": 8,
+                    "parent_id": 7,
+                    "name": "Alcoholic Beverages",
+                    "description": "Bottles.",
+                    "level": 2,
+                },
+            ]
+        }
+    )
+
+    categories = client.list_moderation_categories()
+
+    assert server.last.method == "GET"
+    assert str(server.last.url) == f"{API_BASE}meta/moderation/categories/"
+    assert server.last.headers["Authorization"] == f"Bearer {TOKEN}"
+    assert [(c.id, c.parent_id, c.level, c.name) for c in categories] == [
+        (7, None, 1, "Alcohol"),
+        (8, 7, 2, "Alcoholic Beverages"),
+    ]
+
+
+def test_list_mime_types(client, server):
+    server.respond(payload={"mime_types": ["application/cbor", "image/png"]})
+
+    assert client.list_mime_types() == ["application/cbor", "image/png"]
+    assert server.last.method == "GET"
+    assert str(server.last.url) == f"{API_BASE}meta/mime/types/"
+
+
+def test_meta_with_custom_api_base(server):
+    client = make_client(
+        server, api_base="http://localhost:8000/apps/api/project-api/v1/"
+    )
+    server.respond(payload={"mime_types": []})
+
+    client.list_mime_types()
+
+    assert str(server.last.url) == (
+        "http://localhost:8000/apps/api/project-api/v1/meta/mime/types/"
+    )

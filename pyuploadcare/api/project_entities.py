@@ -74,7 +74,7 @@ class UploadsFeature(Entity):
 
 
 class MimeTypeFilteringFeature(ProjectFeature):
-    # Allowed MIME types, e.g. ``["image/jpeg", "image/avif"]``.
+    # Allowed MIME types, from ``ProjectAPIClient.list_mime_types()``.
     mime_types: Optional[List[str]] = None
 
 
@@ -196,3 +196,21 @@ class ModerationThreshold(Entity):
 
 class ModerationThresholdsResponse(Response):
     thresholds: List[ModerationThreshold]
+
+
+class ModerationCategory(Entity):
+    id: int
+    parent_id: Optional[int] = None
+    name: str
+    # Empty string if the category has no description.
+    description: str = ""
+    # Depth of the category in the category tree, starting at 1.
+    level: int
+
+
+class ModerationCategoriesResponse(Response):
+    categories: List[ModerationCategory]
+
+
+class MimeTypesResponse(Response):
+    mime_types: List[str]
