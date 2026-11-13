@@ -32,7 +32,7 @@ from pyuploadcare.api import (
     WebhooksAPI,
 )
 from pyuploadcare.api.api import URLAPI
-from pyuploadcare.api.auth import UploadcareAuth
+from pyuploadcare.api.auth import UploadcareAuth, UploadcareOAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import (
     FileSearchInfo,
@@ -69,7 +69,8 @@ class Uploadcare:
         - upload_base: Upload API base url.
         - cdn_base: CDN base url.
         - api_version: API version.
-        - signed_uploads: Enable signed uploads.
+        - signed_uploads: Enable signed uploads. Ignored when ``oauth_token``
+          is set: the token authorizes uploads instead of a signature.
         - signed_uploads_ttl: Signed uploads signature timeout in seconds.
         - verify_api_ssl: Verify Rest API SSL certificate.
         - verify_upload_ssl: Verify Upload API SSL certificate.
@@ -81,7 +82,14 @@ class Uploadcare:
         - multipart_min_file_size: Mininum file size to use multipart uploading.
         - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         - auth_class: Authentication class to use for API.
+          Ignored when ``oauth_token`` is set.
         - secure_url_builder: URL builder for secure delivery.
+        - oauth_token: OAuth access token. When set, REST and Upload API
+          requests are authorized with it (``Authorization: Bearer``, plus
+          the public key in ``X-Uploadcare-Pub-Key``) instead of the project
+          key pair; ``set_access_token()`` replaces it for both. Uploads are
+          not signed, so ``secret_key`` is not needed. CDN requests never
+          carry the token.
 
     """
 
@@ -105,6 +113,7 @@ class Uploadcare:
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: Type[UploadcareAuth] = UploadcareAuth,
         secure_url_builder: Optional[BaseSecureUrlBuilder] = None,
+        oauth_token: Optional[str] = conf.oauth_token,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -131,11 +140,29 @@ class Uploadcare:
 
         self.timeout = timeout
 
-        auth = auth_class(public_key, secret_key, self.api_version)  # type: ignore
+        # One instance for the REST and Upload clients, so that replacing the
+        # token applies to both at once.
+        self.oauth: Optional[UploadcareOAuth] = (
+            UploadcareOAuth(oauth_token, public_key=public_key)
+            if oauth_token
+            else None
+        )
+
+        rest_auth: UploadcareAuth | UploadcareOAuth
+        rest_headers: Dict[str, str] = {}
+        if self.oauth is not None:
+            rest_auth = self.oauth
+            # `UploadcareAuth` sets it when the key pair is used.
+            rest_headers["Accept"] = (
+                f"application/vnd.uploadcare-v{self.api_version}+json"
+            )
+        else:
+            rest_auth = auth_class(public_key, secret_key, self.api_version)  # type: ignore
 
         self.rest_client = Client(
             base_url=api_base,
-            auth=auth,
+            auth=rest_auth,
+            headers=rest_headers,
             verify=(
                 DEFAULT_SSL_CONTEXT
                 if verify_api_ssl is True
@@ -149,6 +176,7 @@ class Uploadcare:
 
         self.upload_client = Client(
             base_url=upload_base,
+            auth=self.oauth,
             verify=(
                 DEFAULT_SSL_CONTEXT
                 if verify_upload_ssl is True
@@ -160,6 +188,8 @@ class Uploadcare:
             public_key=public_key,
         )
 
+        # CDN requests never carry the OAuth token: `cdn_base` may point to
+        # a third-party CDN.
         self.cdn_client = Client(
             base_url=cdn_base,
             verify=(
@@ -367,6 +397,11 @@ class Uploadcare:
         )
         return file
 
+    @property
+    def _sign_uploads(self) -> bool:
+        # An OAuth token authorizes uploads in place of a signature.
+        return bool(self.signed_uploads) and self.oauth is None
+
     @staticmethod
     def _format_store(store: Optional[bool]) -> str:
         values_map: Dict[Any, str] = {
@@ -428,7 +463,7 @@ class Uploadcare:
         response = self.upload_api.upload(
             files=files,
             store=self._format_store(store),
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             common_metadata=common_metadata,
             tags=tags,
@@ -484,7 +519,7 @@ class Uploadcare:
             file_size=size,
             content_type=mime_type,
             store=self._format_store(store),
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             metadata=metadata,
             tags=tags,
@@ -559,7 +594,7 @@ class Uploadcare:
             store=store,
             filename=filename,
             metadata=metadata,
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
             check_duplicates=check_duplicates,
             save_duplicates=save_duplicates,
@@ -734,7 +769,7 @@ class Uploadcare:
         file_urls = [str(file_) for file_ in files]
         group_info = self.upload_api.create_group(
             files=file_urls,
-            secure_upload=self.signed_uploads,
+            secure_upload=self._sign_uploads,
             expire=int(time()) + self.signed_uploads_ttl,
         )
 
@@ -1009,6 +1044,18 @@ class Uploadcare:
         """Get info about account project."""
 
         return self.project_api.retrieve()
+
+    def set_access_token(self, token: str) -> str:
+        """Replace the OAuth access token used for the following requests.
+
+        Only available when the client was created with ``oauth_token``.
+        """
+        if self.oauth is None:
+            raise ValueError(
+                "the client is not authorized with OAuth: "
+                "pass `oauth_token` to use an access token"
+            )
+        return self.oauth.set_access_token(token)
 
     def generate_upload_signature(self) -> Tuple[int, str]:
         """Expiration and signature for signed uploads."""
