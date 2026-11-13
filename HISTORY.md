@@ -13,10 +13,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - OAuth 2.0 access token auth, `UploadcareOAuth` (`Authorization: Bearer`). The caller obtains
   and refreshes the token and replaces it with `set_access_token()`.
   - `Uploadcare` takes an optional `oauth_token`, read from the `UPLOADCARE_OAUTH_TOKEN` setting
-    by default. When it is set, the REST and Upload APIs are authorized with it instead of the
-    project key pair and get the public key in the `X-Uploadcare-Pub-Key` header. Uploads are
-    not signed, so `secret_key` is not needed. `Uploadcare.set_access_token()` replaces the token
-    for both. CDN requests never carry it. Without a token nothing changes.
+    by default, to authorize the REST and Upload APIs.
 
 ### Changed
 
