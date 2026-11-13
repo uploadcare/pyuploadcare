@@ -680,9 +680,7 @@ class Uploadcare:
                     uuids.append(file_)
                 else:
                     raise ValueError(
-                        "Invalid type for sequence item: {0}".format(
-                            type(file_)
-                        )
+                        f"Invalid type for sequence item: {type(file_)}"
                     )
 
             return uuids

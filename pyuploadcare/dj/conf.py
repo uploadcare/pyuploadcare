@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import typing
 from copy import deepcopy
 
@@ -106,18 +104,18 @@ if not config["cdn_base"]:
     )
 
 
-user_agent_extension = "Django/{0}; PyUploadcare-Django/{1}".format(
-    django_version(), library_version
+user_agent_extension = (
+    f"Django/{django_version()}; PyUploadcare-Django/{library_version}"
 )
 
-user_agent_extension_short = "PyUploadcare-Django/{0}".format(library_version)
+user_agent_extension_short = f"PyUploadcare-Django/{library_version}"
 
 # Legacy widget (uploadcare.js)
 
 
 def get_legacy_widget_js_url() -> str:
     widget_config = config["legacy_widget"]
-    filename = "uploadcare.{0}.js".format(widget_config["build"]).replace(
+    filename = "uploadcare.{}.js".format(widget_config["build"]).replace(
         "..", "."
     )
     hosted_url = (
@@ -125,7 +123,7 @@ def get_legacy_widget_js_url() -> str:
             version=widget_config["version"], filename=filename
         )
     )
-    local_url = "uploadcare/{filename}".format(filename=filename)
+    local_url = f"uploadcare/{filename}"
     override_url = widget_config["override_js_url"]
 
     if override_url:
@@ -141,14 +139,14 @@ def get_legacy_widget_js_url() -> str:
 
 def get_widget_js_url() -> str:
     widget_config = config["widget"]
-    filename = "file-uploader.{0}.min.js".format(
+    filename = "file-uploader.{}.min.js".format(
         widget_config["build"]
     ).replace("..", ".")
     hosted_url = (
         "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@{version}"
         + "/web/{filename}"
     ).format(version=widget_config["version"], filename=filename)
-    local_url = "uploadcare/{filename}".format(filename=filename)
+    local_url = f"uploadcare/{filename}"
     override_url = widget_config["override_js_url"]
     if override_url:
         return override_url
@@ -160,14 +158,14 @@ def get_widget_js_url() -> str:
 
 def get_widget_css_url(variant: WidgetVariantType) -> str:
     widget_config = config["widget"]
-    filename = "uc-file-uploader-{0}.{1}.min.css".format(
+    filename = "uc-file-uploader-{}.{}.min.css".format(
         variant, widget_config["build"]
     ).replace("..", ".")
     hosted_url = (
         "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader@{version}"
         + "/web/{filename}"
     ).format(version=widget_config["version"], filename=filename)
-    local_url = "uploadcare/{filename}".format(filename=filename)
+    local_url = f"uploadcare/{filename}"
     override_url = widget_config["override_css_url"][variant]
     if override_url:
         return override_url

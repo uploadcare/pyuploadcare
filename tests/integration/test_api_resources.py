@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import random
 import time
 from collections.abc import Iterable, Iterator
@@ -67,7 +65,7 @@ def test_failed_upload_when_file_is_opened_in_txt_mode(small_file, uploadcare):
     with pytest.raises(
         TypeError, match="Multipart file uploads must be opened in binary mode"
     ):
-        with open(small_file.name, "rt") as fh:
+        with open(small_file.name) as fh:
             uploadcare.upload(fh)
 
 

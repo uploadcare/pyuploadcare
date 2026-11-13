@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 from typing import Any
 from urllib.parse import urlparse
 
@@ -49,12 +46,10 @@ class LegacyFileWidget(TextInput):
         if attrs is not None:
             default_attrs.update(attrs)
 
-        super(LegacyFileWidget, self).__init__(default_attrs)
+        super().__init__(default_attrs)
 
     def render(self, name, value, attrs=None, renderer=None):
-        return super(LegacyFileWidget, self).render(
-            name, value, attrs, renderer
-        )
+        return super().render(name, value, attrs, renderer)
 
 
 class FileWidget(TextInput):
@@ -62,7 +57,7 @@ class FileWidget(TextInput):
 
     def __init__(self, attrs=None):
         self._client = get_uploadcare_client()
-        super(FileWidget, self).__init__(attrs)
+        super().__init__(attrs)
 
     def _widget_options(self, attrs=None) -> dict[str, Any]:
         options: dict[str, Any] = {
@@ -163,10 +158,10 @@ class ImageField(FileField):
 
     def __init__(self, manual_crop=None, *args, **kwargs):
         self.manual_crop = manual_crop
-        super(ImageField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def widget_attrs(self, widget):
-        attrs = super(ImageField, self).widget_attrs(widget)
+        attrs = super().widget_attrs(widget)
         if self.legacy_widget:
             attrs["data-images-only"] = ""
             if self.manual_crop is not None:
@@ -222,7 +217,7 @@ class ImageGroupField(FileGroupField):
     """Django form field that sets up ``FileWidget`` in image multiupload mode."""
 
     def widget_attrs(self, widget):
-        attrs = super(ImageGroupField, self).widget_attrs(widget)
+        attrs = super().widget_attrs(widget)
         if self.legacy_widget:
             attrs["data-images-only"] = ""
         else:

@@ -86,9 +86,7 @@ def upload_from_url(arg_namespace, client: Uploadcare):  # noqa: C901
                 break
             if status in ("failed", "error"):
                 raise UploadError(
-                    "could not upload file from url: {0}".format(
-                        file_from_url.info
-                    )
+                    f"could not upload file from url: {file_from_url.info}"
                 )
             time.sleep(1)
         else:

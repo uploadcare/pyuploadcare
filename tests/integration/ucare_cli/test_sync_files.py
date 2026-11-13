@@ -75,10 +75,7 @@ def test_sync_patterns(sync_path, uploadcare):
     uuids = [str(file.uuid) for file in file_list]
 
     expected_filenames = [
-        "{}_{}".format(
-            str(file.uuid),
-            os.path.splitext(file.filename)[1],
-        )
+        f"{file.uuid}_{os.path.splitext(file.filename)[1]}"
         for file in file_list
     ]
 

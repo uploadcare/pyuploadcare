@@ -317,7 +317,7 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
         data: dict | None = None,
     ):
         try:
-            return super(WebhooksAPI, self).update(resource_uuid, data)
+            return super().update(resource_uuid, data)
         except InvalidRequestError as request_error:
             self._process_exceptions(request_error)
 
@@ -326,7 +326,7 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
         data: dict | None = None,
     ):
         try:
-            return super(WebhooksAPI, self).create(data)
+            return super().create(data)
         except InvalidRequestError as request_error:
             self._process_exceptions(request_error)
 

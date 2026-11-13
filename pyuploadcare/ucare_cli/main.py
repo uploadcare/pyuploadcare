@@ -1,7 +1,4 @@
 #!/usr/bin/python
-# coding: utf-8
-
-from __future__ import unicode_literals
 
 import argparse
 import logging
@@ -41,7 +38,7 @@ logger = logging.getLogger("pyuploadcare")
 def ucare_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--version", action="version", version="ucare {0}".format(__version__)
+        "--version", action="version", version=f"ucare {__version__}"
     )
 
     subparsers = parser.add_subparsers()
@@ -82,13 +79,13 @@ def ucare_argparser():
         "--api_base",
         help="API url, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(conf.api_base),
+        f" Default value is {conf.api_base}",
     )
     parser.add_argument(
         "--upload_base",
         help="Upload API url, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(conf.upload_base),
+        f" Default value is {conf.upload_base}",
     )
     parser.add_argument(
         "--no_check_upload_certificate",
@@ -108,7 +105,7 @@ def ucare_argparser():
         "--api_version",
         help="API version, can be read from uploadcare.ini"
         " and ~/.uploadcare config files."
-        " Default value is {0}".format(conf.api_version),
+        f" Default value is {conf.api_version}",
     )
 
     return parser
@@ -128,7 +125,7 @@ def main(  # noqa: C901
         try:
             arg_namespace.func(arg_namespace, client)
         except UploadcareException as exc:
-            pprint("ERROR: {0}".format(exc))
+            pprint(f"ERROR: {exc}")
 
 
 if __name__ == "__main__":
