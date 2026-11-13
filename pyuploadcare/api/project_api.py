@@ -7,7 +7,7 @@ the user's OAuth access token (``pyuploadcare.api.auth.UploadcareOAuth``).
 
 import re
 from collections.abc import Iterable, Iterator
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from re import Pattern
 from typing import Any, cast
 
@@ -41,7 +41,6 @@ RE_PUB_KEY: Pattern[str] = re.compile(r"\w+\Z", re.ASCII)
 
 ProjectOrPubKey = Project | str
 ProjectPayload = Project | dict[str, Any]
-DateLike = date | datetime | str
 
 
 def _pub_key(project: ProjectOrPubKey) -> str:
@@ -73,32 +72,6 @@ def validate_project_data(data: ProjectPayload) -> Project:
 
 def _project_payload(data: ProjectPayload) -> dict[str, Any]:
     return validate_project_data(data).to_payload()
-
-
-def _utc_date(name: str, value: datetime) -> date:
-    # The server counts days in UTC.
-    try:
-        aware = ensure_aware_datetime(value)
-    except ValueError:
-        raise InvalidParamError(
-            f"`{name}` must be a timezone-aware datetime, got {value!r}"
-        ) from None
-    return aware.astimezone(timezone.utc).date()
-
-
-def _to_date(name: str, value: DateLike) -> date:
-    # `datetime` is a subclass of `date`, so check it first.
-    if isinstance(value, datetime):
-        return _utc_date(name, value)
-    if isinstance(value, date):
-        return value
-    try:
-        return date.fromisoformat(value)
-    except (TypeError, ValueError):
-        raise InvalidParamError(
-            f"`{name}` must be a date or an ISO 8601 date string "
-            f"(YYYY-MM-DD), got {value!r}"
-        )
 
 
 def _validate_threshold(
@@ -242,8 +215,8 @@ class ProjectsAPI(ProjectAPIBase):
 class ProjectUsageAPI(ProjectAPIBase):
     """Daily usage statistics of a project.
 
-    Dates are ``date`` objects, ``YYYY-MM-DD`` strings or timezone-aware
-    datetimes, which are converted to their UTC date. The server only serves
+    Dates are timezone-aware datetimes; only their UTC date is sent. The
+    server only serves
     complete days of the last 90 days in UTC: ``date_to`` must be earlier
     than today, and ``date_from`` no more than 90 days back, today included.
     """
@@ -254,9 +227,18 @@ class ProjectUsageAPI(ProjectAPIBase):
     }
 
     @staticmethod
-    def _date_range(date_from: DateLike, date_to: DateLike) -> dict[str, str]:
-        from_ = _to_date("date_from", date_from)
-        to = _to_date("date_to", date_to)
+    def _date_range(date_from: datetime, date_to: datetime) -> dict[str, str]:
+        try:
+            # The server counts days in UTC.
+            from_, to = (
+                ensure_aware_datetime(value).astimezone(timezone.utc).date()
+                for value in (date_from, date_to)
+            )
+        except ValueError:
+            raise InvalidParamError(
+                "`date_from` and `date_to` must be timezone-aware datetimes, "
+                f"got {date_from!r} and {date_to!r}"
+            ) from None
         if from_ > to:
             raise InvalidParamError(
                 f"`date_from` must not be after `date_to`: {from_} > {to}"
@@ -266,8 +248,8 @@ class ProjectUsageAPI(ProjectAPIBase):
     def combined(
         self,
         project: ProjectOrPubKey,
-        date_from: DateLike,
-        date_to: DateLike,
+        date_from: datetime,
+        date_to: datetime,
     ) -> CombinedUsage:
         """All metrics (traffic, storage, operations) day by day."""
         url = self._project_url(
@@ -284,8 +266,8 @@ class ProjectUsageAPI(ProjectAPIBase):
         self,
         project: ProjectOrPubKey,
         metric: UsageMetricName | str,
-        date_from: DateLike,
-        date_to: DateLike,
+        date_from: datetime,
+        date_to: datetime,
     ) -> UsageMetric:
         """One metric day by day.
 

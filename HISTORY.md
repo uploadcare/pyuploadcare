@@ -24,10 +24,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     `ModerationCategory` and usage entities. Project updates are partial: only explicitly set
     fields are sent, and read-only fields never are. Requests are validated locally before they
     are sent.
-  - Usage parameters `date_from` and `date_to` take a day: a `date` or a `YYYY-MM-DD` string.
-    They are an exception to the 7.0 rule that rejects plain `date` objects, which covers inputs
-    that mean a point in time. A `datetime` there must be timezone-aware, as everywhere else, and
-    is converted to its UTC date.
+  - Usage parameters `date_from` and `date_to` take timezone-aware datetimes, as everywhere
+    else since 7.0; only their UTC date is sent.
   - The `UPLOADCARE_PROJECT_API_BASE` setting.
 
 ### Changed
