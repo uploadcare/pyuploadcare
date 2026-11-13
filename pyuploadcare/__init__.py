@@ -1,5 +1,5 @@
 # isort: skip_file
-__version__ = "7.0.1"
+__version__ = "7.1.0"
 
 from pyuploadcare.resources.file import File  # noqa: F401
 from pyuploadcare.resources.file_group import FileGroup  # noqa: F401
@@ -15,4 +15,20 @@ from pyuploadcare.api.search_entities import (  # noqa: F401
     SizeRange,
     TagsFilter,
 )
+from pyuploadcare.api.project_entities import (  # noqa: F401
+    AdaptiveBitrateStreamingFeature,
+    AdaptiveBitrateStreamingProfile,
+    AdaptiveBitrateStreamingProfiles,
+    AdaptiveBitrateStreamingResolution,
+    AutoModeration,
+    MimeTypeFilteringFeature,
+    ModerationThreshold,
+    Project,
+    ProjectFeature,
+    ProjectFeatures,
+    UnsafeContentDetectionFeature,
+    UploadsFeature,
+    UsageMetricName,
+)
 from pyuploadcare.client import Uploadcare  # noqa: F401
+from pyuploadcare.project_client import ProjectAPIClient  # noqa: F401

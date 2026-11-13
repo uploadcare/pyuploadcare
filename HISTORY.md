@@ -9,14 +9,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [7.1.0](https://github.com/uploadcare/pyuploadcare/compare/v7.0.1...v7.1.0) - Unreleased
 
 ### Added
-
 - OAuth 2.0 access token auth, `UploadcareOAuth` (`Authorization: Bearer`). The caller obtains
   and refreshes the token and replaces it with `set_access_token()`.
   - `Uploadcare` takes an optional `oauth_token`, read from the `UPLOADCARE_OAUTH_TOKEN` setting
     by default, to authorize the REST and Upload APIs.
+- Support for the Project API, which manages the projects of an account and is authorized with an
+  OAuth access token:
+  - `ProjectAPIClient` with methods for projects (`list_projects()`, `count_projects()`,
+    `get_project()`, `create_project()`, `update_project()`, `delete_project()`), usage
+    (`get_usage()`, `get_usage_metric()`), content moderation (`get_moderation_thresholds()`,
+    `set_moderation_thresholds()`, `list_moderation_categories()`) and `list_mime_types()`.
+  - Low-level `ProjectsAPI`, `ProjectUsageAPI`, `ProjectModerationAPI` and `ProjectMetaAPI`.
+  - Typed models: `Project`, `ProjectFeatures` and the per-feature models, `ModerationThreshold`,
+    `ModerationCategory` and usage entities. Project updates are partial: only explicitly set
+    fields are sent, and read-only fields never are. Requests are validated locally before they
+    are sent.
+  - The `UPLOADCARE_PROJECT_API_BASE` setting.
 
 ### Changed
 
+- The user agent omits the public key segment when a client has none.
 - Multipart upload chunks are sent to their presigned storage URLs without the client's auth.
 
 

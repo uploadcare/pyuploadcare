@@ -88,6 +88,7 @@ Contents
    quickstart
    django-widget
    core_api
+   project_api
    testing
    security_issues
    feedback
