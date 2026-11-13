@@ -1,7 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
-from typing import Any, Dict
+from typing import Any
 from urllib.parse import urlparse
 
 from django.core.exceptions import ValidationError
@@ -64,8 +64,8 @@ class FileWidget(TextInput):
         self._client = get_uploadcare_client()
         super(FileWidget, self).__init__(attrs)
 
-    def _widget_options(self, attrs=None) -> Dict[str, Any]:
-        options: Dict[str, Any] = {
+    def _widget_options(self, attrs=None) -> dict[str, Any]:
+        options: dict[str, Any] = {
             "multiple": False,
             "user-agent-integration": user_agent_extension_short,
         }
@@ -205,7 +205,7 @@ class FileGroupField(Field):
         return isinstance(self.widget, LegacyFileWidget)
 
     def widget_attrs(self, widget):
-        attrs: Dict[str, Any] = {}
+        attrs: dict[str, Any] = {}
         if self.legacy_widget:
             attrs["data-multiple"] = ""
             if not self.required:

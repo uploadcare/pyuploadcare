@@ -13,7 +13,7 @@ and can be passed wherever such a field is set.
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import (
     Field,
@@ -73,7 +73,7 @@ class ModerationFileType(str, Enum):
 class ProjectFeature(Entity):
     """A feature that can only be switched on and off."""
 
-    is_enabled: Optional[bool] = None
+    is_enabled: bool | None = None
 
 
 class UploadsFeature(Entity):
@@ -86,22 +86,22 @@ class UploadsFeature(Entity):
     """
 
     # `None` means the plan's maximum.
-    filesize_limit_mb: Optional[int] = Field(
+    filesize_limit_mb: int | None = Field(
         default=None,
         ge=0,
         strict=True,
         serialization_alias="filesize_limit",
     )
-    autostore: Optional[bool] = None
+    autostore: bool | None = None
     # `None` means the default value, 75 megapixels.
-    image_resolution_limit_mp: Optional[int] = Field(
+    image_resolution_limit_mp: int | None = Field(
         default=None,
         ge=0,
         le=75,
         strict=True,
         serialization_alias="image_resolution_limit",
     )
-    is_signed_upload_enabled: Optional[bool] = None
+    is_signed_upload_enabled: bool | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -132,17 +132,17 @@ class UploadsFeature(Entity):
 
 class MimeTypeFilteringFeature(ProjectFeature):
     # Allowed MIME types, from ``ProjectAPIClient.list_mime_types()``.
-    mime_types: Optional[List[str]] = None
+    mime_types: list[str] | None = None
 
 
 class UnsafeContentDetectionFeature(ProjectFeature):
     # One of `AutoModeration`.
-    auto_moderation: Optional[str] = None
+    auto_moderation: str | None = None
 
 
 class AdaptiveBitrateStreamingProfile(Entity):
     # `AdaptiveBitrateStreamingResolution` values, 1 to 8 unique items.
-    resolutions: List[str] = Field(min_length=1, max_length=8)
+    resolutions: list[str] = Field(min_length=1, max_length=8)
 
 
 class AdaptiveBitrateStreamingProfiles(Entity):
@@ -153,44 +153,42 @@ class AdaptiveBitrateStreamingProfiles(Entity):
     """
 
     h264: AdaptiveBitrateStreamingProfile
-    h265: Optional[AdaptiveBitrateStreamingProfile] = None
+    h265: AdaptiveBitrateStreamingProfile | None = None
 
 
 class AdaptiveBitrateStreamingFeature(ProjectFeature):
-    profiles: Optional[AdaptiveBitrateStreamingProfiles] = None
+    profiles: AdaptiveBitrateStreamingProfiles | None = None
 
 
 class TeamMembersFeature(Entity):
     # Read-only. Counts the project owner too.
-    team_size: Optional[int] = None
+    team_size: int | None = None
 
 
 class ProjectFeatures(Entity):
-    uploads: Optional[UploadsFeature] = None
-    mime_type_filtering: Optional[MimeTypeFilteringFeature] = None
-    gif_to_video_conversion: Optional[ProjectFeature] = None
-    video_processing: Optional[ProjectFeature] = None
-    malware_protection: Optional[ProjectFeature] = None
-    svg_validation: Optional[ProjectFeature] = None
-    unsafe_content_detection: Optional[UnsafeContentDetectionFeature] = None
-    adaptive_bitrate_streaming: Optional[AdaptiveBitrateStreamingFeature] = (
-        None
-    )
-    document_conversion: Optional[ProjectFeature] = None
-    exif_metadata_removal: Optional[ProjectFeature] = None
-    ai_operations: Optional[ProjectFeature] = None
-    team_members: Optional[TeamMembersFeature] = None
+    uploads: UploadsFeature | None = None
+    mime_type_filtering: MimeTypeFilteringFeature | None = None
+    gif_to_video_conversion: ProjectFeature | None = None
+    video_processing: ProjectFeature | None = None
+    malware_protection: ProjectFeature | None = None
+    svg_validation: ProjectFeature | None = None
+    unsafe_content_detection: UnsafeContentDetectionFeature | None = None
+    adaptive_bitrate_streaming: AdaptiveBitrateStreamingFeature | None = None
+    document_conversion: ProjectFeature | None = None
+    exif_metadata_removal: ProjectFeature | None = None
+    ai_operations: ProjectFeature | None = None
+    team_members: TeamMembersFeature | None = None
 
 
 class Project(Entity):
-    pub_key: Optional[str] = None
-    name: Optional[str] = None
-    is_blocked: Optional[bool] = None
-    is_search_index_allowed: Optional[bool] = None
-    is_shared_project: Optional[bool] = None
-    features: Optional[ProjectFeatures] = None
+    pub_key: str | None = None
+    name: str | None = None
+    is_blocked: bool | None = None
+    is_search_index_allowed: bool | None = None
+    is_shared_project: bool | None = None
+    features: ProjectFeatures | None = None
 
-    def to_payload(self) -> Dict[str, Any]:
+    def to_payload(self) -> dict[str, Any]:
         """The request body: explicitly set, writable fields in API units."""
         return self.model_dump(
             mode="json",
@@ -201,7 +199,7 @@ class Project(Entity):
 
 
 class ProjectListResponse(PaginatedResponse):
-    results: List[Project]  # type: ignore
+    results: list[Project]  # type: ignore
 
 
 class UsageDataPoint(Entity):
@@ -212,7 +210,7 @@ class UsageDataPoint(Entity):
 class UsageMetric(Entity):
     metric: str
     unit: str
-    data: List[UsageDataPoint]
+    data: list[UsageDataPoint]
 
 
 class CombinedUsageDataPoint(Entity):
@@ -224,8 +222,8 @@ class CombinedUsageDataPoint(Entity):
 
 class CombinedUsage(Entity):
     # Metric name to its unit, e.g. ``{"traffic": "bytes"}``.
-    units: Dict[str, str]
-    data: List[CombinedUsageDataPoint]
+    units: dict[str, str]
+    data: list[CombinedUsageDataPoint]
 
 
 class ModerationThreshold(Entity):
@@ -236,15 +234,15 @@ class ModerationThreshold(Entity):
     threshold_percentage: Decimal = Field(
         ge=0, le=100, max_digits=5, decimal_places=2
     )
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     @field_serializer("threshold_percentage")
     def _serialize_threshold(self, value: Decimal) -> str:
         # The API takes the decimal as a string; `str()` keeps it exact.
         return str(value)
 
-    def to_payload(self) -> Dict[str, Any]:
+    def to_payload(self) -> dict[str, Any]:
         """The request body item: read-only timestamps are left out."""
         return self.model_dump(
             mode="json",
@@ -253,12 +251,12 @@ class ModerationThreshold(Entity):
 
 
 class ModerationThresholdsResponse(Response):
-    thresholds: List[ModerationThreshold]
+    thresholds: list[ModerationThreshold]
 
 
 class ModerationCategory(Entity):
     id: int
-    parent_id: Optional[int] = None
+    parent_id: int | None = None
     name: str
     # Empty string if the category has no description.
     description: str = ""
@@ -267,8 +265,8 @@ class ModerationCategory(Entity):
 
 
 class ModerationCategoriesResponse(Response):
-    categories: List[ModerationCategory]
+    categories: list[ModerationCategory]
 
 
 class MimeTypesResponse(Response):
-    mime_types: List[str]
+    mime_types: list[str]

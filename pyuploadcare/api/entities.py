@@ -1,11 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Annotated, Any, Literal, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, PrivateAttr
-from typing_extensions import Annotated, Literal, NamedTuple
+from typing_extensions import NamedTuple
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
@@ -68,43 +68,43 @@ WebhookEvent = Literal[
 
 
 class ImageInfo(Entity):
-    color_mode: Optional[ColorMode] = None
-    orientation: Optional[int] = None
+    color_mode: ColorMode | None = None
+    orientation: int | None = None
     format: str
-    sequence: Optional[bool] = None
+    sequence: bool | None = None
     height: int
     width: int
-    geo_location: Optional[GEOPoint] = None
-    datetime_original: Optional[datetime] = None
-    dpi: Optional[Tuple[int, int]] = None
+    geo_location: GEOPoint | None = None
+    datetime_original: datetime | None = None
+    dpi: tuple[int, int] | None = None
 
 
 class ImageInfoWithFaces(ImageInfo):
-    faces: List[Face]
+    faces: list[Face]
 
 
 class AudioStreamInfo(Entity):
-    bitrate: Optional[Decimal] = None
-    codec: Optional[str] = None
-    sample_rate: Optional[Decimal] = None
-    profile: Optional[str] = None
-    channels: Optional[int] = None
+    bitrate: Decimal | None = None
+    codec: str | None = None
+    sample_rate: Decimal | None = None
+    profile: str | None = None
+    channels: int | None = None
 
 
 class VideoStreamInfo(Entity):
     height: Decimal
     width: Decimal
     frame_rate: float
-    bitrate: Optional[Decimal] = None
-    codec: Optional[str] = None
+    bitrate: Decimal | None = None
+    codec: str | None = None
 
 
 class VideoInfo(Entity):
-    duration: Optional[Decimal] = None
+    duration: Decimal | None = None
     format: str
-    bitrate: Optional[Decimal] = None
-    audio: List[AudioStreamInfo]
-    video: List[VideoStreamInfo]
+    bitrate: Decimal | None = None
+    audio: list[AudioStreamInfo]
+    video: list[VideoStreamInfo]
 
 
 class MIMEInfo(Entity):
@@ -114,9 +114,9 @@ class MIMEInfo(Entity):
 
 
 class ContentInfo(Entity):
-    mime: Optional[MIMEInfo] = None
-    image: Optional[ImageInfo] = None
-    video: Optional[VideoInfo] = None
+    mime: MIMEInfo | None = None
+    image: ImageInfo | None = None
+    video: VideoInfo | None = None
 
 
 class ApllicationDataDetails(Entity):
@@ -129,7 +129,7 @@ DetailsType = TypeVar(
 
 
 class ApplicationDataBase(Entity):
-    data: Optional[Union[Dict[str, Any], ApllicationDataDetails]] = Field(
+    data: dict[str, Any] | ApllicationDataDetails | None = Field(
         default_factory=lambda: {}
     )
     version: str
@@ -139,14 +139,14 @@ class ApplicationDataBase(Entity):
 
 class AWSRecognitionLabel(Entity):
     confidence: Decimal = Field(alias="Confidence")
-    instances: List[Dict] = Field(alias="Instances")
+    instances: list[dict] = Field(alias="Instances")
     name: str = Field(alias="Name")
-    parents: List[Dict] = Field(alias="Parents")
+    parents: list[dict] = Field(alias="Parents")
 
 
 class AWSRecognitionDetectLabelsDetails(ApllicationDataDetails):
-    label_model_version: Optional[str] = Field(None, alias="LabelModelVersion")
-    labels: List[AWSRecognitionLabel] = Field(
+    label_model_version: str | None = Field(None, alias="LabelModelVersion")
+    labels: list[AWSRecognitionLabel] = Field(
         alias="Labels", default_factory=list
     )
 
@@ -162,10 +162,10 @@ class AWSRecognitionModerationLabel(Entity):
 
 
 class AWSRecognitionDetectModerationLabelsDetails(ApllicationDataDetails):
-    label_model_version: Optional[str] = Field(
+    label_model_version: str | None = Field(
         None, alias="ModerationModelVersion"
     )
-    labels: List[AWSRecognitionModerationLabel] = Field(
+    labels: list[AWSRecognitionModerationLabel] = Field(
         alias="ModerationLabels", default_factory=list
     )
 
@@ -175,7 +175,7 @@ class AWSRecognitionDetectModerationLabelsApplicationData(ApplicationDataBase):
 
 
 class RemoveBackgroundDetails(ApllicationDataDetails):
-    foreground_type: Optional[str] = None
+    foreground_type: str | None = None
 
 
 class RemoveBackgroundApplicationData(ApplicationDataBase):
@@ -183,8 +183,8 @@ class RemoveBackgroundApplicationData(ApplicationDataBase):
 
 
 class UCClamAVDetails(ApllicationDataDetails):
-    infected: Optional[bool] = None
-    infected_with: Optional[str] = None
+    infected: bool | None = None
+    infected_with: str | None = None
 
 
 class UCClamAVApplicationData(ApplicationDataBase):
@@ -192,14 +192,14 @@ class UCClamAVApplicationData(ApplicationDataBase):
 
 
 class ApplicationDataSet(Entity):
-    aws_rekognition_detect_labels: Optional[
-        AWSRecognitionDetectLabelsApplicationData
-    ] = None
-    aws_rekognition_detect_moderation_labels: Optional[
-        AWSRecognitionDetectModerationLabelsApplicationData
-    ] = None
-    remove_bg: Optional[RemoveBackgroundApplicationData] = None
-    uc_clamav_virus_scan: Optional[UCClamAVApplicationData] = None
+    aws_rekognition_detect_labels: (
+        AWSRecognitionDetectLabelsApplicationData | None
+    ) = None
+    aws_rekognition_detect_moderation_labels: (
+        AWSRecognitionDetectModerationLabelsApplicationData | None
+    ) = None
+    remove_bg: RemoveBackgroundApplicationData | None = None
+    uc_clamav_virus_scan: UCClamAVApplicationData | None = None
 
 
 MetadataKeyConStrType = Annotated[
@@ -208,7 +208,7 @@ MetadataKeyConStrType = Annotated[
 
 MetadataValueConStrType = Annotated[str, Field(max_length=META_VALUE_MAX_LEN)]
 
-MetadataDict = Dict[MetadataKeyConStrType, MetadataValueConStrType]
+MetadataDict = dict[MetadataKeyConStrType, MetadataValueConStrType]
 
 
 class FileInfo(UUIDEntity):
@@ -220,24 +220,24 @@ class FileInfo(UUIDEntity):
 
     """
 
-    datetime_removed: Optional[datetime] = None
-    datetime_stored: Optional[datetime] = None
-    datetime_uploaded: Optional[datetime] = None
-    metadata: Optional[MetadataDict] = None
+    datetime_removed: datetime | None = None
+    datetime_stored: datetime | None = None
+    datetime_uploaded: datetime | None = None
+    metadata: MetadataDict | None = None
     # `[]` when the file has no tags. `None` when the endpoint does not report
     # tags at all, e.g. upload responses.
-    tags: Optional[List[str]] = None
-    is_image: Optional[bool] = None
-    is_ready: Optional[bool] = None
-    mime_type: Optional[str] = None
-    original_file_url: Optional[str] = None
-    original_filename: Optional[str] = None
-    size: Optional[int] = None
-    url: Optional[str] = None
-    variations: Optional[Dict[str, UUID]] = None
-    source: Optional[str] = None
-    content_info: Optional[ContentInfo] = None
-    appdata: Optional[ApplicationDataSet] = None
+    tags: list[str] | None = None
+    is_image: bool | None = None
+    is_ready: bool | None = None
+    mime_type: str | None = None
+    original_file_url: str | None = None
+    original_filename: str | None = None
+    size: int | None = None
+    url: str | None = None
+    variations: dict[str, UUID] | None = None
+    source: str | None = None
+    content_info: ContentInfo | None = None
+    appdata: ApplicationDataSet | None = None
 
 
 class SearchHighlight(Entity):
@@ -254,51 +254,51 @@ class SearchHighlight(Entity):
     """
 
     # OpenAPI: array of string
-    original_filename: Optional[List[str]] = None
+    original_filename: list[str] | None = None
     # OpenAPI: array of string
-    detected_mime_type: Optional[List[str]] = None
+    detected_mime_type: list[str] | None = None
     # OpenAPI: object with additionalProperties of type string
-    metadata: Optional[Dict[str, str]] = None
+    metadata: dict[str, str] | None = None
 
 
 class FileSearchInfo(FileInfo):
     """A file search result: file info plus the match highlight."""
 
-    highlight: Optional[SearchHighlight] = None
+    highlight: SearchHighlight | None = None
 
 
 class GroupInfo(Entity):
     id: str
-    _fetched: Optional[bool] = PrivateAttr(default=False)
-    datetime_created: Optional[datetime] = None
-    datetime_stored: Optional[datetime] = None
-    files_count: Optional[int] = None
-    cdn_url: Optional[str] = None
-    url: Optional[str] = None
-    files: Optional[List[Optional[FileInfo]]] = None
+    _fetched: bool | None = PrivateAttr(default=False)
+    datetime_created: datetime | None = None
+    datetime_stored: datetime | None = None
+    files_count: int | None = None
+    cdn_url: str | None = None
+    url: str | None = None
+    files: list[FileInfo | None] | None = None
 
 
 class ColaboratorInfo(Entity):
-    email: Optional[EmailStr] = None
-    name: Optional[str] = None
+    email: EmailStr | None = None
+    name: str | None = None
 
 
 class ProjectInfo(Entity):
-    collaborators: Optional[List[ColaboratorInfo]] = None
+    collaborators: list[ColaboratorInfo] | None = None
     name: str
     pub_key: str
-    autostore_enabled: Optional[bool] = None
+    autostore_enabled: bool | None = None
 
 
 class Webhook(Entity):
     id: int
-    created: Optional[datetime] = None
-    updated: Optional[datetime] = None
-    event: Optional[str] = None
-    target_url: Optional[str] = None
-    project: Optional[int] = None
-    is_active: Optional[bool] = None
-    signing_secret: Optional[str] = None
+    created: datetime | None = None
+    updated: datetime | None = None
+    event: str | None = None
+    target_url: str | None = None
+    project: int | None = None
+    is_active: bool | None = None
+    signing_secret: str | None = None
 
 
 class DocumentConvertShortInfo(Entity):
@@ -312,7 +312,7 @@ class DocumentConvertInfo(DocumentConvertShortInfo):
 
 class DocumentConvertStatus(Entity):
     status: str
-    error: Optional[str] = None
+    error: str | None = None
     result: DocumentConvertShortInfo
 
 
@@ -322,12 +322,12 @@ class DocumentConvertConversionFormat(Entity):
 
 class DocumentConvertFormat(Entity):
     name: str
-    conversion_formats: List[DocumentConvertConversionFormat]
-    converted_groups: Dict[str, str]
+    conversion_formats: list[DocumentConvertConversionFormat]
+    converted_groups: dict[str, str]
 
 
 class DocumentConvertFormatInfo(Entity):
-    error: Optional[str] = None
+    error: str | None = None
     format: DocumentConvertFormat
 
 
@@ -343,5 +343,5 @@ class VideoConvertInfo(VideoConvertShortInfo):
 
 class VideoConvertStatus(Entity):
     status: str
-    error: Optional[str] = None
+    error: str | None = None
     result: VideoConvertShortInfo

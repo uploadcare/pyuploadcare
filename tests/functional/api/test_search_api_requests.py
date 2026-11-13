@@ -4,7 +4,7 @@ VCR matches on method and URI only, so the POST body has to be asserted
 against a mocked client instead of a cassette.
 """
 
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -21,7 +21,7 @@ from pyuploadcare.exceptions import InvalidParamError
 
 SEARCH_URL = "https://api.uploadcare.com/files/search/"
 
-EMPTY_PAGE: Dict[str, Any] = {
+EMPTY_PAGE: dict[str, Any] = {
     "next": None,
     "previous": None,
     "total": 0,

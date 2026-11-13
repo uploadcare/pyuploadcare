@@ -42,7 +42,6 @@ import os
 import sys
 from io import BytesIO
 from pathlib import Path
-from typing import List
 from uuid import UUID
 
 from pyuploadcare import Uploadcare
@@ -171,7 +170,7 @@ def apply_substitutions(old_uuids: dict, new_uuids: dict) -> None:
             _rewrite(path, replacements)
 
 
-def main(argv: List[str]) -> int:
+def main(argv: list[str]) -> int:
     if len(argv) != 2 or not argv[1] or argv[1] == "demopublickey":
         print(
             f"usage: {Path(argv[0]).name} <public_key>\n\n"

@@ -36,23 +36,23 @@ class WidgetSettingsType(typing_extensions.TypedDict):
     version: str
     variant: WidgetVariantType
     build: str
-    options: typing.Dict[str, typing.Any]
-    override_js_url: typing.Optional[str]
-    override_css_url: typing.Dict[WidgetVariantType, typing.Optional[str]]
+    options: dict[str, typing.Any]
+    override_js_url: str | None
+    override_css_url: dict[WidgetVariantType, str | None]
 
 
 class LegacyWidgetSettingsType(typing_extensions.TypedDict):
     version: str
     build: str
-    override_js_url: typing.Optional[str]
+    override_js_url: str | None
 
 
 class SettingsType(typing_extensions.TypedDict):
     pub_key: str
     secret: str
     subdomains: bool
-    cdn_base: typing.Optional[str]
-    upload_base_url: typing.Optional[str]
+    cdn_base: str | None
+    upload_base_url: str | None
     signed_uploads: bool
     use_legacy_widget: bool
     use_hosted_assets: bool

@@ -50,18 +50,16 @@ class Client(HTTPXClient):
         self,
         url: URLTypes,
         *,
-        content: typing.Optional[RequestContent] = None,
-        data: typing.Optional[RequestData] = None,
-        json: typing.Optional[typing.Any] = None,
-        params: typing.Optional[QueryParamTypes] = None,
-        headers: typing.Optional[HeaderTypes] = None,
-        cookies: typing.Optional[CookieTypes] = None,
-        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
-        timeout: typing.Union[
-            TimeoutTypes, UseClientDefault
-        ] = USE_CLIENT_DEFAULT,
+        content: RequestContent | None = None,
+        data: RequestData | None = None,
+        json: typing.Any | None = None,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
+        cookies: CookieTypes | None = None,
+        auth: AuthTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
+        timeout: TimeoutTypes | UseClientDefault = USE_CLIENT_DEFAULT,
     ) -> Response:
         """
         Send a `DELETE` request with payload.
@@ -88,20 +86,18 @@ class Client(HTTPXClient):
         method: str,
         url: URLTypes,
         *,
-        content: typing.Optional[RequestContent] = None,
-        data: typing.Optional[RequestData] = None,
-        files: typing.Optional[RequestFiles] = None,
+        content: RequestContent | None = None,
+        data: RequestData | None = None,
+        files: RequestFiles | None = None,
         json: typing.Any = None,
-        params: typing.Optional[QueryParamTypes] = None,
-        headers: typing.Optional[HeaderTypes] = None,
-        cookies: typing.Optional[CookieTypes] = None,
-        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
-        timeout: typing.Union[
-            TimeoutTypes, UseClientDefault
-        ] = USE_CLIENT_DEFAULT,
-        extensions: typing.Optional[dict] = None,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
+        cookies: CookieTypes | None = None,
+        auth: AuthTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
+        timeout: TimeoutTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        extensions: dict | None = None,
     ) -> Response:
         """
         `allow_redirects` is for compatibility with versions for Python 3.6 only
@@ -150,8 +146,8 @@ class Client(HTTPXClient):
 
     def _handle_httpx_arguments(  # noqa: max-complexity: 6
         self,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
     ) -> bool:
         """
         Encapsulate smooth updating for httpx dependency:
@@ -209,19 +205,17 @@ class Client(HTTPXClient):
         self,
         method: str,
         url: URLTypes,
-        content: typing.Optional[RequestContent] = None,
-        data: typing.Optional[RequestData] = None,
-        files: typing.Optional[RequestFiles] = None,
+        content: RequestContent | None = None,
+        data: RequestData | None = None,
+        files: RequestFiles | None = None,
         json: typing.Any = None,
-        params: typing.Optional[QueryParamTypes] = None,
-        headers: typing.Optional[HeaderTypes] = None,
-        cookies: typing.Optional[CookieTypes] = None,
-        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
-        timeout: typing.Union[
-            TimeoutTypes, UseClientDefault
-        ] = USE_CLIENT_DEFAULT,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
+        cookies: CookieTypes | None = None,
+        auth: AuthTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
+        timeout: TimeoutTypes | UseClientDefault = USE_CLIENT_DEFAULT,
     ):
         logger.debug(
             f"sent: method: {method}; path: {url}; headers: {headers}; "

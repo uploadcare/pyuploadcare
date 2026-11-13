@@ -2,9 +2,9 @@
 
 import random
 import time
+from collections.abc import Iterable, Iterator
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Iterator, List, Union
 from uuid import UUID, uuid4
 
 import pytest
@@ -49,15 +49,13 @@ def group_to_delete(uploadcare) -> Iterator[FileGroup]:
 
 
 @pytest.fixture()
-def input_collection(uploadcare) -> Iterable[List[Union[str, File, UUID]]]:
+def input_collection(uploadcare) -> Iterable[list[str | File | UUID]]:
     u = uuid4()
     yield [str(u), uploadcare.file(u), u]
 
 
 @pytest.fixture()
-def expected_uuids(
-    input_collection: List[Union[str, File, UUID]]
-) -> Iterable[str]:
+def expected_uuids(input_collection: list[str | File | UUID]) -> Iterable[str]:
     yield [
         input_collection[0],
         input_collection[1].uuid,  # type: ignore

@@ -2,19 +2,10 @@ import hashlib
 import hmac
 import logging
 import warnings
+from collections.abc import Iterable, Iterator
 from json import JSONDecodeError
 from time import time
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Type,
-    Union,
-    cast,
-)
+from typing import Any, cast
 from uuid import UUID
 
 from httpx2 import Auth
@@ -84,9 +75,9 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
 
     def search(
         self,
-        request: Union[FileSearchRequest, Dict[str, Any]],
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
+        request: FileSearchRequest | dict[str, Any],
+        limit: int | None = None,
+        offset: int | None = None,
         include_appdata: bool = False,
     ) -> responses.FileSearchResponse:
         """Search files, returning a single page of results.
@@ -121,7 +112,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
                 "Narrow the query instead of paging deeper"
             )
 
-        query_parameters: Dict[str, Any] = {}
+        query_parameters: dict[str, Any] = {}
         if limit is not None:
             query_parameters["limit"] = limit
         if offset is not None:
@@ -141,10 +132,10 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
 
     def search_iterate(
         self,
-        request: Union[FileSearchRequest, Dict[str, Any]],
-        limit: Optional[int] = None,
-        request_limit: Optional[int] = None,
-        offset: Optional[int] = None,
+        request: FileSearchRequest | dict[str, Any],
+        limit: int | None = None,
+        request_limit: int | None = None,
+        offset: int | None = None,
         include_appdata: bool = False,
     ) -> Iterator[entities.FileSearchInfo]:
         """Iterate over search results, page by page.
@@ -195,7 +186,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         if first_page_size <= 0:
             return iter(())
 
-        query_parameters: Dict[str, Any] = {
+        query_parameters: dict[str, Any] = {
             "limit": first_page_size,
             "offset": start,
         }
@@ -215,7 +206,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
             limit=limit,
         )
 
-    def store(self, file_uuid: Union[UUID, str]) -> entities.FileInfo:
+    def store(self, file_uuid: UUID | str) -> entities.FileInfo:
         url = self._build_url(file_uuid, suffix="storage")
         response_class = self._get_response_class("store")
         json_response = self._client.put(url).json()
@@ -223,7 +214,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         return cast(entities.FileInfo, response)
 
     def batch_store(
-        self, file_uuids: Iterable[Union[UUID, str]]
+        self, file_uuids: Iterable[UUID | str]
     ) -> responses.BatchFileOperationResponse:
         url = self._build_url(suffix="storage")
         response_class = self._get_response_class("batch_store")
@@ -243,7 +234,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         return cast(responses.BatchFileOperationResponse, response)
 
     def local_copy(
-        self, source: Union[UUID, str], store: bool = False
+        self, source: UUID | str, store: bool = False
     ) -> responses.CreateLocalCopyResponse:
         url = self._build_url(suffix="local_copy")
         data = {"source": source, "store": store}
@@ -254,7 +245,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
 
     def remote_copy(
         self,
-        source: Union[UUID, str],
+        source: UUID | str,
         target: str,
         make_public: bool = True,
         pattern: str = "${default}",
@@ -283,7 +274,7 @@ class GroupsAPI(API, ListCountMixin, RetrieveMixin, DeleteMixin):
         "count": responses.GroupListResponse,
     }
 
-    def store(self, file_uuid: Union[UUID, str]) -> Dict[str, Any]:
+    def store(self, file_uuid: UUID | str) -> dict[str, Any]:
         warnings.warn(
             "/groups/:uuid/storage/ endpoint has been removed from REST API v0.7"
             "https://uploadcare.com/docs/api/rest/changelog/",
@@ -307,7 +298,7 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
     entity_class = entities.Webhook
     response_classes = {
         "create": entities.Webhook,
-        "list": List[entities.Webhook],  # type: ignore
+        "list": list[entities.Webhook],  # type: ignore
         "update": entities.Webhook,
     }
     _NON_FIELD = "non_field_errors"
@@ -322,8 +313,8 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
 
     def update(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity],
-        data: Optional[Dict] = None,
+        resource_uuid: UUID | str | UUIDEntity,
+        data: dict | None = None,
     ):
         try:
             return super(WebhooksAPI, self).update(resource_uuid, data)
@@ -332,7 +323,7 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
 
     def create(
         self,
-        data: Optional[Dict] = None,
+        data: dict | None = None,
     ):
         try:
             return super(WebhooksAPI, self).create(data)
@@ -353,7 +344,7 @@ class DocumentConvertAPI(API, RetrieveMixin):
 
     def retrieve(
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        resource_uuid: UUID | str | UUIDEntity | None = None,
         include_appdata: bool = False,
     ) -> entities.DocumentConvertFormatInfo:
         response = super().retrieve(resource_uuid)
@@ -361,8 +352,8 @@ class DocumentConvertAPI(API, RetrieveMixin):
 
     def convert(
         self,
-        paths: List[str],
-        store: Optional[bool] = None,
+        paths: list[str],
+        store: bool | None = None,
         save_in_group: bool = False,
     ) -> responses.DocumentConvertResponse:
         url = self._build_url()
@@ -401,8 +392,8 @@ class VideoConvertAPI(API):
 
     def convert(
         self,
-        paths: List[str],
-        store: Optional[bool] = None,
+        paths: list[str],
+        store: bool | None = None,
     ) -> responses.VideoConvertResponse:
         url = self._build_url()
 
@@ -435,7 +426,7 @@ class UploadAPI(API):
         ).hexdigest()
 
     @staticmethod
-    def _set_tags(data: Dict[str, Any], tags: Optional[Iterable[str]]) -> None:
+    def _set_tags(data: dict[str, Any], tags: Iterable[str] | None) -> None:
         """Add the comma-separated `tags` form field to `data`, if any.
 
         The field is omitted entirely when there is nothing to send.
@@ -452,13 +443,13 @@ class UploadAPI(API):
         self,
         files: RequestFiles,
         secure_upload: bool = False,
-        common_metadata: Optional[dict] = None,
-        public_key: Optional[str] = None,
-        secret_key: Optional[str] = None,
-        store: Optional[str] = "auto",
-        expire: Optional[int] = None,
-        tags: Optional[Iterable[str]] = None,
-    ) -> Dict[str, Any]:
+        common_metadata: dict | None = None,
+        public_key: str | None = None,
+        secret_key: str | None = None,
+        store: str | None = "auto",
+        expire: int | None = None,
+        tags: Iterable[str] | None = None,
+    ) -> dict[str, Any]:
         data = {}
 
         data["UPLOADCARE_STORE"] = store
@@ -494,11 +485,11 @@ class UploadAPI(API):
         file_name: str,
         file_size: int,
         content_type: str,
-        metadata: Optional[dict] = None,
-        store: Optional[str] = None,
+        metadata: dict | None = None,
+        store: str | None = None,
         secure_upload: bool = False,
-        expire: Optional[int] = None,
-        tags: Optional[Iterable[str]] = None,
+        expire: int | None = None,
+        tags: Iterable[str] | None = None,
     ):
         data = {
             "filename": file_name,
@@ -558,12 +549,12 @@ class UploadAPI(API):
         source_url,
         store="auto",
         filename=None,
-        metadata: Optional[Dict] = None,
+        metadata: dict | None = None,
         secure_upload: bool = False,
-        expire: Optional[int] = None,
-        check_duplicates: Optional[bool] = None,
-        save_duplicates: Optional[bool] = None,
-        tags: Optional[Iterable[str]] = None,
+        expire: int | None = None,
+        check_duplicates: bool | None = None,
+        save_duplicates: bool | None = None,
+        tags: Iterable[str] | None = None,
     ) -> str:
         data = {
             "source_url": source_url,
@@ -610,7 +601,7 @@ class UploadAPI(API):
             raise APIError(f"could not find token in result: {response}")
         return response["token"]
 
-    def get_upload_from_url_status(self, token: str) -> Dict[str, Any]:
+    def get_upload_from_url_status(self, token: str) -> dict[str, Any]:
         query_parameters = {
             "token": token,
         }
@@ -625,9 +616,9 @@ class UploadAPI(API):
 
     def create_group(
         self,
-        files: Iterable[Union[str, UUID]],
+        files: Iterable[str | UUID],
         secure_upload: bool = False,
-        expire: Optional[int] = None,
+        expire: int | None = None,
     ):
         data = {
             "pub_key": self.public_key,
@@ -663,7 +654,7 @@ class MetadataAPI(API):
     }
 
     def update_or_create_key(
-        self, file_uuid: Union[UUID, str], mkey: str, mvalue: str
+        self, file_uuid: UUID | str, mkey: str, mvalue: str
     ) -> str:
         validate_meta_key(mkey)
         validate_meta_value(mvalue)
@@ -674,7 +665,7 @@ class MetadataAPI(API):
         response = self._parse_response(json_response, response_class).root  # type: ignore
         return cast(str, response)
 
-    def get_all_metadata(self, file_uuid: Union[UUID, str]) -> dict:
+    def get_all_metadata(self, file_uuid: UUID | str) -> dict:
         url = self._build_url(file_uuid, suffix="metadata")
         response_class = self._get_response_class("get_all")
 
@@ -690,13 +681,13 @@ class MetadataAPI(API):
         response = self._parse_response(json_response, response_class).root  # type: ignore
         return cast(dict, response)
 
-    def delete_key(self, file_uuid: Union[UUID, str], mkey: str) -> None:
+    def delete_key(self, file_uuid: UUID | str, mkey: str) -> None:
         validate_meta_key(mkey)
         suffix = f"metadata/{mkey}"
         url = self._build_url(file_uuid, suffix=suffix)
         self._client.delete(url)
 
-    def get_key(self, file_uuid: Union[UUID, str], mkey: str) -> str:
+    def get_key(self, file_uuid: UUID | str, mkey: str) -> str:
         validate_meta_key(mkey)
         suffix = f"metadata/{mkey}"
         url = self._build_url(file_uuid, suffix=suffix)
@@ -720,10 +711,10 @@ class TagsAPI(API):
         "update": responses.UpdateFileTagsResponse,
     }
 
-    def _tags_url(self, file_uuid: Union[UUID, str]) -> str:
+    def _tags_url(self, file_uuid: UUID | str) -> str:
         return self._build_url(file_uuid, suffix="tags")
 
-    def get(self, file_uuid: Union[UUID, str]) -> List[str]:
+    def get(self, file_uuid: UUID | str) -> list[str]:
         """Return the tags of a file, an empty list if it has none."""
         url = self._tags_url(file_uuid)
         response_class = self._get_response_class("get")
@@ -732,7 +723,7 @@ class TagsAPI(API):
         return cast(responses.GetFileTagsResponse, response).tags
 
     def set(
-        self, file_uuid: Union[UUID, str], tags: Iterable[str]
+        self, file_uuid: UUID | str, tags: Iterable[str]
     ) -> responses.UpdateFileTagsResponse:
         """Replace all tags of a file.
 
@@ -747,16 +738,16 @@ class TagsAPI(API):
 
     def update(
         self,
-        file_uuid: Union[UUID, str],
-        add: Optional[Iterable[str]] = None,
-        delete: Optional[Iterable[str]] = None,
+        file_uuid: UUID | str,
+        add: Iterable[str] | None = None,
+        delete: Iterable[str] | None = None,
     ) -> responses.UpdateFileTagsResponse:
         """Add and/or delete tags of a file atomically.
 
         Both arguments are optional, matching the endpoint: calling this
         without them sends an empty request and returns the current state.
         """
-        data: Dict[str, List[str]] = {}
+        data: dict[str, list[str]] = {}
 
         if add is not None:
             data["add"] = validate_tags(add)
@@ -776,7 +767,7 @@ class TagsAPI(API):
 
 class AddonsAPI(API):
     resource_type = "addons"
-    request_type: Type[AddonExecutionGeneralRequestData] = (
+    request_type: type[AddonExecutionGeneralRequestData] = (
         AddonExecutionGeneralRequestData
     )
     response_classes = {
@@ -786,8 +777,8 @@ class AddonsAPI(API):
 
     def _get_request_data(
         self,
-        file_uuid: Union[UUID, str],
-        params: Optional[Union[AddonExecutionParams, dict]] = None,
+        file_uuid: UUID | str,
+        params: AddonExecutionParams | dict | None = None,
     ) -> dict:
         cleaned_params = {}
         if params:
@@ -806,9 +797,9 @@ class AddonsAPI(API):
 
     def execute(
         self,
-        file_uuid: Union[UUID, str],
-        addon_name: Union[AddonLabels, str],
-        params: Optional[Union[AddonExecutionParams, dict]] = None,
+        file_uuid: UUID | str,
+        addon_name: AddonLabels | str,
+        params: AddonExecutionParams | dict | None = None,
     ) -> responses.AddonExecuteResponse:
         if isinstance(addon_name, AddonLabels):
             addon_name = addon_name.value
@@ -821,7 +812,7 @@ class AddonsAPI(API):
         return cast(responses.AddonExecuteResponse, response)
 
     def status(
-        self, request_id: Union[UUID, str], addon_name: Union[AddonLabels, str]
+        self, request_id: UUID | str, addon_name: AddonLabels | str
     ) -> responses.AddonResponse:
         if isinstance(addon_name, AddonLabels):
             addon_name = addon_name.value
@@ -843,7 +834,7 @@ class URLAPI(API):
     }
 
     def detect_faces(
-        self, file_uuid: Union[UUID, str]
+        self, file_uuid: UUID | str
     ) -> entities.ImageInfoWithFaces:
         url = self._build_url(file_uuid, suffix="detect_faces/")
         response_class = self._get_response_class("detect_faces")
