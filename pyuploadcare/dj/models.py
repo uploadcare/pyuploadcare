@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import re
 
 from django.core.exceptions import ValidationError
@@ -42,9 +39,7 @@ class FileField(models.Field, metaclass=SubfieldBase):
         try:
             return self._client.file(value)
         except InvalidRequestError as exc:
-            raise ValidationError(
-                "Invalid value for a field: {exc}".format(exc=exc)
-            )
+            raise ValidationError(f"Invalid value for a field: {exc}")
 
     def get_prep_value(self, value):
         if value is None or value == "":
@@ -58,10 +53,10 @@ class FileField(models.Field, metaclass=SubfieldBase):
 
     def formfield(self, **kwargs):
         kwargs["form_class"] = forms.FileField
-        return super(FileField, self).formfield(**kwargs)
+        return super().formfield(**kwargs)
 
     def validate(self, value, model_instance):
-        super(FileField, self).validate(value, model_instance)
+        super().validate(value, model_instance)
 
         if value:
             try:
@@ -72,12 +67,12 @@ class FileField(models.Field, metaclass=SubfieldBase):
             except InvalidRequestError as exc:
                 raise ValidationError(
                     "The file could not be found in your Uploadcare project. "
-                    'Underlying error: "{exc}".'.format(exc=exc),
+                    f'Underlying error: "{exc}".',
                     code="invalid_url",
                 )
 
     def clean(self, value, model_instance):
-        cleaned_value = super(FileField, self).clean(value, model_instance)
+        cleaned_value = super().clean(value, model_instance)
         if cleaned_value and not cleaned_value.is_stored:
             cleaned_value.store()
         return cleaned_value
@@ -125,7 +120,7 @@ class ImageField(FileField):
             raise ValidationError("Invalid manual crop value")
 
         self.manual_crop = manual_crop
-        super(ImageField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         kwargs["manual_crop"] = self.manual_crop
@@ -166,9 +161,7 @@ class FileGroupField(models.Field, metaclass=SubfieldBase):
         try:
             return self._client.file_group(value)
         except InvalidRequestError as exc:
-            raise ValidationError(
-                "Invalid value for a field: {exc}".format(exc=exc)
-            )
+            raise ValidationError(f"Invalid value for a field: {exc}")
 
     def get_prep_value(self, value):
         if value is None or value == "":
@@ -186,9 +179,7 @@ class FileGroupField(models.Field, metaclass=SubfieldBase):
         return models.Field.formfield(self, **kwargs)
 
     def clean(self, value, model_instance):
-        cleaned_value = super(FileGroupField, self).clean(
-            value, model_instance
-        )
+        cleaned_value = super().clean(value, model_instance)
         if cleaned_value:
             cleaned_value.store()
         return cleaned_value

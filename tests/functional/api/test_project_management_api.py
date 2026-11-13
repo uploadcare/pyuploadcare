@@ -8,7 +8,7 @@ import json
 from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
 import httpx2
@@ -41,7 +41,7 @@ API_BASE = "https://api.uploadcare.com/"
 TOKEN = "test-project-api-token"
 PUB_KEY = "a1dddc498fb8a82c6276"
 
-PROJECT_JSON: Dict[str, Any] = {
+PROJECT_JSON: dict[str, Any] = {
     "pub_key": PUB_KEY,
     "name": "Production",
     "is_blocked": False,
@@ -84,14 +84,14 @@ class FakeServer:
     """Answers requests from a queue and records them."""
 
     def __init__(self) -> None:
-        self.requests: List[httpx2.Request] = []
-        self._responses: List[Tuple[int, Any, Dict[str, str]]] = []
+        self.requests: list[httpx2.Request] = []
+        self._responses: list[tuple[int, Any, dict[str, str]]] = []
 
     def respond(
         self,
         status: int = 200,
         payload: Any = None,
-        headers: Optional[Dict[str, str]] = None,
+        headers: dict[str, str] | None = None,
     ) -> None:
         self._responses.append((status, payload, headers or {}))
 
@@ -110,7 +110,7 @@ class FakeServer:
         return json.loads(self.last.content)
 
 
-def query(request: httpx2.Request) -> Dict[str, List[str]]:
+def query(request: httpx2.Request) -> dict[str, list[str]]:
     return parse_qs(urlsplit(str(request.url)).query)
 
 

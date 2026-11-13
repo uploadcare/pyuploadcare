@@ -47,7 +47,7 @@ class FileList(BaseApiList):
     def __init__(self, *args, **kwargs):
         self.stored = kwargs.pop("stored", None)
         self.removed = kwargs.pop("removed", None)
-        super(FileList, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def resource_api(self):

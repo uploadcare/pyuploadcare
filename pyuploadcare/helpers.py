@@ -2,8 +2,9 @@ import hashlib
 import mimetypes
 import os
 import string
+from collections.abc import Iterable
 from datetime import datetime
-from typing import IO, Any, Dict, Iterable, List, Optional, TypeVar
+from typing import IO, Any, TypeVar
 
 
 def get_file_size(file_object: IO) -> int:
@@ -25,8 +26,8 @@ T = TypeVar("T")
 
 
 def iterate_over_batches(
-    collection: List[T], batch_size: int
-) -> Iterable[List[T]]:
+    collection: list[T], batch_size: int
+) -> Iterable[list[T]]:
     """Generate consequent slices of size `batch_size`."""
     if batch_size < 1:
         raise ValueError("Wrong batch size: must be positive number")
@@ -50,8 +51,8 @@ KeyType = TypeVar("KeyType")
 
 
 def deep_update(
-    mapping: Dict[KeyType, Any], *updating_mappings: Dict[KeyType, Any]
-) -> Dict[KeyType, Any]:
+    mapping: dict[KeyType, Any], *updating_mappings: dict[KeyType, Any]
+) -> dict[KeyType, Any]:
     updated_mapping = mapping.copy()
     for updating_mapping in updating_mappings:
         for k, v in updating_mapping.items():
@@ -86,7 +87,7 @@ def get_cname_prefix(pub_key: str):
 
 
 def get_cdn_base(
-    pub_key: Optional[str], default: str, subdomains: bool, subdomains_ptn: str
+    pub_key: str | None, default: str, subdomains: bool, subdomains_ptn: str
 ) -> str:
     if subdomains and pub_key:
         prefix = get_cname_prefix(pub_key)

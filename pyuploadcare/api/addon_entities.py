@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Optional, TypeVar, Union
+from typing import Any, TypeVar
 from uuid import UUID
 
 from pydantic import Field, field_validator
@@ -22,8 +22,8 @@ AddonParamsType = TypeVar("AddonParamsType", bound=AddonExecutionParams)
 
 
 class AddonExecutionGeneralRequestData(Entity):
-    target: Union[UUID, str]
-    params: Optional[Union[Dict[str, Any], AddonExecutionParams]] = None
+    target: UUID | str
+    params: dict[str, Any] | AddonExecutionParams | None = None
 
     @field_validator("target")
     @classmethod
@@ -36,25 +36,25 @@ class AddonClamAVExecutionParams(AddonExecutionParams):
 
 
 class AddonClamAVExecutionRequestData(AddonExecutionGeneralRequestData):
-    params: Optional[AddonClamAVExecutionParams]
+    params: AddonClamAVExecutionParams | None
 
 
 class AddonRemoveBGExecutionParams(AddonExecutionParams):
-    crop: Optional[bool] = Field(
+    crop: bool | None = Field(
         None, description="Whether to crop off all empty regions"
     )
-    crop_margin: Optional[str] = Field(
+    crop_margin: str | None = Field(
         None,
         description="Adds a margin around the cropped subject, e.g 30px or 30%",
     )
-    scale: Optional[str] = Field(
+    scale: str | None = Field(
         None,
         description="Scales the subject relative to the total image size, e.g 80%",
     )
-    add_shadow: Optional[bool] = Field(
+    add_shadow: bool | None = Field(
         None, description="Whether to add an artificial shadow to the result"
     )
-    type_level: Optional[str] = Field(
+    type_level: str | None = Field(
         None,
         description="""Enum: "none" "1" "2" "latest"
     "none" = No classification (foreground_type won't bet set in the application data)
@@ -64,16 +64,16 @@ class AddonRemoveBGExecutionParams(AddonExecutionParams):
     "latest" = Always use the latest classification classes available
     """,
     )
-    type: Optional[str] = Field(
+    type: str | None = Field(
         None,
         description="""Foreground type. Enum: "auto" "person" "product" "car""",
     )
-    semitransparency: Optional[bool] = Field(
+    semitransparency: bool | None = Field(
         None,
         description="Whether to have semi-transparent regions in the result",
     )
-    channels: Optional[str] = Field(None, description="Enum: 'rgba' 'alpha'")
-    roi: Optional[str] = Field(
+    channels: str | None = Field(None, description="Enum: 'rgba' 'alpha'")
+    roi: str | None = Field(
         None,
         description="""
         Region of interest:
@@ -85,7 +85,7 @@ class AddonRemoveBGExecutionParams(AddonExecutionParams):
             By default, the whole image is the region of interest ("0% 0% 100% 100%").
         """,
     )
-    position: Optional[str] = Field(
+    position: str | None = Field(
         None,
         description="""
         Positions the subject within the image canvas.
@@ -99,4 +99,4 @@ class AddonRemoveBGExecutionParams(AddonExecutionParams):
 
 
 class AddonRemoveBGExecutionRequestData(AddonExecutionGeneralRequestData):
-    params: Optional[AddonRemoveBGExecutionParams]
+    params: AddonRemoveBGExecutionParams | None

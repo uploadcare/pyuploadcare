@@ -1,5 +1,5 @@
 import itertools
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from pyuploadcare.api.base import ListCountMixin
 from pyuploadcare.helpers import ensure_aware_datetime
@@ -28,8 +28,8 @@ class BaseApiList:
         self.starting_point = starting_point
         self.limit = limit
         self.request_limit = request_limit
-        self._count: Optional[int] = None
-        self._client: "Uploadcare" = client
+        self._count: int | None = None
+        self._client: Uploadcare = client
 
     @property
     def resource_api(self) -> ListCountMixin:

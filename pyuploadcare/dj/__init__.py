@@ -1,5 +1,3 @@
-# coding: utf-8
-
 # making South happy
 try:
     from south.modelsinspector import add_introspection_rules

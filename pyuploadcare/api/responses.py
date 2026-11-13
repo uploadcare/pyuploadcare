@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, List, Optional, TypeVar
+from typing import Any, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel, RootModel
@@ -19,36 +19,36 @@ class Response(BaseModel): ...
 
 
 class EntityListResponse(Response):
-    results: List[Entity]
+    results: list[Entity]
 
 
 class PaginatedResponse(EntityListResponse):
-    next: Optional[str] = None
-    previous: Optional[str] = None
+    next: str | None = None
+    previous: str | None = None
     total: int
     per_page: int
 
 
 class FileListResponse(PaginatedResponse):
     # https://uploadcare.com/docs/api/rest/file/files-list/
-    results: List[FileInfo]  # type: ignore
+    results: list[FileInfo]  # type: ignore
 
 
 class FileSearchResponse(PaginatedResponse):
     # https://uploadcare.com/docs/api/rest/file/search-files/
-    results: List[FileSearchInfo]  # type: ignore
+    results: list[FileSearchInfo]  # type: ignore
 
 
 class GroupListResponse(PaginatedResponse):
     # https://uploadcare.com/docs/api/rest/group/groups-list/
-    results: List[GroupInfo]  # type: ignore
+    results: list[GroupInfo]  # type: ignore
 
 
 class BatchFileOperationResponse(Response):
     # https://uploadcare.com/docs/api/rest/file/files-storing/
     status: str
-    problems: Optional[Dict[str, Any]] = None
-    result: Optional[List[FileInfo]] = None
+    problems: dict[str, Any] | None = None
+    result: list[FileInfo] | None = None
 
 
 class CreateLocalCopyResponse(Response):
@@ -64,13 +64,13 @@ class CreateRemoteCopyResponse(Response):
 
 
 class DocumentConvertResponse(Entity):
-    problems: Optional[Dict[str, Any]] = None
-    result: Optional[List[DocumentConvertInfo]] = None
+    problems: dict[str, Any] | None = None
+    result: list[DocumentConvertInfo] | None = None
 
 
 class VideoConvertResponse(Entity):
-    problems: Optional[Dict[str, Any]] = None
-    result: Optional[List[VideoConvertInfo]] = None
+    problems: dict[str, Any] | None = None
+    result: list[VideoConvertInfo] | None = None
 
 
 class UpdateMetadataKeyResponse(RootModel, Entity):
@@ -87,15 +87,15 @@ class GetAllMetadataResponse(RootModel, Entity):
 
 class GetFileTagsResponse(Response):
     # https://uploadcare.com/docs/api/rest/file-tags/get-tags/
-    tags: List[str]
+    tags: list[str]
 
 
 class UpdateFileTagsResponse(Response):
     # https://uploadcare.com/docs/api/rest/file-tags/put-tags/
     # https://uploadcare.com/docs/api/rest/file-tags/patch-tags/
-    tags: List[str]
-    added: List[str]
-    deleted: List[str]
+    tags: list[str]
+    added: list[str]
+    deleted: list[str]
 
 
 class AddonResponseResult(Entity):
@@ -118,4 +118,4 @@ AddonResultType = TypeVar("AddonResultType", bound=AddonResponseResult)
 
 class AddonResponse(Response):
     status: AddonStatus
-    result: Optional[Dict[str, Any]] = None
+    result: dict[str, Any] | None = None

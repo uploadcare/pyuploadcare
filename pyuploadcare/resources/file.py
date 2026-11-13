@@ -2,7 +2,8 @@ import dataclasses
 import logging
 import re
 import time
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from pyuploadcare.api.base import UUID_PATTERN
@@ -71,7 +72,7 @@ class File:
 
     """
 
-    thumbnails_group_uuid: Optional[str] = None
+    thumbnails_group_uuid: str | None = None
 
     _client: "Uploadcare"
 
@@ -85,9 +86,9 @@ class File:
             raise InvalidParamError("Couldn't find UUID")
 
         self._uuid = matches.groupdict()["uuid"]
-        self.default_effects: Optional[str] = matches.groupdict()["effects"]
+        self.default_effects: str | None = matches.groupdict()["effects"]
 
-        self._info_cache: Optional[Dict[str, Any]] = None
+        self._info_cache: dict[str, Any] | None = None
 
         self._client = client
 
@@ -98,14 +99,12 @@ class File:
         return self.cdn_url
 
     def set_effects(
-        self, effects: Optional[Union[str, ImageTransformation]] = None
+        self, effects: str | ImageTransformation | None = None
     ) -> None:
         effects = str(effects) if effects else ""
         self.default_effects = effects
 
-    def _build_effects(
-        self, effects: Optional[Union[str, ImageTransformation]] = None
-    ):
+    def _build_effects(self, effects: str | ImageTransformation | None = None):
         effects = str(effects) if effects else ""
         if self.default_effects is not None:
             effects = (
@@ -128,9 +127,7 @@ class File:
 
         self._uuid = match.group(0)
 
-    def cdn_path(
-        self, effects: Optional[Union[str, ImageTransformation]] = None
-    ):
+    def cdn_path(self, effects: str | ImageTransformation | None = None):
         """Returns CDN path with applied effects.
 
         Usage example::
@@ -287,7 +284,7 @@ class File:
         return self.info.get("mime_type")
 
     @property
-    def tags(self) -> Optional[List[str]]:
+    def tags(self) -> list[str] | None:
         """Returns the file `tags`_, e.g. ``["cat", "animal"]``.
 
         ``[]`` when the file has no tags, ``None`` when the cached file info
@@ -299,7 +296,7 @@ class File:
         """
         return self.info.get("tags")
 
-    def _cache_tags(self, tags: List[str]) -> None:
+    def _cache_tags(self, tags: list[str]) -> None:
         """Keep the ``tags`` property in sync after a tags mutation.
 
         Only touches an existing cache, so it never triggers a file info
@@ -308,7 +305,7 @@ class File:
         if self._info_cache is not None:
             self._info_cache["tags"] = tags
 
-    def get_tags(self) -> List[str]:
+    def get_tags(self) -> list[str]:
         """Returns the file `tags`_ by requesting Uploadcare API.
 
         Unlike the ``tags`` property this always performs a request.
@@ -319,7 +316,7 @@ class File:
         self._cache_tags(tags)
         return tags
 
-    def set_tags(self, tags: List[str]) -> UpdateFileTagsResponse:
+    def set_tags(self, tags: list[str]) -> UpdateFileTagsResponse:
         """Replace the file's entire tag set with ``tags``.
 
         Any current tag not in ``tags`` is removed; an empty list clears them
@@ -337,8 +334,8 @@ class File:
 
     def update_tags(
         self,
-        add: Optional[List[str]] = None,
-        delete: Optional[List[str]] = None,
+        add: list[str] | None = None,
+        delete: list[str] | None = None,
     ) -> UpdateFileTagsResponse:
         """Update tags. Pass `add` and `delete` lists to be added and deleted respectively.
 
@@ -370,7 +367,7 @@ class File:
 
     def create_local_copy(
         self,
-        effects: Optional[Union[str, ImageTransformation]] = None,
+        effects: str | ImageTransformation | None = None,
         store=False,
     ) -> "File":
         """Creates a Local File Copy on Uploadcare Storage.
@@ -397,7 +394,7 @@ class File:
     def create_remote_copy(
         self,
         target,
-        effects: Optional[Union[str, ImageTransformation]] = None,
+        effects: str | ImageTransformation | None = None,
         make_public=None,
         pattern=None,
     ) -> str:
@@ -451,8 +448,8 @@ class File:
 
     def convert(
         self,
-        transformation: Union[VideoTransformation, DocumentTransformation],
-        store: Optional[bool] = None,
+        transformation: VideoTransformation | DocumentTransformation,
+        store: bool | None = None,
         save_in_group: bool = False,
     ) -> "File":
         """Convert video or document and return converted file.
@@ -479,10 +476,10 @@ class File:
             >>> converted_file: File = file.convert(transformation)
 
         Arguments:
-            - transformation (Union[VideoTransformation, DocumentTransformation]): transformation
+            - transformation (VideoTransformation | DocumentTransformation): transformation
                 path builder with configured parameters.
                 Depending on type video or document conversion will be performed.
-            - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
+            - store (bool | None): Should the file be automatically stored. Defaults to None.
                 - False - do not store file
                 - True - store file
                 - None - use project settings
@@ -504,15 +501,15 @@ class File:
 
     def convert_video(
         self,
-        transformation: Union[str, VideoTransformation],
-        store: Optional[bool] = None,
+        transformation: str | VideoTransformation,
+        store: bool | None = None,
     ) -> "File":
         """Convert video and return converted file instance.
 
         Arguments:
             - transformation (VideoTransformation): transformation path builder
                 with configured parameters.
-            - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
+            - store (bool | None): Should the file be automatically stored. Defaults to None.
                 - False - do not store file
                 - True - store file
                 - None - use project settings
@@ -534,8 +531,8 @@ class File:
 
     def convert_document(
         self,
-        transformation: Union[str, DocumentTransformation],
-        store: Optional[bool] = None,
+        transformation: str | DocumentTransformation,
+        store: bool | None = None,
         save_in_group: bool = False,
     ) -> "File":
         """Convert document and return converted file instance.
@@ -543,7 +540,7 @@ class File:
         Arguments:
             - transformation (DocumentTransformation): transformation path builder
                 with configured parameters.
-            - store (Optional[bool]): Should the file be automatically stored. Defaults to None.
+            - store (bool | None): Should the file be automatically stored. Defaults to None.
                 - False - do not store file
                 - True - store file
                 - None - use project settings
@@ -571,7 +568,7 @@ class File:
         group_id = response.format.converted_groups[format]
         return self._client.file_group(group_id)
 
-    def detect_faces(self) -> List[Face]:
+    def detect_faces(self) -> list[Face]:
         response = self._client.url_api.detect_faces(self.uuid)
         return response.faces
 
@@ -617,7 +614,7 @@ class FileFromUrl:
         self.token = token
         self._client = client
 
-        self._info_cache: Optional[Dict[str, Any]] = None
+        self._info_cache: dict[str, Any] | None = None
 
     def __repr__(self):
         return f"<uploadcare.FileFromUrl {self.token}>"
@@ -651,7 +648,7 @@ class FileFromUrl:
         timeout=30,
         interval=0.3,
         until_ready=False,
-        callback: Optional[Callable[[UploadProgress], Any]] = None,
+        callback: Callable[[UploadProgress], Any] | None = None,
     ):
         def check_file():
             info = self.update_info()
