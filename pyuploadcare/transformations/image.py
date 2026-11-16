@@ -1,5 +1,4 @@
 import warnings
-from typing import List, Optional, Union
 
 from pyuploadcare.transformations.base import BaseTransformation, StrEnum
 
@@ -173,10 +172,10 @@ class TextBoxMode(StrEnum):
 class ImageTransformation(BaseTransformation):
     def preview(
         self,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        width: int | None = None,
+        height: int | None = None,
     ) -> "ImageTransformation":
-        parameters: List[str] = []
+        parameters: list[str] = []
 
         if width or height:
             parameters.append(f'{width or ""}x{height or ""}')
@@ -186,8 +185,8 @@ class ImageTransformation(BaseTransformation):
 
     def resize(
         self,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        width: int | None = None,
+        height: int | None = None,
     ) -> "ImageTransformation":
         parameters = [f'{width or ""}x{height or ""}']
         self.set("resize", parameters)
@@ -198,7 +197,7 @@ class ImageTransformation(BaseTransformation):
         return self
 
     def smart_resize(self, width: int, height: int) -> "ImageTransformation":
-        parameters: List[str] = [f"{width}x{height}"]
+        parameters: list[str] = [f"{width}x{height}"]
         self.set("smart_resize", parameters)
         return self
 
@@ -206,11 +205,11 @@ class ImageTransformation(BaseTransformation):
         self,
         width: int,
         height: int,
-        offset_x: Optional[Union[int, str]] = None,
-        offset_y: Optional[Union[int, str]] = None,
-        alignment: Optional[CropAlignment] = None,
+        offset_x: int | str | None = None,
+        offset_y: int | str | None = None,
+        alignment: CropAlignment | None = None,
     ) -> "ImageTransformation":
-        parameters: List[str] = [f"{width}x{height}"]
+        parameters: list[str] = [f"{width}x{height}"]
 
         if alignment:
             parameters.append(alignment)
@@ -224,11 +223,11 @@ class ImageTransformation(BaseTransformation):
         self,
         width: int,
         height: int,
-        offset_x_percent: Optional[int] = None,
-        offset_y_percent: Optional[int] = None,
-        mode: Optional[ScaleCropMode] = None,
+        offset_x_percent: int | None = None,
+        offset_y_percent: int | None = None,
+        mode: ScaleCropMode | None = None,
     ) -> "ImageTransformation":
-        parameters: List[str] = [f"{width}x{height}"]
+        parameters: list[str] = [f"{width}x{height}"]
 
         if offset_x_percent and offset_y_percent:
             parameters.append(f"{offset_x_percent}p,{offset_y_percent}p")
@@ -239,28 +238,24 @@ class ImageTransformation(BaseTransformation):
 
     def border_radius(
         self,
-        radii: Union[int, str, List[Union[int, str]]],
-        vertical_radii: Optional[
-            Union[int, str, List[Union[int, str]]]
-        ] = None,
+        radii: int | str | list[int | str],
+        vertical_radii: int | str | list[int | str] | None = None,
     ) -> "ImageTransformation":
-        def _format_radii(
-            radii: Union[int, str, List[Union[int, str]]]
-        ) -> str:
+        def _format_radii(radii: int | str | list[int | str]) -> str:
             """
             >>> _format_radii(10)
             '10'
             >>> _format_radii([10, "20%"])
             '10,20p'
             """
-            radii_as_list: List[str] = (
+            radii_as_list: list[str] = (
                 [str(r) for r in radii]
                 if isinstance(radii, list)
                 else [str(radii)]
             )
             return ",".join(self._escape_percent(r) for r in radii_as_list)
 
-        parameters: List[str] = [_format_radii(radii)]
+        parameters: list[str] = [_format_radii(radii)]
 
         if vertical_radii:
             parameters.append(_format_radii(vertical_radii))
@@ -308,8 +303,8 @@ class ImageTransformation(BaseTransformation):
 
     def gif2video(
         self,
-        format: Optional[Gif2VideoFormat] = None,
-        quality: Optional[Gif2VideoQuality] = None,
+        format: Gif2VideoFormat | None = None,
+        quality: Gif2VideoQuality | None = None,
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/gif-to-video/
@@ -354,16 +349,16 @@ class ImageTransformation(BaseTransformation):
         return self._gif2video_quality(quality)
 
     def adjust_color(
-        self, adjustment: ColorAdjustment, value: Optional[int] = None
+        self, adjustment: ColorAdjustment, value: int | None = None
     ) -> "ImageTransformation":
-        parameters: List[str] = []
+        parameters: list[str] = []
         if value is not None:
             parameters.append(str(value))
         self.set(str(adjustment), parameters)
         return self
 
-    def enhance(self, value: Optional[int] = None) -> "ImageTransformation":
-        parameters: List[str] = []
+    def enhance(self, value: int | None = None) -> "ImageTransformation":
+        parameters: list[str] = []
         if value is not None:
             parameters.append(str(value))
         self.set("enhance", parameters)
@@ -378,28 +373,28 @@ class ImageTransformation(BaseTransformation):
         return self
 
     def filter(
-        self, image_filter: ImageFilter, value: Optional[int] = None
+        self, image_filter: ImageFilter, value: int | None = None
     ) -> "ImageTransformation":
-        parameters: List[str] = [image_filter]
+        parameters: list[str] = [image_filter]
         if value is not None:
             parameters.append(str(value))
         self.set("filter", parameters)
         return self
 
     def srgb(self, conversion: SRGBConversion) -> "ImageTransformation":
-        parameters: List[str] = [conversion]
+        parameters: list[str] = [conversion]
         self.set("srgb", parameters)
         return self
 
     def max_icc_size(self, threshold: int) -> "ImageTransformation":
-        parameters: List[str] = [str(threshold)]
+        parameters: list[str] = [str(threshold)]
         self.set("max_icc_size", parameters)
         return self
 
     def blur(
-        self, strength: Optional[int] = None, amount: Optional[int] = None
+        self, strength: int | None = None, amount: int | None = None
     ) -> "ImageTransformation":
-        parameters: List[str] = []
+        parameters: list[str] = []
         if strength:
             parameters.append(str(strength))
             if amount:
@@ -409,13 +404,13 @@ class ImageTransformation(BaseTransformation):
 
     def blur_region(
         self,
-        region_width: Union[str, int],
-        region_height: Union[str, int],
-        offset_x: Union[str, int],
-        offset_y: Union[str, int],
-        strength: Optional[int] = None,
+        region_width: str | int,
+        region_height: str | int,
+        offset_x: str | int,
+        offset_y: str | int,
+        strength: int | None = None,
     ) -> "ImageTransformation":
-        parameters: List[str] = [
+        parameters: list[str] = [
             f"{region_width}x{region_height}",
             f"{offset_x},{offset_y}",
         ]
@@ -424,17 +419,15 @@ class ImageTransformation(BaseTransformation):
         self.set("blur_region", parameters)
         return self
 
-    def blur_faces(
-        self, strength: Optional[int] = None
-    ) -> "ImageTransformation":
-        parameters: List[str] = ["faces"]
+    def blur_faces(self, strength: int | None = None) -> "ImageTransformation":
+        parameters: list[str] = ["faces"]
         if strength is not None:
             parameters.append(str(strength))
         self.set("blur_region", parameters)
         return self
 
-    def sharp(self, strength: Optional[int] = None) -> "ImageTransformation":
-        parameters: List[str] = []
+    def sharp(self, strength: int | None = None) -> "ImageTransformation":
+        parameters: list[str] = []
         if strength is not None:
             parameters.append(str(strength))
         self.set("sharp", parameters)
@@ -442,18 +435,18 @@ class ImageTransformation(BaseTransformation):
 
     def _get_parameters_for_overlay_position(
         self,
-        overlay_width: Optional[Union[str, int]],
-        overlay_height: Optional[Union[str, int]],
-        offset: Optional[OverlayOffset],
-        offset_x: Optional[Union[str, int]],
-        offset_y: Optional[Union[str, int]],
-    ) -> List[str]:
+        overlay_width: str | int | None,
+        overlay_height: str | int | None,
+        offset: OverlayOffset | None,
+        offset_x: str | int | None,
+        offset_y: str | int | None,
+    ) -> list[str]:
         """
         relative_dimensions and relative_coordinates for overlays.
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-image
         """
 
-        parameters: List[str] = []
+        parameters: list[str] = []
         if overlay_width is not None and overlay_height is not None:
             overlay_width = self._escape_percent(overlay_width)
             overlay_height = self._escape_percent(overlay_height)
@@ -471,18 +464,18 @@ class ImageTransformation(BaseTransformation):
     def overlay(
         self,
         uuid: str,
-        overlay_width: Optional[Union[str, int]] = None,
-        overlay_height: Optional[Union[str, int]] = None,
-        offset: Optional[OverlayOffset] = None,
-        offset_x: Optional[Union[str, int]] = None,
-        offset_y: Optional[Union[str, int]] = None,
-        strength: Optional[int] = None,
+        overlay_width: str | int | None = None,
+        overlay_height: str | int | None = None,
+        offset: OverlayOffset | None = None,
+        offset_x: str | int | None = None,
+        offset_y: str | int | None = None,
+        strength: int | None = None,
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-image
         """
 
-        parameters: List[str] = [
+        parameters: list[str] = [
             uuid,
             *self._get_parameters_for_overlay_position(
                 overlay_width, overlay_height, offset, offset_x, offset_y
@@ -497,12 +490,12 @@ class ImageTransformation(BaseTransformation):
 
     def overlay_self(
         self,
-        overlay_width: Optional[Union[str, int]] = None,
-        overlay_height: Optional[Union[str, int]] = None,
-        offset: Optional[OverlayOffset] = None,
-        offset_x: Optional[Union[str, int]] = None,
-        offset_y: Optional[Union[str, int]] = None,
-        strength: Optional[int] = None,
+        overlay_width: str | int | None = None,
+        overlay_height: str | int | None = None,
+        offset: OverlayOffset | None = None,
+        offset_x: str | int | None = None,
+        offset_y: str | int | None = None,
+        strength: int | None = None,
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-self
@@ -520,18 +513,18 @@ class ImageTransformation(BaseTransformation):
     def text(
         self,
         text: str,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
-        offset: Optional[OverlayOffset] = None,
-        offset_x: Optional[str] = None,
-        offset_y: Optional[str] = None,
-        horizontal_alignment: Optional[HorizontalTextAlignment] = None,
-        vertical_alignment: Optional[VerticalTextAlignment] = None,
-        font_size: Optional[int] = None,
-        font_color: Optional[str] = None,
-        box_mode: Optional[TextBoxMode] = None,
-        box_color: Optional[str] = None,
-        box_padding: Optional[int] = None,
+        overlay_width: str | int,
+        overlay_height: str | int,
+        offset: OverlayOffset | None = None,
+        offset_x: str | None = None,
+        offset_y: str | None = None,
+        horizontal_alignment: HorizontalTextAlignment | None = None,
+        vertical_alignment: VerticalTextAlignment | None = None,
+        font_size: int | None = None,
+        font_color: str | None = None,
+        box_mode: TextBoxMode | None = None,
+        box_color: str | None = None,
+        box_padding: int | None = None,
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
@@ -573,12 +566,12 @@ class ImageTransformation(BaseTransformation):
         return self
 
     def _font(
-        self, font_size: Optional[int], font_color: Optional[str]
+        self, font_size: int | None, font_color: str | None
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/overlay/#font-properties
         """
-        parameters: List[str] = []
+        parameters: list[str] = []
         if font_size:
             parameters.append(str(font_size))
         if font_color:
@@ -589,13 +582,13 @@ class ImageTransformation(BaseTransformation):
     def _text_box(
         self,
         box_mode: TextBoxMode,
-        box_color: Optional[str],
-        box_padding: Optional[int],
+        box_color: str | None,
+        box_padding: int | None,
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/overlay/#text-background-box
         """
-        parameters: List[str] = [box_mode]
+        parameters: list[str] = [box_mode]
         if box_color:
             parameters.append(box_color)
         if box_padding:
@@ -606,16 +599,16 @@ class ImageTransformation(BaseTransformation):
     def _text(
         self,
         text: str,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
-        offset: Optional[OverlayOffset],
-        offset_x: Optional[str],
-        offset_y: Optional[str],
+        overlay_width: str | int,
+        overlay_height: str | int,
+        offset: OverlayOffset | None,
+        offset_x: str | None,
+        offset_y: str | None,
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
         """
-        parameters: List[str] = [
+        parameters: list[str] = [
             *self._get_parameters_for_overlay_position(
                 overlay_width, overlay_height, offset, offset_x, offset_y
             ),
@@ -628,16 +621,16 @@ class ImageTransformation(BaseTransformation):
     def rect(
         self,
         color: str,
-        overlay_width: Union[str, int],
-        overlay_height: Union[str, int],
-        offset: Optional[OverlayOffset] = None,
-        offset_x: Optional[str] = None,
-        offset_y: Optional[str] = None,
+        overlay_width: str | int,
+        overlay_height: str | int,
+        offset: OverlayOffset | None = None,
+        offset_x: str | None = None,
+        offset_y: str | None = None,
     ) -> "ImageTransformation":
         """
         https://uploadcare.com/docs/transformations/image/overlay/#overlay-solid
         """
-        parameters: List[str] = [
+        parameters: list[str] = [
             color,
             *self._get_parameters_for_overlay_position(
                 overlay_width, overlay_height, offset, offset_x, offset_y
@@ -648,12 +641,12 @@ class ImageTransformation(BaseTransformation):
         return self
 
     def autorotate(self, enabled=True) -> "ImageTransformation":
-        parameters: List[str] = ["yes" if enabled else "no"]
+        parameters: list[str] = ["yes" if enabled else "no"]
         self.set("autorotate", parameters)
         return self
 
     def rotate(self, angle: int) -> "ImageTransformation":
-        parameters: List[str] = [str(angle)]
+        parameters: list[str] = [str(angle)]
         self.set("rotate", parameters)
         return self
 

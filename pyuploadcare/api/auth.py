@@ -1,7 +1,7 @@
 import hashlib
 import hmac
+from collections.abc import Generator
 from datetime import datetime, timezone
-from typing import Generator, Union
 
 from httpx2 import Auth, Request, Response
 from httpx2._utils import to_bytes, to_str
@@ -13,8 +13,8 @@ class AuthBase(Auth): ...
 class UploadcareSimpleAuth(AuthBase):
     def __init__(
         self,
-        public_key: Union[str, bytes],
-        secret_key: Union[str, bytes],
+        public_key: str | bytes,
+        secret_key: str | bytes,
         api_version: str,
     ) -> None:
         self.public_key = public_key
@@ -38,8 +38,8 @@ class UploadcareSimpleAuth(AuthBase):
     def _build_auth_header(
         self,
         request: Request,
-        public_key: Union[str, bytes],
-        secret_key: Union[str, bytes],
+        public_key: str | bytes,
+        secret_key: str | bytes,
         formated_date_time: str = "",
     ) -> str:
         credentials = f"{public_key!s}:{secret_key!s}"
@@ -72,8 +72,8 @@ class UploadcareAuth(UploadcareSimpleAuth):
     def _build_auth_header(
         self,
         request: Request,
-        public_key: Union[str, bytes],
-        secret_key: Union[str, bytes],
+        public_key: str | bytes,
+        secret_key: str | bytes,
         formated_date_time: str = "",
     ) -> str:
         content_md5 = hashlib.md5(request.read()).hexdigest()

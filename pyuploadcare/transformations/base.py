@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List, Optional, Union
 from urllib.parse import quote
 
 from typing_extensions import Self
@@ -12,7 +11,7 @@ class StrEnum(str, Enum):
 
 class BaseTransformation:
     def __init__(
-        self, transformation: Optional[Union[str, "BaseTransformation"]] = None
+        self, transformation: "str | BaseTransformation | None" = None
     ):
         if isinstance(transformation, BaseTransformation):
             transformation = transformation.effects
@@ -22,14 +21,14 @@ class BaseTransformation:
             transformation = transformation.rstrip("/")  # type: ignore
             self._effects.append(transformation)
 
-    def set(self, transformation_name: str, parameters: List[str]) -> Self:
+    def set(self, transformation_name: str, parameters: list[str]) -> Self:
         effect = transformation_name
         if parameters:
             effect += "/" + "/".join(parameters)
         self._effects.append(effect)
         return self
 
-    def _escape_percent(self, value: Union[str, int]) -> str:
+    def _escape_percent(self, value: str | int) -> str:
         return str(value).replace("%", "p")
 
     def _escape_text(self, value: str) -> str:

@@ -1,8 +1,8 @@
-# coding: utf-8
 """
 Configuration variables.
 
 """
+
 import os
 
 from pyuploadcare.helpers import get_cdn_base

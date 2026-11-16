@@ -2,7 +2,6 @@ import os
 import sys
 from io import BytesIO
 from tempfile import TemporaryDirectory
-from typing import Tuple
 
 import pytest
 
@@ -101,7 +100,7 @@ def uploadcare(setup_settings):
 
 
 @pytest.fixture()
-def memo_file(temp_directory) -> Tuple[BytesIO, int]:
+def memo_file(temp_directory) -> tuple[BytesIO, int]:
     ENOUGH_MILLIONS = 1_000
     mem_file = BytesIO(b"0" * ENOUGH_MILLIONS)
     mem_file.size = ENOUGH_MILLIONS  # type: ignore
