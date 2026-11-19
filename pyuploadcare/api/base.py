@@ -22,9 +22,7 @@ ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Response | Entity)
 
 UUID_PATTERN = r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}"
 
-RE_UUID_RESOURCE_ID: Pattern[str] = re.compile(
-    UUID_PATTERN + r"\Z", re.IGNORECASE
-)
+RE_UUID_RESOURCE_ID: Pattern[str] = re.compile(UUID_PATTERN + r"\Z", re.IGNORECASE)
 RE_GROUP_RESOURCE_ID: Pattern[str] = re.compile(
     UUID_PATTERN + r"~[0-9]+\Z", re.IGNORECASE
 )
@@ -66,9 +64,7 @@ class API:
         """Reject a resource id that does not match this endpoint's shape."""
         if not self.resource_id_pattern.match(resource_id):
             label = f"{self.resource_type} " if self.resource_type else ""
-            raise InvalidParamError(
-                f"Invalid {label}resource id: {resource_id}"
-            )
+            raise InvalidParamError(f"Invalid {label}resource id: {resource_id}")
 
     def _build_url(  # noqa: C901
         self,
@@ -93,9 +89,7 @@ class API:
             url += "?" + urlencode(query_parameters)
         return url
 
-    def _get_response_class(
-        self, action: str
-    ) -> type[Response] | type[Entity]:
+    def _get_response_class(self, action: str) -> type[Response] | type[Entity]:
         response_class = self.response_classes.get(
             action, self.response_classes.get("default")
         )
@@ -128,9 +122,7 @@ class API:
         document = self._client.put(url, json=data)
         return document.json()
 
-    def _delete(
-        self, resource_uuid: UUID | str | UUIDEntity | None = None
-    ) -> None:
+    def _delete(self, resource_uuid: UUID | str | UUIDEntity | None = None) -> None:
         url = self._build_url(resource_uuid)
         self._client.delete(url)
 
@@ -161,9 +153,7 @@ class APIProtocol(Protocol):
         query_parameters: dict[str, Any] | None = None,
     ) -> str: ...
 
-    def _get_response_class(
-        self, action: str
-    ) -> type[Response] | type[Entity]: ...
+    def _get_response_class(self, action: str) -> type[Response] | type[Entity]: ...
 
     def _post(self, data: dict | None = None) -> dict[str, Any]: ...
 
@@ -179,9 +169,7 @@ class APIProtocol(Protocol):
         data: dict | None = None,
     ) -> dict[str, Any]: ...
 
-    def _delete(
-        self, resource_uuid: UUID | str | UUIDEntity | None = None
-    ) -> None: ...
+    def _delete(self, resource_uuid: UUID | str | UUIDEntity | None = None) -> None: ...
 
     def _delete_with_response(
         self, resource_uuid: UUID | str | UUIDEntity | None = None

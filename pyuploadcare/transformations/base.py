@@ -10,9 +10,7 @@ class StrEnum(str, Enum):
 
 
 class BaseTransformation:
-    def __init__(
-        self, transformation: "str | BaseTransformation | None" = None
-    ):
+    def __init__(self, transformation: "str | BaseTransformation | None" = None):
         if isinstance(transformation, BaseTransformation):
             transformation = transformation.effects
 
@@ -32,9 +30,7 @@ class BaseTransformation:
         return str(value).replace("%", "p")
 
     def _escape_text(self, value: str) -> str:
-        return quote(
-            value.replace("~", "~~").replace("/", "~s").replace("\n", "~n")
-        )
+        return quote(value.replace("~", "~~").replace("/", "~s").replace("\n", "~n"))
 
     def _prefix(self, file_id: str) -> str:
         return f"{file_id}/"

@@ -50,9 +50,7 @@ def _search_all_fixtures(uploadcare, vcr):
 def test_search_files_parses_file_info(uploadcare, vcr):
     response = _search_all_fixtures(uploadcare, vcr)
 
-    main = next(
-        result for result in response.results if str(result.uuid) == MAIN_UUID
-    )
+    main = next(result for result in response.results if str(result.uuid) == MAIN_UUID)
 
     assert isinstance(main, FileSearchInfo)
     assert main.original_filename == "sunset-cat.jpg"
@@ -65,9 +63,7 @@ def test_search_files_parses_file_info(uploadcare, vcr):
 def test_search_files_parses_highlight(uploadcare, vcr):
     response = _search_all_fixtures(uploadcare, vcr)
 
-    main = next(
-        result for result in response.results if str(result.uuid) == MAIN_UUID
-    )
+    main = next(result for result in response.results if str(result.uuid) == MAIN_UUID)
     highlight = main.highlight
 
     assert highlight is not None
@@ -96,9 +92,7 @@ def test_search_files_handles_a_result_without_metadata(uploadcare, vcr):
 
 @pytest.mark.vcr
 def test_search_files_empty_result(uploadcare):
-    response = uploadcare.search_files(
-        FileSearchRequest(query="nothing-matches-this")
-    )
+    response = uploadcare.search_files(FileSearchRequest(query="nothing-matches-this"))
 
     assert response.total == 0
     assert response.results == []
@@ -114,9 +108,7 @@ def test_search_files_with_appdata(uploadcare):
 
     # A filter-only search has an undefined order and the unstored fixture
     # carries no scan, so locate the ClamAV-scanned main fixture directly.
-    main = next(
-        result for result in response.results if str(result.uuid) == MAIN_UUID
-    )
+    main = next(result for result in response.results if str(result.uuid) == MAIN_UUID)
     appdata = main.appdata
 
     assert appdata is not None

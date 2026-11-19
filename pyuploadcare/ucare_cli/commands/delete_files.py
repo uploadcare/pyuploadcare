@@ -10,8 +10,7 @@ def register_arguments(subparsers):
         type=int,
         dest="timeout",
         default=5,
-        help="Set wait seconds until operation completed."
-        " Default value is 5 seconds",
+        help="Set wait seconds until operation completed. Default value is 5 seconds",
     )
     group = subparser.add_mutually_exclusive_group()
     group.add_argument(

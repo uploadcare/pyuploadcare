@@ -91,9 +91,7 @@ def test_exact_rejects_empty_metadata_mapping():
         SearchExact(metadata={})
 
 
-@pytest.mark.parametrize(
-    "field", ["uuid", "original_filename", "detected_mime_type"]
-)
+@pytest.mark.parametrize("field", ["uuid", "original_filename", "detected_mime_type"])
 def test_exact_rejects_empty_arrays(field):
     with pytest.raises(ValidationError):
         SearchExact(**{field: []})
@@ -164,9 +162,7 @@ def test_sort_rejects_too_many_keys():
 
 def test_sort_rejects_duplicate_keys():
     with pytest.raises(ValidationError):
-        FileSearchRequest(
-            query="sunset", sort=[SearchSort.SIZE, SearchSort.SIZE]
-        )
+        FileSearchRequest(query="sunset", sort=[SearchSort.SIZE, SearchSort.SIZE])
 
 
 def test_sort_rejects_both_directions_of_the_same_key():
@@ -282,17 +278,13 @@ def test_unknown_field_is_rejected():
 
 def test_unknown_nested_field_is_rejected():
     with pytest.raises(ValidationError):
-        FileSearchRequest.model_validate(
-            {"exact": {"filename": ["sunset.jpg"]}}
-        )
+        FileSearchRequest.model_validate({"exact": {"filename": ["sunset.jpg"]}})
 
 
 def test_wire_shape_for_exact_metadata_is_rejected():
     """Dicts use the SDK shape, not the `metadata[key]` wire shape."""
     with pytest.raises(ValidationError):
-        FileSearchRequest.model_validate(
-            {"exact": {"metadata[color]": ["red"]}}
-        )
+        FileSearchRequest.model_validate({"exact": {"metadata[color]": ["red"]}})
 
 
 # --- to_payload -------------------------------------------------------------
@@ -310,9 +302,7 @@ def test_payload_lifts_exact_metadata_into_bracketed_keys():
 
 def test_payload_keeps_other_exact_fields_alongside_metadata():
     request = FileSearchRequest(
-        exact=SearchExact(
-            original_filename=["sunset.jpg"], metadata={"color": ["red"]}
-        )
+        exact=SearchExact(original_filename=["sunset.jpg"], metadata={"color": ["red"]})
     )
 
     assert request.to_payload() == {
@@ -331,9 +321,7 @@ def test_payload_renders_datetime_as_iso8601():
     )
 
     payload = request.to_payload()
-    assert payload["datetime_uploaded"]["gte"].startswith(
-        "2024-01-02T03:04:05"
-    )
+    assert payload["datetime_uploaded"]["gte"].startswith("2024-01-02T03:04:05")
 
 
 def test_payload_renders_sort_keys_as_values():

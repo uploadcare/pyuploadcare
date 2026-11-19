@@ -69,9 +69,7 @@ def test_search_response_shape(uploadcare):
 
 
 def test_query_returns_a_highlight(uploadcare, indexed_term):
-    response = uploadcare.search_files(
-        FileSearchRequest(query=indexed_term), limit=3
-    )
+    response = uploadcare.search_files(FileSearchRequest(query=indexed_term), limit=3)
 
     assert response.total >= 1
 
@@ -229,9 +227,7 @@ def test_pagination_matches_a_single_page(uploadcare):
     request = FileSearchRequest(is_image=True, sort=BY_NEWEST)
 
     page = uploadcare.search_files(request, limit=4)
-    iterated = list(
-        uploadcare.iterate_search_files(request, limit=4, request_limit=2)
-    )
+    iterated = list(uploadcare.iterate_search_files(request, limit=4, request_limit=2))
 
     assert [str(result.uuid) for result in iterated] == [
         str(result.uuid) for result in page.results

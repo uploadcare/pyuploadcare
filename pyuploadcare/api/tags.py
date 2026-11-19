@@ -39,9 +39,7 @@ def normalize_tags(tags: Iterable[str]) -> list[str]:
 
     for tag in tags:
         if not isinstance(tag, str):
-            raise TagValidationError(
-                f"Tag [{tag!s}] must be string not a {type(tag)}"
-            )
+            raise TagValidationError(f"Tag [{tag!s}] must be string not a {type(tag)}")
 
         normalized_tag = normalize_tag(tag)
 
@@ -56,9 +54,7 @@ def normalize_tags(tags: Iterable[str]) -> list[str]:
 
 def validate_tag(tag: str) -> None:
     if not isinstance(tag, str):
-        raise TagValidationError(
-            f"Tag [{tag!s}] must be string not a {type(tag)}"
-        )
+        raise TagValidationError(f"Tag [{tag!s}] must be string not a {type(tag)}")
 
     if not tag_matcher.match(tag):
         raise TagValidationError(

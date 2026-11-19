@@ -25,9 +25,7 @@ def ensure_aware_datetime(value: datetime) -> datetime:
 T = TypeVar("T")
 
 
-def iterate_over_batches(
-    collection: list[T], batch_size: int
-) -> Iterable[list[T]]:
+def iterate_over_batches(collection: list[T], batch_size: int) -> Iterable[list[T]]:
     """Generate consequent slices of size `batch_size`."""
     if batch_size < 1:
         raise ValueError("Wrong batch size: must be positive number")

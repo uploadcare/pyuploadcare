@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.ucare_cli.commands.search_files import (
@@ -9,6 +8,7 @@ from pyuploadcare.ucare_cli.commands.search_files import (
     search_files,
 )
 from pyuploadcare.ucare_cli.main import main
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 @pytest.mark.vcr
@@ -31,9 +31,7 @@ def test_cli_search_files(capsys, uploadcare):
 def test_cli_search_files_without_conditions_prints_error(capsys):
     """A `ValidationError` must not surface as a traceback."""
     main(
-        arg_namespace(
-            "--pub_key demopublickey --secret demosecretkey search_files"
-        ),
+        arg_namespace("--pub_key demopublickey --secret demosecretkey search_files"),
         config_file_names=(),
     )
     captured = capsys.readouterr()
@@ -49,9 +47,7 @@ def test_cli_search_files_without_conditions_raises(uploadcare):
 def test_cli_search_files_invalid_tag_raises_invalid_param(uploadcare):
     """Tag validation errors route through the CLI handler like any other."""
     with pytest.raises(InvalidParamError):
-        search_files(
-            arg_namespace("search_files --tags_any 'bad tag'"), uploadcare
-        )
+        search_files(arg_namespace("search_files --tags_any 'bad tag'"), uploadcare)
 
 
 @pytest.mark.parametrize("flag", ["--limit", "--request_limit"])
@@ -85,9 +81,7 @@ def test_cli_builds_nested_conditions():
         "phrase": {"original_filename": "sunset"},
         "exact": {"detected_mime_type": ["image/jpeg", "image/png"]},
         "size": {"gt": 1000, "lte": 5000},
-        "datetime_uploaded": {
-            "gte": datetime(2024, 1, 2, tzinfo=timezone.utc)
-        },
+        "datetime_uploaded": {"gte": datetime(2024, 1, 2, tzinfo=timezone.utc)},
         "tags": {"any": ["cat", "dog"], "none": ["old"]},
     }
 
@@ -100,9 +94,7 @@ def test_cli_omits_unset_conditions():
 
 def test_cli_sort_accepts_repeated_keys():
     parsed = arg_namespace("search_files --query sunset --sort=-score")
-    parsed_two = arg_namespace(
-        "search_files --query sunset --sort=-score --sort=size"
-    )
+    parsed_two = arg_namespace("search_files --query sunset --sort=-score --sort=size")
 
     assert parsed.sort == ["-score"]
     assert parsed_two.sort == ["-score", "size"]
@@ -132,9 +124,7 @@ def test_cli_uploaded_bound_rejects_unparsable_datetime():
 
 
 def test_cli_uploaded_bound_keeps_explicit_offset():
-    parsed = arg_namespace(
-        "search_files --uploaded_gte 2024-01-02T03:04:05+02:00"
-    )
+    parsed = arg_namespace("search_files --uploaded_gte 2024-01-02T03:04:05+02:00")
 
     assert parsed.uploaded_gte == datetime(
         2024, 1, 2, 3, 4, 5, tzinfo=timezone(timedelta(hours=2))

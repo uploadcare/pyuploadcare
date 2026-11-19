@@ -60,6 +60,5 @@ def test_generate_upload_signature(uploadcare):
     expire, signature = uploadcare.generate_upload_signature()
     assert expire == 1698364860
     assert (
-        signature
-        == "bf659caf5e081da589634770a84494fdb310d117be6f3f7b8e9842abf2997695"
+        signature == "bf659caf5e081da589634770a84494fdb310d117be6f3f7b8e9842abf2997695"
     )

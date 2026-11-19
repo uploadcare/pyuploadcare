@@ -1,7 +1,7 @@
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.ucare_cli.commands.delete_files import delete_files
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 def test_delete_parse_wait_arg():
@@ -15,17 +15,13 @@ def test_delete_wait_is_true_by_default():
 
 
 def test_delete_parse_no_wait_arg():
-    args = arg_namespace(
-        "delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342"
-    )
+    args = arg_namespace("delete --nowait 6c5e9526-b0fe-4739-8975-72e8d5ee6342")
     assert not args.wait
 
 
 @pytest.mark.vcr
 def test_delete_one_file(uploadcare):
-    args = arg_namespace(
-        "delete --nowait 23762be6-cfe3-4d27-86be-9ed7d403dd43"
-    )
+    args = arg_namespace("delete --nowait 23762be6-cfe3-4d27-86be-9ed7d403dd43")
 
     delete_files(args, uploadcare)
 

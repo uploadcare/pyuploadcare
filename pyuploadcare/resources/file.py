@@ -98,9 +98,7 @@ class File:
     def __str__(self):
         return self.cdn_url
 
-    def set_effects(
-        self, effects: str | ImageTransformation | None = None
-    ) -> None:
+    def set_effects(self, effects: str | ImageTransformation | None = None) -> None:
         effects = str(effects) if effects else ""
         self.default_effects = effects
 
@@ -344,9 +342,7 @@ class File:
         UpdateFileTagsResponse(tags=['cat', 'cute'], added=['cute'], deleted=['animal'])
 
         """
-        response = self._client.tags_api.update(
-            self.uuid, add=add, delete=delete
-        )
+        response = self._client.tags_api.update(self.uuid, add=add, delete=delete)
         self._cache_tags(response.tags)
         return response
 
@@ -442,9 +438,7 @@ class File:
 
     def delete(self) -> "None":
         """Deletes file by requesting Uploadcare API."""
-        self._info_cache = self._client.files_api.delete(
-            self.uuid
-        ).model_dump()
+        self._info_cache = self._client.files_api.delete(self.uuid).model_dump()
 
     def convert(
         self,
@@ -516,9 +510,7 @@ class File:
         """
         transformation = VideoTransformation(transformation)
         path = transformation.path(self.uuid)
-        response = self._client.video_convert_api.convert(
-            paths=[path], store=store
-        )
+        response = self._client.video_convert_api.convert(paths=[path], store=store)
         if response.problems:
             raise InvalidRequestError(str(response.problems))
 
@@ -559,9 +551,7 @@ class File:
         new_uuid = conversion_info.uuid
         return File(new_uuid, self._client)
 
-    def get_converted_document_group(
-        self, format: DocumentFormat
-    ) -> FileGroup:
+    def get_converted_document_group(self, format: DocumentFormat) -> FileGroup:
         response: DocumentConvertFormatInfo = (
             self._client.document_convert_api.retrieve(self.uuid)
         )
@@ -655,23 +645,17 @@ class FileFromUrl:
             status = info["status"]
 
             if callback:
-                callback(
-                    UploadProgress(total=info["total"], done=info["done"])
-                )
+                callback(UploadProgress(total=info["total"], done=info["done"]))
 
             if status == "success":
                 return self.get_file()
             if status in ("failed", "error"):
-                raise UploadError(
-                    f"could not upload file from url: {self.info}"
-                )
+                raise UploadError(f"could not upload file from url: {self.info}")
 
         time_started = time.time()
         while time.time() - time_started < timeout:
             file = check_file()
-            if file and (
-                not until_ready or file.update_info().get("is_ready")
-            ):
+            if file and (not until_ready or file.update_info().get("is_ready")):
                 return file
             time.sleep(interval)
 

@@ -27,9 +27,7 @@ def test_create_key_and_delete(uploadcare, vcr):
 
     assert created_value == new_value
 
-    uploadcare.metadata_api.delete_key(
-        "cdc00a7a-366f-4e0b-a942-9a7141b4004b", new_key
-    )
+    uploadcare.metadata_api.delete_key("cdc00a7a-366f-4e0b-a942-9a7141b4004b", new_key)
 
     with vcr.use_cassette("test_get_all_metadata"):
         stored_metadata = uploadcare.metadata_api.get_all_metadata(

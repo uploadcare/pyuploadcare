@@ -110,9 +110,7 @@ def main(argv: list[str]) -> int:
             env=record_env,
         )
 
-    print(
-        "\n== Verifying replay without keys (falls back to demosecretkey) =="
-    )
+    print("\n== Verifying replay without keys (falls back to demosecretkey) ==")
     replay_env = {
         key: value
         for key, value in os.environ.items()

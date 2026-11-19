@@ -85,11 +85,7 @@ class ProjectAPIClient:
             base_url=api_base,
             auth=self.auth,
             headers={"Accept": "application/json"},
-            verify=(
-                DEFAULT_SSL_CONTEXT
-                if verify_api_ssl is True
-                else verify_api_ssl
-            ),
+            verify=(DEFAULT_SSL_CONTEXT if verify_api_ssl is True else verify_api_ssl),
             timeout=timeout,
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,

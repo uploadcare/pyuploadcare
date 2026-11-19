@@ -32,9 +32,7 @@ class FileField(models.Field, metaclass=SubfieldBase):
             return value
 
         if not isinstance(value, str):
-            raise ValidationError(
-                "Invalid value for a field: string was expected"
-            )
+            raise ValidationError("Invalid value for a field: string was expected")
 
         try:
             return self._client.file(value)
@@ -154,9 +152,7 @@ class FileGroupField(models.Field, metaclass=SubfieldBase):
             return value
 
         if not isinstance(value, str):
-            raise ValidationError(
-                "Invalid value for a field: string was expected"
-            )
+            raise ValidationError("Invalid value for a field: string was expected")
 
         try:
             return self._client.file_group(value)
