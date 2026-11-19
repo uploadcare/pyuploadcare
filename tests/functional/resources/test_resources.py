@@ -152,9 +152,7 @@ def test_file_upload_signature(small_file, uploadcare, signed_uploads):
 
     assert mocked_post.called
     data = mocked_post.call_args[1]["data"]
-    expected_expire = datetime.now() + timedelta(
-        seconds=uploadcare.signed_uploads_ttl
-    )
+    expected_expire = datetime.now() + timedelta(seconds=uploadcare.signed_uploads_ttl)
     assert data["expire"] == str(int(expected_expire.timestamp()))
     assert (
         data["signature"]
@@ -178,9 +176,7 @@ def test_file_create_local_copy(uploadcare):
 
 @pytest.mark.vcr
 def test_file_delete(uploadcare):
-    file = uploadcare.file(
-        "35ea470d-216c-4752-91d2-5176b34c1225"
-    ).create_local_copy(
+    file = uploadcare.file("35ea470d-216c-4752-91d2-5176b34c1225").create_local_copy(
         effects="effect/flip/-/effect/mirror/",
         store=True,
     )
@@ -274,9 +270,7 @@ def test_file_info_has_new_structure(uploadcare):
 @pytest.mark.vcr
 def test_file_convert_document_page(uploadcare):
     file = uploadcare.file("5dddafa0-a742-4a51-ac40-ae491201ff97")
-    transformation = (
-        DocumentTransformation().format(DocumentFormat.png).page(1)
-    )
+    transformation = DocumentTransformation().format(DocumentFormat.png).page(1)
     converted_file = file.convert(transformation)
     assert not converted_file.is_ready
 
@@ -291,19 +285,14 @@ def test_cdn_url_default_effects(uploadcare, image_transformation):
     file.set_effects(image_transformation)
 
     assert file.cdn_url == (
-        "https://ucarecdn.com/5dddafa0-a742-4a51-ac40-ae491201ff97/"
-        "-/grayscale/-/flip/"
+        "https://ucarecdn.com/5dddafa0-a742-4a51-ac40-ae491201ff97/-/grayscale/-/flip/"
     )
 
 
 @pytest.mark.vcr
-def test_create_local_copy_with_transformation(
-    uploadcare, image_transformation
-):
+def test_create_local_copy_with_transformation(uploadcare, image_transformation):
     file = uploadcare.file("463c38f7-8a27-46bb-bebc-2e0617d159a4")
-    copied_file = file.create_local_copy(
-        effects=image_transformation, store=True
-    )
+    copied_file = file.create_local_copy(effects=image_transformation, store=True)
     assert copied_file
 
 

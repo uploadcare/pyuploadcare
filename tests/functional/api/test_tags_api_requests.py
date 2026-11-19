@@ -56,9 +56,7 @@ def test_replace_sends_normalized_tags(tags_api):
     ) as mocked_put:
         response = tags_api.set(FILE_UUID, [" Cat ", "ANIMAL", "cat"])
 
-    mocked_put.assert_called_once_with(
-        TAGS_URL, json={"tags": ["cat", "animal"]}
-    )
+    mocked_put.assert_called_once_with(TAGS_URL, json={"tags": ["cat", "animal"]})
     assert response.tags == ["cat", "animal"]
     assert response.added == ["animal"]
     assert response.deleted == []

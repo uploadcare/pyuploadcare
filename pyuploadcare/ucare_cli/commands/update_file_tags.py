@@ -26,12 +26,8 @@ def register_arguments(subparsers):
 
 def update_file_tags(arg_namespace, client: Uploadcare):
     if arg_namespace.add is None and arg_namespace.delete is None:
-        raise InvalidParamError(
-            "nothing to do: pass at least one of --add or --delete"
-        )
+        raise InvalidParamError("nothing to do: pass at least one of --add or --delete")
 
     file = client.file(arg_namespace.path)
-    response = file.update_tags(
-        add=arg_namespace.add, delete=arg_namespace.delete
-    )
+    response = file.update_tags(add=arg_namespace.add, delete=arg_namespace.delete)
     pprint(response.model_dump())

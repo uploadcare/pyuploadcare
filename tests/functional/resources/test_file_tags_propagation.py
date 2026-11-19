@@ -139,13 +139,9 @@ def test_upload_from_url_forwards_tags(uploadcare):
 
 
 def test_upload_from_url_sync_forwards_tags_to_upload_api(uploadcare):
-    with patch.object(
-        uploadcare.upload_api, "upload_from_url"
-    ) as mocked_upload:
+    with patch.object(uploadcare.upload_api, "upload_from_url") as mocked_upload:
         with patch.object(FileFromUrl, "wait"):
-            uploadcare.upload_from_url_sync(
-                "https://example.com/file.jpg", tags=TAGS
-            )
+            uploadcare.upload_from_url_sync("https://example.com/file.jpg", tags=TAGS)
 
     assert mocked_upload.call_args.kwargs["tags"] == TAGS
 

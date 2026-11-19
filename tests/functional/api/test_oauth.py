@@ -2,7 +2,6 @@ import io
 import os
 import subprocess
 import sys
-from typing import List
 
 import httpx2
 import pytest
@@ -22,10 +21,10 @@ class TokenServer:
 
     def __init__(self, valid_token: str) -> None:
         self.valid_token = valid_token
-        self.requests: List[httpx2.Request] = []
+        self.requests: list[httpx2.Request] = []
 
     @property
-    def tokens(self) -> List[str]:
+    def tokens(self) -> list[str]:
         return [
             request.headers["Authorization"].removeprefix("Bearer ")
             for request in self.requests
@@ -136,7 +135,7 @@ FILE_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
 
 class RecordingTransport:
     def __init__(self) -> None:
-        self.requests: List[httpx2.Request] = []
+        self.requests: list[httpx2.Request] = []
 
     def __call__(self, request: httpx2.Request) -> httpx2.Response:
         self.requests.append(request)
@@ -273,9 +272,7 @@ def test_both_clients_read_uploadcare_oauth_token_env():
 def test_sets_public_key_header_when_given():
     server = TokenServer("token")
 
-    make_http_client(UploadcareOAuth("token", public_key="pub"), server).get(
-        URL
-    )
+    make_http_client(UploadcareOAuth("token", public_key="pub"), server).get(URL)
 
     headers = server.requests[0].headers
     assert headers["Authorization"] == "Bearer token"

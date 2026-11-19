@@ -25,9 +25,7 @@ def _list(api_list_method, arg_namespace, **extra):
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
         if ordering_field in ("", "datetime_uploaded", "datetime_created"):
-            arg_namespace.starting_point = parse_datetime(
-                arg_namespace.starting_point
-            )
+            arg_namespace.starting_point = parse_datetime(arg_namespace.starting_point)
 
     items = api_list_method(
         starting_point=arg_namespace.starting_point,
@@ -74,7 +72,7 @@ def _handle_uploaded_file(file_, arg_namespace):
         pprint(file_.info)
 
     if arg_namespace.cdnurl:
-        pprint("CDN url: {0}".format(file_.cdn_url))
+        pprint(f"CDN url: {file_.cdn_url}")
 
 
 class Encoder(json.JSONEncoder):
@@ -117,7 +115,7 @@ def int_or_none(value):
 
 
 def promt(text, default="y"):
-    return (input("{0} [y/n]: ".format(text)) or default) == "y"
+    return (input(f"{text} [y/n]: ") or default) == "y"
 
 
 def bar(iter_content, parts, title=""):
@@ -128,9 +126,7 @@ def bar(iter_content, parts, title=""):
     step = cells / parts
 
     draw = lambda progress: sys.stdout.write(  # noqa: E731
-        "\r[{0:10}] {1:.2f}% {2}".format(
-            "#" * int(progress), progress * cells, title
-        )
+        f"\r[{'#' * int(progress):10}] {progress * cells:.2f}% {title}"
     )
 
     for chunk in iter_content:

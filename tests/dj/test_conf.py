@@ -32,14 +32,10 @@ class GetLegacyWidgetAssetsTest(unittest.TestCase):
 
     def test_local_js_url(self):
         config["use_hosted_assets"] = False
-        self.assertEqual(
-            get_legacy_widget_js_url(), "uploadcare/uploadcare.min.js"
-        )
+        self.assertEqual(get_legacy_widget_js_url(), "uploadcare/uploadcare.min.js")
 
     def test_override_js_url(self):
-        config["legacy_widget"][
-            "override_js_url"
-        ] = "https://example.com/uploadcare.js"
+        config["legacy_widget"]["override_js_url"] = "https://example.com/uploadcare.js"
         self.assertEqual(
             get_legacy_widget_js_url(), "https://example.com/uploadcare.js"
         )
@@ -76,9 +72,7 @@ class GetWidgetAssetsTest(unittest.TestCase):
 
     def test_local_js_url(self):
         config["use_hosted_assets"] = False
-        self.assertEqual(
-            get_widget_js_url(), "uploadcare/file-uploader.min.js"
-        )
+        self.assertEqual(get_widget_js_url(), "uploadcare/file-uploader.min.js")
 
     def test_override_js_url(self):
         config["widget"]["override_js_url"] = "https://example.com/blocks.js"
@@ -100,9 +94,9 @@ class GetWidgetAssetsTest(unittest.TestCase):
         )
 
     def test_override_css_url(self):
-        config["widget"]["override_css_url"][
-            "minimal"
-        ] = "https://example.com/minimal.css"
+        config["widget"]["override_css_url"]["minimal"] = (
+            "https://example.com/minimal.css"
+        )
         self.assertEqual(
             get_widget_css_url("minimal"), "https://example.com/minimal.css"
         )

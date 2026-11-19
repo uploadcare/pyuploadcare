@@ -1,11 +1,11 @@
-from typing import Any, Dict
+from typing import Any
 
 from pyuploadcare.client import Uploadcare
 from pyuploadcare.dj.conf import config, user_agent_extension
 
 
 def get_uploadcare_client():
-    client_config: Dict[str, Any] = {
+    client_config: dict[str, Any] = {
         "public_key": config["pub_key"],
         "secret_key": config["secret"],
         "user_agent_extension": user_agent_extension,

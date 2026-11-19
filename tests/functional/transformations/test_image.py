@@ -28,8 +28,7 @@ def test_image_transformation_path():
         .resize(220)
     )
     assert str(transformation) == (
-        "quality/best/-/preview/160x160/"
-        "-/setfill/8d8578/-/stretch/fill/-/resize/220x/"
+        "quality/best/-/preview/160x160/-/setfill/8d8578/-/stretch/fill/-/resize/220x/"
     )
     assert transformation.path("52da3bfc-7cd8-4861-8b05-126fef7a6994") == (
         "52da3bfc-7cd8-4861-8b05-126fef7a6994/"
@@ -40,9 +39,7 @@ def test_image_transformation_path():
 
 def test_image_smart_resize():
     transformation = (
-        ImageTransformation()
-        .smart_resize(440, 600)
-        .quality(ImageQuality.smart)
+        ImageTransformation().smart_resize(440, 600).quality(ImageQuality.smart)
     )
 
     assert str(transformation) == ("smart_resize/440x600/-/quality/smart/")
@@ -57,9 +54,7 @@ def test_image_crop():
 
 
 def test_image_crop_offset():
-    transformation = ImageTransformation().crop(
-        640, 424, offset_x=2560, offset_y=830
-    )
+    transformation = ImageTransformation().crop(640, 424, offset_x=2560, offset_y=830)
 
     assert str(transformation) == "crop/640x424/2560,830/"
 
@@ -84,9 +79,7 @@ def test_border_radius():
 
 
 def test_setfill():
-    transformation = (
-        ImageTransformation().setfill("ece3d2").format(ImageFormat.jpeg)
-    )
+    transformation = ImageTransformation().setfill("ece3d2").format(ImageFormat.jpeg)
 
     assert str(transformation) == "setfill/ece3d2/-/format/jpeg/"
 
@@ -103,10 +96,7 @@ def test_rasterize():
 
 def test_image_progressive():
     transformation = (
-        ImageTransformation()
-        .preview()
-        .quality(ImageQuality.best)
-        .progressive()
+        ImageTransformation().preview().quality(ImageQuality.best).progressive()
     )
 
     assert str(transformation) == "preview/-/quality/best/-/progressive/yes/"
@@ -150,10 +140,7 @@ def test_image_color_adjustment():
         .adjust_color(ColorAdjustment.warmth, 50)
     )
 
-    assert (
-        str(transformation)
-        == "preview/-/saturation/-80/-/contrast/80/-/warmth/50/"
-    )
+    assert str(transformation) == "preview/-/saturation/-80/-/contrast/80/-/warmth/50/"
 
 
 def test_image_enhance():
@@ -175,9 +162,7 @@ def test_image_invert():
 
 
 def test_image_filter():
-    transformation = (
-        ImageTransformation().preview().filter(ImageFilter.briaril)
-    )
+    transformation = ImageTransformation().preview().filter(ImageFilter.briaril)
 
     assert str(transformation) == "preview/-/filter/briaril/"
 
@@ -190,10 +175,7 @@ def test_image_color_profile():
 
 def test_image_max_icc_size():
     transformation = (
-        ImageTransformation()
-        .max_icc_size(0)
-        .srgb(SRGBConversion.fast)
-        .preview()
+        ImageTransformation().max_icc_size(0).srgb(SRGBConversion.fast).preview()
     )
 
     assert str(transformation) == "max_icc_size/0/-/srgb/fast/-/preview/"
@@ -211,9 +193,7 @@ def test_image_blur_region():
         .preview(440, 400)
         .blur_region(130, 180, offset_x=220, offset_y=25)
     )
-    assert (
-        str(transformation) == "preview/440x400/-/blur_region/130x180/220,25/"
-    )
+    assert str(transformation) == "preview/440x400/-/blur_region/130x180/220,25/"
 
 
 def test_image_blur_region_percent():
@@ -222,10 +202,7 @@ def test_image_blur_region_percent():
         .preview(440, 400)
         .blur_region("30p", "80p", offset_x="50p", offset_y="10p", strength=20)
     )
-    assert (
-        str(transformation)
-        == "preview/440x400/-/blur_region/30px80p/50p,10p/20/"
-    )
+    assert str(transformation) == "preview/440x400/-/blur_region/30px80p/50p,10p/20/"
 
 
 def test_image_blur_faces():
@@ -255,8 +232,7 @@ def test_overlay():
         .preview()
     )
     assert str(transformation) == (
-        "overlay/b18b5179-b9f6-4fdc-9920-5539f938fc44/50px50p/"
-        "center/-/preview/"
+        "overlay/b18b5179-b9f6-4fdc-9920-5539f938fc44/50px50p/center/-/preview/"
     )
 
 

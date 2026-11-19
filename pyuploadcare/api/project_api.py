@@ -61,8 +61,7 @@ def validate_project_data(data: ProjectPayload) -> Project:
         return data
     if not isinstance(data, dict):
         raise InvalidParamError(
-            "project data must be a `Project` or a dict, "
-            f"got {type(data).__name__}"
+            f"project data must be a `Project` or a dict, got {type(data).__name__}"
         )
     try:
         return Project.model_validate(data, extra="forbid")
@@ -193,9 +192,7 @@ class ProjectsAPI(ProjectAPIBase):
         response = self._parse_response(json_response, response_class)
         return cast(Project, response)
 
-    def update(
-        self, project: ProjectOrPubKey, data: ProjectPayload
-    ) -> Project:
+    def update(self, project: ProjectOrPubKey, data: ProjectPayload) -> Project:
         """Change only the fields present in ``data``.
 
         The Project API updates projects with ``POST``.
@@ -311,9 +308,7 @@ class ProjectModerationAPI(ProjectAPIBase):
         thresholds: Iterable[ModerationThreshold | dict[str, Any]],
     ) -> list[dict[str, Any]]:
         if isinstance(thresholds, (dict, str, bytes)):
-            raise InvalidParamError(
-                "`thresholds` must be a collection of thresholds"
-            )
+            raise InvalidParamError("`thresholds` must be a collection of thresholds")
 
         payload: list[dict[str, Any]] = []
         seen = set()

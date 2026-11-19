@@ -44,5 +44,5 @@ def test_video_transformation_custom_without_parameters():
     transformation = VideoTransformation().set("custom", []).thumbs(10)
 
     assert transformation.path("a6efd840-076f-4227-9073-bbaef16cfe35") == (
-        "a6efd840-076f-4227-9073-bbaef16cfe35/video/" "-/custom/-/thumbs~10/"
+        "a6efd840-076f-4227-9073-bbaef16cfe35/video/-/custom/-/thumbs~10/"
     )
