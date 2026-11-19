@@ -1124,6 +1124,20 @@ class Uploadcare:
 
         return self.webhooks_api.delete(webhook_id)  # type: ignore
 
+    def unsubscribe_webhook(self, target_url: str) -> None:
+        """Delete the webhooks that send events to ``target_url``.
+
+        Deletes the webhooks for all events that use the URL; to delete one
+        webhook, use ``delete_webhook()`` with its id. A URL with no
+        webhooks is not an error.
+
+        Usage example::
+
+            >>> uploadcare.unsubscribe_webhook('https://example.com/hooks/')
+
+        """
+        self.webhooks_api.unsubscribe(target_url)
+
     def get_project_info(self) -> ProjectInfo:
         """Get info about account project."""
 
