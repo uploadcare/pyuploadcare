@@ -303,6 +303,88 @@ def test_list_projects_validates_request_limit(client, request_limit):
         client.list_projects(request_limit=request_limit)
 
 
+def test_list_projects_page_returns_one_page(client, server):
+    next_url = f"{API_BASE}projects/?from=b&limit=2"
+    server.respond(
+        payload=page(
+            [{"pub_key": "a"}, {"pub_key": "b"}],
+            next_=next_url,
+            total=3,
+            per_page=2,
+        )
+    )
+
+    response = client.list_projects_page(request_limit=2)
+
+    assert [p.pub_key for p in response.results] == ["a", "b"]
+    assert response.next == next_url
+    assert response.previous is None
+    assert response.total == 3
+    assert response.per_page == 2
+    assert len(server.requests) == 1
+    assert url_without_query(server.last) == f"{API_BASE}projects/"
+    assert query(server.last) == {"limit": ["2"]}
+
+
+@pytest.mark.parametrize("request_limit", [0, 101, True, "10"])
+def test_list_projects_page_validates_request_limit(client, request_limit):
+    with pytest.raises(InvalidParamError):
+        client.list_projects_page(request_limit=request_limit)
+
+
+@pytest.mark.parametrize(
+    "next_url",
+    [
+        f"{API_BASE}projects/?from=b&limit=2",
+        "HTTPS://API.uploadcare.com:443/projects/?from=b&limit=2",
+        "/projects/?from=b&limit=2",
+        "projects/?from=b&limit=2",
+    ],
+)
+def test_fetch_projects_page(client, server, next_url):
+    server.respond(payload=page([{"pub_key": "c"}], total=3))
+
+    response = client.fetch_projects_page(next_url)
+
+    assert [p.pub_key for p in response.results] == ["c"]
+    assert url_without_query(server.last) == f"{API_BASE}projects/"
+    assert query(server.last) == {"from": ["b"], "limit": ["2"]}
+
+
+def test_fetch_projects_page_resolves_against_api_base_with_path(server):
+    api_base = "http://localhost:8000/apps/api/project-api/v1/"
+    client = make_client(server, api_base=api_base)
+    server.respond(payload=page([{"pub_key": "c"}]))
+
+    client.fetch_projects_page("projects/?from=b")
+
+    assert str(server.last.url) == f"{api_base}projects/?from=b"
+
+
+@pytest.mark.parametrize(
+    "next_url",
+    [
+        "https://evil.example/projects/",
+        "//evil.example/projects/",
+        "http://api.uploadcare.com/projects/",
+        "https://api.uploadcare.com:8443/projects/",
+    ],
+)
+def test_fetch_projects_page_refuses_foreign_origin(client, server, next_url):
+    with pytest.raises(InvalidRequestError, match="refusing to follow"):
+        client.fetch_projects_page(next_url)
+
+    assert server.requests == []
+
+
+@pytest.mark.parametrize("next_url", ["", None, 42])
+def test_fetch_projects_page_requires_url(client, server, next_url):
+    with pytest.raises(InvalidParamError):
+        client.fetch_projects_page(next_url)
+
+    assert server.requests == []
+
+
 def test_count_projects(client, server):
     server.respond(payload=page([{"pub_key": "a"}], total=42, per_page=1))
 

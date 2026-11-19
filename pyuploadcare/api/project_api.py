@@ -13,7 +13,7 @@ from typing import Any, cast
 
 from pydantic import ValidationError
 
-from pyuploadcare.api.base import API, _iterate_pages
+from pyuploadcare.api.base import API, PageMixin, _iterate_pages
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
     CombinedUsage,
@@ -142,7 +142,7 @@ class ProjectAPIBase(API):
         return {"limit": request_limit}
 
 
-class ProjectsAPI(ProjectAPIBase):
+class ProjectsAPI(ProjectAPIBase, PageMixin):
     """Projects and their settings."""
 
     response_classes = {
@@ -166,6 +166,23 @@ class ProjectsAPI(ProjectAPIBase):
         _check_page_limits(limit, request_limit)
         url = self._build_url(query_parameters=self._page_query(request_limit))
         return self._iterate(url, "list", limit=limit)
+
+    def list_page(  # type: ignore[override]
+        self,
+        request_limit: int | None = None,
+    ) -> ProjectListResponse:
+        """Return the first page of projects available to the token's user.
+
+        Args:
+            - request_limit: number of projects per page, 1 to 100.
+        """
+        _check_page_limits(None, request_limit)
+        page = super().list_page(request_limit=request_limit)
+        return cast(ProjectListResponse, page)
+
+    def fetch_page(self, next_url: str) -> ProjectListResponse:
+        """Return the page of projects that ``next_url`` points to."""
+        return cast(ProjectListResponse, super().fetch_page(next_url))
 
     def count(self) -> int:
         url = self._build_url(query_parameters={"limit": 1})

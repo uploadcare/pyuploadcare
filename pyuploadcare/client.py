@@ -4,7 +4,7 @@ import ssl
 import warnings
 from collections.abc import Callable, Iterable, Iterator
 from time import time
-from typing import IO, Any
+from typing import IO, Any, cast
 from uuid import UUID
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
@@ -29,7 +29,11 @@ from pyuploadcare.api.entities import (
     Webhook,
     WebhookEvent,
 )
-from pyuploadcare.api.responses import FileSearchResponse
+from pyuploadcare.api.responses import (
+    FileListResponse,
+    FileSearchResponse,
+    GroupListResponse,
+)
 from pyuploadcare.api.search_entities import FileSearchRequest
 from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
@@ -805,6 +809,54 @@ class Uploadcare:
             removed=removed,
         )
 
+    def list_files_page(
+        self,
+        starting_point=None,
+        ordering=None,
+        request_limit: int | None = None,
+        stored: bool | None = None,
+        removed: bool | None = None,
+    ) -> FileListResponse:
+        """Get the first page of files.
+
+        Takes the filters of ``list_files()``. The page has ``results``
+        (``FileInfo``), ``total``, ``per_page``, ``next`` and ``previous``.
+        ``next`` is ``None`` on the last page.
+
+        Usage example::
+
+            >>> page = uploadcare.list_files_page(stored=True, request_limit=50)
+            >>> print(page.total)
+            >>> for file_info in page.results:
+            ...     print(file_info.uuid)
+
+        Get the next page later, e.g. in another request::
+
+            >>> cursor = page.next
+            >>> page = uploadcare.fetch_files_page(cursor)
+
+        """
+        query_parameters = FileList(
+            client=self,
+            starting_point=starting_point,
+            ordering=ordering,
+            stored=stored,
+            removed=removed,
+        ).query_parameters()
+        page = self.files_api.list_page(
+            request_limit=request_limit, **query_parameters
+        )
+        return cast(FileListResponse, page)
+
+    def fetch_files_page(self, next_url: str) -> FileListResponse:
+        """Get the page of files that ``next_url`` points to.
+
+        ``next_url`` is the ``next`` or ``previous`` of a page from
+        ``list_files_page()``. A URL outside the REST API origin raises
+        ``InvalidRequestError``.
+        """
+        return cast(FileListResponse, self.files_api.fetch_page(next_url))
+
     def search_files(
         self,
         request: FileSearchRequest | dict[str, Any],
@@ -953,6 +1005,45 @@ class Uploadcare:
             limit=limit,
             request_limit=request_limit,
         )
+
+    def list_file_groups_page(
+        self,
+        starting_point=None,
+        ordering=None,
+        request_limit: int | None = None,
+    ) -> GroupListResponse:
+        """Get the first page of file groups.
+
+        Takes the filters of ``list_file_groups()``. The page has ``results``
+        (``GroupInfo``), ``total``, ``per_page``, ``next`` and ``previous``.
+
+        Usage example::
+
+            >>> page = uploadcare.list_file_groups_page(request_limit=20)
+            >>> groups = list(page.results)
+            >>> while page.next:
+            ...     page = uploadcare.fetch_file_groups_page(page.next)
+            ...     groups.extend(page.results)
+
+        """
+        query_parameters = GroupList(
+            client=self,
+            starting_point=starting_point,
+            ordering=ordering,
+        ).query_parameters()
+        page = self.groups_api.list_page(
+            request_limit=request_limit, **query_parameters
+        )
+        return cast(GroupListResponse, page)
+
+    def fetch_file_groups_page(self, next_url: str) -> GroupListResponse:
+        """Get the page of file groups that ``next_url`` points to.
+
+        ``next_url`` is the ``next`` or ``previous`` of a page from
+        ``list_file_groups_page()``. A URL outside the REST API origin raises
+        ``InvalidRequestError``.
+        """
+        return cast(GroupListResponse, self.groups_api.fetch_page(next_url))
 
     def create_webhook(
         self,

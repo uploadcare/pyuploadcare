@@ -21,6 +21,7 @@ from pyuploadcare.api.project_entities import (
     ModerationThreshold,
     Project,
     ProjectFeatures,
+    ProjectListResponse,
     UsageMetric,
     UsageMetricName,
 )
@@ -131,6 +132,37 @@ class ProjectAPIClient:
             - request_limit: number of projects per request (page), 1 to 100.
         """
         return self.projects_api.list(limit=limit, request_limit=request_limit)
+
+    def list_projects_page(
+        self,
+        request_limit: int | None = None,
+    ) -> ProjectListResponse:
+        """Get the first page of projects available to the token's user.
+
+        The page has ``results`` (``Project``), ``total``, ``per_page``,
+        ``next`` and ``previous``. ``next`` is ``None`` on the last page.
+
+        Usage example::
+
+            >>> page = projects.list_projects_page(request_limit=10)
+            >>> for project in page.results:
+            ...     print(project.pub_key, project.name)
+            >>> if page.next:
+            ...     page = projects.fetch_projects_page(page.next)
+
+        Args:
+            - request_limit: projects per page, 1 to 100.
+        """
+        return self.projects_api.list_page(request_limit=request_limit)
+
+    def fetch_projects_page(self, next_url: str) -> ProjectListResponse:
+        """Get the page of projects that ``next_url`` points to.
+
+        ``next_url`` is the ``next`` or ``previous`` of a page from
+        ``list_projects_page()``. A URL outside the Project API origin raises
+        ``InvalidRequestError``.
+        """
+        return self.projects_api.fetch_page(next_url)
 
     def count_projects(self) -> int:
         """Number of projects available to the token's user."""
