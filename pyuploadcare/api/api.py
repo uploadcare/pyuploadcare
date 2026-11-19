@@ -676,7 +676,7 @@ class UploadAPI(API):
                 expire,
             )
 
-        url = self._build_url(base="/group/")
+        url = self._build_url(base="/group")
         document = self._client.post(url, data=data)
         return document.json()
 
