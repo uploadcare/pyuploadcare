@@ -6,11 +6,11 @@ on:
   push:
     branches:
       - main
+      - "version-*"
   pull_request:
     branches:
       - "main"
-      - "feature/**"
-      - "version-3.x/**"
+      - "version-*"
 
 env:
   UV_VERSION: "0.13.5"
