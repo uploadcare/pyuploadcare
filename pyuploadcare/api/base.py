@@ -329,7 +329,7 @@ class CountMixin(APIProtocol):
             query_parameters["limit"] = request_limit
 
         response_class = self._get_response_class("list")
-        json_response = self._get(query_parameters=query_parameters)
+        json_response = self._get(**query_parameters)
         response = self._parse_response(json_response, response_class)
         response = cast(PaginatedResponse, response)
         return response.total
