@@ -10,7 +10,7 @@ on:
     branches:
       - "main"
       - "feature/**"
-      - "version-3.x/**"
+      - "version-6.x/**"
 
 env:
   POETRY_INSTALLER_ONLY_BINARY: ":all:"
