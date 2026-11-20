@@ -5,12 +5,12 @@ name: Tests
 on:
   push:
     branches:
-      - main
+      - "main"
+      - "version-*"
   pull_request:
     branches:
       - "main"
-      - "feature/**"
-      - "version-3.x/**"
+      - "version-*"
 
 env:
   POETRY_INSTALLER_ONLY_BINARY: ":all:"

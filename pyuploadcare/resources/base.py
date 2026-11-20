@@ -90,6 +90,7 @@ class BaseApiList:
                 "Can't count objects if the `starting_point` present"
             )
         if self._count is None:
-            qs = self.query_parameters(limit=None)
+            qs = self.query_parameters()
+            qs.pop("limit", None)
             self._count = self.resource_api.count(**qs)
         return self._count
