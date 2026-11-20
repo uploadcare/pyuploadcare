@@ -31,9 +31,7 @@ def test_convert_document_with_save_in_group(uploadcare):
 
     path = transformation.path("da288a95-3029-4044-b902-5107e8579c5c")
 
-    response = uploadcare.document_convert_api.convert(
-        [path], save_in_group=True
-    )
+    response = uploadcare.document_convert_api.convert([path], save_in_group=True)
 
     assert not response.problems
 

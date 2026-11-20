@@ -42,7 +42,6 @@ import os
 import sys
 from io import BytesIO
 from pathlib import Path
-from typing import List
 from uuid import UUID
 
 from pyuploadcare import Uploadcare
@@ -162,16 +161,14 @@ def apply_substitutions(old_uuids: dict, new_uuids: dict) -> None:
     if not replacements:
         return
 
-    tests_dir = os.path.realpath(
-        MANIFEST.parent.parent / "tests" / "functional"
-    )
+    tests_dir = os.path.realpath(MANIFEST.parent.parent / "tests" / "functional")
     for candidate in Path(tests_dir).rglob("*.py"):
         path = os.path.realpath(candidate)
         if path.startswith(tests_dir + os.sep):
             _rewrite(path, replacements)
 
 
-def main(argv: List[str]) -> int:
+def main(argv: list[str]) -> int:
     if len(argv) != 2 or not argv[1] or argv[1] == "demopublickey":
         print(
             f"usage: {Path(argv[0]).name} <public_key>\n\n"
@@ -189,8 +186,7 @@ def main(argv: List[str]) -> int:
 
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
     old_uuids = {
-        key: _as_uuid(value)
-        for key, value in manifest.get("files", {}).items()
+        key: _as_uuid(value) for key, value in manifest.get("files", {}).items()
     }
     uuids = dict(old_uuids)
     for key, filename, store, tags, metadata in FIXTURES:

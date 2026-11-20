@@ -1,23 +1,12 @@
 import re
-from typing import (
-    Any,
-    Callable,
-    ClassVar,
-    Dict,
-    Iterator,
-    Optional,
-    Pattern,
-    Tuple,
-    Type,
-    Union,
-    cast,
-)
+from collections.abc import Callable, Iterator
+from re import Pattern
+from typing import Any, ClassVar, Protocol, TypeVar, cast
 from urllib.parse import urlencode, urljoin, urlsplit
 from uuid import UUID
 
 from httpx2._types import RequestFiles
 from pydantic import TypeAdapter
-from typing_extensions import Protocol, TypeVar
 
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import Entity, UUIDEntity
@@ -29,13 +18,11 @@ from pyuploadcare.exceptions import (
 )
 
 
-ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Union[Response, Entity])
+ResponseOrEntity = TypeVar("ResponseOrEntity", bound=Response | Entity)
 
 UUID_PATTERN = r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}"
 
-RE_UUID_RESOURCE_ID: Pattern[str] = re.compile(
-    UUID_PATTERN + r"\Z", re.IGNORECASE
-)
+RE_UUID_RESOURCE_ID: Pattern[str] = re.compile(UUID_PATTERN + r"\Z", re.IGNORECASE)
 RE_GROUP_RESOURCE_ID: Pattern[str] = re.compile(
     UUID_PATTERN + r"~[0-9]+\Z", re.IGNORECASE
 )
@@ -48,7 +35,7 @@ RE_SAFE_RESOURCE_ID: Pattern[str] = re.compile(r"[a-zA-Z0-9~_-]+\Z")
 
 class API:
     resource_type: str
-    response_classes: Dict[str, Union[Type[Response], Type[Entity]]]
+    response_classes: dict[str, type[Response] | type[Entity]]
     # The shape of a valid resource id for this endpoint; subclasses narrow
     # it (file UUID, group id, numeric webhook id, etc).
     resource_id_pattern: ClassVar[Pattern[str]] = RE_SAFE_RESOURCE_ID
@@ -58,7 +45,7 @@ class API:
         self,
         client: Client,
         public_key: str,
-        secret_key: Optional[str] = None,
+        secret_key: str | None = None,
         signed_uploads_ttl: int = 60,
     ) -> None:
         self.public_key = public_key
@@ -68,8 +55,8 @@ class API:
 
     def _parse_response(
         self,
-        raw_resource: Dict[str, Any],
-        response_class: Type[ResponseOrEntity],
+        raw_resource: dict[str, Any],
+        response_class: type[ResponseOrEntity],
     ) -> ResponseOrEntity:
         return TypeAdapter(response_class).validate_python(raw_resource)
 
@@ -77,16 +64,14 @@ class API:
         """Reject a resource id that does not match this endpoint's shape."""
         if not self.resource_id_pattern.match(resource_id):
             label = f"{self.resource_type} " if self.resource_type else ""
-            raise InvalidParamError(
-                f"Invalid {label}resource id: {resource_id}"
-            )
+            raise InvalidParamError(f"Invalid {label}resource id: {resource_id}")
 
     def _build_url(  # noqa: C901
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
-        base: Optional[str] = None,
-        suffix: Optional[str] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        resource_uuid: UUID | str | UUIDEntity | None = None,
+        base: str | None = None,
+        suffix: str | None = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> str:
         if base is not None:
             url = urljoin(str(self._client.base_url), base) + "/"
@@ -104,9 +89,7 @@ class API:
             url += "?" + urlencode(query_parameters)
         return url
 
-    def _get_response_class(
-        self, action: str
-    ) -> Union[Type[Response], Type[Entity]]:
+    def _get_response_class(self, action: str) -> type[Response] | type[Entity]:
         response_class = self.response_classes.get(
             action, self.response_classes.get("default")
         )
@@ -115,39 +98,37 @@ class API:
         return response_class
 
     def _post(
-        self, data: Optional[Dict] = None, files: Optional[RequestFiles] = None
-    ) -> Dict[str, Any]:
+        self, data: dict | None = None, files: RequestFiles | None = None
+    ) -> dict[str, Any]:
         url = self._build_url()
         document = self._client.post(url, data=data, files=files)
         return document.json()
 
     def _get(
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        resource_uuid: UUID | str | UUIDEntity | None = None,
         **query_parameters,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         url = self._build_url(resource_uuid, query_parameters=query_parameters)
         document = self._client.get(url)
         return document.json()
 
     def _put(
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
-        data: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        resource_uuid: UUID | str | UUIDEntity | None = None,
+        data: dict | None = None,
+    ) -> dict[str, Any]:
         url = self._build_url(resource_uuid)
         document = self._client.put(url, json=data)
         return document.json()
 
-    def _delete(
-        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
-    ) -> None:
+    def _delete(self, resource_uuid: UUID | str | UUIDEntity | None = None) -> None:
         url = self._build_url(resource_uuid)
         self._client.delete(url)
 
     def _delete_with_response(
-        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
-    ) -> Dict[str, Any]:
+        self, resource_uuid: UUID | str | UUIDEntity | None = None
+    ) -> dict[str, Any]:
         url = self._build_url(resource_uuid, suffix="storage")
         document = self._client.delete(url)
         return document.json()
@@ -155,54 +136,50 @@ class API:
 
 class APIProtocol(Protocol):
     resource_type: str
-    response_classes: Dict[str, Union[Type[Response], Type[Entity]]]
+    response_classes: dict[str, type[Response] | type[Entity]]
     _client: Client
 
     def _parse_response(
         self,
-        raw_resource: Dict[str, Any],
-        response_class: Type[ResponseOrEntity],
+        raw_resource: dict[str, Any],
+        response_class: type[ResponseOrEntity],
     ) -> ResponseOrEntity: ...
 
     def _build_url(
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
-        base: Optional[str] = None,
-        suffix: Optional[str] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        resource_uuid: UUID | str | UUIDEntity | None = None,
+        base: str | None = None,
+        suffix: str | None = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> str: ...
 
-    def _get_response_class(
-        self, action: str
-    ) -> Union[Type[Response], Type[Entity]]: ...
+    def _get_response_class(self, action: str) -> type[Response] | type[Entity]: ...
 
-    def _post(self, data: Optional[Dict] = None) -> Dict[str, Any]: ...
+    def _post(self, data: dict | None = None) -> dict[str, Any]: ...
 
     def _get(
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        resource_uuid: UUID | str | UUIDEntity | None = None,
         **query_parameters,
-    ) -> Dict[str, Any]: ...
+    ) -> dict[str, Any]: ...
 
     def _put(
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
-        data: Optional[Dict] = None,
-    ) -> Dict[str, Any]: ...
+        resource_uuid: UUID | str | UUIDEntity | None = None,
+        data: dict | None = None,
+    ) -> dict[str, Any]: ...
 
-    def _delete(
-        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
-    ) -> None: ...
+    def _delete(self, resource_uuid: UUID | str | UUIDEntity | None = None) -> None: ...
 
     def _delete_with_response(
-        self, resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None
-    ) -> Dict[str, Any]: ...
+        self, resource_uuid: UUID | str | UUIDEntity | None = None
+    ) -> dict[str, Any]: ...
 
 
 class RetrieveMixin(APIProtocol):
     def retrieve(
         self,
-        resource_uuid: Optional[Union[UUID, str, UUIDEntity]] = None,
+        resource_uuid: UUID | str | UUIDEntity | None = None,
         include_appdata: bool = False,
     ):
         response_class = self._get_response_class("retrieve")
@@ -221,7 +198,7 @@ class RetrieveMixin(APIProtocol):
 _DEFAULT_PORTS = {"http": 80, "https": 443}
 
 
-def _origin(url: str) -> Tuple[str, str, Optional[int]]:
+def _origin(url: str) -> tuple[str, str, int | None]:
     """The (scheme, host, port) origin of ``url``, normalized for comparison.
 
     Scheme and host are case-insensitive, and an explicit default port is the
@@ -244,9 +221,9 @@ def _origin(url: str) -> Tuple[str, str, Optional[int]]:
 
 def _iterate_pages(  # noqa: C901
     first_url: str,
-    fetch_page: Callable[[str], Dict[str, Any]],
-    parse: Callable[[Dict[str, Any]], Any],
-    limit: Optional[int] = None,
+    fetch_page: Callable[[str], dict[str, Any]],
+    parse: Callable[[dict[str, Any]], Any],
+    limit: int | None = None,
 ) -> Iterator[Any]:
     """Walk a paginated endpoint, yielding up to ``limit`` results.
 
@@ -262,7 +239,7 @@ def _iterate_pages(  # noqa: C901
     supplied it.
     """
     origin = _origin(first_url)
-    next_: Optional[str] = first_url
+    next_: str | None = first_url
 
     while next_:
         page_url = next_
@@ -338,7 +315,7 @@ class CountMixin(APIProtocol):
 class CreateMixin(APIProtocol):
     def create(
         self,
-        data: Optional[Dict] = None,
+        data: dict | None = None,
     ):
         response_class = self._get_response_class("create")
 
@@ -349,8 +326,8 @@ class CreateMixin(APIProtocol):
 class UpdateMixin(APIProtocol):
     def update(
         self,
-        resource_uuid: Union[UUID, str, UUIDEntity],
-        data: Optional[Dict] = None,
+        resource_uuid: UUID | str | UUIDEntity,
+        data: dict | None = None,
     ):
         response_class = self._get_response_class("update")
 
@@ -359,12 +336,12 @@ class UpdateMixin(APIProtocol):
 
 
 class DeleteMixin(APIProtocol):
-    def delete(self, resource_uuid: Union[UUID, str, UUIDEntity]):
+    def delete(self, resource_uuid: UUID | str | UUIDEntity):
         self._delete(resource_uuid)
 
 
 class DeleteWithResponseMixin(APIProtocol):
-    def delete(self, resource_uuid: Union[UUID, str, UUIDEntity]):
+    def delete(self, resource_uuid: UUID | str | UUIDEntity):
         response_class = self._get_response_class("delete")
 
         json_response = self._delete_with_response(resource_uuid)

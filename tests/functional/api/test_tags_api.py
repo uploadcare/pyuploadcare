@@ -43,9 +43,7 @@ def test_replace_file_tags(uploadcare):
 @pytest.mark.vcr
 def test_update_file_tags(uploadcare):
     # State before: ["cat", "animal", "cute"], left by the previous test.
-    response = uploadcare.tags_api.update(
-        FILE_UUID, add=["dog"], delete=["animal"]
-    )
+    response = uploadcare.tags_api.update(FILE_UUID, add=["dog"], delete=["animal"])
 
     assert isinstance(response, UpdateFileTagsResponse)
     assert sorted(response.tags) == ["cat", "cute", "dog"]

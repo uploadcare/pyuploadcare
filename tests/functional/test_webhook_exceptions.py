@@ -8,9 +8,7 @@ from pyuploadcare.exceptions import InvalidRequestError, WebhookIsNotUnique
 
 ERROR_MESSAGE_FOR_COLLISION = """
     "non_field_errors":["This project is already subscribed on this event"]
-""".replace(
-    "\n", ""
-)
+""".replace("\n", "")
 
 
 def get_raising_client(decoded_content):

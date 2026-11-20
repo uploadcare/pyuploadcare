@@ -17,8 +17,7 @@ def register_arguments(subparsers):  # noqa: C901
 
     subparser.add_argument(
         "--query",
-        help="full text search across all searchable fields,"
-        " at least 4 characters",
+        help="full text search across all searchable fields, at least 4 characters",
     )
     subparser.add_argument(
         "--fuzziness",
@@ -34,8 +33,7 @@ def register_arguments(subparsers):  # noqa: C901
     ):
         subparser.add_argument(
             f"--phrase_{field}",
-            help=f"ordered full text match on {field},"
-            " at least 4 characters",
+            help=f"ordered full text match on {field}, at least 4 characters",
         )
 
     for field in ("uuid", "original_filename", "detected_mime_type"):
@@ -113,8 +111,7 @@ def register_arguments(subparsers):  # noqa: C901
 def _sub_condition(arg_namespace, prefix, fields):
     """Collect `--<prefix>_<field>` arguments into a nested dict."""
     condition = {
-        field: getattr(arg_namespace, f"{prefix}_{field}", None)
-        for field in fields
+        field: getattr(arg_namespace, f"{prefix}_{field}", None) for field in fields
     }
     condition = {
         field: value for field, value in condition.items() if value is not None
@@ -138,24 +135,18 @@ def _build_request(arg_namespace) -> dict:
             "exact",
             ("uuid", "original_filename", "detected_mime_type"),
         ),
-        "size": _sub_condition(
-            arg_namespace, "size", ("gt", "gte", "lt", "lte")
-        ),
+        "size": _sub_condition(arg_namespace, "size", ("gt", "gte", "lt", "lte")),
         "datetime_uploaded": _sub_condition(
             arg_namespace, "uploaded", ("gt", "gte", "lt", "lte")
         ),
         "tags": _sub_condition(arg_namespace, "tags", ("any", "all", "none")),
     }
-    return {
-        name: value for name, value in request.items() if value is not None
-    }
+    return {name: value for name, value in request.items() if value is not None}
 
 
 def search_files(arg_namespace, client: Uploadcare):
     try:
-        request = FileSearchRequest.model_validate(
-            _build_request(arg_namespace)
-        )
+        request = FileSearchRequest.model_validate(_build_request(arg_namespace))
     except ValidationError as error:
         # `main()` only handles UploadcareException, so a raw ValidationError
         # would surface as a traceback.

@@ -256,6 +256,30 @@ deeper.
 > `highlight` values contain your users' filenames and metadata wrapped in `<em>` tags by the
 > server. Treat them as untrusted text and escape them before rendering as HTML.
 
+#### Project API
+
+The Project API manages the projects of an account. It is authorized with an OAuth access token
+instead of a project key pair, so it has its own client:
+
+```python
+from pyuploadcare import ProjectAPIClient, ProjectFeatures, UploadsFeature
+
+projects = ProjectAPIClient(token="<access-token>")
+
+project = projects.create_project("Production")
+
+# Partial update: only the fields that were set are sent.
+projects.update_project(
+    project, features=ProjectFeatures(uploads=UploadsFeature(autostore=False))
+)
+
+for project in projects.list_projects():
+    print(project.pub_key, project.name)
+```
+
+The client also covers usage statistics, content moderation thresholds and categories, and the
+list of MIME types for MIME type filtering. See the [documentation](https://pyuploadcare.readthedocs.io/en/latest/project_api.html).
+
 ### Django integration
 
 Let's add [File Uploader](https://uploadcare.com/docs/file-uploader/) to an existing Django project.

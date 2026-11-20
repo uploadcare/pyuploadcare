@@ -1,7 +1,8 @@
 import re
 import warnings
+from collections.abc import Iterable, Iterator
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Iterator, Optional
+from typing import TYPE_CHECKING, Any
 
 import dateutil.parser
 
@@ -71,9 +72,9 @@ class FileGroup(Iterable):
         self.id = matches.groupdict()["group_id"]
 
         self._is_deleted = False
-        self._stored_at: Optional[datetime] = None
+        self._stored_at: datetime | None = None
         self._files_qty = files_qty
-        self._info_cache: Optional[Dict[str, Any]] = None
+        self._info_cache: dict[str, Any] | None = None
 
         self._client = client
 
@@ -145,9 +146,7 @@ class FileGroup(Iterable):
 
     def update_info(self):
         """Updates and returns group information by requesting Uploadcare API."""
-        self._info_cache = self._client.groups_api.retrieve(
-            self.id
-        ).model_dump()
+        self._info_cache = self._client.groups_api.retrieve(self.id).model_dump()
         if self.is_stored and self._stored_at:
             assert self._info_cache
             self._info_cache["datetime_stored"] = self._stored_at.isoformat()
@@ -181,11 +180,11 @@ class FileGroup(Iterable):
 
         """
         is_stored = False
-        most_fresh_date: Optional[datetime] = None
+        most_fresh_date: datetime | None = None
 
         for _file in self:
             if not _file:
-                """Due to type of source as Optional[List[Optional[FileInfo]]]"""
+                """Due to type of source as list[FileInfo | None] | None"""
                 continue
 
             if not _file.is_stored:

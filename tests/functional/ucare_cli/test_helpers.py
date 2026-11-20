@@ -12,9 +12,7 @@ def test_parse_datetime_assumes_utc_without_offset():
 
 
 def test_parse_datetime_date_only_is_midnight_utc():
-    assert parse_datetime("2024-01-02") == datetime(
-        2024, 1, 2, tzinfo=timezone.utc
-    )
+    assert parse_datetime("2024-01-02") == datetime(2024, 1, 2, tzinfo=timezone.utc)
 
 
 def test_parse_datetime_keeps_explicit_offset():

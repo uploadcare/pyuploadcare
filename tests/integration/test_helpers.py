@@ -1,7 +1,7 @@
 import math
 import uuid
+from collections.abc import Iterable
 from itertools import chain
-from typing import Iterable, List
 
 import pytest
 
@@ -12,14 +12,14 @@ TEST_COLLECTION_LENGTH = 10
 
 
 @pytest.fixture()
-def uuid_collection() -> Iterable[List[uuid.UUID]]:
+def uuid_collection() -> Iterable[list[uuid.UUID]]:
     yield [uuid.uuid4() for _ in range(TEST_COLLECTION_LENGTH)]
 
 
 @pytest.fixture()
 def str_collection(
-    uuid_collection: Iterable[List[uuid.UUID]],
-) -> Iterable[List[str]]:
+    uuid_collection: Iterable[list[uuid.UUID]],
+) -> Iterable[list[str]]:
     yield list(map(str, uuid_collection))
 
 

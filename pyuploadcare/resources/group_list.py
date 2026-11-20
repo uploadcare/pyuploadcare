@@ -22,7 +22,7 @@ class GroupList(BaseApiList):
         >>> from datetime import datetime, timedelta, timezone
         >>> last_week = datetime.now(timezone.utc) - timedelta(weeks=1)
         >>> for f in uploadcare.list_file_groups(starting_point=last_week):
-        >>>     print(f.datetime_created)
+        ...     print(f.datetime_created)
 
     Count objects::
 

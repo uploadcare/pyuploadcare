@@ -6,13 +6,12 @@ check-env-%:
 	fi
 
 format:
-	uv run black .
-	uv run isort .
+	uv run ruff check --fix .
+	uv run ruff format .
 
 lint:
-	uv run black --check .
-	uv run isort --check .
-	uv run flake8 .
+	uv run ruff check .
+	uv run ruff format --check .
 	uv run mypy --namespace-packages --show-error-codes --check-untyped-defs .
 
 test:

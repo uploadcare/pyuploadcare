@@ -1,6 +1,5 @@
-from tests.functional.ucare_cli.helpers import arg_namespace
-
 from pyuploadcare.ucare_cli.settings import load_config
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 def test_change_pub_key():
@@ -25,9 +24,7 @@ def test_change_api_base():
 
 def test_change_upload_base():
     conf = load_config(
-        arg_namespace(
-            "--upload_base https://uploadcare.com/upload/ list_files"
-        )
+        arg_namespace("--upload_base https://uploadcare.com/upload/ list_files")
     )
 
     assert conf["upload_base"] == "https://uploadcare.com/upload/"
@@ -45,9 +42,7 @@ def test_change_verify_upload_ssl():
     conf = load_config(arg_namespace("list_files"))
     assert "verify_upload_ssl" not in conf
 
-    conf = load_config(
-        arg_namespace("--no_check_upload_certificate list_files")
-    )
+    conf = load_config(arg_namespace("--no_check_upload_certificate list_files"))
     assert not conf["verify_upload_ssl"]
 
 

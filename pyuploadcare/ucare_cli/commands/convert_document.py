@@ -7,9 +7,7 @@ from pyuploadcare.ucare_cli.commands.helpers import pprint
 
 
 def register_arguments(subparsers):
-    subparser = subparsers.add_parser(
-        "convert_document", help="convert document"
-    )
+    subparser = subparsers.add_parser("convert_document", help="convert document")
     subparser.set_defaults(func=convert_document)
     subparser.add_argument("path", help="file path")
     subparser.add_argument(

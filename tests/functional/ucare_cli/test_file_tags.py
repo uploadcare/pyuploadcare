@@ -1,11 +1,11 @@
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.exceptions import InvalidParamError
 from pyuploadcare.ucare_cli.commands.get_file_tags import get_file_tags
 from pyuploadcare.ucare_cli.commands.set_file_tags import set_file_tags
 from pyuploadcare.ucare_cli.commands.update_file_tags import update_file_tags
 from pyuploadcare.ucare_cli.main import main
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 FILE_UUID = "cdc00a7a-366f-4e0b-a942-9a7141b4004b"
@@ -32,9 +32,7 @@ def test_cli_get_file_tags_by_cdn_url(capsys, uploadcare, vcr):
 
 @pytest.mark.vcr
 def test_cli_set_file_tags(capsys, uploadcare):
-    set_file_tags(
-        arg_namespace(f"set_file_tags {FILE_UUID} cat animal"), uploadcare
-    )
+    set_file_tags(arg_namespace(f"set_file_tags {FILE_UUID} cat animal"), uploadcare)
     captured = capsys.readouterr()
     assert '"added"' in captured.out
     assert '"deleted"' in captured.out
@@ -52,9 +50,7 @@ def test_cli_update_file_tags(capsys, uploadcare):
 
 def test_cli_update_file_tags_without_flags_raises(uploadcare):
     with pytest.raises(InvalidParamError):
-        update_file_tags(
-            arg_namespace(f"update_file_tags {FILE_UUID}"), uploadcare
-        )
+        update_file_tags(arg_namespace(f"update_file_tags {FILE_UUID}"), uploadcare)
 
 
 def test_cli_update_file_tags_without_flags_prints_error(capsys):

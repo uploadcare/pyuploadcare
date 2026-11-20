@@ -1,10 +1,8 @@
-# coding: utf-8
-
 import random
 import time
+from collections.abc import Iterable, Iterator
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Iterator, List, Union
 from uuid import UUID, uuid4
 
 import pytest
@@ -40,7 +38,7 @@ def group(uploadcare) -> Iterator[FileGroup]:
 @pytest.fixture
 def group_to_delete(uploadcare) -> Iterator[FileGroup]:
     group = create_file_group(uploadcare, files_qty=1)
-    files = [file for file in group]
+    files = [*group]
 
     yield group
 
@@ -49,15 +47,13 @@ def group_to_delete(uploadcare) -> Iterator[FileGroup]:
 
 
 @pytest.fixture()
-def input_collection(uploadcare) -> Iterable[List[Union[str, File, UUID]]]:
+def input_collection(uploadcare) -> Iterable[list[str | File | UUID]]:
     u = uuid4()
     yield [str(u), uploadcare.file(u), u]
 
 
 @pytest.fixture()
-def expected_uuids(
-    input_collection: List[Union[str, File, UUID]]
-) -> Iterable[str]:
+def expected_uuids(input_collection: list[str | File | UUID]) -> Iterable[str]:
     yield [
         input_collection[0],
         input_collection[1].uuid,  # type: ignore
@@ -69,13 +65,11 @@ def test_failed_upload_when_file_is_opened_in_txt_mode(small_file, uploadcare):
     with pytest.raises(
         TypeError, match="Multipart file uploads must be opened in binary mode"
     ):
-        with open(small_file.name, "rt") as fh:
+        with open(small_file.name) as fh:
             uploadcare.upload(fh)
 
 
-def test_successful_upload_when_file_is_opened_in_binary_mode(
-    small_file, uploadcare
-):
+def test_successful_upload_when_file_is_opened_in_binary_mode(small_file, uploadcare):
     with open(small_file.name, "rb") as fh:
         file = uploadcare.upload(fh)
 
@@ -167,9 +161,7 @@ def test_successful_upload_from_url_sync_store(uploadcare):
 
 
 def test_successful_upload_from_url_sync_with_filename(uploadcare):
-    file = uploadcare.upload_from_url_sync(
-        IMAGE_URL, filename="meh.png", interval=1
-    )
+    file = uploadcare.upload_from_url_sync(IMAGE_URL, filename="meh.png", interval=1)
     assert isinstance(file, File)
     assert file.filename == "meh.png"
 
@@ -475,9 +467,7 @@ def test_next_urls_need_no_rebuilding(uploadcare):
         return files_api._parse_response(raw, response_class)
 
     page = fetch(
-        files_api._build_url(
-            query_parameters={"limit": 1, "include": "appdata"}
-        )
+        files_api._build_url(query_parameters={"limit": 1, "include": "appdata"})
     )
 
     if page.total < 3:
