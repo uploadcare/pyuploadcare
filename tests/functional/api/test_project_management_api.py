@@ -442,7 +442,8 @@ def test_uploads_limits_in_response_must_be_integers(client, server, field, valu
 def test_project_units_roundtrip_without_mutating_response():
     raw = deepcopy(PROJECT_JSON)
     original = deepcopy(raw)
-    project = Project.model_validate(raw)
+    # Raw API JSON may carry fields unknown to the SDK, as responses do.
+    project = Project.model_validate(raw, extra="ignore")
 
     assert raw == original
     assert Project.model_validate_json(project.model_dump_json()) == project
@@ -577,6 +578,72 @@ def test_update_project_rejects_invalid_features(client, server, features):
         client.update_project(PUB_KEY, features=features)
 
     assert server.requests == []
+
+
+@pytest.mark.parametrize(
+    "build",
+    [
+        # Misspelled `uploads`.
+        lambda: ProjectFeatures(upload=UploadsFeature(autostore=False)),
+        lambda: UploadsFeature(autostor=False),
+        lambda: ProjectFeature(is_enabld=True),
+        lambda: Project(nam="x"),
+        lambda: AdaptiveBitrateStreamingProfiles(
+            h264=AdaptiveBitrateStreamingProfile(resolutions=["720p"]),
+            h266=None,
+        ),
+        lambda: ModerationThreshold(category_id=4, threshold_percentage="1", extra=1),
+    ],
+)
+def test_request_models_reject_unknown_fields(build):
+    with pytest.raises(ValidationError, match="extra_forbidden|Extra inputs"):
+        build()
+
+
+def test_responses_ignore_unknown_fields_at_any_depth(client, server):
+    server.respond(
+        payload={
+            **PROJECT_JSON,
+            "new_top_level": 1,
+            "features": {
+                **PROJECT_JSON["features"],
+                "uploads": {"autostore": True, "new_upload_setting": 1},
+                "adaptive_bitrate_streaming": {
+                    "is_enabled": True,
+                    "new_flag": True,
+                    "profiles": {
+                        "h264": {"resolutions": ["720p"], "new": 1},
+                    },
+                },
+            },
+        }
+    )
+
+    project = client.get_project(PUB_KEY)
+
+    assert project.features is not None
+    assert project.features.uploads is not None
+    assert project.features.uploads.autostore is True
+
+
+def test_moderation_thresholds_response_ignores_unknown_fields(client, server):
+    server.respond(
+        payload={
+            "thresholds": [
+                {
+                    "category_id": 4,
+                    "file_type": "image",
+                    "threshold_percentage": "37.00",
+                    "new_field": 1,
+                }
+            ],
+            "new_top_level": 1,
+        }
+    )
+
+    thresholds = client.get_moderation_thresholds(PUB_KEY)
+
+    assert thresholds[0].category_id == 4
 
 
 def test_update_project_accepts_api_names_in_api_units(client, server):
