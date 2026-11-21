@@ -46,6 +46,7 @@ Technical release, no functional changes.
 
 ### Added
 
+- Added `moderation.state_changed` to the `WebhookEvent` type.
 - Support for [file tags](https://uploadcare.com/docs/file-tags/):
   - `TagsAPI` (`uploadcare.tags_api`) with `get()`, `replace()` and `update()` methods, covering
     `GET`, `PUT` and `PATCH` on `/files/{uuid}/tags/`.
