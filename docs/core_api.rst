@@ -100,6 +100,17 @@ Example of using callback function for printing progress::
     56780/56780 B
 
 
+Get the info of an uploaded file from the Upload API. It is available right after the upload,
+before the file shows up in the REST API; ``is_ready`` stays ``False`` until the file is
+available on the CDN::
+
+    info: UploadFileInfo = uploadcare.get_upload_info(ucare_file)
+    if info.is_ready:
+        print(info.original_filename, info.size, info.is_stored)
+
+``get_upload_info`` accepts a ``File`` or a file UUID. A removed or unknown file raises
+``InvalidRequestError``.
+
 Manage files and file groups
 ----------------------------
 

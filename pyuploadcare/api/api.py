@@ -602,6 +602,35 @@ class UploadAPI(API):
             raise APIError(f"could not find status in result: {response}")
         return response
 
+    def info(self, file_id: UUID | str) -> entities.UploadFileInfo:
+        """Get the info of an uploaded file.
+
+        Works right after the upload, before the file is available in the
+        REST API.
+
+        Usage example::
+
+            >>> info = uploadcare.upload_api.info(file_id)
+            >>> info.is_ready, info.size
+
+        """
+        if not self.public_key:
+            raise ValueError("public_key is required")
+
+        file_id = str(file_id)
+        if not RE_UUID_RESOURCE_ID.match(file_id):
+            raise InvalidParamError(f"Invalid file id: {file_id}")
+
+        url = self._build_url(
+            base="info",
+            query_parameters={
+                "pub_key": self.public_key,
+                "file_id": file_id.lower(),
+            },
+        )
+        document = self._client.get(url)
+        return self._parse_response(document.json(), entities.UploadFileInfo)
+
     def create_group(
         self,
         files: Iterable[str | UUID],

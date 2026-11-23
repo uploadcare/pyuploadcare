@@ -27,6 +27,7 @@ from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import (
     FileSearchInfo,
     ProjectInfo,
+    UploadFileInfo,
     Webhook,
     WebhookEvent,
 )
@@ -842,6 +843,26 @@ class Uploadcare:
             stored=stored,
             removed=removed,
         )
+
+    def get_upload_info(self, file_id: UUID | str | File) -> UploadFileInfo:
+        """Get the info of an uploaded file from the Upload API.
+
+        Works right after the upload, before the file is available in the
+        REST API. ``is_ready`` is ``False`` until the file is available on
+        the CDN. A removed or unknown file raises ``InvalidRequestError``.
+
+        Usage example::
+
+            >>> info = uploadcare.get_upload_info(
+            ...     'a771f854-c2cb-408a-8c36-71af77811f3b'
+            ... )
+            >>> if info.is_ready:
+            ...     print(info.original_filename, info.size)
+
+        """
+        if isinstance(file_id, File):
+            return self.upload_api.info(file_id.uuid)
+        return self.upload_api.info(file_id)
 
     def list_files_page(
         self,

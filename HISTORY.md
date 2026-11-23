@@ -33,9 +33,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - One-page listing with a `next` cursor: `Uploadcare.list_files_page()` / `fetch_files_page()`,
   `list_file_groups_page()` / `fetch_file_groups_page()`, `ProjectAPIClient.list_projects_page()` /
   `fetch_projects_page()`, and `list_page()` / `fetch_page()` on the low-level list APIs.
+- `Uploadcare.get_upload_info()` and `UploadAPI.info()`: the Upload API info of a file
+  (`GET /info/`), available before the file appears in the REST API. Returns `UploadFileInfo`.
 
 ### Changed
 
+- `ImageInfo` accepts a `color_mode` outside `ColorMode` as a string and a fractional `dpi`,
+  as the API returns them. Such images used to fail to parse.
 - The user agent omits the public key segment when a client has none.
 - Multipart upload chunks are sent to their presigned storage URLs without the client's auth.
 
