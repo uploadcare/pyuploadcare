@@ -17,7 +17,7 @@ interactions:
       user-agent:
       - PyUploadcare/3.0.0/demopublickey (CPython/3.9.6)
     method: POST
-    uri: https://upload.uploadcare.com/group//
+    uri: https://upload.uploadcare.com/group/
   response:
     content: '{"id":"d496a4df-0b36-4281-8156-268ae9524d4a~1","datetime_created":"2021-10-19T08:36:22.326641Z","datetime_stored":null,"files_count":1,"cdn_url":"https://ucarecdn.com/d496a4df-0b36-4281-8156-268ae9524d4a~1/","url":"https://api.uploadcare.com/groups/d496a4df-0b36-4281-8156-268ae9524d4a~1/","files":[{"size":3303,"total":3303,"done":3303,"uuid":"94a2218e-3526-428a-945e-65fbc06e7b35","file_id":"94a2218e-3526-428a-945e-65fbc06e7b35","original_filename":"instellar_logo_main
       (1).png","is_image":true,"is_stored":true,"image_info":{"width":134,"height":60,"format":"PNG","color_mode":"P","geo_location":null,"orientation":null,"dpi":[72,72],"datetime_original":null,"sequence":false},"video_info":null,"is_ready":true,"filename":"instellar_logo_main1.png","mime_type":"image/png","default_effects":""}]}'
