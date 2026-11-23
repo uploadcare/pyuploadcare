@@ -69,7 +69,7 @@ Upload multiple files. Direct upload method is used::
 
     file1 = open('file1.txt', 'rb')
     file2 = open('file2.txt', 'rb')
-    ucare_files: List[File] = uploadcare.upload_files([file1, file2])
+    ucare_files: list[File] = uploadcare.upload_files([file1, file2])
 
 Send single file via multipart upload::
 
@@ -158,7 +158,7 @@ Stores all group's files::
 
 List file groups::
 
-    file_groups: List[FileGroup] = uploadcare.list_file_groups(limit=10)
+    file_groups: list[FileGroup] = uploadcare.list_file_groups(limit=10)
     for file_group in file_groups:
         print(file_group.info)
 
@@ -194,7 +194,7 @@ While uploading multiple files at once you can set common metadata that will be 
 
     file1 = open('file1.txt', 'rb')
     file2 = open('file2.txt', 'rb')
-    ucare_files: List[File] = uploadcare.upload_files(
+    ucare_files: list[File] = uploadcare.upload_files(
         [file1, file2],
         common_metadata=custom_metadata,
     )
@@ -237,7 +237,7 @@ While uploading multiple files at once, the tags are applied to every file in th
 
     file1 = open('file1.txt', 'rb')
     file2 = open('file2.txt', 'rb')
-    ucare_files: List[File] = uploadcare.upload_files([file1, file2], tags=['cat'])
+    ucare_files: list[File] = uploadcare.upload_files([file1, file2], tags=['cat'])
     # don't forget to close the files, of course
 
 Uploads from URL accept tags the same way::
@@ -247,7 +247,7 @@ Uploads from URL accept tags the same way::
 Read the current tags of a file::
 
     file = uploadcare.file('740e1b8c-1ad8-4324-b7ec-112c79d8eac2')
-    tags: List[str] = file.get_tags()
+    tags: list[str] = file.get_tags()
 
 Or, if the file info is already loaded, without an extra request::
 
@@ -447,7 +447,7 @@ After each video file upload you obtain a file identifier in UUID format. Then y
 or you can use API directly to convert single or multiple files::
 
     transformation = VideoTransformation().format(VideoFormat.webm).thumbs(2)
-    paths: List[str] = [
+    paths: list[str] = [
         transformation.path("740e1b8c-1ad8-4324-b7ec-112c79d8eac2"),
     ]
 
@@ -486,7 +486,7 @@ or you can use API directly to convert single or multiple files::
 
     transformation = DocumentTransformation().format(DocumentFormat.pdf)
 
-    paths: List[str] = [
+    paths: list[str] = [
         transformation.path("0e1cac48-1296-417f-9e7f-9bf13e330dcf"),
     ]
 
@@ -581,7 +581,7 @@ Create a webhook with a signing secret::
 
 List webhooks::
 
-    webhooks: List[Webhook] = list(uploadcare.list_webhooks(limit=10))
+    webhooks: list[Webhook] = list(uploadcare.list_webhooks(limit=10))
 
 Update a webhook::
 

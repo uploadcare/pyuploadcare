@@ -1,7 +1,6 @@
 __all__ = ["Client"]
 
 import logging
-import sys
 import time
 import typing
 from platform import python_implementation, python_version
@@ -34,10 +33,6 @@ from pyuploadcare.exceptions import (
 logger = logging.getLogger("pyuploadcare")
 
 
-PY37_PLUS = sys.version_info[:2] > (3, 6)
-PY36 = not PY37_PLUS
-
-
 class Client(HTTPXClient):
     def __init__(self, *args, **kwargs):
         self.user_agent_extension = kwargs.pop("user_agent_extension", None)
@@ -50,18 +45,16 @@ class Client(HTTPXClient):
         self,
         url: URLTypes,
         *,
-        content: typing.Optional[RequestContent] = None,
-        data: typing.Optional[RequestData] = None,
-        json: typing.Optional[typing.Any] = None,
-        params: typing.Optional[QueryParamTypes] = None,
-        headers: typing.Optional[HeaderTypes] = None,
-        cookies: typing.Optional[CookieTypes] = None,
-        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
-        timeout: typing.Union[
-            TimeoutTypes, UseClientDefault
-        ] = USE_CLIENT_DEFAULT,
+        content: RequestContent | None = None,
+        data: RequestData | None = None,
+        json: typing.Any | None = None,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
+        cookies: CookieTypes | None = None,
+        auth: AuthTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
+        timeout: TimeoutTypes | UseClientDefault = USE_CLIENT_DEFAULT,
     ) -> Response:
         """
         Send a `DELETE` request with payload.
@@ -88,20 +81,18 @@ class Client(HTTPXClient):
         method: str,
         url: URLTypes,
         *,
-        content: typing.Optional[RequestContent] = None,
-        data: typing.Optional[RequestData] = None,
-        files: typing.Optional[RequestFiles] = None,
+        content: RequestContent | None = None,
+        data: RequestData | None = None,
+        files: RequestFiles | None = None,
         json: typing.Any = None,
-        params: typing.Optional[QueryParamTypes] = None,
-        headers: typing.Optional[HeaderTypes] = None,
-        cookies: typing.Optional[CookieTypes] = None,
-        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
-        timeout: typing.Union[
-            TimeoutTypes, UseClientDefault
-        ] = USE_CLIENT_DEFAULT,
-        extensions: typing.Optional[dict] = None,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
+        cookies: CookieTypes | None = None,
+        auth: AuthTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
+        timeout: TimeoutTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        extensions: dict | None = None,
     ) -> Response:
         """
         `allow_redirects` is for compatibility with versions for Python 3.6 only
@@ -150,8 +141,8 @@ class Client(HTTPXClient):
 
     def _handle_httpx_arguments(  # noqa: max-complexity: 6
         self,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
     ) -> bool:
         """
         Encapsulate smooth updating for httpx dependency:
@@ -209,19 +200,17 @@ class Client(HTTPXClient):
         self,
         method: str,
         url: URLTypes,
-        content: typing.Optional[RequestContent] = None,
-        data: typing.Optional[RequestData] = None,
-        files: typing.Optional[RequestFiles] = None,
+        content: RequestContent | None = None,
+        data: RequestData | None = None,
+        files: RequestFiles | None = None,
         json: typing.Any = None,
-        params: typing.Optional[QueryParamTypes] = None,
-        headers: typing.Optional[HeaderTypes] = None,
-        cookies: typing.Optional[CookieTypes] = None,
-        auth: typing.Union[AuthTypes, UseClientDefault] = USE_CLIENT_DEFAULT,
-        follow_redirects: typing.Optional[bool] = None,
-        allow_redirects: typing.Optional[bool] = None,
-        timeout: typing.Union[
-            TimeoutTypes, UseClientDefault
-        ] = USE_CLIENT_DEFAULT,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
+        cookies: CookieTypes | None = None,
+        auth: AuthTypes | UseClientDefault = USE_CLIENT_DEFAULT,
+        follow_redirects: bool | None = None,
+        allow_redirects: bool | None = None,
+        timeout: TimeoutTypes | UseClientDefault = USE_CLIENT_DEFAULT,
     ):
         logger.debug(
             f"sent: method: {method}; path: {url}; headers: {headers}; "
@@ -243,16 +232,8 @@ class Client(HTTPXClient):
             cookies=cookies,
             auth=auth,
             timeout=timeout,
+            follow_redirects=redirecting,
         )
-
-        if PY36:
-            kwargs["allow_redirects"] = redirecting
-        elif PY37_PLUS:
-            kwargs["follow_redirects"] = redirecting
-        else:
-            raise ValueError(
-                "Unexpected set of Python version. Check the setup"
-            )
 
         response = super().request(method, url, **kwargs)  # type: ignore
         performed_response = self._perform_response(response)
@@ -265,10 +246,7 @@ class Client(HTTPXClient):
             extension_info = f"; {self.user_agent_extension}"
 
         key_info = f"/{self.public_key}" if self.public_key else ""
-        return "PyUploadcare/{0}{1} ({2}/{3}{4})".format(
-            __version__,
-            key_info,
-            python_implementation(),
-            python_version(),
-            extension_info,
+        return (
+            f"PyUploadcare/{__version__}{key_info} "
+            f"({python_implementation()}/{python_version()}{extension_info})"
         )

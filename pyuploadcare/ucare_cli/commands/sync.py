@@ -28,10 +28,9 @@ def register_arguments(subparsers):
         "path",
         nargs="?",
         help=(
-            "Local path. It can contains special patterns like: {0} "
-            "Default is {1}".format(
-                " ".join(PATTERNS_MAPPING.keys()), DEFAULT_PATTERN_FILENAME
-            )
+            "Local path. It can contains special patterns like: "
+            f"{' '.join(PATTERNS_MAPPING)} "
+            f"Default is {DEFAULT_PATTERN_FILENAME}"
         ),
         default=".",
     )
@@ -135,10 +134,8 @@ def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
 
             if os.path.exists(local_filepath) and not arg_namespace.replace:
                 pprint(
-                    "File `{0}` already exists. "
-                    "To override it use `--replace` option".format(
-                        local_filepath
-                    )
+                    f"File `{local_filepath}` already exists. "
+                    "To override it use `--replace` option"
                 )
                 continue
 
@@ -155,7 +152,7 @@ def _download_file(url: str, local_filepath: str, file_size: int, max_retry=3):
         try:
             with client.stream("GET", url) as response:
                 if response is None:
-                    pprint("Can't fetch URL: {0}".format(url))
+                    pprint(f"Can't fetch URL: {url}")
                     pprint("Skip it.")
                     return
 
@@ -166,7 +163,7 @@ def _download_file(url: str, local_filepath: str, file_size: int, max_retry=3):
                 )
 
         except HTTPError as e:
-            pprint("Connection Error: {0}".format(e))
+            pprint(f"Connection Error: {e}")
             pprint("Retry..")
             time.sleep(i**2)
             continue
@@ -219,9 +216,9 @@ class SyncSession:
         parts = str(file_list.__dict__)
         self.session = file_list
         self.no_input = no_input
-        self.signature = hashlib.md5(parts.encode("utf-8")).hexdigest()
+        self.signature = hashlib.md5(parts.encode()).hexdigest()
         self.session_filepath = os.path.join(
-            os.path.expanduser("~"), ".{0}.sync".format(self.signature)
+            os.path.expanduser("~"), f".{self.signature}.sync"
         )
 
         # If the serialized session is exists load it and set as current
@@ -265,7 +262,7 @@ class TrackedFileList(FileList):
         self.uuids = kwargs.pop("uuids", None)
         self.handled_uuids = []
         self.last_page_url = None
-        super(TrackedFileList, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __iter__(self):
         if self.uuids:

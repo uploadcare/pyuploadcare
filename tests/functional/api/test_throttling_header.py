@@ -1,4 +1,3 @@
-from typing import Optional, Union
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,7 +8,7 @@ from pyuploadcare.exceptions import DEFAULT_RETRY_AFTER, ThrottledRequestError
 
 def create_fake_response(
     status_code: int = 429,
-    throttling_header_value: Optional[Union[str, int]] = None,
+    throttling_header_value: str | int | None = None,
 ):
     magic_response = MagicMock()
     magic_response.status_code = status_code

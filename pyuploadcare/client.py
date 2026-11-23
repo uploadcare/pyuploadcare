@@ -2,20 +2,9 @@ import os
 import socket
 import ssl
 import warnings
+from collections.abc import Callable, Iterable, Iterator
 from time import time
-from typing import (
-    IO,
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import IO, Any
 from uuid import UUID
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
@@ -95,8 +84,8 @@ class Uploadcare:
 
     def __init__(
         self,
-        public_key: Optional[str] = conf.pub_key,
-        secret_key: Optional[str] = conf.secret,
+        public_key: str | None = conf.pub_key,
+        secret_key: str | None = conf.secret,
         api_base=conf.api_base,
         upload_base=conf.upload_base,
         cdn_base=conf.cdn_base,
@@ -111,9 +100,9 @@ class Uploadcare:
         batch_chunk_size=conf.batch_chunk_size,
         multipart_min_file_size=conf.multipart_min_file_size,
         multipart_chunk_size=conf.multipart_chunk_size,
-        auth_class: Type[UploadcareAuth] = UploadcareAuth,
-        secure_url_builder: Optional[BaseSecureUrlBuilder] = None,
-        oauth_token: Optional[str] = conf.oauth_token,
+        auth_class: type[UploadcareAuth] = UploadcareAuth,
+        secure_url_builder: BaseSecureUrlBuilder | None = None,
+        oauth_token: str | None = conf.oauth_token,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -142,7 +131,7 @@ class Uploadcare:
 
         # One instance for the REST and Upload clients, so that replacing the
         # token applies to both at once.
-        self.oauth: Optional[UploadcareOAuth] = (
+        self.oauth: UploadcareOAuth | None = (
             UploadcareOAuth(oauth_token, public_key=public_key)
             if oauth_token
             else None
@@ -223,8 +212,8 @@ class Uploadcare:
 
     def file(
         self,
-        cdn_url_or_file_id: Union[str, UUID],
-        file_info: Optional[Dict[str, Any]] = None,
+        cdn_url_or_file_id: str | UUID,
+        file_info: dict[str, Any] | None = None,
     ) -> File:
         """File resource for working with user-uploaded files.
 
@@ -233,8 +222,8 @@ class Uploadcare:
             >>> file_ = uploadcare.file('a771f854-c2cb-408a-8c36-71af77811f3b')
             >>> file_.cdn_url
             https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/
-            >>> print uploadcare.file(
-            ...    'https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/')
+            >>> print(uploadcare.file(
+            ...     'https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/'))
             https://ucarecdn.com/a771f854-c2cb-408a-8c36-71af77811f3b/-/effect/flip/
 
         """
@@ -248,7 +237,7 @@ class Uploadcare:
         return FileFromUrl(token, client=self)
 
     def file_group(
-        self, group_id: str, group_info: Optional[Dict[str, Any]] = None
+        self, group_id: str, group_info: dict[str, Any] | None = None
     ) -> FileGroup:
         """
         File Group resource for working with user-uploaded group of files.
@@ -283,12 +272,12 @@ class Uploadcare:
 
     def upload(  # noqa: C901
         self,
-        file_handle: Union[IO, str],
+        file_handle: IO | str,
         store=None,
-        size: Optional[int] = None,
-        callback: Optional[Callable[[UploadProgress], Any]] = None,
-        metadata: Optional[Dict] = None,
-        tags: Optional[Iterable[str]] = None,
+        size: int | None = None,
+        callback: Callable[[UploadProgress], Any] | None = None,
+        metadata: dict | None = None,
+        tags: Iterable[str] | None = None,
     ) -> "File":
         """Uploads a file and returns ``File`` instance.
 
@@ -308,15 +297,15 @@ class Uploadcare:
         Upload big file, multipart upload is used::
 
             >>> with open('big_file.mp4', 'rb') as fh:
-            >>>     file: File = uploadcare.upload(fh)
+            ...     file: File = uploadcare.upload(fh)
 
         To track uploading progress you can pass optional callback function::
 
             >>> def print_progress(info: UploadProgress):
             ...     print(f'{info.done}/{info.total} B')
-            >>>
+            ...
             >>> with open('big_file.mp4', 'rb') as fh:
-            ...    file: File = uploadcare.upload(fh, callback=print_progress)
+            ...     file: File = uploadcare.upload(fh, callback=print_progress)
             0/11000000 B
             5242880/11000000 B
             10485760/11000000 B
@@ -328,18 +317,18 @@ class Uploadcare:
                 ``File.multipart_upload`` (multipart upload) will be used.
                 If file URL is passed, ``File.upload_from_url_sync`` will be
                 used for uploading.
-            - store (Optional[bool]): Should the file be automatically stored
+            - store (bool | None): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
-            - size (Optional[int]): file size in bytes.
+            - size (int | None): file size in bytes.
                 If not set, it is calculated by ``os.fstat``.
                 Used for multipart uploading.
-            - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
+            - callback (Callable[[UploadProgress], Any] | None): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
-            - tags (Optional[Iterable[str]]): Optional
+            - tags (Iterable[str] | None): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
                 the uploaded file.
                 Upload responses do not report tags back. After a direct
@@ -377,7 +366,7 @@ class Uploadcare:
             )
             if not files:
                 raise ValueError("Failed to get uploaded file from response")
-            file: "File" = files[0]
+            file: File = files[0]
 
             if callback:
                 callback(UploadProgress(total=size, done=size))
@@ -400,8 +389,8 @@ class Uploadcare:
         return bool(self.signed_uploads) and self.oauth is None
 
     @staticmethod
-    def _format_store(store: Optional[bool]) -> str:
-        values_map: Dict[Any, str] = {
+    def _format_store(store: bool | None) -> str:
+        values_map: dict[Any, str] = {
             None: "auto",
             True: "1",
             False: "0",
@@ -414,11 +403,11 @@ class Uploadcare:
 
     def upload_files(
         self,
-        file_objects: List[IO],
-        store: Optional[bool] = None,
-        common_metadata: Optional[Dict] = None,
-        tags: Optional[Iterable[str]] = None,
-    ) -> List["File"]:
+        file_objects: list[IO],
+        store: bool | None = None,
+        common_metadata: dict | None = None,
+        tags: Iterable[str] | None = None,
+    ) -> list["File"]:
         """Upload multiple files using direct upload.
 
         It support files smaller than 100MB only. If you want to upload larger files,
@@ -426,7 +415,7 @@ class Uploadcare:
 
         Args:
             - file_objects: list of file objects to upload to
-            - store (Optional[bool]): Should the file be automatically stored
+            - store (bool | None): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
@@ -435,7 +424,7 @@ class Uploadcare:
             - common_metadata:
                 Dict with keys and values are all strings with constraints
                 If presented it is set for each file from ``files`` collection
-            - tags (Optional[Iterable[str]]): Optional
+            - tags (Iterable[str] | None): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_.
                 If presented they are set for each file from ``files``
                 collection.
@@ -471,12 +460,12 @@ class Uploadcare:
     def multipart_upload(  # noqa: C901
         self,
         file_obj: IO,
-        store: Optional[bool] = None,
-        size: Optional[int] = None,
-        mime_type: Optional[str] = None,
-        callback: Optional[Callable[[UploadProgress], Any]] = None,
-        metadata: Optional[Dict] = None,
-        tags: Optional[Iterable[str]] = None,
+        store: bool | None = None,
+        size: int | None = None,
+        mime_type: str | None = None,
+        callback: Callable[[UploadProgress], Any] | None = None,
+        metadata: dict | None = None,
+        tags: Iterable[str] | None = None,
     ) -> "File":
         """Upload file straight to s3 by chunks.
 
@@ -485,20 +474,20 @@ class Uploadcare:
 
         Args:
             - file_obj: file object to upload to
-            - store (Optional[bool]): Should the file be automatically stored
+            - store (bool | None): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
-            - size (Optional[int]): file size in bytes.
+            - size (int | None): file size in bytes.
                 If not set, it is calculated by ``os.fstat``
-            - mime_type (Optional[str]): file mime type.
+            - mime_type (str | None): file mime type.
                 If not set, it is guessed from filename extension.
-            - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
+            - callback (Callable[[UploadProgress], Any] | None): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
-            - metadata (Optional[Dict]): Optional metadata
-            - tags (Optional[Iterable[str]]): Optional
+            - metadata (dict | None): Optional metadata
+            - tags (Iterable[str] | None): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_.
 
         Returns:
@@ -524,7 +513,7 @@ class Uploadcare:
 
         multipart_uuid = complete_response["uuid"]
 
-        parts: List[str] = complete_response["parts"]
+        parts: list[str] = complete_response["parts"]
 
         chunk = file_obj.read(self.multipart_chunk_size)
 
@@ -540,7 +529,7 @@ class Uploadcare:
 
             chunk = file_obj.read(self.multipart_chunk_size)
 
-        file_info: Dict = self.upload_api.multipart_complete(multipart_uuid)
+        file_info: dict = self.upload_api.multipart_complete(multipart_uuid)
         return self.file(file_info["uuid"], file_info)
 
     def upload_from_url(
@@ -549,29 +538,29 @@ class Uploadcare:
         store=None,
         filename=None,
         metadata=None,
-        check_duplicates: Optional[bool] = None,
-        save_duplicates: Optional[bool] = None,
-        tags: Optional[Iterable[str]] = None,
+        check_duplicates: bool | None = None,
+        save_duplicates: bool | None = None,
+        tags: Iterable[str] | None = None,
     ) -> FileFromUrl:
         """Uploads file from given url and returns ``FileFromUrl`` instance.
 
         Args:
             - url (str): URL of file to upload to
-            - store (Optional[bool]): Should the file be automatically stored
+            - store (bool | None): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
-            - filename (Optional[str]): Name of the uploaded file. If this not
+            - filename (str | None): Name of the uploaded file. If this not
                 specified the filename will be obtained from response headers
                 or source URL. Defaults to None.
-            - check_duplicates (Optional[bool]): Enables duplicate uploads
+            - check_duplicates (bool | None): Enables duplicate uploads
                 prevention. If a file with the same source URL has been
                 previously uploaded this method will raise DuplicateFileError.
-            - save_duplicates (Optional[bool]): Indicates if the URL should be
+            - save_duplicates (bool | None): Indicates if the URL should be
                 stored by Uploadcare future check_duplicates usages.
-            - tags (Optional[Iterable[str]]): Optional
+            - tags (Iterable[str] | None): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
                 the uploaded file.
 
@@ -609,39 +598,39 @@ class Uploadcare:
         until_ready=False,
         store=None,
         filename=None,
-        callback: Optional[Callable[[UploadProgress], Any]] = None,
-        check_duplicates: Optional[bool] = None,
-        save_duplicates: Optional[bool] = None,
-        tags: Optional[Iterable[str]] = None,
+        callback: Callable[[UploadProgress], Any] | None = None,
+        check_duplicates: bool | None = None,
+        save_duplicates: bool | None = None,
+        tags: Iterable[str] | None = None,
     ) -> File:
         """Uploads file from given url and returns ``File`` instance.
 
         Args:
             - url (str): URL of file to upload to
-            - store (Optional[bool]): Should the file be automatically stored
+            - store (bool | None): Should the file be automatically stored
                 upon upload. Defaults to None.
                 - False - do not store file
                 - True - store file (can result in error if autostore
                                is disabled for project)
                 - None - use project settings
-            - filename (Optional[str]): Name of the uploaded file. If this not
+            - filename (str | None): Name of the uploaded file. If this not
                 specified the filename will be obtained from response headers
                 or source URL. Defaults to None.
-            - timeout (Optional[int]): seconds to wait for successful upload.
+            - timeout (int | None): seconds to wait for successful upload.
                 Defaults to 30.
-            - interval (Optional[float]): interval between upload status checks.
+            - interval (float | None): interval between upload status checks.
                 Defaults to 0.3.
-            - until_ready (Optional[bool]): should we wait until file is
+            - until_ready (bool | None): should we wait until file is
                 available via CDN. Defaults to False.
-            - callback (Optional[Callable[[UploadProgress], Any]]): Optional callback
+            - callback (Callable[[UploadProgress], Any] | None): Optional callback
                 accepting ``UploadProgress`` to track uploading progress.
-            - check_duplicates (Optional[bool]): Enables duplicate uploads
+            - check_duplicates (bool | None): Enables duplicate uploads
                 prevention. If a file with the same source URL has been
                 previously uploaded this method will return the previously
                 uploaded file.
-            - save_duplicates (Optional[bool]): Indicates if the URL should be
+            - save_duplicates (bool | None): Indicates if the URL should be
                 stored by Uploadcare future check_duplicates usages.
-            - tags (Optional[Iterable[str]]): Optional
+            - tags (Iterable[str] | None): Optional
                 `tags <https://uploadcare.com/docs/file-tags/>`_ to attach to
                 the uploaded file.
 
@@ -671,17 +660,15 @@ class Uploadcare:
         except DuplicateFileError as e:
             return self.file(e.file_id)
 
-    def _extract_uuids(
-        self, files: Iterable[Union[str, File, UUID]]
-    ) -> List[str]:
+    def _extract_uuids(self, files: Iterable[str | File | UUID]) -> list[str]:
         """Convert various resource representation into string-based."""
         file_generator = (
             file_ if isinstance(file_, File) else File(file_, self)
             for file_ in files
         )
 
-        def __extracts_uuids(files: Iterable[Union[str, File]]) -> List[str]:
-            uuids: List[str] = []
+        def __extracts_uuids(files: Iterable[str | File]) -> list[str]:
+            uuids: list[str] = []
 
             for file_ in files:
                 if isinstance(file_, File):
@@ -690,17 +677,15 @@ class Uploadcare:
                     uuids.append(file_)
                 else:
                     raise ValueError(
-                        "Invalid type for sequence item: {0}".format(
-                            type(file_)
-                        )
+                        f"Invalid type for sequence item: {type(file_)}"
                     )
 
             return uuids
 
-        uuids: List[str] = __extracts_uuids(file_generator)
+        uuids: list[str] = __extracts_uuids(file_generator)
         return uuids
 
-    def store_files(self, files: Iterable[Union[str, UUID, "File"]]) -> None:
+    def store_files(self, files: Iterable[str | UUID | File]) -> None:
         """Stores multiple files by requesting Uploadcare API.
 
         Usage example::
@@ -721,7 +706,7 @@ class Uploadcare:
         for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
             self.files_api.batch_store(chunk)
 
-    def delete_files(self, files: Iterable[Union[str, UUID, "File"]]) -> None:
+    def delete_files(self, files: Iterable[str | UUID | File]) -> None:
         """Deletes multiple files by requesting Uploadcare API.
 
         Usage example::
@@ -742,7 +727,7 @@ class Uploadcare:
         for chunk in iterate_over_batches(uuids, self.batch_chunk_size):
             self.files_api.batch_delete(chunk)
 
-    def create_file_group(self, files: List[File]) -> FileGroup:
+    def create_file_group(self, files: list[File]) -> FileGroup:
         """Creates file group and returns ``FileGroup`` instance.
 
         It expects iterable object that contains ``File`` instances, e.g.::
@@ -777,10 +762,10 @@ class Uploadcare:
         self,
         starting_point=None,
         ordering=None,
-        limit: Optional[int] = None,
-        request_limit: Optional[int] = None,
-        stored: Optional[bool] = None,
-        removed: Optional[bool] = None,
+        limit: int | None = None,
+        request_limit: int | None = None,
+        stored: bool | None = None,
+        removed: bool | None = None,
     ) -> FileList:
         """List files.
 
@@ -812,7 +797,7 @@ class Uploadcare:
         Usage example::
 
             >>> for f in uploadcare.list_files(removed=None):
-            >>>     print(f.datetime_uploaded)
+            ...     print(f.datetime_uploaded)
 
         Count objects::
 
@@ -832,9 +817,9 @@ class Uploadcare:
 
     def search_files(
         self,
-        request: Union[FileSearchRequest, Dict[str, Any]],
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
+        request: FileSearchRequest | dict[str, Any],
+        limit: int | None = None,
+        offset: int | None = None,
         include_appdata: bool = False,
     ) -> FileSearchResponse:
         """Search files, returning a single page of results.
@@ -882,10 +867,10 @@ class Uploadcare:
 
     def iterate_search_files(
         self,
-        request: Union[FileSearchRequest, Dict[str, Any]],
-        limit: Optional[int] = None,
-        request_limit: Optional[int] = None,
-        offset: Optional[int] = None,
+        request: FileSearchRequest | dict[str, Any],
+        limit: int | None = None,
+        request_limit: int | None = None,
+        offset: int | None = None,
         include_appdata: bool = False,
     ) -> Iterator[FileSearchInfo]:
         """Iterate over file search results, page by page.
@@ -940,8 +925,8 @@ class Uploadcare:
         self,
         starting_point=None,
         ordering=None,
-        limit: Optional[int] = None,
-        request_limit: Optional[int] = None,
+        limit: int | None = None,
+        request_limit: int | None = None,
     ):
         """List file groups.
 
@@ -964,7 +949,7 @@ class Uploadcare:
             >>> from datetime import datetime, timedelta, timezone
             >>> last_week = datetime.now(timezone.utc) - timedelta(weeks=1)
             >>> for f in uploadcare.list_file_groups(starting_point=last_week):
-            >>>     print(f.datetime_created)
+            ...     print(f.datetime_created)
 
         Count objects::
 
@@ -1006,9 +991,9 @@ class Uploadcare:
 
     def update_webhook(  # noqa: C901
         self,
-        webhook_id: Union[Webhook, int],
+        webhook_id: Webhook | int,
         target_url=None,
-        event: Optional[WebhookEvent] = None,
+        event: WebhookEvent | None = None,
         is_active=None,
         signing_secret=None,
     ) -> Webhook:
@@ -1029,7 +1014,7 @@ class Uploadcare:
 
         return self.webhooks_api.update(webhook_id, data)  # type: ignore
 
-    def delete_webhook(self, webhook_id: Union[Webhook, int]) -> None:
+    def delete_webhook(self, webhook_id: Webhook | int) -> None:
         """Unsubscribe and delete a webhook."""
 
         if isinstance(webhook_id, Webhook):
@@ -1054,7 +1039,7 @@ class Uploadcare:
             )
         return self.oauth.set_access_token(token)
 
-    def generate_upload_signature(self) -> Tuple[int, str]:
+    def generate_upload_signature(self) -> tuple[int, str]:
         """Expiration and signature for signed uploads."""
         if not self.secret_key:
             raise ValueError("secret_key is required")
@@ -1065,7 +1050,7 @@ class Uploadcare:
         return expire, signature
 
     def generate_secure_url(
-        self, handle: Union[str, UUID], wildcard: bool = False
+        self, handle: str | UUID, wildcard: bool = False
     ) -> str:
         """
         Generate authenticated URL.
@@ -1080,7 +1065,7 @@ class Uploadcare:
         return self.secure_url_builder.build(handle, wildcard=wildcard)
 
     def generate_secure_url_token(
-        self, handle: Union[str, UUID], wildcard: bool = False
+        self, handle: str | UUID, wildcard: bool = False
     ) -> str:
         """
         Generate token for authenticated URL.

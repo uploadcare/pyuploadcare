@@ -129,4 +129,4 @@ clears them. Category ids come from ``list_moderation_categories()``::
 
 List MIME types allowed in ``mime_type_filtering``::
 
-    mime_types: List[str] = projects.list_mime_types()
+    mime_types: list[str] = projects.list_mime_types()

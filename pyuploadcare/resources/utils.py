@@ -1,12 +1,11 @@
 from datetime import datetime
-from typing import Optional, Union
 
 import dateutil.parser
 
 
 def coerce_to_optional_datetime(
-    value: Optional[Union[str, datetime]]
-) -> Optional[datetime]:
+    value: str | datetime | None,
+) -> datetime | None:
     if not value:
         return None
     elif isinstance(value, datetime):
@@ -18,8 +17,8 @@ def coerce_to_optional_datetime(
 
 
 def max_for_optional_datetimes(
-    left: Optional[datetime], right: Optional[datetime]
-) -> Optional[datetime]:
+    left: datetime | None, right: datetime | None
+) -> datetime | None:
     if not left and not right:
         return None
 
