@@ -581,23 +581,26 @@ def test_update_project_rejects_invalid_features(client, server, features):
 
 
 @pytest.mark.parametrize(
-    "build",
+    ("model", "fields"),
     [
         # Misspelled `uploads`.
-        lambda: ProjectFeatures(upload=UploadsFeature(autostore=False)),
-        lambda: UploadsFeature(autostor=False),
-        lambda: ProjectFeature(is_enabld=True),
-        lambda: Project(nam="x"),
-        lambda: AdaptiveBitrateStreamingProfiles(
-            h264=AdaptiveBitrateStreamingProfile(resolutions=["720p"]),
-            h266=None,
+        (ProjectFeatures, {"upload": {"autostore": False}}),
+        (UploadsFeature, {"autostor": False}),
+        (ProjectFeature, {"is_enabld": True}),
+        (Project, {"nam": "x"}),
+        (
+            AdaptiveBitrateStreamingProfiles,
+            {"h264": {"resolutions": ["720p"]}, "h266": None},
         ),
-        lambda: ModerationThreshold(category_id=4, threshold_percentage="1", extra=1),
+        (
+            ModerationThreshold,
+            {"category_id": 4, "threshold_percentage": "1", "extra": 1},
+        ),
     ],
 )
-def test_request_models_reject_unknown_fields(build):
+def test_request_models_reject_unknown_fields(model, fields):
     with pytest.raises(ValidationError, match="extra_forbidden|Extra inputs"):
-        build()
+        model(**fields)
 
 
 def test_responses_ignore_unknown_fields_at_any_depth(client, server):

@@ -4,7 +4,7 @@ Regression tests for https://github.com/uploadcare/pyuploadcare/issues/355:
 filters used to be sent as a single stringified ``query_parameters`` key.
 """
 
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import MagicMock, patch
 from urllib.parse import parse_qs, urlparse
 
@@ -14,7 +14,7 @@ import pytest
 FILES_URL = "https://api.uploadcare.com/files/"
 GROUPS_URL = "https://api.uploadcare.com/groups/"
 
-EMPTY_PAGE: Dict[str, Any] = {
+EMPTY_PAGE: dict[str, Any] = {
     "next": None,
     "previous": None,
     "total": 7,

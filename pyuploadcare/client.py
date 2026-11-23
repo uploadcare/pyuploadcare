@@ -144,9 +144,7 @@ class Uploadcare:
         self.rest_client = Client(
             base_url=api_base,
             auth=rest_auth,
-            headers={
-                "Accept": f"application/vnd.uploadcare-v{self.api_version}+json"
-            },
+            headers={"Accept": f"application/vnd.uploadcare-v{self.api_version}+json"},
             verify=(DEFAULT_SSL_CONTEXT if verify_api_ssl is True else verify_api_ssl),
             timeout=timeout,
             user_agent_extension=user_agent_extension,
