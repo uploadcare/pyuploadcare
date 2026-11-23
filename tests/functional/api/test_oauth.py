@@ -423,6 +423,8 @@ def test_uploadcare_set_access_token_applies_to_account_project_api():
 
     assert transport.requests[0].headers["Authorization"] == "Bearer new"
     assert server.tokens == ["new"]
+
+
 # Shared transport
 
 
@@ -454,7 +456,7 @@ def test_project_client_uses_given_transport():
     server = TokenServer("token")
     shared = httpx2.MockTransport(server)
 
-    projects = ProjectAPIClient(token="token", transport=shared)
+    projects = AccountProjectAPIClient(token="token", transport=shared)
 
     assert projects.http_client._transport is shared
     assert list(projects.list_projects()) == []
