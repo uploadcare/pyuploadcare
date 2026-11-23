@@ -30,6 +30,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     fields are sent, and read-only fields never are. Requests are validated locally before they
     are sent.
   - The `UPLOADCARE_PROJECT_API_BASE` setting.
+- One-page listing with a `next` cursor: `Uploadcare.list_files_page()` / `fetch_files_page()`,
+  `list_file_groups_page()` / `fetch_file_groups_page()`, `ProjectAPIClient.list_projects_page()` /
+  `fetch_projects_page()`, and `list_page()` / `fetch_page()` on the low-level list APIs.
 
 ### Changed
 
