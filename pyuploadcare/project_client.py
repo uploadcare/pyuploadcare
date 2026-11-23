@@ -1,6 +1,7 @@
 import socket
 import ssl
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Union
+from collections.abc import Iterable, Iterator
+from typing import Any
 
 from pyuploadcare import conf
 from pyuploadcare.api.auth import UploadcareOAuth
@@ -58,7 +59,7 @@ class ProjectAPIClient:
 
     def __init__(
         self,
-        token: Optional[str] = conf.oauth_token,
+        token: str | None = conf.oauth_token,
         api_base=conf.project_api_base,
         verify_api_ssl=conf.verify_api_ssl,
         retry_throttled=conf.retry_throttled,
@@ -105,14 +106,14 @@ class ProjectAPIClient:
 
     @staticmethod
     def _project_data(
-        name: Optional[str] = None,
-        is_blocked: Optional[bool] = None,
-        is_search_index_allowed: Optional[bool] = None,
-        features: Optional[Union[ProjectFeatures, Dict[str, Any]]] = None,
+        name: str | None = None,
+        is_blocked: bool | None = None,
+        is_search_index_allowed: bool | None = None,
+        features: ProjectFeatures | dict[str, Any] | None = None,
     ) -> Project:
         # Arguments left as `None` are not set on the model, so they are not
         # sent.
-        fields: Dict[str, Any] = {
+        fields: dict[str, Any] = {
             "name": name,
             "is_blocked": is_blocked,
             "is_search_index_allowed": is_search_index_allowed,
@@ -124,8 +125,8 @@ class ProjectAPIClient:
 
     def list_projects(
         self,
-        limit: Optional[int] = None,
-        request_limit: Optional[int] = None,
+        limit: int | None = None,
+        request_limit: int | None = None,
     ) -> Iterator[Project]:
         """Iterate over the projects available to the token's user.
 
@@ -146,9 +147,9 @@ class ProjectAPIClient:
     def create_project(
         self,
         name: str,
-        is_blocked: Optional[bool] = None,
-        is_search_index_allowed: Optional[bool] = None,
-        features: Optional[Union[ProjectFeatures, Dict[str, Any]]] = None,
+        is_blocked: bool | None = None,
+        is_search_index_allowed: bool | None = None,
+        features: ProjectFeatures | dict[str, Any] | None = None,
     ) -> Project:
         """Create a project.
 
@@ -165,10 +166,10 @@ class ProjectAPIClient:
     def update_project(
         self,
         project: ProjectOrPubKey,
-        name: Optional[str] = None,
-        is_blocked: Optional[bool] = None,
-        is_search_index_allowed: Optional[bool] = None,
-        features: Optional[Union[ProjectFeatures, Dict[str, Any]]] = None,
+        name: str | None = None,
+        is_blocked: bool | None = None,
+        is_search_index_allowed: bool | None = None,
+        features: ProjectFeatures | dict[str, Any] | None = None,
     ) -> Project:
         """Update project settings.
 
@@ -220,7 +221,7 @@ class ProjectAPIClient:
     def get_usage_metric(
         self,
         project: ProjectOrPubKey,
-        metric: Union[UsageMetricName, str],
+        metric: UsageMetricName | str,
         date_from: DateLike,
         date_to: DateLike,
     ) -> UsageMetric:
@@ -229,15 +230,15 @@ class ProjectAPIClient:
 
     def get_moderation_thresholds(
         self, project: ProjectOrPubKey
-    ) -> List[ModerationThreshold]:
+    ) -> list[ModerationThreshold]:
         """Content moderation thresholds of a project."""
         return self.moderation_api.get(project)
 
     def set_moderation_thresholds(
         self,
         project: ProjectOrPubKey,
-        thresholds: Iterable[Union[ModerationThreshold, Dict[str, Any]]],
-    ) -> List[ModerationThreshold]:
+        thresholds: Iterable[ModerationThreshold | dict[str, Any]],
+    ) -> list[ModerationThreshold]:
         """Replace all content moderation thresholds of a project.
 
         Thresholds not included are deleted::
@@ -249,13 +250,13 @@ class ProjectAPIClient:
         """
         return self.moderation_api.set(project, thresholds)
 
-    def list_moderation_categories(self) -> List[ModerationCategory]:
+    def list_moderation_categories(self) -> list[ModerationCategory]:
         """Available content moderation categories.
 
         Their ids are what ``ModerationThreshold.category_id`` takes.
         """
         return self.meta_api.moderation_categories()
 
-    def list_mime_types(self) -> List[str]:
+    def list_mime_types(self) -> list[str]:
         """MIME types accepted by MIME type filtering."""
         return self.meta_api.mime_types()

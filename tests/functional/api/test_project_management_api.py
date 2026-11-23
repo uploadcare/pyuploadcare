@@ -228,7 +228,8 @@ def test_get_project(client, server):
     assert features.team_members is not None
     assert features.team_members.team_size == 2
     abs_feature = features.adaptive_bitrate_streaming
-    assert abs_feature is not None and abs_feature.profiles is not None
+    assert abs_feature is not None
+    assert abs_feature.profiles is not None
     assert abs_feature.profiles.h264 == AdaptiveBitrateStreamingProfile(
         resolutions=["360p", "720p", "1080p"]
     )
