@@ -54,11 +54,10 @@ Create a project::
 
 Update project settings. Updates are partial: only the passed arguments are
 changed, and within ``features`` only the fields that were set.
-Limits are set in millions: ``filesize_limit_mb`` in megabytes (10^6 bytes)
-and ``image_resolution_limit_mp`` in megapixels. Both accept whole integers
-(for example, ``filesize_limit_mb=10`` sends 10,000,000 bytes). Responses use
-the same MB/MP units. The API's own names, ``filesize_limit`` and
-``image_resolution_limit``, are accepted too, in bytes and pixels. An explicit
+Upload limits keep the API's field names but are set in millions:
+``filesize_limit`` in megabytes (10^6 bytes) and ``image_resolution_limit`` in
+megapixels. Both accept whole integers (for example, ``filesize_limit=10``
+sends 10,000,000 bytes). Responses use the same MB/MP units. An explicit
 ``None`` for either limit resets it to the plan's value::
 
     from pyuploadcare import ProjectFeature
@@ -67,7 +66,7 @@ the same MB/MP units. The API's own names, ``filesize_limit`` and
         project,
         is_search_index_allowed=True,
         features=ProjectFeatures(
-            uploads=UploadsFeature(filesize_limit_mb=None),
+            uploads=UploadsFeature(filesize_limit=None),
             svg_validation=ProjectFeature(is_enabled=True),
         ),
     )

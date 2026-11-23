@@ -17,6 +17,7 @@ from pydantic import TypeAdapter, ValidationError
 from pyuploadcare.api.base import API, ResponseOrEntity, _iterate_pages
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
+    API_UNITS,
     CombinedUsage,
     MimeTypesResponse,
     ModerationCategoriesResponse,
@@ -118,8 +119,11 @@ class AccountProjectAPIBase(API):
         response_class: type[ResponseOrEntity],
     ) -> ResponseOrEntity:
         # Request models forbid unknown fields; a response may carry fields
-        # added on the server later, so they are ignored here.
-        return TypeAdapter(response_class).validate_python(raw_resource, extra="ignore")
+        # added on the server later, so they are ignored here. Upload limits
+        # come in bytes and pixels and are converted to MB and megapixels.
+        return TypeAdapter(response_class).validate_python(
+            raw_resource, extra="ignore", context=API_UNITS
+        )
 
     def _project_url(
         self,

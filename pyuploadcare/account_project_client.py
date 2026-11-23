@@ -184,8 +184,8 @@ class AccountProjectAPIClient:
             ...     ),
             ... )
 
-        Setting ``filesize_limit_mb`` (in megabytes, 10^6 bytes) or
-        ``image_resolution_limit_mp`` (in megapixels) to ``None`` explicitly
+        Setting ``filesize_limit`` (in megabytes, 10^6 bytes) or
+        ``image_resolution_limit`` (in megapixels) to ``None`` explicitly
         resets the limit to the plan's value.
 
         The server rejects changes to features the owner's plan does not

@@ -28,6 +28,7 @@ from pyuploadcare import (
     UploadsFeature,
     UsageMetricName,
 )
+from pyuploadcare.api.project_entities import API_UNITS
 from pyuploadcare.exceptions import (
     APIError,
     AuthenticationError,
@@ -225,7 +226,7 @@ def test_get_project(client, server):
     features = project.features
     assert features is not None
     assert features.uploads is not None
-    assert features.uploads.filesize_limit_mb is None
+    assert features.uploads.filesize_limit is None
     assert features.uploads.autostore is True
     assert features.team_members is not None
     assert features.team_members.team_size == 2
@@ -342,7 +343,7 @@ def test_update_project_is_partial_post(client, server):
         PUB_KEY,
         is_search_index_allowed=True,
         features={
-            "uploads": {"filesize_limit_mb": None},
+            "uploads": {"filesize_limit": None},
             "svg_validation": {"is_enabled": True},
         },
     )
@@ -374,7 +375,7 @@ def test_uploads_limits_are_set_in_millions(client, server, as_dict):
     )
 
     features = ProjectFeatures(
-        uploads=UploadsFeature(filesize_limit_mb=10, image_resolution_limit_mp=25)
+        uploads=UploadsFeature(filesize_limit=10, image_resolution_limit=25)
     )
     project = client.update_project(
         PUB_KEY,
@@ -393,17 +394,30 @@ def test_uploads_limits_are_set_in_millions(client, server, as_dict):
     # Parsed back to megabytes.
     assert project.features is not None
     assert project.features.uploads is not None
-    assert project.features.uploads.filesize_limit_mb == 20
-    assert project.features.uploads.image_resolution_limit_mp == 50
+    assert project.features.uploads.filesize_limit == 20
+    assert project.features.uploads.image_resolution_limit == 50
 
 
 def test_uploads_limits_are_dumped_in_millions():
-    uploads = UploadsFeature(filesize_limit_mb=10, image_resolution_limit_mp=25)
+    uploads = UploadsFeature(filesize_limit=10, image_resolution_limit=25)
 
-    # Outside of the API requests the fields keep their names and units.
-    assert uploads.model_dump(exclude_unset=True) == {
-        "filesize_limit_mb": 10,
-        "image_resolution_limit_mp": 25,
+    # Outside of the API requests the limits stay in MB and megapixels.
+    expected = {"filesize_limit": 10, "image_resolution_limit": 25}
+    assert uploads.model_dump(exclude_unset=True) == expected
+    assert uploads.model_dump(exclude_unset=True, by_alias=True) == expected
+
+
+@pytest.mark.parametrize("mode", ["validation", "serialization"])
+def test_uploads_schema_keeps_the_api_field_names(mode):
+    # Tools built on the models publish this schema: it must name the
+    # fields as the API does, and the same in both directions.
+    properties = UploadsFeature.model_json_schema(mode=mode)["properties"]
+
+    assert set(properties) == {
+        "filesize_limit",
+        "autostore",
+        "image_resolution_limit",
+        "is_signed_upload_enabled",
     }
 
 
@@ -422,7 +436,7 @@ def test_uploads_limits_in_response_round_down(client, server, value, expected):
 
     project = client.get_project(PUB_KEY)
 
-    assert project.features.uploads.filesize_limit_mb == expected
+    assert project.features.uploads.filesize_limit == expected
 
 
 @pytest.mark.parametrize("field", ["filesize_limit", "image_resolution_limit"])
@@ -443,7 +457,7 @@ def test_project_units_roundtrip_without_mutating_response():
     raw = deepcopy(PROJECT_JSON)
     original = deepcopy(raw)
     # Raw API JSON may carry fields unknown to the SDK, as responses do.
-    project = Project.model_validate(raw, extra="ignore")
+    project = Project.model_validate(raw, extra="ignore", context=API_UNITS)
 
     assert raw == original
     assert Project.model_validate_json(project.model_dump_json()) == project
@@ -452,7 +466,7 @@ def test_project_units_roundtrip_without_mutating_response():
     assert project.to_payload() == payload
     assert project.features is not None
     assert project.features.uploads is not None
-    assert project.features.uploads.image_resolution_limit_mp == 75
+    assert project.features.uploads.image_resolution_limit == 75
 
 
 @pytest.mark.parametrize(
@@ -461,11 +475,11 @@ def test_project_units_roundtrip_without_mutating_response():
         ({}, {}),
         ({"autostore": False}, {"autostore": False}),
         (
-            {"filesize_limit_mb": None, "image_resolution_limit_mp": None},
+            {"filesize_limit": None, "image_resolution_limit": None},
             {"filesize_limit": None, "image_resolution_limit": None},
         ),
         (
-            {"filesize_limit_mb": 1, "image_resolution_limit_mp": 75},
+            {"filesize_limit": 1, "image_resolution_limit": 75},
             {
                 "filesize_limit": 1_000_000,
                 "image_resolution_limit": 75_000_000,
@@ -482,7 +496,7 @@ def test_create_project_upload_limits(client, server, uploads, expected):
         "name": "Test",
         "features": {"uploads": expected},
     }
-    assert project.features.uploads.image_resolution_limit_mp == 75
+    assert project.features.uploads.image_resolution_limit == 75
 
 
 def test_list_projects_converts_units_on_every_page(client, server):
@@ -493,10 +507,10 @@ def test_list_projects_converts_units_on_every_page(client, server):
 
     assert len(projects) == 2
     for project in projects:
-        assert project.features.uploads.image_resolution_limit_mp == 75
+        assert project.features.uploads.image_resolution_limit == 75
 
 
-@pytest.mark.parametrize("field", ["filesize_limit_mb", "image_resolution_limit_mp"])
+@pytest.mark.parametrize("field", ["filesize_limit", "image_resolution_limit"])
 @pytest.mark.parametrize("value", [True, False, 1.5, 1.0, "10"])
 def test_upload_limits_require_integers(client, server, field, value):
     with pytest.raises(InvalidParamError):
@@ -566,11 +580,11 @@ def test_update_project_adaptive_bitrate_streaming_profiles(client, server):
     [
         {"uploads": {"autostor": False}},  # misspelled key
         {"no_such_feature": {"is_enabled": True}},
-        {"uploads": {"image_resolution_limit_mp": -1}},  # below the minimum
-        {"uploads": {"image_resolution_limit_mp": 76}},  # above the maximum
-        {"uploads": {"filesize_limit_mb": -1}},  # below the minimum
-        # The same limit under both names is ambiguous.
-        {"uploads": {"filesize_limit_mb": 10, "filesize_limit": 10_000_000}},
+        {"uploads": {"image_resolution_limit": -1}},  # below the minimum
+        {"uploads": {"image_resolution_limit": 76}},  # above the maximum
+        {"uploads": {"filesize_limit": -1}},  # below the minimum
+        # Pixels instead of megapixels.
+        {"uploads": {"image_resolution_limit": 25_000_000}},
     ],
 )
 def test_update_project_rejects_invalid_features(client, server, features):
@@ -647,29 +661,6 @@ def test_moderation_thresholds_response_ignores_unknown_fields(client, server):
     thresholds = client.get_moderation_thresholds(PUB_KEY)
 
     assert thresholds[0].category_id == 4
-
-
-def test_update_project_accepts_api_names_in_api_units(client, server):
-    server.respond(payload=PROJECT_JSON)
-
-    client.update_project(
-        PUB_KEY,
-        features={
-            "uploads": {
-                "filesize_limit": 10_000_000,
-                "image_resolution_limit": 25_000_000,
-            }
-        },
-    )
-
-    assert server.last_json() == {
-        "features": {
-            "uploads": {
-                "filesize_limit": 10_000_000,
-                "image_resolution_limit": 25_000_000,
-            }
-        },
-    }
 
 
 def test_update_project_requires_changes(client, server):

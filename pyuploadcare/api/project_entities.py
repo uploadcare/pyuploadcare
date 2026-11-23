@@ -13,6 +13,11 @@ Models that make up a request reject unknown fields on construction, so a
 misspelled setting raises an error instead of being dropped. Responses are
 parsed with unknown fields ignored (``AccountProjectAPIBase._parse_response``), so
 a field added on the server later does not break parsing.
+
+Upload limits keep the API's field names, so the models' JSON schemas match
+the API's, but hold the values in megabytes and megapixels. Only the HTTP
+boundary uses bytes and pixels: responses are parsed and request bodies are
+dumped with the ``API_UNITS`` context, which converts them.
 """
 
 from datetime import date, datetime
@@ -24,8 +29,9 @@ from pydantic import (
     ConfigDict,
     Field,
     FieldSerializationInfo,
+    ValidationInfo,
     field_serializer,
-    model_validator,
+    field_validator,
 )
 
 from pyuploadcare.api.entities import Entity
@@ -35,11 +41,14 @@ from pyuploadcare.api.responses import PaginatedResponse, Response
 # A decimal megabyte (and megapixel), as on the server.
 MEGA = 10**6
 
-# Upload limit fields and their API names. The API takes bytes and pixels.
-_UPLOAD_LIMIT_API_NAMES = {
-    "filesize_limit_mb": "filesize_limit",
-    "image_resolution_limit_mp": "image_resolution_limit",
-}
+# Validation and serialization context of the HTTP boundary: upload limits
+# are in bytes and pixels there, as the API takes them.
+API_UNITS: dict[str, Any] = {"api_units": True}
+
+
+def _in_api_units(info: ValidationInfo | FieldSerializationInfo) -> bool:
+    return bool(info.context and info.context.get("api_units"))
+
 
 # Read-only fields are never sent back to the server.
 PROJECT_READ_ONLY_FIELDS: dict[str, Any] = {
@@ -91,53 +100,32 @@ class ProjectFeature(RequestEntity):
 class UploadsFeature(RequestEntity):
     """Upload settings.
 
-    The limits are in megabytes (10^6 bytes) and megapixels. The API names
-    the fields ``filesize_limit`` and ``image_resolution_limit`` and takes
-    them in bytes and pixels: those names are parsed in API units, and
-    a dump with ``by_alias=True`` produces them.
+    The fields are named as in the API, but the limits are in megabytes
+    (10^6 bytes) and megapixels, where the API takes bytes and pixels. The
+    conversion happens only with the ``API_UNITS`` context.
     """
 
-    # `None` means the plan's maximum.
-    filesize_limit_mb: int | None = Field(
-        default=None,
-        ge=0,
-        strict=True,
-        serialization_alias="filesize_limit",
-    )
+    # In megabytes. `None` means the plan's maximum.
+    filesize_limit: int | None = Field(default=None, ge=0, strict=True)
     autostore: bool | None = None
-    # `None` means the default value, 75 megapixels.
-    image_resolution_limit_mp: int | None = Field(
-        default=None,
-        ge=0,
-        le=75,
-        strict=True,
-        serialization_alias="image_resolution_limit",
-    )
+    # In megapixels. `None` means the default value, 75 megapixels.
+    image_resolution_limit: int | None = Field(default=None, ge=0, le=75, strict=True)
     is_signed_upload_enabled: bool | None = None
 
-    @model_validator(mode="before")
+    @field_validator("filesize_limit", "image_resolution_limit", mode="before")
     @classmethod
-    def _from_api_units(cls, data: Any) -> Any:
-        if not isinstance(data, dict):
-            return data
-        data = dict(data)
-        for name, api_name in _UPLOAD_LIMIT_API_NAMES.items():
-            if api_name not in data:
-                continue
-            if name in data:
-                raise ValueError(f"pass either {name} or {api_name}")
-            value = data.pop(api_name)
-            # Rounds down, as the server does when it stores the limit.
-            is_int = isinstance(value, int) and not isinstance(value, bool)
-            data[name] = value // MEGA if is_int else value
-        return data
+    def _from_api_units(cls, value: Any, info: ValidationInfo) -> Any:
+        # Rounds down, as the server does when it stores the limit.
+        is_int = isinstance(value, int) and not isinstance(value, bool)
+        if is_int and _in_api_units(info):
+            return value // MEGA
+        return value
 
-    @field_serializer("filesize_limit_mb", "image_resolution_limit_mp")
+    @field_serializer("filesize_limit", "image_resolution_limit")
     def _to_api_units(
         self, value: int | None, info: FieldSerializationInfo
     ) -> int | None:
-        # The API names, used for request bodies, carry the API units.
-        if value is not None and info.by_alias:
+        if value is not None and _in_api_units(info):
             return value * MEGA
         return value
 
@@ -207,6 +195,7 @@ class Project(RequestEntity):
             by_alias=True,
             exclude_unset=True,
             exclude=PROJECT_READ_ONLY_FIELDS,
+            context=API_UNITS,
         )
 
 
