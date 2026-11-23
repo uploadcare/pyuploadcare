@@ -10,14 +10,15 @@ server later does not break parsing; the enums below list the known values
 and can be passed wherever such a field is set.
 """
 
-from datetime import date
+from datetime import date, datetime
+from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
 from pyuploadcare.api.entities import Entity
-from pyuploadcare.api.responses import PaginatedResponse
+from pyuploadcare.api.responses import PaginatedResponse, Response
 
 
 # Read-only fields are never sent back to the server.
@@ -49,6 +50,10 @@ class AdaptiveBitrateStreamingResolution(str, Enum):
     R1080P = "1080p"
     R1440P = "1440p"
     R2160P = "2160p"
+
+
+class ModerationFileType(str, Enum):
+    IMAGE = "image"
 
 
 class ProjectFeature(Entity):
@@ -163,3 +168,31 @@ class CombinedUsage(Entity):
     # Metric name to its unit, e.g. ``{"traffic": "bytes"}``.
     units: Dict[str, str]
     data: List[CombinedUsageDataPoint]
+
+
+class ModerationThreshold(Entity):
+    category_id: int
+    # One of `ModerationFileType`.
+    file_type: str = ModerationFileType.IMAGE.value
+    # 0 to 100, up to two decimal places.
+    threshold_percentage: Decimal = Field(
+        ge=0, le=100, max_digits=5, decimal_places=2
+    )
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    @field_serializer("threshold_percentage")
+    def _serialize_threshold(self, value: Decimal) -> str:
+        # The API takes the decimal as a string; `str()` keeps it exact.
+        return str(value)
+
+    def to_payload(self) -> Dict[str, Any]:
+        """The request body item: read-only timestamps are left out."""
+        return self.model_dump(
+            mode="json",
+            include={"category_id", "file_type", "threshold_percentage"},
+        )
+
+
+class ModerationThresholdsResponse(Response):
+    thresholds: List[ModerationThreshold]
