@@ -40,9 +40,7 @@ class AddonClamAVExecutionRequestData(AddonExecutionGeneralRequestData):
 
 
 class AddonRemoveBGExecutionParams(AddonExecutionParams):
-    crop: bool | None = Field(
-        None, description="Whether to crop off all empty regions"
-    )
+    crop: bool | None = Field(None, description="Whether to crop off all empty regions")
     crop_margin: str | None = Field(
         None,
         description="Adds a margin around the cropped subject, e.g 30px or 30%",

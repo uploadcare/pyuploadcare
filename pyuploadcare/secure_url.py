@@ -20,9 +20,7 @@ class BaseSecureUrlBuilder(ABC):
         """
         :param handle: Can be one of the following: UUID, UUID with transformations, full URL.
         """
-        raise NotImplementedError(
-            f"{self.__class__} doesn't provide get_token()"
-        )
+        raise NotImplementedError(f"{self.__class__} doesn't provide get_token()")
 
 
 class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
@@ -72,17 +70,13 @@ class BaseAkamaiSecureUrlBuilder(BaseSecureUrlBuilder):
 
     def _prepare_path_for_acl(self, path: str) -> str:
         for escape_char in "~":
-            path = path.replace(
-                escape_char, "%" + hex(ord(escape_char)).lower()[2:]
-            )
+            path = path.replace(escape_char, "%" + hex(ord(escape_char)).lower()[2:])
         return path
 
     def _build_expire_time(self) -> int:
         return int(time.time()) + self.window
 
-    def _build_signature(
-        self, handle: str, expire: int, acl: str | None
-    ) -> str:
+    def _build_signature(self, handle: str, expire: int, acl: str | None) -> str:
         path = self._get_path(handle)
         path = self._prepare_path_for_url(path)
         hash_source = [

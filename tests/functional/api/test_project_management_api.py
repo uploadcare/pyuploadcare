@@ -176,7 +176,7 @@ def test_custom_api_base_with_path(server):
     client.get_project(PUB_KEY)
 
     assert str(server.last.url) == (
-        "http://localhost:8000/apps/api/project-api/v1/projects/" f"{PUB_KEY}/"
+        f"http://localhost:8000/apps/api/project-api/v1/projects/{PUB_KEY}/"
     )
 
 
@@ -288,9 +288,7 @@ def test_list_projects_limit_stops_early(client, server):
 
 def test_list_projects_refuses_foreign_next(client, server):
     server.respond(
-        payload=page(
-            [{"pub_key": "a"}], next_="https://evil.example/projects/"
-        )
+        payload=page([{"pub_key": "a"}], next_="https://evil.example/projects/")
     )
 
     with pytest.raises(InvalidRequestError):
@@ -376,15 +374,11 @@ def test_uploads_limits_are_set_in_millions(client, server, as_dict):
     )
 
     features = ProjectFeatures(
-        uploads=UploadsFeature(
-            filesize_limit_mb=10, image_resolution_limit_mp=25
-        )
+        uploads=UploadsFeature(filesize_limit_mb=10, image_resolution_limit_mp=25)
     )
     project = client.update_project(
         PUB_KEY,
-        features=(
-            features.model_dump(exclude_unset=True) if as_dict else features
-        ),
+        features=(features.model_dump(exclude_unset=True) if as_dict else features),
     )
 
     # Sent in bytes and pixels, a decimal megabyte being 10^6 bytes.
@@ -404,9 +398,7 @@ def test_uploads_limits_are_set_in_millions(client, server, as_dict):
 
 
 def test_uploads_limits_are_dumped_in_millions():
-    uploads = UploadsFeature(
-        filesize_limit_mb=10, image_resolution_limit_mp=25
-    )
+    uploads = UploadsFeature(filesize_limit_mb=10, image_resolution_limit_mp=25)
 
     # Outside of the API requests the fields keep their names and units.
     assert uploads.model_dump(exclude_unset=True) == {
@@ -418,9 +410,7 @@ def test_uploads_limits_are_dumped_in_millions():
 @pytest.mark.parametrize(
     "value,expected", [(0, 0), (999_999, 0), (1_500_000, 1), (5_000_000, 5)]
 )
-def test_uploads_limits_in_response_round_down(
-    client, server, value, expected
-):
+def test_uploads_limits_in_response_round_down(client, server, value, expected):
     # The server stores whole megabytes and rounds down the same way. A plan
     # limit, returned when the project has none, need not be a multiple.
     server.respond(
@@ -437,9 +427,7 @@ def test_uploads_limits_in_response_round_down(
 
 @pytest.mark.parametrize("field", ["filesize_limit", "image_resolution_limit"])
 @pytest.mark.parametrize("value", [-1_000_000, True, "1000000", 1e6])
-def test_uploads_limits_in_response_must_be_integers(
-    client, server, field, value
-):
+def test_uploads_limits_in_response_must_be_integers(client, server, field, value):
     server.respond(
         payload={
             **PROJECT_JSON,
@@ -497,9 +485,7 @@ def test_create_project_upload_limits(client, server, uploads, expected):
 
 
 def test_list_projects_converts_units_on_every_page(client, server):
-    server.respond(
-        payload=page([PROJECT_JSON], next_=f"{API_BASE}projects/?from=b")
-    )
+    server.respond(payload=page([PROJECT_JSON], next_=f"{API_BASE}projects/?from=b"))
     server.respond(payload=page([PROJECT_JSON]))
 
     projects = list(client.list_projects())
@@ -509,9 +495,7 @@ def test_list_projects_converts_units_on_every_page(client, server):
         assert project.features.uploads.image_resolution_limit_mp == 75
 
 
-@pytest.mark.parametrize(
-    "field", ["filesize_limit_mb", "image_resolution_limit_mp"]
-)
+@pytest.mark.parametrize("field", ["filesize_limit_mb", "image_resolution_limit_mp"])
 @pytest.mark.parametrize("value", [True, False, 1.5, 1.0, "10"])
 def test_upload_limits_require_integers(client, server, field, value):
     with pytest.raises(InvalidParamError):
@@ -662,9 +646,7 @@ def test_get_usage(client, server):
         datetime(2025, 3, 2, tzinfo=timezone.utc),
     )
 
-    assert url_without_query(server.last) == (
-        f"{API_BASE}projects/{PUB_KEY}/usage/"
-    )
+    assert url_without_query(server.last) == (f"{API_BASE}projects/{PUB_KEY}/usage/")
     assert query(server.last) == {"from": ["2025-03-01"], "to": ["2025-03-02"]}
     assert usage.units["traffic"] == "bytes"
     assert usage.data[0].date == date(2025, 3, 1)

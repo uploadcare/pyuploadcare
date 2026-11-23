@@ -54,9 +54,7 @@ def test_search_sends_limit_and_offset_as_query_parameters(files_api):
     with patch.object(
         files_api._client, "post", return_value=_json_response()
     ) as mocked_post:
-        files_api.search(
-            FileSearchRequest(query="sunset"), limit=50, offset=100
-        )
+        files_api.search(FileSearchRequest(query="sunset"), limit=50, offset=100)
 
     url = mocked_post.call_args.args[0]
     assert url == f"{SEARCH_URL}?limit=50&offset=100"
@@ -66,9 +64,7 @@ def test_search_sends_include_appdata(files_api):
     with patch.object(
         files_api._client, "post", return_value=_json_response()
     ) as mocked_post:
-        files_api.search(
-            FileSearchRequest(query="sunset"), include_appdata=True
-        )
+        files_api.search(FileSearchRequest(query="sunset"), include_appdata=True)
 
     assert mocked_post.call_args.args[0] == f"{SEARCH_URL}?include=appdata"
 

@@ -27,7 +27,7 @@ def upload_image_file(uploadcare, tags=None):
 
 def unique_tag(prefix="pyuploadcare-test"):
     """A tag no other test run will collide on."""
-    return f"{prefix}-{random.randint(10 ** 9, 10 ** 10)}"
+    return f"{prefix}-{random.randint(10**9, 10**10)}"
 
 
 def search_term(filename):

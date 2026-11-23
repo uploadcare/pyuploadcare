@@ -101,9 +101,7 @@ def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
         if ordering_field in ("", "datetime_uploaded"):
-            arg_namespace.starting_point = parse_datetime(
-                arg_namespace.starting_point
-            )
+            arg_namespace.starting_point = parse_datetime(arg_namespace.starting_point)
 
     kwargs = dict(uuids=arg_namespace.uuids or None)
     if kwargs["uuids"] is None:
@@ -144,9 +142,7 @@ def sync_files(arg_namespace, client: Uploadcare):  # noqa: C901
 
 
 def _download_file(url: str, local_filepath: str, file_size: int, max_retry=3):
-    client = Client(
-        verify=conf.verify_api_ssl, timeout=get_timeout(conf.timeout)
-    )
+    client = Client(verify=conf.verify_api_ssl, timeout=get_timeout(conf.timeout))
 
     for i in range(max_retry):
         try:

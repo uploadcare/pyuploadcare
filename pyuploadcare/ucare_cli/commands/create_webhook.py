@@ -3,9 +3,7 @@ from pyuploadcare.ucare_cli.commands.helpers import pprint
 
 
 def register_arguments(subparsers):
-    subparser = subparsers.add_parser(
-        "create_webhook", help="create a webhook"
-    )
+    subparser = subparsers.add_parser("create_webhook", help="create a webhook")
     subparser.set_defaults(func=create_webhook)
     subparser.add_argument("target_url", help="webhook target URL")
     subparser.add_argument("--active", action="store_true")

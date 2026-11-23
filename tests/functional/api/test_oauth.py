@@ -272,9 +272,7 @@ def test_both_clients_read_uploadcare_oauth_token_env():
 def test_sets_public_key_header_when_given():
     server = TokenServer("token")
 
-    make_http_client(UploadcareOAuth("token", public_key="pub"), server).get(
-        URL
-    )
+    make_http_client(UploadcareOAuth("token", public_key="pub"), server).get(URL)
 
     headers = server.requests[0].headers
     assert headers["Authorization"] == "Bearer token"

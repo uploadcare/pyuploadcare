@@ -1,7 +1,7 @@
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.ucare_cli.commands.get_project import get_project
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 @pytest.mark.vcr

@@ -178,7 +178,7 @@ class ImageTransformation(BaseTransformation):
         parameters: list[str] = []
 
         if width or height:
-            parameters.append(f'{width or ""}x{height or ""}')
+            parameters.append(f"{width or ''}x{height or ''}")
 
         self.set("preview", parameters)
         return self
@@ -188,7 +188,7 @@ class ImageTransformation(BaseTransformation):
         width: int | None = None,
         height: int | None = None,
     ) -> "ImageTransformation":
-        parameters = [f'{width or ""}x{height or ""}']
+        parameters = [f"{width or ''}x{height or ''}"]
         self.set("resize", parameters)
         return self
 
@@ -249,9 +249,7 @@ class ImageTransformation(BaseTransformation):
             '10,20p'
             """
             radii_as_list: list[str] = (
-                [str(r) for r in radii]
-                if isinstance(radii, list)
-                else [str(radii)]
+                [str(r) for r in radii] if isinstance(radii, list) else [str(radii)]
             )
             return ",".join(self._escape_percent(r) for r in radii_as_list)
 
@@ -316,21 +314,15 @@ class ImageTransformation(BaseTransformation):
             self._gif2video_quality(quality)
         return self
 
-    def _gif2video_format(
-        self, format: Gif2VideoFormat
-    ) -> "ImageTransformation":
+    def _gif2video_format(self, format: Gif2VideoFormat) -> "ImageTransformation":
         self.set("format", [format])
         return self
 
-    def _gif2video_quality(
-        self, quality: Gif2VideoQuality
-    ) -> "ImageTransformation":
+    def _gif2video_quality(self, quality: Gif2VideoQuality) -> "ImageTransformation":
         self.set("quality", [quality])
         return self
 
-    def gif2video_format(
-        self, format: Gif2VideoFormat
-    ) -> "ImageTransformation":
+    def gif2video_format(self, format: Gif2VideoFormat) -> "ImageTransformation":
         warnings.warn(
             "The method `gif2video_format` is deprecated. "
             "Use the `format` parameter of `gif2video` instead.",
@@ -338,9 +330,7 @@ class ImageTransformation(BaseTransformation):
         )
         return self._gif2video_format(format)
 
-    def gif2video_quality(
-        self, quality: Gif2VideoQuality
-    ) -> "ImageTransformation":
+    def gif2video_quality(self, quality: Gif2VideoQuality) -> "ImageTransformation":
         warnings.warn(
             "The method `gif2video_quality` is deprecated. "
             "Use the `quality` parameter of `gif2video` instead.",

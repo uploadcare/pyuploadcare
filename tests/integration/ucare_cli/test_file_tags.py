@@ -3,10 +3,10 @@
 import json
 
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
-from tests.integration.utils import IMAGE_PATH, upload_image_file
 
 from pyuploadcare.ucare_cli.main import main
+from tests.functional.ucare_cli.helpers import arg_namespace
+from tests.integration.utils import IMAGE_PATH, upload_image_file
 
 
 @pytest.fixture
@@ -44,11 +44,7 @@ def test_get_file_tags_by_cdn_url(capsys, keys, tagged_file):
 
 
 def test_set_file_tags(capsys, keys, tagged_file):
-    main(
-        arg_namespace(
-            [*keys, "set_file_tags", tagged_file.uuid, "cat", "cute"]
-        )
-    )
+    main(arg_namespace([*keys, "set_file_tags", tagged_file.uuid, "cat", "cute"]))
 
     response = _output(capsys)
     assert response["tags"] == ["cat", "cute"]
@@ -82,9 +78,7 @@ def test_update_file_tags(capsys, keys, tagged_file):
     assert response["deleted"] == ["animal"]
 
 
-def test_update_file_tags_without_flags_reports_an_error(
-    capsys, keys, tagged_file
-):
+def test_update_file_tags_without_flags_reports_an_error(capsys, keys, tagged_file):
     main(arg_namespace([*keys, "update_file_tags", tagged_file.uuid]))
 
     assert "ERROR:" in capsys.readouterr().out
@@ -106,11 +100,7 @@ def test_upload_with_tags(capsys, keys, uploadcare):
 
 
 def test_search_files(capsys, keys):
-    main(
-        arg_namespace(
-            [*keys, "search_files", "--is_image", "true", "--limit", "1"]
-        )
-    )
+    main(arg_namespace([*keys, "search_files", "--is_image", "true", "--limit", "1"]))
 
     results = _output(capsys)
     assert isinstance(results, list)

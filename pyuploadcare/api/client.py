@@ -5,9 +5,8 @@ import time
 import typing
 from platform import python_implementation, python_version
 
-from httpx2 import USE_CLIENT_DEFAULT
+from httpx2 import USE_CLIENT_DEFAULT, HTTPStatusError, Response
 from httpx2 import Client as HTTPXClient
-from httpx2 import HTTPStatusError, Response
 from httpx2._client import UseClientDefault
 from httpx2._types import (
     AuthTypes,
@@ -139,7 +138,7 @@ class Client(HTTPXClient):
                 else:
                     raise
 
-    def _handle_httpx_arguments(  # noqa: max-complexity: 6
+    def _handle_httpx_arguments(  # noqa: C901
         self,
         follow_redirects: bool | None = None,
         allow_redirects: bool | None = None,
@@ -172,7 +171,7 @@ class Client(HTTPXClient):
 
         return redirecting
 
-    def _perform_response(  # noqa: max-complexity: 6
+    def _perform_response(  # noqa: C901
         self, response: Response
     ) -> Response:
         logger.debug(

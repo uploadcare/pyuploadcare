@@ -116,8 +116,7 @@ def get_legacy_widget_js_url() -> str:
     widget_config = config["legacy_widget"]
     filename = f"uploadcare.{widget_config['build']}.js".replace("..", ".")
     hosted_url = (
-        f"https://ucarecdn.com/libs/widget/{widget_config['version']}"
-        f"/{filename}"
+        f"https://ucarecdn.com/libs/widget/{widget_config['version']}/{filename}"
     )
     local_url = f"uploadcare/{filename}"
     override_url = widget_config["override_js_url"]
@@ -135,9 +134,7 @@ def get_legacy_widget_js_url() -> str:
 
 def get_widget_js_url() -> str:
     widget_config = config["widget"]
-    filename = f"file-uploader.{widget_config['build']}.min.js".replace(
-        "..", "."
-    )
+    filename = f"file-uploader.{widget_config['build']}.min.js".replace("..", ".")
     hosted_url = (
         "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader"
         f"@{widget_config['version']}/web/{filename}"
@@ -154,9 +151,9 @@ def get_widget_js_url() -> str:
 
 def get_widget_css_url(variant: WidgetVariantType) -> str:
     widget_config = config["widget"]
-    filename = (
-        f"uc-file-uploader-{variant}.{widget_config['build']}.min.css"
-    ).replace("..", ".")
+    filename = (f"uc-file-uploader-{variant}.{widget_config['build']}.min.css").replace(
+        "..", "."
+    )
     hosted_url = (
         "https://cdn.jsdelivr.net/npm/@uploadcare/file-uploader"
         f"@{widget_config['version']}/web/{filename}"

@@ -1,7 +1,7 @@
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.ucare_cli.commands.store_files import store_files
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 def test_store_parse_wait_arg():

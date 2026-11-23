@@ -231,9 +231,7 @@ class ModerationThreshold(Entity):
     # One of `ModerationFileType`.
     file_type: str = ModerationFileType.IMAGE.value
     # 0 to 100, up to two decimal places.
-    threshold_percentage: Decimal = Field(
-        ge=0, le=100, max_digits=5, decimal_places=2
-    )
+    threshold_percentage: Decimal = Field(ge=0, le=100, max_digits=5, decimal_places=2)
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
