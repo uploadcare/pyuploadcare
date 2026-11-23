@@ -30,7 +30,8 @@ variable::
         oauth_token='<access token>',
     )
 
-The public key is still needed: uploads and CDN URLs carry it. Obtaining and
+The public key is still needed: uploads and CDN URLs carry it. The secret key
+is not: uploads are not signed, since the token authorizes them. Obtaining and
 refreshing the token is up to you; pass the new one to the client and the
 following REST and Upload API requests use it::
 
