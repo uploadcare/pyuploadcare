@@ -35,6 +35,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `fetch_projects_page()`, and `list_page()` / `fetch_page()` on the low-level list APIs.
 - `Uploadcare.get_upload_info()` and `UploadAPI.info()`: the Upload API info of a file
   (`GET /info/`), available before the file appears in the REST API. Returns `UploadFileInfo`.
+- `Uploadcare.unsubscribe_webhook()` and `WebhooksAPI.unsubscribe()`: delete the webhooks with a
+  given `target_url` (`DELETE /webhooks/unsubscribe/`).
 
 ### Changed
 

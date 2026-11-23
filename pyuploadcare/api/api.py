@@ -6,6 +6,7 @@ from collections.abc import Iterable, Iterator
 from json import JSONDecodeError
 from time import time
 from typing import Any, cast
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from httpx2 import Auth
@@ -319,6 +320,26 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
             return super().create(data)
         except InvalidRequestError as request_error:
             self._process_exceptions(request_error)
+
+    def unsubscribe(self, target_url: str) -> None:
+        """Delete every webhook of the project with this ``target_url``.
+
+        https://uploadcare.com/docs/api/rest/webhook/unsubscribe/
+
+        Deletes the webhooks for all events that use the URL. A URL with no
+        webhooks is not an error.
+        """
+        if not isinstance(target_url, str):
+            raise InvalidParamError("`target_url` must be a string")
+
+        split = urlsplit(target_url)
+        if split.scheme not in ("http", "https") or not split.netloc:
+            raise InvalidParamError(
+                f"`target_url` must be an absolute http(s) URL: {target_url!r}"
+            )
+
+        url = self._build_url(suffix="unsubscribe")
+        self._client.delete_with_payload(url, json={"target_url": target_url})
 
 
 class DocumentConvertAPI(API, RetrieveMixin):
