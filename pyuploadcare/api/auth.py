@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 from datetime import datetime, timezone
-from typing import Generator, Optional, Union
+from typing import Generator, Union
 
 from httpx2 import Auth, Request, Response
 from httpx2._utils import to_bytes, to_str
