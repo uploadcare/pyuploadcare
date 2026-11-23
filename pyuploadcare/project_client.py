@@ -1,13 +1,13 @@
 import socket
 import ssl
 from collections.abc import Iterable, Iterator
+from datetime import datetime
 from typing import Any
 
 from pyuploadcare import conf
 from pyuploadcare.api.auth import UploadcareOAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_api import (
-    DateLike,
     ProjectMetaAPI,
     ProjectModerationAPI,
     ProjectOrPubKey,
@@ -209,13 +209,14 @@ class ProjectAPIClient:
     def get_usage(
         self,
         project: ProjectOrPubKey,
-        date_from: DateLike,
-        date_to: DateLike,
+        date_from: datetime,
+        date_to: datetime,
     ) -> CombinedUsage:
         """Daily traffic, storage and operations usage of a project.
 
         Only complete days of the last 90 days in UTC are available:
-        ``date_to`` must be before today. Datetimes must be timezone-aware.
+        ``date_to`` must be before today. Dates are timezone-aware
+        datetimes; only their UTC date is sent.
         """
         return self.usage_api.combined(project, date_from, date_to)
 
@@ -223,8 +224,8 @@ class ProjectAPIClient:
         self,
         project: ProjectOrPubKey,
         metric: UsageMetricName | str,
-        date_from: DateLike,
-        date_to: DateLike,
+        date_from: datetime,
+        date_to: datetime,
     ) -> UsageMetric:
         """Daily usage of one metric: traffic, storage or operations."""
         return self.usage_api.metric(project, metric, date_from, date_to)

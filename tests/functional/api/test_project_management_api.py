@@ -656,7 +656,11 @@ def test_get_usage(client, server):
         }
     )
 
-    usage = client.get_usage(PUB_KEY, date(2025, 3, 1), "2025-03-02")
+    usage = client.get_usage(
+        PUB_KEY,
+        datetime(2025, 3, 1, tzinfo=timezone.utc),
+        datetime(2025, 3, 2, tzinfo=timezone.utc),
+    )
 
     assert url_without_query(server.last) == (
         f"{API_BASE}projects/{PUB_KEY}/usage/"
@@ -683,7 +687,7 @@ def test_get_usage_metric(client, server, metric):
         PUB_KEY,
         metric,
         datetime(2025, 3, 1, 12, 0, tzinfo=timezone.utc),
-        date(2025, 3, 1),
+        datetime(2025, 3, 1, 18, 0, tzinfo=timezone.utc),
     )
 
     assert url_without_query(server.last) == (
@@ -694,14 +698,19 @@ def test_get_usage_metric(client, server, metric):
     assert usage.data[0].value == 123456
 
 
+MAR_1 = datetime(2025, 3, 1, tzinfo=timezone.utc)
+MAR_2 = datetime(2025, 3, 2, tzinfo=timezone.utc)
+
+
 @pytest.mark.parametrize(
     "metric,date_from,date_to",
     [
-        ("bandwidth", "2025-03-01", "2025-03-02"),
-        ("traffic", "2025-03-02", "2025-03-01"),  # from after to
-        ("traffic", "03/01/2025", "2025-03-02"),
-        ("traffic", None, "2025-03-02"),
-        ("traffic", datetime(2025, 3, 1), "2025-03-02"),  # naive
+        ("bandwidth", MAR_1, MAR_2),
+        ("traffic", MAR_2, MAR_1),  # from after to
+        ("traffic", date(2025, 3, 1), MAR_2),
+        ("traffic", "2025-03-01", MAR_2),
+        ("traffic", None, MAR_2),
+        ("traffic", MAR_1, datetime(2025, 3, 2)),  # naive
     ],
 )
 def test_get_usage_metric_validates_arguments(
