@@ -59,9 +59,7 @@ def settled_images():
     """
     return FileSearchRequest(
         is_image=True,
-        datetime_uploaded=DatetimeRange(
-            lt=datetime.now(timezone.utc) - SETTLED_AGE
-        ),
+        datetime_uploaded=DatetimeRange(lt=datetime.now(timezone.utc) - SETTLED_AGE),
         sort=BY_NEWEST,
     )
 
