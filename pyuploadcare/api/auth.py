@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 from datetime import datetime, timezone
-from typing import Generator, Union
+from typing import Generator, Optional, Union
 
 from httpx2 import Auth, Request, Response
 from httpx2._utils import to_bytes, to_str
@@ -93,3 +93,60 @@ class UploadcareAuth(UploadcareSimpleAuth):
         ).hexdigest()
         credentials = f"{public_key!s}:{signature!s}"
         return f"Uploadcare {credentials}"
+
+
+class UploadcareOAuth(AuthBase):
+    """OAuth 2.0 access token auth: ``Authorization: Bearer <token>``.
+
+    Obtaining and refreshing the token is up to the caller; replace the
+    token used for the following requests with ``set_access_token()``::
+
+        >>> auth = UploadcareOAuth("<access-token>")
+        >>> auth.set_access_token("<new-access-token>")
+
+    With ``public_key`` set, requests also carry it in
+    ``X-Uploadcare-Pub-Key``, which the REST and Upload APIs need to know the
+    project. APIs that take the public key in the URL, such as the Project
+    API, need no ``public_key`` here.
+
+    Other headers that differ between APIs, such as ``Accept``, are up to the
+    client of a particular API.
+    """
+
+    PUBLIC_KEY_HEADER = "X-Uploadcare-Pub-Key"
+
+    def __init__(
+        self,
+        access_token: Union[str, bytes],
+        public_key: Optional[str] = None,
+    ) -> None:
+        self._access_token = self._validate_token(access_token)
+        self.public_key = public_key
+
+    @staticmethod
+    def _validate_token(access_token: Union[str, bytes, None]) -> str:
+        if isinstance(access_token, bytes):
+            access_token = to_str(access_token)
+        if not isinstance(access_token, str) or not access_token.strip():
+            raise ValueError("access token must be a non-empty string")
+        return access_token.strip()
+
+    @property
+    def access_token(self) -> str:
+        return self._access_token
+
+    def set_access_token(self, access_token: Union[str, bytes]) -> str:
+        """Replace the access token and return the new one.
+
+        Requests already in flight keep the token they were sent with.
+        """
+        self._access_token = self._validate_token(access_token)
+        return self._access_token
+
+    def auth_flow(
+        self, request: Request
+    ) -> Generator[Request, Response, None]:
+        request.headers["Authorization"] = f"Bearer {self._access_token}"
+        if self.public_key:
+            request.headers[self.PUBLIC_KEY_HEADER] = self.public_key
+        yield request
