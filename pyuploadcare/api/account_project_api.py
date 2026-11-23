@@ -158,7 +158,7 @@ class AccountProjectAPIBase(API):
         return {"limit": request_limit}
 
 
-class AccountProjectsAPI(AccountProjectAPIBase):
+class AccountProjectsAPI(AccountProjectAPIBase, PageMixin):
     """Projects and their settings."""
 
     response_classes = {
