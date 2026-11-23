@@ -148,7 +148,7 @@ class Uploadcare:
             else None
         )
 
-        rest_auth: Union[UploadcareAuth, UploadcareOAuth]
+        rest_auth: UploadcareAuth | UploadcareOAuth
         rest_headers: Dict[str, str] = {}
         if self.oauth is not None:
             rest_auth = self.oauth

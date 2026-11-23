@@ -90,9 +90,10 @@ def test_set_empty_access_token_keeps_old_one(token):
 
 def test_401_is_not_retried():
     server = TokenServer("new")
+    client = make_http_client(UploadcareOAuth("old"), server)
 
     with pytest.raises(AuthenticationError):
-        make_http_client(UploadcareOAuth("old"), server).get(URL)
+        client.get(URL)
 
     assert server.tokens == ["old"]
 
