@@ -6,7 +6,7 @@ import sys
 import httpx2
 import pytest
 
-from pyuploadcare import ProjectAPIClient, Uploadcare
+from pyuploadcare import AccountProjectAPIClient, Uploadcare
 from pyuploadcare.api.auth import UploadcareAuth, UploadcareOAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.exceptions import AuthenticationError
@@ -97,11 +97,11 @@ def test_401_is_not_retried():
     assert server.tokens == ["old"]
 
 
-# ProjectAPIClient
+# AccountProjectAPIClient
 
 
-def make_project_client(server: TokenServer, token: str) -> ProjectAPIClient:
-    projects = ProjectAPIClient(token=token, retry_throttled=0)
+def make_project_client(server: TokenServer, token: str) -> AccountProjectAPIClient:
+    projects = AccountProjectAPIClient(token=token, retry_throttled=0)
     projects.http_client._transport = httpx2.MockTransport(server)
     return projects
 
@@ -252,8 +252,8 @@ def test_multipart_chunks_never_get_oauth_token():
 def test_both_clients_read_uploadcare_oauth_token_env():
     # Settings are read at import time, hence a fresh interpreter.
     code = (
-        "from pyuploadcare import ProjectAPIClient, Uploadcare; "
-        "print(ProjectAPIClient().auth.access_token); "
+        "from pyuploadcare import AccountProjectAPIClient, Uploadcare; "
+        "print(AccountProjectAPIClient().auth.access_token); "
         "print(Uploadcare(public_key='pub').oauth.access_token)"
     )
     env = {**os.environ, "UPLOADCARE_OAUTH_TOKEN": "from-env"}
@@ -379,3 +379,47 @@ def test_uploadcare_rest_api_needs_no_secret_key_with_oauth():
     uploadcare.tags_api.get(FILE_UUID)
 
     assert transport.requests[0].headers["Authorization"] == "Bearer token"
+
+
+# Uploadcare.account_project_api
+
+
+def test_uploadcare_account_project_api_requires_oauth():
+    uploadcare = make_uploadcare(RecordingTransport(), oauth_token=None)
+
+    with pytest.raises(ValueError):
+        uploadcare.account_project_api
+
+
+def test_uploadcare_account_project_api_uses_oauth_token_without_public_key():
+    server = TokenServer("token")
+    uploadcare = make_uploadcare(
+        RecordingTransport(),
+        oauth_token="token",
+        account_project_api_base="https://projects.example/",
+    )
+    projects = uploadcare.account_project_api
+    projects.http_client._transport = httpx2.MockTransport(server)
+
+    assert list(projects.list_projects()) == []
+
+    request = server.requests[0]
+    assert request.url.host == "projects.example"
+    assert request.headers["Authorization"] == "Bearer token"
+    assert request.headers["Accept"] == "application/json"
+    assert "X-Uploadcare-Pub-Key" not in request.headers
+
+
+def test_uploadcare_set_access_token_applies_to_account_project_api():
+    server = TokenServer("new")
+    transport = RecordingTransport()
+    uploadcare = make_uploadcare(transport, oauth_token="old")
+    projects = uploadcare.account_project_api
+    projects.http_client._transport = httpx2.MockTransport(server)
+
+    assert uploadcare.set_access_token("new") == "new"
+    uploadcare.tags_api.get(FILE_UUID)
+    list(projects.list_projects())
+
+    assert transport.requests[0].headers["Authorization"] == "Bearer new"
+    assert server.tokens == ["new"]

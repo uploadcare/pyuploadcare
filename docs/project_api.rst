@@ -3,23 +3,34 @@ Project API
 ===========
 
 The Project API manages the projects of an account: their settings, usage
-statistics and content moderation thresholds. It is authorized with an OAuth
-access token issued for a user rather than with a project key pair, so it has
-its own client. The token gives access to every project the user owns or is a
-team member of.
+statistics and content moderation thresholds. It is account-scoped: it is
+authorized with an OAuth access token issued for a user rather than with a
+project key pair, and the token gives access to every project the user owns
+or is a team member of. Not to be confused with ``Uploadcare.project_api``
+(``get_project_info()``), which is scoped to the client's own project.
 
-Initialize the client. The token can also be set with the
-``UPLOADCARE_OAUTH_TOKEN`` environment variable, the same one ``Uploadcare``
-reads::
+A client created with ``oauth_token`` exposes it as ``account_project_api``::
 
-    from pyuploadcare import ProjectAPIClient
+    from pyuploadcare import Uploadcare
 
-    projects = ProjectAPIClient(token="<access-token>")
+    uploadcare = Uploadcare(public_key="<public-key>", oauth_token="<access-token>")
+    projects = uploadcare.account_project_api
+
+It needs no public key, so it can also be used on its own. The token can also
+be set with the ``UPLOADCARE_OAUTH_TOKEN`` environment variable, the same one
+``Uploadcare`` reads::
+
+    from pyuploadcare import AccountProjectAPIClient
+
+    projects = AccountProjectAPIClient(token="<access-token>")
 
 Refreshing the token is up to you; pass the new one to the client and the
 following requests use it::
 
     projects.set_access_token("<new-access-token>")
+
+``Uploadcare.set_access_token()`` replaces the token of
+``account_project_api`` as well.
 
 List, count and get projects::
 

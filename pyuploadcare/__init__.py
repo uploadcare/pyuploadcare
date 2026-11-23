@@ -31,4 +31,4 @@ from pyuploadcare.api.project_entities import (  # noqa: F401
     UsageMetricName,
 )
 from pyuploadcare.client import Uploadcare  # noqa: F401
-from pyuploadcare.project_client import ProjectAPIClient  # noqa: F401
+from pyuploadcare.account_project_client import AccountProjectAPIClient  # noqa: F401

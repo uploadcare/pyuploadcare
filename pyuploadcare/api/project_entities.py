@@ -11,7 +11,7 @@ and can be passed wherever such a field is set.
 
 Models that make up a request reject unknown fields on construction, so a
 misspelled setting raises an error instead of being dropped. Responses are
-parsed with unknown fields ignored (``ProjectAPIBase._parse_response``), so
+parsed with unknown fields ignored (``AccountProjectAPIBase._parse_response``), so
 a field added on the server later does not break parsing.
 """
 
@@ -143,7 +143,7 @@ class UploadsFeature(RequestEntity):
 
 
 class MimeTypeFilteringFeature(ProjectFeature):
-    # Allowed MIME types, from ``ProjectAPIClient.list_mime_types()``.
+    # Allowed MIME types, from ``AccountProjectAPIClient.list_mime_types()``.
     mime_types: list[str] | None = None
 
 

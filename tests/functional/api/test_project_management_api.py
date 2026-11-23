@@ -1,4 +1,4 @@
-"""Tests for ``ProjectAPIClient``.
+"""Tests for ``AccountProjectAPIClient``.
 
 Requests go through the real HTTP client stack with a mocked transport, so
 the tests check URLs, methods, headers, bodies and error handling as sent.
@@ -16,13 +16,13 @@ import pytest
 from pydantic import ValidationError
 
 from pyuploadcare import (
+    AccountProjectAPIClient,
     AdaptiveBitrateStreamingFeature,
     AdaptiveBitrateStreamingProfile,
     AdaptiveBitrateStreamingProfiles,
     AdaptiveBitrateStreamingResolution,
     ModerationThreshold,
     Project,
-    ProjectAPIClient,
     ProjectFeature,
     ProjectFeatures,
     UploadsFeature,
@@ -124,15 +124,15 @@ def server() -> FakeServer:
     return FakeServer()
 
 
-def make_client(server: FakeServer, **kwargs) -> ProjectAPIClient:
+def make_client(server: FakeServer, **kwargs) -> AccountProjectAPIClient:
     kwargs.setdefault("api_base", API_BASE)
-    client = ProjectAPIClient(token=TOKEN, **kwargs)
+    client = AccountProjectAPIClient(token=TOKEN, **kwargs)
     client.http_client._transport = httpx2.MockTransport(server)
     return client
 
 
 @pytest.fixture
-def client(server: FakeServer) -> ProjectAPIClient:
+def client(server: FakeServer) -> AccountProjectAPIClient:
     return make_client(server, retry_throttled=0)
 
 
@@ -151,7 +151,7 @@ def page(results, next_=None, total=None, per_page=20):
 
 def test_token_is_required():
     with pytest.raises(ValueError):
-        ProjectAPIClient(token=None)
+        AccountProjectAPIClient(token=None)
 
 
 def test_requests_carry_bearer_token_and_json_headers(client, server):

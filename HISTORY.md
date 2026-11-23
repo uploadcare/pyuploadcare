@@ -13,13 +13,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and refreshes the token and replaces it with `set_access_token()`.
   - `Uploadcare` takes an optional `oauth_token`, read from the `UPLOADCARE_OAUTH_TOKEN` setting
     by default, to authorize the REST and Upload APIs.
-- Support for the Project API, which manages the projects of an account and is authorized with an
-  OAuth access token:
-  - `ProjectAPIClient` with methods for projects (`list_projects()`, `count_projects()`,
-    `get_project()`, `create_project()`, `update_project()`, `delete_project()`), usage
-    (`get_usage()`, `get_usage_metric()`), content moderation (`get_moderation_thresholds()`,
-    `set_moderation_thresholds()`, `list_moderation_categories()`) and `list_mime_types()`.
-  - Low-level `ProjectsAPI`, `ProjectUsageAPI`, `ProjectModerationAPI` and `ProjectMetaAPI`.
+- Support for the account-scoped Project API, which manages the projects of an account and is
+  authorized with an OAuth access token:
+  - `Uploadcare.account_project_api`, available when `Uploadcare` is created with `oauth_token`;
+    `Uploadcare.set_access_token()` replaces its token too. The `account_project_api_base`
+    argument sets its base url.
+  - `AccountProjectAPIClient`, which needs no public key, with methods for projects
+    (`list_projects()`, `count_projects()`, `get_project()`, `create_project()`,
+    `update_project()`, `delete_project()`), usage (`get_usage()`, `get_usage_metric()`), content
+    moderation (`get_moderation_thresholds()`, `set_moderation_thresholds()`,
+    `list_moderation_categories()`) and `list_mime_types()`.
+  - Low-level `AccountProjectsAPI`, `AccountProjectUsageAPI`, `AccountProjectModerationAPI` and
+    `AccountProjectMetaAPI`.
   - Typed models: `Project`, `ProjectFeatures` and the per-feature models, `ModerationThreshold`,
     `ModerationCategory` and usage entities. Project updates are partial: only explicitly set
     fields are sent, and read-only fields never are. Requests are validated locally before they

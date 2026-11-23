@@ -1,3 +1,9 @@
+from pyuploadcare.api.account_project_api import (  # noqa: F401
+    AccountProjectMetaAPI,
+    AccountProjectModerationAPI,
+    AccountProjectsAPI,
+    AccountProjectUsageAPI,
+)
 from pyuploadcare.api.api import (  # noqa: F401
     AddonsAPI,
     DocumentConvertAPI,
@@ -9,10 +15,4 @@ from pyuploadcare.api.api import (  # noqa: F401
     UploadAPI,
     VideoConvertAPI,
     WebhooksAPI,
-)
-from pyuploadcare.api.project_api import (  # noqa: F401
-    ProjectMetaAPI,
-    ProjectModerationAPI,
-    ProjectsAPI,
-    ProjectUsageAPI,
 )

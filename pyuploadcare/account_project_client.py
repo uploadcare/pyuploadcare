@@ -5,16 +5,16 @@ from datetime import datetime
 from typing import Any
 
 from pyuploadcare import conf
-from pyuploadcare.api.auth import UploadcareOAuth
-from pyuploadcare.api.client import Client
-from pyuploadcare.api.project_api import (
-    ProjectMetaAPI,
-    ProjectModerationAPI,
+from pyuploadcare.api.account_project_api import (
+    AccountProjectMetaAPI,
+    AccountProjectModerationAPI,
+    AccountProjectsAPI,
+    AccountProjectUsageAPI,
     ProjectOrPubKey,
-    ProjectsAPI,
-    ProjectUsageAPI,
     validate_project_data,
 )
+from pyuploadcare.api.auth import UploadcareOAuth
+from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
     CombinedUsage,
     ModerationCategory,
@@ -30,14 +30,15 @@ from pyuploadcare.exceptions import InvalidParamError
 DEFAULT_SSL_CONTEXT = ssl.create_default_context()
 
 
-class ProjectAPIClient:
-    """Project API client: manage the projects of an account.
+class AccountProjectAPIClient:
+    """Account-scoped Project API client: manage the projects of an account.
 
-    ``Uploadcare`` works with one project and its key pair. This client is
-    authorized with an OAuth access token issued for a user and works with
-    every project the user owns or is a team member of::
+    Not to be confused with ``Uploadcare.project_api``, which is scoped to
+    one project and its key pair. This client is authorized with an OAuth
+    access token issued for a user and works with every project the user owns
+    or is a team member of::
 
-        >>> projects = ProjectAPIClient(token='<access-token>')
+        >>> projects = AccountProjectAPIClient(token='<access-token>')
         >>> project = projects.create_project('Production')
         >>> projects.update_project(project, is_search_index_allowed=True)
 
@@ -45,6 +46,9 @@ class ProjectAPIClient:
     ``set_access_token()``::
 
         >>> projects.set_access_token('<new-access-token>')
+
+    ``Uploadcare`` created with ``oauth_token`` builds one of these as
+    ``Uploadcare.account_project_api``, sharing the token.
 
     Args:
         - token: OAuth access token.
@@ -91,10 +95,10 @@ class ProjectAPIClient:
             retry_throttled=retry_throttled,
         )
 
-        self.projects_api = ProjectsAPI(client=self.http_client)
-        self.usage_api = ProjectUsageAPI(client=self.http_client)
-        self.moderation_api = ProjectModerationAPI(client=self.http_client)
-        self.meta_api = ProjectMetaAPI(client=self.http_client)
+        self.projects_api = AccountProjectsAPI(client=self.http_client)
+        self.usage_api = AccountProjectUsageAPI(client=self.http_client)
+        self.moderation_api = AccountProjectModerationAPI(client=self.http_client)
+        self.meta_api = AccountProjectMetaAPI(client=self.http_client)
 
     def set_access_token(self, token: str) -> str:
         """Replace the access token used for the following requests."""

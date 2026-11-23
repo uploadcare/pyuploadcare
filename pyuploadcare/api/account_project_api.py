@@ -1,8 +1,9 @@
-"""Project API endpoints.
+"""Account-scoped Project API endpoints.
 
-The Project API works with every project the user owns or is a team member
-of, where the REST API works with one project. Requests are authorized with
-the user's OAuth access token (``pyuploadcare.api.auth.UploadcareOAuth``).
+The Project API is scoped to an account, not to a project: it works with
+every project the user owns or is a team member of, where the REST API works
+with one project. Requests are authorized with the user's OAuth access token
+(``pyuploadcare.api.auth.UploadcareOAuth``).
 """
 
 import re
@@ -98,7 +99,7 @@ def _check_page_limits(limit: int | None, request_limit: int | None) -> None:
     )
 
 
-class ProjectAPIBase(API):
+class AccountProjectAPIBase(API):
     """Base for Project API endpoints.
 
     Takes only the HTTP client, which carries the OAuth access token. Project
@@ -153,7 +154,7 @@ class ProjectAPIBase(API):
         return {"limit": request_limit}
 
 
-class ProjectsAPI(ProjectAPIBase):
+class AccountProjectsAPI(AccountProjectAPIBase):
     """Projects and their settings."""
 
     response_classes = {
@@ -220,7 +221,7 @@ class ProjectsAPI(ProjectAPIBase):
         self._client.delete(self._project_url(project))
 
 
-class ProjectUsageAPI(ProjectAPIBase):
+class AccountProjectUsageAPI(AccountProjectAPIBase):
     """Daily usage statistics of a project.
 
     Dates are timezone-aware datetimes; only their UTC date is sent. The
@@ -301,7 +302,7 @@ class ProjectUsageAPI(ProjectAPIBase):
         return cast(UsageMetric, response)
 
 
-class ProjectModerationAPI(ProjectAPIBase):
+class AccountProjectModerationAPI(AccountProjectAPIBase):
     """Content moderation thresholds of a project.
 
     Requires the unsafe content detection feature on the owner's plan.
@@ -359,7 +360,7 @@ class ProjectModerationAPI(ProjectAPIBase):
         return cast(ModerationThresholdsResponse, response).thresholds
 
 
-class ProjectMetaAPI(ProjectAPIBase):
+class AccountProjectMetaAPI(AccountProjectAPIBase):
     """MIME types and moderation categories."""
 
     resource_type = "meta"

@@ -258,13 +258,15 @@ deeper.
 
 #### Project API
 
-The Project API manages the projects of an account. It is authorized with an OAuth access token
-instead of a project key pair, so it has its own client:
+The Project API manages the projects of an account. It is account-scoped: authorized with an
+OAuth access token instead of a project key pair, it works with every project of the token's user.
+A client created with `oauth_token` exposes it as `account_project_api`:
 
 ```python
-from pyuploadcare import ProjectAPIClient, ProjectFeatures, UploadsFeature
+from pyuploadcare import ProjectFeatures, Uploadcare, UploadsFeature
 
-projects = ProjectAPIClient(token="<access-token>")
+uploadcare = Uploadcare(public_key="<public-key>", oauth_token="<access-token>")
+projects = uploadcare.account_project_api
 
 project = projects.create_project("Production")
 
@@ -276,6 +278,9 @@ projects.update_project(
 for project in projects.list_projects():
     print(project.pub_key, project.name)
 ```
+
+It needs no public key, so it can also be used on its own:
+`AccountProjectAPIClient(token="<access-token>")`.
 
 The client also covers usage statistics, content moderation thresholds and categories, and the
 list of MIME types for MIME type filtering. See the [documentation](https://pyuploadcare.readthedocs.io/en/latest/project_api.html).
