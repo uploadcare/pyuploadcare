@@ -4,6 +4,8 @@ from collections.abc import Iterable, Iterator
 from datetime import datetime
 from typing import Any
 
+from httpx2 import BaseTransport
+
 from pyuploadcare import conf
 from pyuploadcare.api.account_project_api import (
     AccountProjectMetaAPI,
@@ -59,6 +61,10 @@ class AccountProjectAPIClient:
         - user_agent_extension: Extra suffix to user agent to identify client.
         - timeout: HTTP requests timeout. If not set, default socket timeout
           is used.
+        - transport: httpx2 transport to send requests with, e.g. one shared
+          instance to reuse a single connection pool across clients. TLS is
+          configured on the transport, so ``verify_api_ssl`` is ignored when
+          it is set. The client never closes the transport.
 
     """
 
@@ -70,6 +76,7 @@ class AccountProjectAPIClient:
         retry_throttled=conf.retry_throttled,
         user_agent_extension=conf.user_agent_extension,
         timeout=conf.timeout,
+        transport: BaseTransport | None = None,
     ):
         if not token:
             raise ValueError("token is required")
@@ -94,6 +101,7 @@ class AccountProjectAPIClient:
             timeout=timeout,
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
+            transport=transport,
         )
 
         self.projects_api = AccountProjectsAPI(client=self.http_client)

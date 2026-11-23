@@ -423,3 +423,39 @@ def test_uploadcare_set_access_token_applies_to_account_project_api():
 
     assert transport.requests[0].headers["Authorization"] == "Bearer new"
     assert server.tokens == ["new"]
+# Shared transport
+
+
+def test_uploadcare_clients_share_given_transport():
+    recorder = RecordingTransport()
+    shared = httpx2.MockTransport(recorder)
+
+    first = Uploadcare(public_key="pub1", oauth_token="token1", transport=shared)
+    second = Uploadcare(public_key="pub2", oauth_token="token2", transport=shared)
+
+    for uploadcare in (first, second):
+        for client in (
+            uploadcare.rest_client,
+            uploadcare.upload_client,
+            uploadcare.cdn_client,
+        ):
+            assert client._transport is shared
+
+    first.tags_api.get(FILE_UUID)
+    second.tags_api.get(FILE_UUID)
+
+    assert [r.headers["Authorization"] for r in recorder.requests] == [
+        "Bearer token1",
+        "Bearer token2",
+    ]
+
+
+def test_project_client_uses_given_transport():
+    server = TokenServer("token")
+    shared = httpx2.MockTransport(server)
+
+    projects = ProjectAPIClient(token="token", transport=shared)
+
+    assert projects.http_client._transport is shared
+    assert list(projects.list_projects()) == []
+    assert server.tokens == ["token"]

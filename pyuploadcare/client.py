@@ -7,6 +7,8 @@ from time import time
 from typing import IO, Any, cast
 from uuid import UUID
 
+from httpx2 import BaseTransport
+
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.account_project_client import AccountProjectAPIClient
 from pyuploadcare.api import (
@@ -86,6 +88,19 @@ class Uploadcare:
           not signed, so ``secret_key`` is not needed. CDN requests never
           carry the token. It also authorizes ``account_project_api``.
         - account_project_api_base: Account-scoped Project API base url.
+          carry the token.
+        - transport: httpx2 transport for REST, Upload and CDN requests.
+          Pass one shared instance to make many short-lived clients (e.g.
+          one per caller token) reuse a single connection pool::
+
+              >>> _TRANSPORT = httpx2.HTTPTransport(
+              ...     limits=httpx2.Limits(max_connections=200),
+              ... )
+              >>> Uploadcare(..., oauth_token=token, transport=_TRANSPORT)
+
+          TLS is configured on the transport, so ``verify_api_ssl`` and
+          ``verify_upload_ssl`` are ignored when it is set. The client never
+          closes the transport: closing it is up to the caller.
 
     """
 
@@ -111,6 +126,7 @@ class Uploadcare:
         secure_url_builder: BaseSecureUrlBuilder | None = None,
         oauth_token: str | None = conf.oauth_token,
         account_project_api_base=conf.project_api_base,
+        transport: BaseTransport | None = None,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -158,6 +174,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         self.upload_client = Client(
@@ -170,6 +187,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         # CDN requests never carry the OAuth token: `cdn_base` may point to
@@ -183,6 +201,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         api_config = {
