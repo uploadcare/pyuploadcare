@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from pyuploadcare.exceptions import InvalidParamError
 
@@ -21,9 +21,9 @@ def require_optional_int(name: str, value: Any) -> None:
 
 def require_range(
     name: str,
-    value: Optional[int],
-    minimum: Optional[int] = None,
-    maximum: Optional[int] = None,
+    value: int | None,
+    minimum: int | None = None,
+    maximum: int | None = None,
 ) -> None:
     """Reject an out-of-range value. ``None`` always passes."""
     if value is None:

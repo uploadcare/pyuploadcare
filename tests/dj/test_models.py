@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import unittest
 
 from django.core.exceptions import ValidationError

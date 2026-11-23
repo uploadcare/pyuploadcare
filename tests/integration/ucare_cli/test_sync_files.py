@@ -75,19 +75,15 @@ def test_sync_patterns(sync_path, uploadcare):
     uuids = [str(file.uuid) for file in file_list]
 
     expected_filenames = [
-        "{}_{}".format(
-            str(file.uuid),
-            os.path.splitext(file.filename)[1],
-        )
+        f"{file.uuid}_{os.path.splitext(file.filename)[1]}"
         for file in file_list
     ]
 
     main(
         arg_namespace(
             f"--pub_key {uploadcare.public_key} --secret {uploadcare.secret_key} "
-            "sync --no-input {} --uuids {}".format(
-                sync_path + "/${uuid}_${ext}", " ".join(uuids)
-            )
+            f"sync --no-input {sync_path}/${{uuid}}_${{ext}} "
+            f"--uuids {' '.join(uuids)}"
         )
     )
 

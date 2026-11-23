@@ -1,5 +1,4 @@
 import os
-from typing import List
 from unittest.mock import ANY
 
 import pytest
@@ -42,7 +41,7 @@ def test_multipart_upload(big_file, uploadcare):
         assert response == {"uuid": ANY, "parts": [ANY, ANY, ANY]}
         multipart_uuid = response["uuid"]
 
-        parts: List[str] = response["parts"]
+        parts: list[str] = response["parts"]
 
         chunk = fh.read(chunk_size)
 

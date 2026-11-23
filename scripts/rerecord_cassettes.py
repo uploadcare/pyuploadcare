@@ -34,7 +34,6 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -54,7 +53,7 @@ TEST_NAME = re.compile(r"^(?:async\s+)?def\s+(test_\w+)\s*\(", re.MULTILINE)
 CASSETTE_NAME = re.compile(r"use_cassette\(\s*['\"]([^'\"]+)['\"]")
 
 
-def cassette_names(module: Path) -> Set[str]:
+def cassette_names(module: Path) -> set[str]:
     source = module.read_text(encoding="utf-8")
     return set(TEST_NAME.findall(source)) | set(CASSETTE_NAME.findall(source))
 
@@ -65,7 +64,7 @@ def delete_cassettes(module: Path) -> None:
         (cassette_dir / f"{name}.yaml").unlink(missing_ok=True)
 
 
-def run(cmd: List[str], env: Optional[Dict[str, str]] = None) -> int:
+def run(cmd: list[str], env: dict[str, str] | None = None) -> int:
     print(f"\n$ {' '.join(cmd)}", flush=True)
     return subprocess.run(cmd, cwd=ROOT, env=env).returncode
 
@@ -74,7 +73,7 @@ def prepare_fixtures(pub_key: str) -> int:
     return run([sys.executable, str(PREPARE), pub_key])
 
 
-def main(argv: List[str]) -> int:
+def main(argv: list[str]) -> int:
     if len(argv) != 2 or not argv[1] or argv[1] == "demopublickey":
         print(
             f"usage: {Path(argv[0]).name} <public_key>\n\n"

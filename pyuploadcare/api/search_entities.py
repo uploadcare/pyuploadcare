@@ -5,7 +5,7 @@ https://uploadcare.com/docs/api/rest/file/search-files/
 """
 
 from enum import Enum
-from typing import Any, ClassVar, Dict, List, Optional, Tuple
+from typing import Any, ClassVar
 
 from pydantic import (
     AwareDatetime,
@@ -53,9 +53,9 @@ class SearchRequestModel(BaseModel):
 
     # The error to raise when no field is set. `None` disables the check,
     # for models whose notion of "carries a condition" is more involved.
-    _at_least_one_error: ClassVar[Optional[str]] = None
+    _at_least_one_error: ClassVar[str | None] = None
 
-    def _set_field_names(self) -> List[str]:
+    def _set_field_names(self) -> list[str]:
         """Names of the fields that carry an actual condition."""
         return [
             name for name, value in self.__dict__.items() if value is not None
@@ -80,10 +80,10 @@ class DatetimeRange(SearchRequestModel):
         "at least one of `gt`, `gte`, `lt` or `lte` is required"
     )
 
-    gt: Optional[AwareDatetime] = None
-    gte: Optional[AwareDatetime] = None
-    lt: Optional[AwareDatetime] = None
-    lte: Optional[AwareDatetime] = None
+    gt: AwareDatetime | None = None
+    gte: AwareDatetime | None = None
+    lt: AwareDatetime | None = None
+    lte: AwareDatetime | None = None
 
 
 class SizeRange(SearchRequestModel):
@@ -92,10 +92,10 @@ class SizeRange(SearchRequestModel):
     )
 
     # Strict, so `gt=True` is rejected instead of silently becoming `gt=1`.
-    gt: Optional[StrictInt] = Field(None, ge=0)
-    gte: Optional[StrictInt] = Field(None, ge=0)
-    lt: Optional[StrictInt] = Field(None, ge=0)
-    lte: Optional[StrictInt] = Field(None, ge=0)
+    gt: StrictInt | None = Field(None, ge=0)
+    gte: StrictInt | None = Field(None, ge=0)
+    lt: StrictInt | None = Field(None, ge=0)
+    lte: StrictInt | None = Field(None, ge=0)
 
 
 class SearchPhrase(SearchRequestModel):
@@ -103,19 +103,19 @@ class SearchPhrase(SearchRequestModel):
 
     _at_least_one_error: ClassVar[str] = "`phrase` requires at least one field"
 
-    original_filename: Optional[str] = Field(None, min_length=MIN_TERM_LENGTH)
-    metadata: Optional[str] = Field(None, min_length=MIN_TERM_LENGTH)
-    detected_mime_type: Optional[str] = Field(None, min_length=MIN_TERM_LENGTH)
+    original_filename: str | None = Field(None, min_length=MIN_TERM_LENGTH)
+    metadata: str | None = Field(None, min_length=MIN_TERM_LENGTH)
+    detected_mime_type: str | None = Field(None, min_length=MIN_TERM_LENGTH)
 
 
 class SearchExact(SearchRequestModel):
     """Exact matching. Each key takes a non-empty array of values."""
 
-    uuid: Optional[List[str]] = Field(None, min_length=1)
-    detected_mime_type: Optional[List[str]] = Field(None, min_length=1)
-    original_filename: Optional[List[str]] = Field(None, min_length=1)
+    uuid: list[str] | None = Field(None, min_length=1)
+    detected_mime_type: list[str] | None = Field(None, min_length=1)
+    original_filename: list[str] | None = Field(None, min_length=1)
     # Serialized as `metadata[<key>]` by `FileSearchRequest.to_payload()`.
-    metadata: Optional[Dict[str, List[str]]] = None
+    metadata: dict[str, list[str]] | None = None
 
     @model_validator(mode="after")
     def _validate_metadata(self) -> "SearchExact":
@@ -158,9 +158,9 @@ class TagsFilter(SearchRequestModel):
     Both ``TagsFilter(any_=[...])`` and ``TagsFilter(**{"any": [...]})`` work.
     """
 
-    any_: Optional[List[str]] = Field(None, alias="any")
-    all_: Optional[List[str]] = Field(None, alias="all")
-    none_: Optional[List[str]] = Field(None, alias="none")
+    any_: list[str] | None = Field(None, alias="any")
+    all_: list[str] | None = Field(None, alias="all")
+    none_: list[str] | None = Field(None, alias="none")
 
     @model_validator(mode="after")
     def _normalize_and_check(self) -> "TagsFilter":
@@ -190,20 +190,20 @@ class FileSearchRequest(SearchRequestModel):
     and ``sort`` are modifiers and do not count as conditions.
     """
 
-    query: Optional[str] = Field(None, min_length=MIN_TERM_LENGTH)
-    phrase: Optional[SearchPhrase] = None
-    exact: Optional[SearchExact] = None
-    datetime_uploaded: Optional[DatetimeRange] = None
-    size: Optional[SizeRange] = None
+    query: str | None = Field(None, min_length=MIN_TERM_LENGTH)
+    phrase: SearchPhrase | None = None
+    exact: SearchExact | None = None
+    datetime_uploaded: DatetimeRange | None = None
+    size: SizeRange | None = None
     # Strict, so `1` or `"true"` is rejected rather than silently coerced.
-    is_image: Optional[StrictBool] = None
-    tags: Optional[TagsFilter] = None
-    fuzziness: Optional[StrictBool] = None
-    sort: Optional[List[SearchSort]] = Field(
+    is_image: StrictBool | None = None
+    tags: TagsFilter | None = None
+    fuzziness: StrictBool | None = None
+    sort: list[SearchSort] | None = Field(
         None, min_length=MIN_SORT_KEYS, max_length=MAX_SORT_KEYS
     )
 
-    CONDITION_FIELDS: ClassVar[Tuple[str, ...]] = (
+    CONDITION_FIELDS: ClassVar[tuple[str, ...]] = (
         "query",
         "phrase",
         "exact",
@@ -216,7 +216,7 @@ class FileSearchRequest(SearchRequestModel):
     # Fields `phrase` and `exact` have in common. `metadata` is excluded on
     # purpose: `phrase.metadata` and `exact.metadata[<key>]` are different
     # field names on the wire, so they do not collide.
-    OVERLAPPING_FIELDS: ClassVar[Tuple[str, ...]] = (
+    OVERLAPPING_FIELDS: ClassVar[tuple[str, ...]] = (
         "original_filename",
         "detected_mime_type",
     )
@@ -277,7 +277,7 @@ class FileSearchRequest(SearchRequestModel):
         """
         return self.sort is None and self.query is None and self.phrase is None
 
-    def to_payload(self) -> Dict[str, Any]:
+    def to_payload(self) -> dict[str, Any]:
         """Render the request as the JSON body the API expects."""
         payload = self.model_dump(
             mode="json", by_alias=True, exclude_none=True
