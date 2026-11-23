@@ -8,6 +8,11 @@ not include, so a project fetched from the API can not be sent back as is.
 Enum-like response fields are typed as ``str`` so that a value added on the
 server later does not break parsing; the enums below list the known values
 and can be passed wherever such a field is set.
+
+Models that make up a request reject unknown fields on construction, so a
+misspelled setting raises an error instead of being dropped. Responses are
+parsed with unknown fields ignored (``ProjectAPIBase._parse_response``), so
+a field added on the server later does not break parsing.
 """
 
 from datetime import date, datetime
@@ -16,6 +21,7 @@ from enum import Enum
 from typing import Any
 
 from pydantic import (
+    ConfigDict,
     Field,
     FieldSerializationInfo,
     field_serializer,
@@ -41,6 +47,12 @@ PROJECT_READ_ONLY_FIELDS: dict[str, Any] = {
     "is_shared_project": True,
     "features": {"team_members": True},
 }
+
+
+class RequestEntity(Entity):
+    """A model that is also sent to the server: unknown fields are an error."""
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class UsageMetricName(str, Enum):
@@ -70,13 +82,13 @@ class ModerationFileType(str, Enum):
     IMAGE = "image"
 
 
-class ProjectFeature(Entity):
+class ProjectFeature(RequestEntity):
     """A feature that can only be switched on and off."""
 
     is_enabled: bool | None = None
 
 
-class UploadsFeature(Entity):
+class UploadsFeature(RequestEntity):
     """Upload settings.
 
     The limits are in megabytes (10^6 bytes) and megapixels. The API names
@@ -140,12 +152,12 @@ class UnsafeContentDetectionFeature(ProjectFeature):
     auto_moderation: str | None = None
 
 
-class AdaptiveBitrateStreamingProfile(Entity):
+class AdaptiveBitrateStreamingProfile(RequestEntity):
     # `AdaptiveBitrateStreamingResolution` values, 1 to 8 unique items.
     resolutions: list[str] = Field(min_length=1, max_length=8)
 
 
-class AdaptiveBitrateStreamingProfiles(Entity):
+class AdaptiveBitrateStreamingProfiles(RequestEntity):
     """Profiles indexed by codec.
 
     Sending profiles replaces all existing ones, so omit ``h265`` to remove
@@ -160,12 +172,12 @@ class AdaptiveBitrateStreamingFeature(ProjectFeature):
     profiles: AdaptiveBitrateStreamingProfiles | None = None
 
 
-class TeamMembersFeature(Entity):
+class TeamMembersFeature(RequestEntity):
     # Read-only. Counts the project owner too.
     team_size: int | None = None
 
 
-class ProjectFeatures(Entity):
+class ProjectFeatures(RequestEntity):
     uploads: UploadsFeature | None = None
     mime_type_filtering: MimeTypeFilteringFeature | None = None
     gif_to_video_conversion: ProjectFeature | None = None
@@ -180,7 +192,7 @@ class ProjectFeatures(Entity):
     team_members: TeamMembersFeature | None = None
 
 
-class Project(Entity):
+class Project(RequestEntity):
     pub_key: str | None = None
     name: str | None = None
     is_blocked: bool | None = None
@@ -226,7 +238,7 @@ class CombinedUsage(Entity):
     data: list[CombinedUsageDataPoint]
 
 
-class ModerationThreshold(Entity):
+class ModerationThreshold(RequestEntity):
     category_id: int
     # One of `ModerationFileType`.
     file_type: str = ModerationFileType.IMAGE.value

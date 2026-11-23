@@ -11,9 +11,9 @@ from datetime import datetime, timezone
 from re import Pattern
 from typing import Any, cast
 
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
-from pyuploadcare.api.base import API, _iterate_pages
+from pyuploadcare.api.base import API, ResponseOrEntity, _iterate_pages
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
     CombinedUsage,
@@ -108,6 +108,15 @@ class ProjectAPIBase(API):
 
     def __init__(self, client: Client) -> None:
         super().__init__(client=client, public_key="")
+
+    def _parse_response(
+        self,
+        raw_resource: dict[str, Any],
+        response_class: type[ResponseOrEntity],
+    ) -> ResponseOrEntity:
+        # Request models forbid unknown fields; a response may carry fields
+        # added on the server later, so they are ignored here.
+        return TypeAdapter(response_class).validate_python(raw_resource, extra="ignore")
 
     def _project_url(
         self,
