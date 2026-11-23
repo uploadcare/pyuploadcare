@@ -11,6 +11,7 @@ from pyuploadcare.api.api import (  # noqa: F401
     WebhooksAPI,
 )
 from pyuploadcare.api.project_api import (  # noqa: F401
+    ProjectMetaAPI,
     ProjectModerationAPI,
     ProjectsAPI,
     ProjectUsageAPI,

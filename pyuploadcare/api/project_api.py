@@ -25,6 +25,9 @@ from pyuploadcare.api.base import API, _iterate_pages
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
     CombinedUsage,
+    MimeTypesResponse,
+    ModerationCategoriesResponse,
+    ModerationCategory,
     ModerationThreshold,
     ModerationThresholdsResponse,
     Project,
@@ -376,3 +379,33 @@ class ProjectModerationAPI(ProjectAPIBase):
         json_response = self._client.put(url, json=payload).json()
         response = self._parse_response(json_response, response_class)
         return cast(ModerationThresholdsResponse, response).thresholds
+
+
+class ProjectMetaAPI(ProjectAPIBase):
+    """MIME types and moderation categories."""
+
+    resource_type = "meta"
+    response_classes = {
+        "mime_types": MimeTypesResponse,
+        "moderation_categories": ModerationCategoriesResponse,
+    }
+
+    def mime_types(self) -> List[str]:
+        """MIME types accepted by ``mime_type_filtering``, sorted."""
+        url = self._build_url(suffix="mime/types")
+        response_class = self._get_response_class("mime_types")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(MimeTypesResponse, response).mime_types
+
+    def moderation_categories(self) -> List[ModerationCategory]:
+        """The moderation category tree, flattened.
+
+        Category ids are what ``ModerationThreshold.category_id`` takes;
+        ``parent_id`` and ``level`` describe the tree.
+        """
+        url = self._build_url(suffix="moderation/categories")
+        response_class = self._get_response_class("moderation_categories")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(ModerationCategoriesResponse, response).categories
