@@ -278,7 +278,7 @@ for project in projects.list_projects():
 ```
 
 The client also covers usage statistics, content moderation thresholds and categories, and the
-list of MIME types for MIME type filtering. See the [documentation](https://pyuploadcare.readthedocs.io/en/latest/core_api.html#project-api).
+list of MIME types for MIME type filtering. See the [documentation](https://pyuploadcare.readthedocs.io/en/latest/project_api.html).
 
 ### Django integration
 
