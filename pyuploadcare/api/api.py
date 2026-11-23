@@ -17,6 +17,7 @@ from typing import (
 )
 from uuid import UUID
 
+from httpx2 import Auth
 from httpx2._types import RequestFiles
 
 from pyuploadcare.api import entities, responses
@@ -532,10 +533,14 @@ class UploadAPI(API):
         return document.json()
 
     def multipart_upload_chunk(self, url: str, chunk: bytes):
+        # `url` is a presigned storage URL with its own credentials. The
+        # client's auth must not leak there, and the storage rejects requests
+        # that carry an `Authorization` header as well.
         document = self._client.put(
             url,
             content=chunk,
             headers={"Content-Type": "application/octet-stream"},
+            auth=Auth(),  # disables the client's auth
         )
         return document.content
 
