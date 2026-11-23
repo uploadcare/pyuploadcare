@@ -27,6 +27,10 @@ secret = os.getenv("UPLOADCARE_SECRET_KEY")
 api_version = "0.7"
 api_base = os.getenv("UPLOADCARE_API_BASE", DEFAULT_API_BASE)
 upload_base = os.getenv("UPLOADCARE_UPLOAD_BASE", DEFAULT_UPLOAD_BASE)
+
+# OAuth access token. When set, it authorizes the REST and Upload APIs
+# instead of the project key pair.
+oauth_token = os.getenv("UPLOADCARE_OAUTH_TOKEN")
 _forced_cdn_base = os.getenv("UPLOADCARE_CDN_BASE")
 
 if _forced_cdn_base:
