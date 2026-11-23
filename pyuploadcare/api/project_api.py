@@ -6,15 +6,23 @@ the user's OAuth access token (``pyuploadcare.api.auth.UploadcareOAuth``).
 """
 
 import re
+from datetime import date, datetime, timezone
 from typing import Any, Dict, Iterator, Optional, Pattern, Union, cast
 
 from pydantic import ValidationError
 
 from pyuploadcare.api.base import API, _iterate_pages
 from pyuploadcare.api.client import Client
-from pyuploadcare.api.project_entities import Project, ProjectListResponse
+from pyuploadcare.api.project_entities import (
+    CombinedUsage,
+    Project,
+    ProjectListResponse,
+    UsageMetric,
+    UsageMetricName,
+)
 from pyuploadcare.api.utils import require_optional_int, require_range
 from pyuploadcare.exceptions import InvalidParamError
+from pyuploadcare.helpers import ensure_aware_datetime
 
 
 # Maximum page size of the list endpoints.
@@ -26,6 +34,7 @@ RE_PUB_KEY: Pattern[str] = re.compile(r"[a-zA-Z0-9_]+\Z")
 
 ProjectOrPubKey = Union[Project, str]
 ProjectPayload = Union[Project, Dict[str, Any]]
+DateLike = Union[date, datetime, str]
 
 
 def _pub_key(project: ProjectOrPubKey) -> str:
@@ -57,6 +66,32 @@ def validate_project_data(data: ProjectPayload) -> Project:
 
 def _project_payload(data: ProjectPayload) -> Dict[str, Any]:
     return validate_project_data(data).to_payload()
+
+
+def _utc_date(name: str, value: datetime) -> date:
+    # The server counts days in UTC.
+    try:
+        aware = ensure_aware_datetime(value)
+    except ValueError:
+        raise InvalidParamError(
+            f"`{name}` must be a timezone-aware datetime, got {value!r}"
+        ) from None
+    return aware.astimezone(timezone.utc).date()
+
+
+def _to_date(name: str, value: DateLike) -> date:
+    # `datetime` is a subclass of `date`, so check it first.
+    if isinstance(value, datetime):
+        return _utc_date(name, value)
+    if isinstance(value, date):
+        return value
+    try:
+        return date.fromisoformat(value)
+    except (TypeError, ValueError):
+        raise InvalidParamError(
+            f"`{name}` must be a date or an ISO 8601 date string "
+            f"(YYYY-MM-DD), got {value!r}"
+        )
 
 
 def _check_page_limits(
@@ -186,3 +221,75 @@ class ProjectsAPI(ProjectAPIBase):
     def delete(self, project: ProjectOrPubKey) -> None:
         """Delete a project. Only the project owner can do this."""
         self._client.delete(self._project_url(project))
+
+
+class ProjectUsageAPI(ProjectAPIBase):
+    """Daily usage statistics of a project.
+
+    Dates are ``date`` objects, ``YYYY-MM-DD`` strings or timezone-aware
+    datetimes, which are converted to their UTC date. The server only serves
+    complete days of the last 90 days in UTC: ``date_to`` must be earlier
+    than today, and ``date_from`` no more than 90 days back, today included.
+    """
+
+    response_classes = {
+        "combined": CombinedUsage,
+        "metric": UsageMetric,
+    }
+
+    @staticmethod
+    def _date_range(date_from: DateLike, date_to: DateLike) -> Dict[str, str]:
+        from_ = _to_date("date_from", date_from)
+        to = _to_date("date_to", date_to)
+        if from_ > to:
+            raise InvalidParamError(
+                f"`date_from` must not be after `date_to`: {from_} > {to}"
+            )
+        return {"from": from_.isoformat(), "to": to.isoformat()}
+
+    def combined(
+        self,
+        project: ProjectOrPubKey,
+        date_from: DateLike,
+        date_to: DateLike,
+    ) -> CombinedUsage:
+        """All metrics (traffic, storage, operations) day by day."""
+        url = self._project_url(
+            project,
+            suffix="usage",
+            query_parameters=self._date_range(date_from, date_to),
+        )
+        response_class = self._get_response_class("combined")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(CombinedUsage, response)
+
+    def metric(
+        self,
+        project: ProjectOrPubKey,
+        metric: Union[UsageMetricName, str],
+        date_from: DateLike,
+        date_to: DateLike,
+    ) -> UsageMetric:
+        """One metric day by day.
+
+        ``operations`` is only available when the owner's plan includes it,
+        otherwise the server responds with 404.
+        """
+        try:
+            metric_name = UsageMetricName(metric).value
+        except ValueError:
+            known = ", ".join(m.value for m in UsageMetricName)
+            raise InvalidParamError(
+                f"Unknown usage metric {metric!r}, expected one of: {known}"
+            )
+
+        url = self._project_url(
+            project,
+            suffix=f"usage/{metric_name}",
+            query_parameters=self._date_range(date_from, date_to),
+        )
+        response_class = self._get_response_class("metric")
+        json_response = self._client.get(url).json()
+        response = self._parse_response(json_response, response_class)
+        return cast(UsageMetric, response)

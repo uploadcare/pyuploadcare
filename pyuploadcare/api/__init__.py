@@ -10,4 +10,7 @@ from pyuploadcare.api.api import (  # noqa: F401
     VideoConvertAPI,
     WebhooksAPI,
 )
-from pyuploadcare.api.project_api import ProjectsAPI  # noqa: F401
+from pyuploadcare.api.project_api import (  # noqa: F401
+    ProjectsAPI,
+    ProjectUsageAPI,
+)
