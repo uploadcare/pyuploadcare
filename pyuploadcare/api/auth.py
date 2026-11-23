@@ -27,6 +27,8 @@ class UploadcareSimpleAuth(AuthBase):
         if "Content-Type" not in request.headers:
             request.headers["Content-Type"] = "application/json"
 
+        # TODO(8.0.*): drop `Accept` and `api_version` from auth: `Uploadcare`
+        # sets `Accept` on the REST client itself.
         request.headers["Accept"] = (
             f"application/vnd.uploadcare-v{self.api_version}+json"
         )
@@ -55,6 +57,8 @@ class UploadcareAuth(UploadcareSimpleAuth):
         if "Content-Type" not in request.headers:
             request.headers["Content-Type"] = "application/json"
 
+        # TODO(8.0): drop `Accept` and `api_version` from auth: `Uploadcare`
+        # sets `Accept` on the REST client itself.
         request.headers["Accept"] = (
             f"application/vnd.uploadcare-v{self.api_version}+json"
         )

@@ -148,21 +148,18 @@ class Uploadcare:
             else None
         )
 
-        rest_auth: UploadcareAuth | UploadcareOAuth
-        rest_headers: Dict[str, str] = {}
-        if self.oauth is not None:
-            rest_auth = self.oauth
-            # `UploadcareAuth` sets it when the key pair is used.
-            rest_headers["Accept"] = (
-                f"application/vnd.uploadcare-v{self.api_version}+json"
-            )
-        else:
-            rest_auth = auth_class(public_key, secret_key, self.api_version)  # type: ignore
+        rest_auth: UploadcareAuth | UploadcareOAuth = (
+            self.oauth
+            if self.oauth is not None
+            else auth_class(public_key, secret_key, self.api_version)  # type: ignore
+        )
 
         self.rest_client = Client(
             base_url=api_base,
             auth=rest_auth,
-            headers=rest_headers,
+            headers={
+                "Accept": f"application/vnd.uploadcare-v{self.api_version}+json"
+            },
             verify=(
                 DEFAULT_SSL_CONTEXT
                 if verify_api_ssl is True
