@@ -1,7 +1,7 @@
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.ucare_cli.commands.convert_video import convert_video
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 @pytest.mark.vcr

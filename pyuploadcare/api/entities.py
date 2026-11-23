@@ -122,9 +122,7 @@ class ApllicationDataDetails(Entity):
     pass
 
 
-DetailsType = TypeVar(
-    "DetailsType", bound=ApllicationDataDetails, covariant=True
-)
+DetailsType = TypeVar("DetailsType", bound=ApllicationDataDetails, covariant=True)
 
 
 class ApplicationDataBase(Entity):
@@ -145,9 +143,7 @@ class AWSRecognitionLabel(Entity):
 
 class AWSRecognitionDetectLabelsDetails(ApllicationDataDetails):
     label_model_version: str | None = Field(None, alias="LabelModelVersion")
-    labels: list[AWSRecognitionLabel] = Field(
-        alias="Labels", default_factory=list
-    )
+    labels: list[AWSRecognitionLabel] = Field(alias="Labels", default_factory=list)
 
 
 class AWSRecognitionDetectLabelsApplicationData(ApplicationDataBase):
@@ -161,9 +157,7 @@ class AWSRecognitionModerationLabel(Entity):
 
 
 class AWSRecognitionDetectModerationLabelsDetails(ApllicationDataDetails):
-    label_model_version: str | None = Field(
-        None, alias="ModerationModelVersion"
-    )
+    label_model_version: str | None = Field(None, alias="ModerationModelVersion")
     labels: list[AWSRecognitionModerationLabel] = Field(
         alias="ModerationLabels", default_factory=list
     )
@@ -191,9 +185,9 @@ class UCClamAVApplicationData(ApplicationDataBase):
 
 
 class ApplicationDataSet(Entity):
-    aws_rekognition_detect_labels: (
-        AWSRecognitionDetectLabelsApplicationData | None
-    ) = None
+    aws_rekognition_detect_labels: AWSRecognitionDetectLabelsApplicationData | None = (
+        None
+    )
     aws_rekognition_detect_moderation_labels: (
         AWSRecognitionDetectModerationLabelsApplicationData | None
     ) = None

@@ -161,9 +161,7 @@ def apply_substitutions(old_uuids: dict, new_uuids: dict) -> None:
     if not replacements:
         return
 
-    tests_dir = os.path.realpath(
-        MANIFEST.parent.parent / "tests" / "functional"
-    )
+    tests_dir = os.path.realpath(MANIFEST.parent.parent / "tests" / "functional")
     for candidate in Path(tests_dir).rglob("*.py"):
         path = os.path.realpath(candidate)
         if path.startswith(tests_dir + os.sep):
@@ -188,8 +186,7 @@ def main(argv: list[str]) -> int:
 
     manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
     old_uuids = {
-        key: _as_uuid(value)
-        for key, value in manifest.get("files", {}).items()
+        key: _as_uuid(value) for key, value in manifest.get("files", {}).items()
     }
     uuids = dict(old_uuids)
     for key, filename, store, tags, metadata in FIXTURES:

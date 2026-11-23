@@ -39,11 +39,8 @@ Repository = "https://github.com/uploadcare/pyuploadcare"
 [dependency-groups]
 dev = [
     "pytest>=7.4,<8",
-    "black>=24.3.0,<25",
-    "isort>=6.0.1,<7",
-    "flake8>=6.1.0,<7",
+    "ruff>=0.17.5,<0.18",
     "mypy>=1.7.1,<2",
-    "flake8-print>=5.0.0,<6",
     "pytest-vcr>=1.0.2,<2",
     "vcrpy>=8.0,<9",
     "yarl>=1.9.4,<2",
@@ -66,29 +63,31 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-root = ""
 
-[tool.black]
-line-length = 79
-target-version = ['py310']
-exclude = '''
-(
-  \.eggs
-  |\.git
-  |\.hg
-  |\.mypy_cache
-  |\.nox
-  |\.tox
-  |\.venv
-  |_build
-  |buck-out
-  |build
-  |dist
-)
-'''
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+extend-exclude = ["**/migrations/*", "snapshots"]
 
-[tool.isort]
-line_length = 79
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-multi_line_output = 3
-src_paths = "pyuploadcare"
-include_trailing_comma = "true"
-lines_after_imports = 2
+[tool.ruff.format]
+# keep docs snippets as written
+exclude = ["*.md"]
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, C90: mccabe, T20: flake8-print,
+# I: isort, UP: pyupgrade
+select = ["E", "W", "F", "C90", "T20", "I", "UP"]
+ignore = ["E701"]
+
+[tool.ruff.lint.per-file-ignores]
+"pyuploadcare/ucare_cli/**" = ["T201", "T203"]
+"scripts/**" = ["T201", "C901"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 100
+
+[tool.ruff.lint.mccabe]
+max-complexity = 5
+
+[tool.ruff.lint.isort]
+known-first-party = ["pyuploadcare"]
+lines-after-imports = 2

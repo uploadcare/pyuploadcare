@@ -25,9 +25,7 @@ def _list(api_list_method, arg_namespace, **extra):
     if arg_namespace.starting_point:
         ordering_field = (arg_namespace.ordering or "").lstrip("-")
         if ordering_field in ("", "datetime_uploaded", "datetime_created"):
-            arg_namespace.starting_point = parse_datetime(
-                arg_namespace.starting_point
-            )
+            arg_namespace.starting_point = parse_datetime(arg_namespace.starting_point)
 
     items = api_list_method(
         starting_point=arg_namespace.starting_point,

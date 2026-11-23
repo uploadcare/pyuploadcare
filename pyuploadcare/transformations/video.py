@@ -35,7 +35,7 @@ class VideoTransformation(BaseTransformation):
         height: int | None = None,
         resize_mode: str | ResizeMode | None = None,
     ) -> Self:
-        parameters = [f'{width or ""}x{height or ""}']
+        parameters = [f"{width or ''}x{height or ''}"]
         if resize_mode:
             parameters.append(resize_mode)
         self.set("size", parameters)

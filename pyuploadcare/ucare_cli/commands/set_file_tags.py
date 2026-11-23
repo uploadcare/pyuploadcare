@@ -3,9 +3,7 @@ from pyuploadcare.ucare_cli.commands.helpers import pprint
 
 
 def register_arguments(subparsers):
-    subparser = subparsers.add_parser(
-        "set_file_tags", help="replace all file tags"
-    )
+    subparser = subparsers.add_parser("set_file_tags", help="replace all file tags")
     subparser.set_defaults(func=set_file_tags)
     subparser.add_argument("path", help="file path")
     subparser.add_argument(

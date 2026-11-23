@@ -57,9 +57,7 @@ class SearchRequestModel(BaseModel):
 
     def _set_field_names(self) -> list[str]:
         """Names of the fields that carry an actual condition."""
-        return [
-            name for name, value in self.__dict__.items() if value is not None
-        ]
+        return [name for name, value in self.__dict__.items() if value is not None]
 
     @model_validator(mode="after")
     def _require_at_least_one_field(self) -> "SearchRequestModel":
@@ -127,9 +125,7 @@ class SearchExact(SearchRequestModel):
             validate_meta_key(key)
 
             if not values:
-                raise ValueError(
-                    f"`exact.metadata[{key}]` requires a non-empty array"
-                )
+                raise ValueError(f"`exact.metadata[{key}]` requires a non-empty array")
 
         return self
 
@@ -170,14 +166,10 @@ class TagsFilter(SearchRequestModel):
                 # Stored tags are normalized, so filters have to be too.
                 # No count limit: the 50-tag ceiling applies to the tags
                 # stored on a single file, not to a filter's alternatives.
-                object.__setattr__(
-                    self, name, validate_tags(value, max_count=None)
-                )
+                object.__setattr__(self, name, validate_tags(value, max_count=None))
 
         if not any(getattr(self, name) for name in ("any_", "all_", "none_")):
-            raise ValueError(
-                "`tags` requires at least one non-empty list of tags"
-            )
+            raise ValueError("`tags` requires at least one non-empty list of tags")
 
         return self
 
@@ -241,9 +233,7 @@ class FileSearchRequest(SearchRequestModel):
                 getattr(self.phrase, name) is not None
                 and getattr(self.exact, name) is not None
             ):
-                raise ValueError(
-                    f"`{name}` cannot appear in both `phrase` and `exact`"
-                )
+                raise ValueError(f"`{name}` cannot appear in both `phrase` and `exact`")
 
         return self
 
@@ -279,9 +269,7 @@ class FileSearchRequest(SearchRequestModel):
 
     def to_payload(self) -> dict[str, Any]:
         """Render the request as the JSON body the API expects."""
-        payload = self.model_dump(
-            mode="json", by_alias=True, exclude_none=True
-        )
+        payload = self.model_dump(mode="json", by_alias=True, exclude_none=True)
 
         exact = payload.get("exact")
         if exact and "metadata" in exact:
@@ -290,8 +278,6 @@ class FileSearchRequest(SearchRequestModel):
 
         tags = payload.get("tags")
         if tags:
-            payload["tags"] = {
-                key: value for key, value in tags.items() if value
-            }
+            payload["tags"] = {key: value for key, value in tags.items() if value}
 
         return payload

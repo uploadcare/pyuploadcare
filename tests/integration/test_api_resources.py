@@ -69,9 +69,7 @@ def test_failed_upload_when_file_is_opened_in_txt_mode(small_file, uploadcare):
             uploadcare.upload(fh)
 
 
-def test_successful_upload_when_file_is_opened_in_binary_mode(
-    small_file, uploadcare
-):
+def test_successful_upload_when_file_is_opened_in_binary_mode(small_file, uploadcare):
     with open(small_file.name, "rb") as fh:
         file = uploadcare.upload(fh)
 
@@ -163,9 +161,7 @@ def test_successful_upload_from_url_sync_store(uploadcare):
 
 
 def test_successful_upload_from_url_sync_with_filename(uploadcare):
-    file = uploadcare.upload_from_url_sync(
-        IMAGE_URL, filename="meh.png", interval=1
-    )
+    file = uploadcare.upload_from_url_sync(IMAGE_URL, filename="meh.png", interval=1)
     assert isinstance(file, File)
     assert file.filename == "meh.png"
 
@@ -471,9 +467,7 @@ def test_next_urls_need_no_rebuilding(uploadcare):
         return files_api._parse_response(raw, response_class)
 
     page = fetch(
-        files_api._build_url(
-            query_parameters={"limit": 1, "include": "appdata"}
-        )
+        files_api._build_url(query_parameters={"limit": 1, "include": "appdata"})
     )
 
     if page.total < 3:

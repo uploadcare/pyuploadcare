@@ -2,9 +2,9 @@ import os
 import tempfile
 
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.ucare_cli.main import main
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 @pytest.fixture
@@ -75,8 +75,7 @@ def test_sync_patterns(sync_path, uploadcare):
     uuids = [str(file.uuid) for file in file_list]
 
     expected_filenames = [
-        f"{file.uuid}_{os.path.splitext(file.filename)[1]}"
-        for file in file_list
+        f"{file.uuid}_{os.path.splitext(file.filename)[1]}" for file in file_list
     ]
 
     main(

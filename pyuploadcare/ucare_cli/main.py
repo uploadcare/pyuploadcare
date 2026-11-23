@@ -37,9 +37,7 @@ logger = logging.getLogger("pyuploadcare")
 
 def ucare_argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--version", action="version", version=f"ucare {__version__}"
-    )
+    parser.add_argument("--version", action="version", version=f"ucare {__version__}")
 
     subparsers = parser.add_subparsers()
 

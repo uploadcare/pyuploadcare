@@ -10,9 +10,7 @@ from pyuploadcare.secure_url import (
 )
 
 
-known_secret = (
-    "73636b61519adede42191efe1e73f02a67c7b692e3765f90c250c230be095211"
-)
+known_secret = "73636b61519adede42191efe1e73f02a67c7b692e3765f90c250c230be095211"
 
 
 @pytest.mark.freeze_time("2021-10-12")
@@ -33,9 +31,7 @@ def test_generate_secure_url_acl_token():
     secure_url_bulder = AkamaiSecureUrlBuilderWithAclToken(
         "cdn.yourdomain.com", known_secret
     )
-    secure_url = secure_url_bulder.build(
-        "52da3bfc-7cd8-4861-8b05-126fef7a6994"
-    )
+    secure_url = secure_url_bulder.build("52da3bfc-7cd8-4861-8b05-126fef7a6994")
     assert secure_url == (
         "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/?token="
         "exp=1633997100~"
@@ -88,9 +84,7 @@ def test_client_generate_secure_url_acl_token():
         secret_key="secret",
         secure_url_builder=secure_url_bulder,
     )
-    secure_url = uploadcare.generate_secure_url(
-        "52da3bfc-7cd8-4861-8b05-126fef7a6994"
-    )
+    secure_url = uploadcare.generate_secure_url("52da3bfc-7cd8-4861-8b05-126fef7a6994")
     assert secure_url == (
         "https://cdn.yourdomain.com/52da3bfc-7cd8-4861-8b05-126fef7a6994/?token="
         "exp=1633997100~"

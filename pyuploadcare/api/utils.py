@@ -14,9 +14,7 @@ def require_optional_int(name: str, value: Any) -> None:
         return
 
     if isinstance(value, bool) or not isinstance(value, int):
-        raise InvalidParamError(
-            f"`{name}` must be an int, got {type(value).__name__}"
-        )
+        raise InvalidParamError(f"`{name}` must be an int, got {type(value).__name__}")
 
 
 def require_range(

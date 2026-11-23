@@ -81,9 +81,7 @@ class FormFieldsAttributesTest(BaseFormFieldTest):
 
 class FileFieldURLTest(BaseFormFieldTest):
     def test_returns_url_if_uuid_is_given(self):
-        cdn_url = uc_forms.FileField().clean(
-            "cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0"
-        )
+        cdn_url = uc_forms.FileField().clean("cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0")
         path = urlparse(cdn_url).path
         expected_path = "/cde35b21-c5e1-4ed4-b2fc-d4ef4b0538b0/"
 

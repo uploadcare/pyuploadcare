@@ -119,13 +119,9 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         if include_appdata:
             query_parameters["include"] = "appdata"
 
-        url = self._build_url(
-            suffix="search", query_parameters=query_parameters
-        )
+        url = self._build_url(suffix="search", query_parameters=query_parameters)
         response_class = self._get_response_class("search")
-        json_response = self._client.post(
-            url, json=search_request.to_payload()
-        ).json()
+        json_response = self._client.post(url, json=search_request.to_payload()).json()
         response = self._parse_response(json_response, response_class)
         return cast(responses.FileSearchResponse, response)
 
@@ -167,9 +163,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
             "request_limit", request_limit, minimum=1, maximum=SEARCH_MAX_LIMIT
         )
         require_range("offset", offset, minimum=0)
-        page_size = (
-            SEARCH_DEFAULT_LIMIT if request_limit is None else request_limit
-        )
+        page_size = SEARCH_DEFAULT_LIMIT if request_limit is None else request_limit
         start = 0 if offset is None else offset
 
         if start >= SEARCH_MAX_WINDOW:
@@ -192,9 +186,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
         if include_appdata:
             query_parameters["include"] = "appdata"
 
-        first_url = self._build_url(
-            suffix="search", query_parameters=query_parameters
-        )
+        first_url = self._build_url(suffix="search", query_parameters=query_parameters)
         response_class = self._get_response_class("search")
         payload = search_request.to_payload()  # rendered once for all pages
 
@@ -226,9 +218,7 @@ class FilesAPI(API, ListCountMixin, RetrieveMixin, DeleteWithResponseMixin):
     ) -> responses.BatchFileOperationResponse:
         url = self._build_url(suffix="storage")
         response_class = self._get_response_class("batch_delete")
-        json_response = self._client.delete_with_payload(
-            url, json=file_uuids
-        ).json()
+        json_response = self._client.delete_with_payload(url, json=file_uuids).json()
         response = self._parse_response(json_response, response_class)
         return cast(responses.BatchFileOperationResponse, response)
 
@@ -508,14 +498,13 @@ class UploadAPI(API):
 
         if secure_upload:
             expire = (
-                (int(time()) + self.signed_uploads_ttl)
-                if expire is None
-                else expire
+                (int(time()) + self.signed_uploads_ttl) if expire is None else expire
             )
 
             data["expire"] = str(expire)
             data["signature"] = self.generate_secure_signature(
-                self.secret_key, expire  # type: ignore
+                self.secret_key,  # type: ignore
+                expire,
             )
 
         url = self._build_url(base="multipart/start")
@@ -539,7 +528,7 @@ class UploadAPI(API):
         document = self._client.post(url, data=data)
         return document.json()
 
-    def upload_from_url(  # noqa: max-complexity: 8
+    def upload_from_url(  # noqa: C901
         self,
         source_url,
         store="auto",
@@ -567,14 +556,13 @@ class UploadAPI(API):
 
         if secure_upload:
             expire = (
-                (int(time()) + self.signed_uploads_ttl)
-                if expire is None
-                else expire
+                (int(time()) + self.signed_uploads_ttl) if expire is None else expire
             )
 
             data["expire"] = str(expire)
             data["signature"] = self.generate_secure_signature(
-                self.secret_key, expire  # type: ignore
+                self.secret_key,  # type: ignore
+                expire,
             )
 
         if check_duplicates is not None:
@@ -624,14 +612,13 @@ class UploadAPI(API):
 
         if secure_upload:
             expire = (
-                (int(time()) + self.signed_uploads_ttl)
-                if expire is None
-                else expire
+                (int(time()) + self.signed_uploads_ttl) if expire is None else expire
             )
 
             data["expire"] = str(expire)
             data["signature"] = self.generate_secure_signature(
-                self.secret_key, expire  # type: ignore
+                self.secret_key,  # type: ignore
+                expire,
             )
 
         url = self._build_url(base="/group/")
@@ -668,9 +655,7 @@ class MetadataAPI(API):
             json_response = self._client.get(url).json()
         except JSONDecodeError as jerr:  # noqa
             # assume that there is "empty response" bug (Expecting value: line 1 column 1 (char 0))
-            logging.warning(
-                f"For file `{file_uuid}` there is empty metadata response"
-            )
+            logging.warning(f"For file `{file_uuid}` there is empty metadata response")
             json_response = {}
 
         response = self._parse_response(json_response, response_class).root  # type: ignore
@@ -786,9 +771,7 @@ class AddonsAPI(API):
         execution_request_data = self.request_type.model_validate(
             dict(target=str(file_uuid), params=cleaned_params)
         )
-        return execution_request_data.model_dump(
-            exclude_unset=True, exclude_none=True
-        )
+        return execution_request_data.model_dump(exclude_unset=True, exclude_none=True)
 
     def execute(
         self,
@@ -828,9 +811,7 @@ class URLAPI(API):
         "detect_faces": entities.ImageInfoWithFaces,
     }
 
-    def detect_faces(
-        self, file_uuid: UUID | str
-    ) -> entities.ImageInfoWithFaces:
+    def detect_faces(self, file_uuid: UUID | str) -> entities.ImageInfoWithFaces:
         url = self._build_url(file_uuid, suffix="detect_faces/")
         response_class = self._get_response_class("detect_faces")
         json_response = self._client.get(url).json()

@@ -1,7 +1,7 @@
 import pytest
-from tests.functional.ucare_cli.helpers import arg_namespace
 
 from pyuploadcare.ucare_cli.commands.update_webhook import update_webhook
+from tests.functional.ucare_cli.helpers import arg_namespace
 
 
 @pytest.mark.vcr

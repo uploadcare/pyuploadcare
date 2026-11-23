@@ -21,9 +21,7 @@ class UploadcareSimpleAuth(AuthBase):
         self.secret_key = secret_key
         self.api_version = api_version
 
-    def auth_flow(
-        self, request: Request
-    ) -> Generator[Request, Response, None]:
+    def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
         if "Content-Type" not in request.headers:
             request.headers["Content-Type"] = "application/json"
 
@@ -47,9 +45,7 @@ class UploadcareSimpleAuth(AuthBase):
 
 
 class UploadcareAuth(UploadcareSimpleAuth):
-    def auth_flow(
-        self, request: Request
-    ) -> Generator[Request, Response, None]:
+    def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
         formated_date_time = self._formated_date_time()
 
         if "Content-Type" not in request.headers:
@@ -65,9 +61,7 @@ class UploadcareAuth(UploadcareSimpleAuth):
         yield request
 
     def _formated_date_time(self):
-        return datetime.now(timezone.utc).strftime(
-            "%a, %d %b %Y, %H:%M:%S GMT"
-        )
+        return datetime.now(timezone.utc).strftime("%a, %d %b %Y, %H:%M:%S GMT")
 
     def _build_auth_header(
         self,

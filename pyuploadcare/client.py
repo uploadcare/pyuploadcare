@@ -92,8 +92,8 @@ class Uploadcare:
         batch_chunk_size=conf.batch_chunk_size,
         multipart_min_file_size=conf.multipart_min_file_size,
         multipart_chunk_size=conf.multipart_chunk_size,
-        auth_class: Type[UploadcareAuth] = UploadcareAuth,
-        secure_url_builder: Optional[BaseSecureUrlBuilder] = None,
+        auth_class: type[UploadcareAuth] = UploadcareAuth,
+        secure_url_builder: BaseSecureUrlBuilder | None = None,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -125,11 +125,7 @@ class Uploadcare:
         self.rest_client = Client(
             base_url=api_base,
             auth=auth,
-            verify=(
-                DEFAULT_SSL_CONTEXT
-                if verify_api_ssl is True
-                else verify_api_ssl
-            ),
+            verify=(DEFAULT_SSL_CONTEXT if verify_api_ssl is True else verify_api_ssl),
             timeout=timeout,
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
@@ -139,9 +135,7 @@ class Uploadcare:
         self.upload_client = Client(
             base_url=upload_base,
             verify=(
-                DEFAULT_SSL_CONTEXT
-                if verify_upload_ssl is True
-                else verify_upload_ssl
+                DEFAULT_SSL_CONTEXT if verify_upload_ssl is True else verify_upload_ssl
             ),
             timeout=timeout,
             user_agent_extension=user_agent_extension,
@@ -152,9 +146,7 @@ class Uploadcare:
         self.cdn_client = Client(
             base_url=cdn_base,
             verify=(
-                DEFAULT_SSL_CONTEXT
-                if verify_upload_ssl is True
-                else verify_upload_ssl
+                DEFAULT_SSL_CONTEXT if verify_upload_ssl is True else verify_upload_ssl
             ),
             timeout=timeout,
             user_agent_extension=user_agent_extension,
@@ -171,10 +163,12 @@ class Uploadcare:
         self.files_api = FilesAPI(client=self.rest_client, **api_config)  # type: ignore
         self.groups_api = GroupsAPI(client=self.rest_client, **api_config)  # type: ignore
         self.video_convert_api = VideoConvertAPI(
-            client=self.rest_client, **api_config  # type: ignore
+            client=self.rest_client,
+            **api_config,  # type: ignore
         )
         self.document_convert_api = DocumentConvertAPI(
-            client=self.rest_client, **api_config  # type: ignore
+            client=self.rest_client,
+            **api_config,  # type: ignore
         )
         self.webhooks_api = WebhooksAPI(client=self.rest_client, **api_config)  # type: ignore
         self.project_api = ProjectAPI(client=self.rest_client, **api_config)  # type: ignore
@@ -357,8 +351,8 @@ class Uploadcare:
         return file
 
     @staticmethod
-    def _format_store(store: Optional[bool]) -> str:
-        values_map: Dict[Any, str] = {
+    def _format_store(store: bool | None) -> str:
+        values_map: dict[Any, str] = {
             None: "auto",
             True: "1",
             False: "0",
@@ -631,8 +625,7 @@ class Uploadcare:
     def _extract_uuids(self, files: Iterable[str | File | UUID]) -> list[str]:
         """Convert various resource representation into string-based."""
         file_generator = (
-            file_ if isinstance(file_, File) else File(file_, self)
-            for file_ in files
+            file_ if isinstance(file_, File) else File(file_, self) for file_ in files
         )
 
         def __extracts_uuids(files: Iterable[str | File]) -> list[str]:
@@ -644,9 +637,7 @@ class Uploadcare:
                 elif isinstance(file_, str):
                     uuids.append(file_)
                 else:
-                    raise ValueError(
-                        f"Invalid type for sequence item: {type(file_)}"
-                    )
+                    raise ValueError(f"Invalid type for sequence item: {type(file_)}")
 
             return uuids
 
@@ -712,9 +703,7 @@ class Uploadcare:
 
         for file_ in files:
             if not isinstance(file_, File):
-                raise InvalidParamError(
-                    "all items have to be ``File`` instance"
-                )
+                raise InvalidParamError("all items have to be ``File`` instance")
 
         file_urls = [str(file_) for file_ in files]
         group_info = self.upload_api.create_group(
@@ -995,19 +984,15 @@ class Uploadcare:
 
         return self.project_api.retrieve()
 
-    def generate_upload_signature(self) -> Tuple[int, str]:
+    def generate_upload_signature(self) -> tuple[int, str]:
         """Expiration and signature for signed uploads."""
         if not self.secret_key:
             raise ValueError("secret_key is required")
         expire = int(time()) + self.signed_uploads_ttl
-        signature = self.upload_api.generate_secure_signature(
-            self.secret_key, expire
-        )
+        signature = self.upload_api.generate_secure_signature(self.secret_key, expire)
         return expire, signature
 
-    def generate_secure_url(
-        self, handle: str | UUID, wildcard: bool = False
-    ) -> str:
+    def generate_secure_url(self, handle: str | UUID, wildcard: bool = False) -> str:
         """
         Generate authenticated URL.
         :param handle: Can be one of the following: UUID, UUID with transformations, full URL.

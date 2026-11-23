@@ -92,9 +92,7 @@ def test_follows_next_until_none(uploadcare):
     ]
 
     with _patched_post(uploadcare, pages) as mocked_post:
-        results = list(
-            uploadcare.iterate_search_files(REQUEST, request_limit=2)
-        )
+        results = list(uploadcare.iterate_search_files(REQUEST, request_limit=2))
 
     assert [str(item.uuid) for item in results] == [_uuid(i) for i in range(4)]
     assert _offsets(mocked_post) == [0, 2]
@@ -153,9 +151,7 @@ def test_equivalent_origin_next_is_followed(uploadcare, next_url):
     ]
 
     with _patched_post(uploadcare, pages) as mocked_post:
-        results = list(
-            uploadcare.iterate_search_files(REQUEST, request_limit=2)
-        )
+        results = list(uploadcare.iterate_search_files(REQUEST, request_limit=2))
 
     assert len(results) == 4
     assert mocked_post.call_count == 2
@@ -215,9 +211,7 @@ def test_stops_on_an_empty_page(uploadcare):
     ]
 
     with _patched_post(uploadcare, pages) as mocked_post:
-        results = list(
-            uploadcare.iterate_search_files(REQUEST, request_limit=2)
-        )
+        results = list(uploadcare.iterate_search_files(REQUEST, request_limit=2))
 
     assert len(results) == 2
     assert mocked_post.call_count == 2
@@ -231,9 +225,7 @@ def test_does_not_stop_on_an_understated_total(uploadcare):
     ]
 
     with _patched_post(uploadcare, pages):
-        results = list(
-            uploadcare.iterate_search_files(REQUEST, request_limit=2)
-        )
+        results = list(uploadcare.iterate_search_files(REQUEST, request_limit=2))
 
     assert len(results) == 4
 
