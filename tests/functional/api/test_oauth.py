@@ -7,7 +7,7 @@ from typing import List
 import httpx2
 import pytest
 
-from pyuploadcare import Uploadcare
+from pyuploadcare import ProjectAPIClient, Uploadcare
 from pyuploadcare.api.auth import UploadcareAuth, UploadcareOAuth
 from pyuploadcare.api.client import Client
 from pyuploadcare.exceptions import AuthenticationError
@@ -96,6 +96,36 @@ def test_401_is_not_retried():
         client.get(URL)
 
     assert server.tokens == ["old"]
+
+
+# ProjectAPIClient
+
+
+def make_project_client(server: TokenServer, token: str) -> ProjectAPIClient:
+    projects = ProjectAPIClient(token=token, retry_throttled=0)
+    projects.http_client._transport = httpx2.MockTransport(server)
+    return projects
+
+
+def test_project_client_set_access_token():
+    server = TokenServer("new")
+    projects = make_project_client(server, "old")
+
+    assert projects.set_access_token("new") == "new"
+    assert list(projects.list_projects()) == []
+
+    assert projects.auth.access_token == "new"
+    assert server.tokens == ["new"]
+
+
+def test_project_client_sends_json_accept_header():
+    server = TokenServer("token")
+    projects = make_project_client(server, "token")
+
+    list(projects.list_projects())
+
+    assert server.requests[0].headers["Accept"] == "application/json"
+    assert server.requests[0].headers["Authorization"] == "Bearer token"
 
 
 # Uploadcare
@@ -220,10 +250,11 @@ def test_multipart_chunks_never_get_oauth_token():
     assert "Authorization" not in request.headers
 
 
-def test_uploadcare_reads_uploadcare_oauth_token_env():
+def test_both_clients_read_uploadcare_oauth_token_env():
     # Settings are read at import time, hence a fresh interpreter.
     code = (
-        "from pyuploadcare import Uploadcare; "
+        "from pyuploadcare import ProjectAPIClient, Uploadcare; "
+        "print(ProjectAPIClient().auth.access_token); "
         "print(Uploadcare(public_key='pub').oauth.access_token)"
     )
     env = {**os.environ, "UPLOADCARE_OAUTH_TOKEN": "from-env"}
@@ -236,7 +267,7 @@ def test_uploadcare_reads_uploadcare_oauth_token_env():
         check=True,
     ).stdout
 
-    assert output.split() == ["from-env"]
+    assert output.split() == ["from-env", "from-env"]
 
 
 def test_sets_public_key_header_when_given():
@@ -249,6 +280,15 @@ def test_sets_public_key_header_when_given():
     headers = server.requests[0].headers
     assert headers["Authorization"] == "Bearer token"
     assert headers["X-Uploadcare-Pub-Key"] == "pub"
+
+
+def test_project_client_sends_no_public_key_header():
+    server = TokenServer("token")
+    projects = make_project_client(server, "token")
+
+    list(projects.list_projects())
+
+    assert "X-Uploadcare-Pub-Key" not in server.requests[0].headers
 
 
 def test_uploadcare_rest_and_upload_send_public_key_header():
