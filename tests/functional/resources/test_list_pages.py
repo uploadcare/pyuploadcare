@@ -41,9 +41,7 @@ def _files(count, offset=0):
 
 
 def _groups(count):
-    return [
-        {"id": f"{_uuid(index)}~1", "files_count": 1} for index in range(count)
-    ]
+    return [{"id": f"{_uuid(index)}~1", "files_count": 1} for index in range(count)]
 
 
 def _patched_get(uploadcare, *pages):

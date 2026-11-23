@@ -36,9 +36,7 @@ class FakeServer:
 
 def make_uploadcare(server: FakeServer, **kwargs) -> Uploadcare:
     kwargs.setdefault("secret_key", "demosecretkey")
-    uploadcare = Uploadcare(
-        public_key="demopublickey", retry_throttled=0, **kwargs
-    )
+    uploadcare = Uploadcare(public_key="demopublickey", retry_throttled=0, **kwargs)
     uploadcare.rest_client._transport = httpx2.MockTransport(server)
     return uploadcare
 

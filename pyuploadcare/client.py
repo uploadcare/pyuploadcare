@@ -917,9 +917,7 @@ class Uploadcare:
             stored=stored,
             removed=removed,
         ).query_parameters()
-        page = self.files_api.list_page(
-            request_limit=request_limit, **query_parameters
-        )
+        page = self.files_api.list_page(request_limit=request_limit, **query_parameters)
         return cast(FileListResponse, page)
 
     def fetch_files_page(self, next_url: str) -> FileListResponse:

@@ -68,9 +68,7 @@ WebhookEvent = Literal[
 
 class ImageInfo(Entity):
     # A mode outside `ColorMode` (e.g. "1", "I;16") stays a string.
-    color_mode: ColorMode | str | None = Field(
-        default=None, union_mode="left_to_right"
-    )
+    color_mode: ColorMode | str | None = Field(default=None, union_mode="left_to_right")
     orientation: int | None = None
     format: str
     sequence: bool | None = None
