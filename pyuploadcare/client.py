@@ -87,9 +87,9 @@ class Uploadcare:
         - oauth_token: OAuth access token. When set, REST and Upload API
           requests are authorized with it (``Authorization: Bearer``, plus
           the public key in ``X-Uploadcare-Pub-Key``) instead of the project
-          key pair; replace it with ``set_access_token()``. Uploads are not
-          signed, so ``secret_key`` is not needed. CDN requests never carry
-          the token.
+          key pair; ``set_access_token()`` replaces it for both. Uploads are
+          not signed, so ``secret_key`` is not needed. CDN requests never
+          carry the token.
 
     """
 
