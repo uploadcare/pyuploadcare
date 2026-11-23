@@ -5,6 +5,7 @@ the tests check URLs, methods, headers, bodies and error handling as sent.
 """
 
 import json
+from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple
@@ -12,6 +13,7 @@ from urllib.parse import parse_qs, urlsplit
 
 import httpx2
 import pytest
+from pydantic import ValidationError
 
 from pyuploadcare import (
     AdaptiveBitrateStreamingFeature,
@@ -223,7 +225,7 @@ def test_get_project(client, server):
     features = project.features
     assert features is not None
     assert features.uploads is not None
-    assert features.uploads.filesize_limit is None
+    assert features.uploads.filesize_limit_mb is None
     assert features.uploads.autostore is True
     assert features.team_members is not None
     assert features.team_members.team_size == 2
@@ -342,7 +344,7 @@ def test_update_project_is_partial_post(client, server):
         PUB_KEY,
         is_search_index_allowed=True,
         features={
-            "uploads": {"filesize_limit": None},
+            "uploads": {"filesize_limit_mb": None},
             "svg_validation": {"is_enabled": True},
         },
     )
@@ -357,6 +359,165 @@ def test_update_project_is_partial_post(client, server):
             "svg_validation": {"is_enabled": True},
         },
     }
+
+
+@pytest.mark.parametrize("as_dict", [False, True])
+def test_uploads_limits_are_set_in_millions(client, server, as_dict):
+    server.respond(
+        payload={
+            **PROJECT_JSON,
+            "features": {
+                "uploads": {
+                    "filesize_limit": 20_000_000,
+                    "image_resolution_limit": 50_000_000,
+                }
+            },
+        }
+    )
+
+    features = ProjectFeatures(
+        uploads=UploadsFeature(
+            filesize_limit_mb=10, image_resolution_limit_mp=25
+        )
+    )
+    project = client.update_project(
+        PUB_KEY,
+        features=(
+            features.model_dump(exclude_unset=True) if as_dict else features
+        ),
+    )
+
+    # Sent in bytes and pixels, a decimal megabyte being 10^6 bytes.
+    assert server.last_json() == {
+        "features": {
+            "uploads": {
+                "filesize_limit": 10_000_000,
+                "image_resolution_limit": 25_000_000,
+            }
+        },
+    }
+    # Parsed back to megabytes.
+    assert project.features is not None
+    assert project.features.uploads is not None
+    assert project.features.uploads.filesize_limit_mb == 20
+    assert project.features.uploads.image_resolution_limit_mp == 50
+
+
+def test_uploads_limits_are_dumped_in_millions():
+    uploads = UploadsFeature(
+        filesize_limit_mb=10, image_resolution_limit_mp=25
+    )
+
+    # Outside of the API requests the fields keep their names and units.
+    assert uploads.model_dump(exclude_unset=True) == {
+        "filesize_limit_mb": 10,
+        "image_resolution_limit_mp": 25,
+    }
+
+
+@pytest.mark.parametrize(
+    "value,expected", [(0, 0), (999_999, 0), (1_500_000, 1), (5_000_000, 5)]
+)
+def test_uploads_limits_in_response_round_down(
+    client, server, value, expected
+):
+    # The server stores whole megabytes and rounds down the same way. A plan
+    # limit, returned when the project has none, need not be a multiple.
+    server.respond(
+        payload={
+            **PROJECT_JSON,
+            "features": {"uploads": {"filesize_limit": value}},
+        }
+    )
+
+    project = client.get_project(PUB_KEY)
+
+    assert project.features.uploads.filesize_limit_mb == expected
+
+
+@pytest.mark.parametrize("field", ["filesize_limit", "image_resolution_limit"])
+@pytest.mark.parametrize("value", [-1_000_000, True, "1000000", 1e6])
+def test_uploads_limits_in_response_must_be_integers(
+    client, server, field, value
+):
+    server.respond(
+        payload={
+            **PROJECT_JSON,
+            "features": {"uploads": {field: value}},
+        }
+    )
+
+    with pytest.raises(ValidationError):
+        client.get_project(PUB_KEY)
+
+
+def test_project_units_roundtrip_without_mutating_response():
+    raw = deepcopy(PROJECT_JSON)
+    original = deepcopy(raw)
+    project = Project.model_validate(raw)
+
+    assert raw == original
+    assert Project.model_validate_json(project.model_dump_json()) == project
+    payload = project.to_payload()
+    assert payload["features"]["uploads"] == original["features"]["uploads"]
+    assert project.to_payload() == payload
+    assert project.features is not None
+    assert project.features.uploads is not None
+    assert project.features.uploads.image_resolution_limit_mp == 75
+
+
+@pytest.mark.parametrize(
+    "uploads,expected",
+    [
+        ({}, {}),
+        ({"autostore": False}, {"autostore": False}),
+        (
+            {"filesize_limit_mb": None, "image_resolution_limit_mp": None},
+            {"filesize_limit": None, "image_resolution_limit": None},
+        ),
+        (
+            {"filesize_limit_mb": 1, "image_resolution_limit_mp": 75},
+            {
+                "filesize_limit": 1_000_000,
+                "image_resolution_limit": 75_000_000,
+            },
+        ),
+    ],
+)
+def test_create_project_upload_limits(client, server, uploads, expected):
+    server.respond(payload=PROJECT_JSON)
+
+    project = client.create_project("Test", features={"uploads": uploads})
+
+    assert server.last_json() == {
+        "name": "Test",
+        "features": {"uploads": expected},
+    }
+    assert project.features.uploads.image_resolution_limit_mp == 75
+
+
+def test_list_projects_converts_units_on_every_page(client, server):
+    server.respond(
+        payload=page([PROJECT_JSON], next_=f"{API_BASE}projects/?from=b")
+    )
+    server.respond(payload=page([PROJECT_JSON]))
+
+    projects = list(client.list_projects())
+
+    assert len(projects) == 2
+    for project in projects:
+        assert project.features.uploads.image_resolution_limit_mp == 75
+
+
+@pytest.mark.parametrize(
+    "field", ["filesize_limit_mb", "image_resolution_limit_mp"]
+)
+@pytest.mark.parametrize("value", [True, False, 1.5, 1.0, "10"])
+def test_upload_limits_require_integers(client, server, field, value):
+    with pytest.raises(InvalidParamError):
+        client.update_project(PUB_KEY, features={"uploads": {field: value}})
+
+    assert server.requests == []
 
 
 def test_update_project_never_sends_read_only_fields(client, server):
@@ -420,7 +581,11 @@ def test_update_project_adaptive_bitrate_streaming_profiles(client, server):
     [
         {"uploads": {"autostor": False}},  # misspelled key
         {"no_such_feature": {"is_enabled": True}},
-        {"uploads": {"image_resolution_limit": 10}},  # below the minimum
+        {"uploads": {"image_resolution_limit_mp": -1}},  # below the minimum
+        {"uploads": {"image_resolution_limit_mp": 76}},  # above the maximum
+        {"uploads": {"filesize_limit_mb": -1}},  # below the minimum
+        # The same limit under both names is ambiguous.
+        {"uploads": {"filesize_limit_mb": 10, "filesize_limit": 10_000_000}},
     ],
 )
 def test_update_project_rejects_invalid_features(client, server, features):
@@ -428,6 +593,29 @@ def test_update_project_rejects_invalid_features(client, server, features):
         client.update_project(PUB_KEY, features=features)
 
     assert server.requests == []
+
+
+def test_update_project_accepts_api_names_in_api_units(client, server):
+    server.respond(payload=PROJECT_JSON)
+
+    client.update_project(
+        PUB_KEY,
+        features={
+            "uploads": {
+                "filesize_limit": 10_000_000,
+                "image_resolution_limit": 25_000_000,
+            }
+        },
+    )
+
+    assert server.last_json() == {
+        "features": {
+            "uploads": {
+                "filesize_limit": 10_000_000,
+                "image_resolution_limit": 25_000_000,
+            }
+        },
+    }
 
 
 def test_update_project_requires_changes(client, server):

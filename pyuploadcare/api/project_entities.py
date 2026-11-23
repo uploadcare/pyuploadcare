@@ -15,14 +15,28 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import Field, field_serializer
+from pydantic import (
+    Field,
+    FieldSerializationInfo,
+    field_serializer,
+    model_validator,
+)
 
 from pyuploadcare.api.entities import Entity
 from pyuploadcare.api.responses import PaginatedResponse, Response
 
 
+# A decimal megabyte (and megapixel), as on the server.
+MEGA = 10**6
+
+# Upload limit fields and their API names. The API takes bytes and pixels.
+_UPLOAD_LIMIT_API_NAMES = {
+    "filesize_limit_mb": "filesize_limit",
+    "image_resolution_limit_mp": "image_resolution_limit",
+}
+
 # Read-only fields are never sent back to the server.
-PROJECT_READ_ONLY_FIELDS: Dict[str, Any] = {
+PROJECT_READ_ONLY_FIELDS: dict[str, Any] = {
     "pub_key": True,
     "is_shared_project": True,
     "features": {"team_members": True},
@@ -63,14 +77,57 @@ class ProjectFeature(Entity):
 
 
 class UploadsFeature(Entity):
-    # In bytes, a multiple of a megabyte. `None` means the plan's maximum.
-    filesize_limit: Optional[int] = Field(default=None, ge=0)
+    """Upload settings.
+
+    The limits are in megabytes (10^6 bytes) and megapixels. The API names
+    the fields ``filesize_limit`` and ``image_resolution_limit`` and takes
+    them in bytes and pixels: those names are parsed in API units, and
+    a dump with ``by_alias=True`` produces them.
+    """
+
+    # `None` means the plan's maximum.
+    filesize_limit_mb: Optional[int] = Field(
+        default=None,
+        ge=0,
+        strict=True,
+        serialization_alias="filesize_limit",
+    )
     autostore: Optional[bool] = None
-    # In pixels, a multiple of 10^6. `None` means the default value.
-    image_resolution_limit: Optional[int] = Field(
-        default=None, ge=1_000_000, le=75_000_000
+    # `None` means the default value, 75 megapixels.
+    image_resolution_limit_mp: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=75,
+        strict=True,
+        serialization_alias="image_resolution_limit",
     )
     is_signed_upload_enabled: Optional[bool] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _from_api_units(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        data = dict(data)
+        for name, api_name in _UPLOAD_LIMIT_API_NAMES.items():
+            if api_name not in data:
+                continue
+            if name in data:
+                raise ValueError(f"pass either {name} or {api_name}")
+            value = data.pop(api_name)
+            # Rounds down, as the server does when it stores the limit.
+            is_int = isinstance(value, int) and not isinstance(value, bool)
+            data[name] = value // MEGA if is_int else value
+        return data
+
+    @field_serializer("filesize_limit_mb", "image_resolution_limit_mp")
+    def _to_api_units(
+        self, value: Optional[int], info: FieldSerializationInfo
+    ) -> Optional[int]:
+        # The API names, used for request bodies, carry the API units.
+        if value is not None and info.by_alias:
+            return value * MEGA
+        return value
 
 
 class MimeTypeFilteringFeature(ProjectFeature):
@@ -134,9 +191,10 @@ class Project(Entity):
     features: Optional[ProjectFeatures] = None
 
     def to_payload(self) -> Dict[str, Any]:
-        """The request body: explicitly set, writable fields only."""
+        """The request body: explicitly set, writable fields in API units."""
         return self.model_dump(
             mode="json",
+            by_alias=True,
             exclude_unset=True,
             exclude=PROJECT_READ_ONLY_FIELDS,
         )
