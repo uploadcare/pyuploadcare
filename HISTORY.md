@@ -38,6 +38,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (`GET /info/`), available before the file appears in the REST API. Returns `UploadFileInfo`.
 - `Uploadcare.unsubscribe_webhook()` and `WebhooksAPI.unsubscribe()`: delete the webhooks with a
   given `target_url` (`DELETE /webhooks/unsubscribe/`).
+- `transport` argument of `Uploadcare` and `AccountProjectAPIClient`: an httpx2 transport to send
+  requests with. Pass one shared instance to make many clients reuse a single connection pool;
+  `Uploadcare` uses it for the REST, Upload, CDN and account-scoped Project APIs. The client
+  never closes it.
 
 ### Changed
 
