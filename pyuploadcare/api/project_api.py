@@ -48,6 +48,8 @@ def _pub_key(project: ProjectOrPubKey) -> str:
         if not project.pub_key:
             raise InvalidParamError("project has no `pub_key`")
         return project.pub_key
+    if not isinstance(project, str):
+        raise InvalidParamError("project must be a `Project` or a public key string")
     return project
 
 
