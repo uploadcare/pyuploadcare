@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Annotated, Any, Literal, NamedTuple, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, PrivateAttr
 
 from .metadata import META_KEY_MAX_LEN, META_KEY_PATTERN, META_VALUE_MAX_LEN
 
@@ -67,7 +67,8 @@ WebhookEvent = Literal[
 
 
 class ImageInfo(Entity):
-    color_mode: ColorMode | None = None
+    # A mode outside `ColorMode` (e.g. "1", "I;16") stays a string.
+    color_mode: ColorMode | str | None = Field(default=None, union_mode="left_to_right")
     orientation: int | None = None
     format: str
     sequence: bool | None = None
@@ -75,7 +76,7 @@ class ImageInfo(Entity):
     width: int
     geo_location: GEOPoint | None = None
     datetime_original: datetime | None = None
-    dpi: tuple[int, int] | None = None
+    dpi: tuple[int | float, int | float] | None = None
 
 
 class ImageInfoWithFaces(ImageInfo):
@@ -231,6 +232,34 @@ class FileInfo(UUIDEntity):
     source: str | None = None
     content_info: ContentInfo | None = None
     appdata: ApplicationDataSet | None = None
+
+
+class UploadFileInfo(Entity):
+    """File info from the Upload API.
+
+    https://uploadcare.com/docs/api/upload/upload/file-upload-info/
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    uuid: UUID | None = None
+    file_id: UUID | None = None
+    original_filename: str | None = None
+    filename: str | None = None
+    mime_type: str | None = None
+    size: int | None = None
+    is_image: bool | None = None
+    # The file is available on the CDN.
+    is_ready: bool | None = None
+    is_stored: bool | None = None
+    done: int | None = None
+    total: int | None = None
+    image_info: ImageInfo | None = None
+    video_info: dict[str, Any] | None = None
+    content_info: ContentInfo | None = None
+    metadata: MetadataDict | None = None
+    # Only for a project with a Foreign Storage Bucket.
+    s3_bucket: str | None = None
 
 
 class SearchHighlight(Entity):
