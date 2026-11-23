@@ -14,7 +14,7 @@ from typing import Any, cast
 
 from pydantic import TypeAdapter, ValidationError
 
-from pyuploadcare.api.base import API, ResponseOrEntity, _iterate_pages
+from pyuploadcare.api.base import API, PageMixin, ResponseOrEntity, _iterate_pages
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
     API_UNITS,
