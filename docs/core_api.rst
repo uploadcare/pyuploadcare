@@ -584,9 +584,14 @@ Update a webhook's signing secret::
 
     webhook: Webhook = uploadcare.update_webhook(webhook_id, signing_secret="7kMVZivndx0ErgvhRKAr")
 
-Delete a webhook::
+Delete a webhook by its id::
 
     uploadcare.delete_webhook(webhook_id)
+
+Delete the webhooks that send events to a URL. Unlike ``delete_webhook``, it deletes the
+webhooks for all events with this URL; a URL with no webhooks is not an error::
+
+    uploadcare.unsubscribe_webhook("https://path/to/webhook")
 
 
 Secure delivery
