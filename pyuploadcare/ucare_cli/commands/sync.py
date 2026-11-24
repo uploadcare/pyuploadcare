@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 import pickle
 import re
@@ -209,10 +210,9 @@ class SyncSession:
     """
 
     def __init__(self, file_list, no_input=False):
-        parts = str(file_list.__dict__)
         self.session = file_list
         self.no_input = no_input
-        self.signature = hashlib.md5(parts.encode()).hexdigest()
+        self.signature = self._build_signature(file_list)
         self.session_filepath = os.path.join(
             os.path.expanduser("~"), f".{self.signature}.sync"
         )
@@ -225,6 +225,23 @@ class SyncSession:
                     self.session = pickle.load(f)
                     self.session._client = client
                     return
+
+    @staticmethod
+    def _build_signature(file_list) -> str:
+        """Build a stable identifier for the sync parameters."""
+
+        payload = {
+            "public_key": file_list._client.public_key,
+            "uuids": getattr(file_list, "uuids", None),
+            "starting_point": file_list.starting_point,
+            "ordering": file_list.ordering,
+            "limit": file_list.limit,
+            "request_limit": file_list.request_limit,
+            "stored": getattr(file_list, "stored", None),
+            "removed": getattr(file_list, "removed", None),
+        }
+        serialized = json.dumps(payload, sort_keys=True, default=str)
+        return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
     def __enter__(self):
         return self.session
