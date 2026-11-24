@@ -9,18 +9,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Unreleased
 
 ### Added
-- One-page listing with a `next` cursor: `Uploadcare.list_files_page()` / `fetch_files_page()`,
-  `list_file_groups_page()` / `fetch_file_groups_page()`, and `list_page()` / `fetch_page()` on
-  the low-level list APIs.
-- `Uploadcare.get_upload_info()` and `UploadAPI.info()`: the Upload API info of a file
-  (`GET /info/`), available before the file appears in the REST API. Returns `UploadFileInfo`.
-- `Uploadcare.unsubscribe_webhook()` and `WebhooksAPI.unsubscribe()`: delete the webhooks with a
-  given `target_url` (`DELETE /webhooks/unsubscribe/`).
 
-### Changed
-
-- `ImageInfo` accepts a `color_mode` outside `ColorMode` as a string and a fractional `dpi`,
-  as the API returns them. Such images used to fail to parse.
+- Support for one-page listing with a `next` cursor.
+- Method to retrieve uploaded file info.
+- Method to unsubscribe webhooks by `target_url`.
+- `transport` argument of `Uploadcare` for a custom httpx2 transport.
 
 ## [7.0.2](https://github.com/uploadcare/pyuploadcare/compare/v7.0.1...v7.0.2) - 2026-11-20
 

@@ -7,6 +7,8 @@ from time import time
 from typing import IO, Any, cast
 from uuid import UUID
 
+from httpx2 import BaseTransport
+
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
     AddonsAPI,
@@ -76,6 +78,18 @@ class Uploadcare:
         - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         - auth_class: Authentication class to use for API.
         - secure_url_builder: URL builder for secure delivery.
+        - transport: httpx2 transport for REST, Upload and CDN requests.
+          Pass one shared instance to make many short-lived clients (e.g.
+          one per caller token) reuse a single connection pool::
+
+              >>> _TRANSPORT = httpx2.HTTPTransport(
+              ...     limits=httpx2.Limits(max_connections=200),
+              ... )
+              >>> Uploadcare(..., transport=_TRANSPORT)
+
+          TLS is configured on the transport, so ``verify_api_ssl`` and
+          ``verify_upload_ssl`` are ignored when it is set. The client never
+          closes the transport: closing it is up to the caller.
 
     """
 
@@ -99,6 +113,7 @@ class Uploadcare:
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: type[UploadcareAuth] = UploadcareAuth,
         secure_url_builder: BaseSecureUrlBuilder | None = None,
+        transport: BaseTransport | None = None,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -135,6 +150,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         self.upload_client = Client(
@@ -146,6 +162,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         self.cdn_client = Client(
@@ -157,6 +174,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         api_config = {
