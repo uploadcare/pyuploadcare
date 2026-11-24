@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
 
 from pyuploadcare.exceptions import TagValidationError
 
@@ -21,7 +21,7 @@ def normalize_tag(tag: str) -> str:
     return tag.strip().lower()
 
 
-def normalize_tags(tags: Iterable[str]) -> List[str]:
+def normalize_tags(tags: Iterable[str]) -> list[str]:
     """Normalize a collection of tags the way the REST API does.
 
     Tags are lowercased and stripped, empty ones are discarded and duplicates
@@ -34,14 +34,12 @@ def normalize_tags(tags: Iterable[str]) -> List[str]:
             f"Got [{tags}], did you mean [{tags!r}.split(',')]?"
         )
 
-    normalized: List[str] = []
+    normalized: list[str] = []
     seen = set()
 
     for tag in tags:
         if not isinstance(tag, str):
-            raise TagValidationError(
-                f"Tag [{tag!s}] must be string not a {type(tag)}"
-            )
+            raise TagValidationError(f"Tag [{tag!s}] must be string not a {type(tag)}")
 
         normalized_tag = normalize_tag(tag)
 
@@ -56,9 +54,7 @@ def normalize_tags(tags: Iterable[str]) -> List[str]:
 
 def validate_tag(tag: str) -> None:
     if not isinstance(tag, str):
-        raise TagValidationError(
-            f"Tag [{tag!s}] must be string not a {type(tag)}"
-        )
+        raise TagValidationError(f"Tag [{tag!s}] must be string not a {type(tag)}")
 
     if not tag_matcher.match(tag):
         raise TagValidationError(
@@ -70,8 +66,8 @@ def validate_tag(tag: str) -> None:
 
 def validate_tags(
     tags: Iterable[str],
-    max_count: Optional[int] = MAX_TAGS_PER_FILE,
-) -> List[str]:
+    max_count: int | None = MAX_TAGS_PER_FILE,
+) -> list[str]:
     """Normalize and validate tags, returning the normalized list.
 
     Tags are normalized before validation, so values the API would accept

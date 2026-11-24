@@ -1,5 +1,4 @@
 import os
-from typing import List
 from unittest.mock import ANY
 
 import pytest
@@ -42,7 +41,7 @@ def test_multipart_upload(big_file, uploadcare):
         assert response == {"uuid": ANY, "parts": [ANY, ANY, ANY]}
         multipart_uuid = response["uuid"]
 
-        parts: List[str] = response["parts"]
+        parts: list[str] = response["parts"]
 
         chunk = fh.read(chunk_size)
 
@@ -61,6 +60,5 @@ def test_generate_upload_signature(uploadcare):
     expire, signature = uploadcare.generate_upload_signature()
     assert expire == 1698364860
     assert (
-        signature
-        == "bf659caf5e081da589634770a84494fdb310d117be6f3f7b8e9842abf2997695"
+        signature == "bf659caf5e081da589634770a84494fdb310d117be6f3f7b8e9842abf2997695"
     )

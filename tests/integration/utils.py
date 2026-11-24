@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 import random
 import re
 import time
@@ -30,7 +27,7 @@ def upload_image_file(uploadcare, tags=None):
 
 def unique_tag(prefix="pyuploadcare-test"):
     """A tag no other test run will collide on."""
-    return f"{prefix}-{random.randint(10 ** 9, 10 ** 10)}"
+    return f"{prefix}-{random.randint(10**9, 10**10)}"
 
 
 def search_term(filename):
@@ -73,7 +70,7 @@ def wait_until_searchable(
 
 def upload_tmp_txt_file(uploadcare, content=""):
     tmp_txt_file = NamedTemporaryFile(mode="wb", delete=False)
-    tmp_txt_file.write(content.encode("utf-8"))
+    tmp_txt_file.write(content.encode())
     tmp_txt_file.close()
 
     with open(tmp_txt_file.name, "rb") as fh:

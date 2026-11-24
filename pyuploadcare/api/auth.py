@@ -1,7 +1,7 @@
 import hashlib
 import hmac
+from collections.abc import Generator
 from datetime import datetime, timezone
-from typing import Generator, Union
 
 from httpx2 import Auth, Request, Response
 from httpx2._utils import to_bytes, to_str
@@ -13,17 +13,15 @@ class AuthBase(Auth): ...
 class UploadcareSimpleAuth(AuthBase):
     def __init__(
         self,
-        public_key: Union[str, bytes],
-        secret_key: Union[str, bytes],
+        public_key: str | bytes,
+        secret_key: str | bytes,
         api_version: str,
     ) -> None:
         self.public_key = public_key
         self.secret_key = secret_key
         self.api_version = api_version
 
-    def auth_flow(
-        self, request: Request
-    ) -> Generator[Request, Response, None]:
+    def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
         if "Content-Type" not in request.headers:
             request.headers["Content-Type"] = "application/json"
 
@@ -38,8 +36,8 @@ class UploadcareSimpleAuth(AuthBase):
     def _build_auth_header(
         self,
         request: Request,
-        public_key: Union[str, bytes],
-        secret_key: Union[str, bytes],
+        public_key: str | bytes,
+        secret_key: str | bytes,
         formated_date_time: str = "",
     ) -> str:
         credentials = f"{public_key!s}:{secret_key!s}"
@@ -47,9 +45,7 @@ class UploadcareSimpleAuth(AuthBase):
 
 
 class UploadcareAuth(UploadcareSimpleAuth):
-    def auth_flow(
-        self, request: Request
-    ) -> Generator[Request, Response, None]:
+    def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
         formated_date_time = self._formated_date_time()
 
         if "Content-Type" not in request.headers:
@@ -65,15 +61,13 @@ class UploadcareAuth(UploadcareSimpleAuth):
         yield request
 
     def _formated_date_time(self):
-        return datetime.now(timezone.utc).strftime(
-            "%a, %d %b %Y, %H:%M:%S GMT"
-        )
+        return datetime.now(timezone.utc).strftime("%a, %d %b %Y, %H:%M:%S GMT")
 
     def _build_auth_header(
         self,
         request: Request,
-        public_key: Union[str, bytes],
-        secret_key: Union[str, bytes],
+        public_key: str | bytes,
+        secret_key: str | bytes,
         formated_date_time: str = "",
     ) -> str:
         content_md5 = hashlib.md5(request.read()).hexdigest()

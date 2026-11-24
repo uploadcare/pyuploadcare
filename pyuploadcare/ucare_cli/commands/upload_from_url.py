@@ -10,9 +10,7 @@ from pyuploadcare.ucare_cli.commands.helpers import (
 
 
 def register_arguments(subparsers):
-    subparser = subparsers.add_parser(
-        "upload_from_url", help="upload file from url"
-    )
+    subparser = subparsers.add_parser("upload_from_url", help="upload file from url")
     subparser.set_defaults(func=upload_from_url)
     subparser.add_argument("url", help="file url")
     subparser.add_argument(
@@ -20,8 +18,7 @@ def register_arguments(subparsers):
         type=int,
         dest="timeout",
         default=30,
-        help="Set wait seconds file uploading from url."
-        " Default value is 30 seconds",
+        help="Set wait seconds file uploading from url. Default value is 30 seconds",
     )
     group = subparser.add_mutually_exclusive_group()
     group.add_argument(
@@ -86,9 +83,7 @@ def upload_from_url(arg_namespace, client: Uploadcare):  # noqa: C901
                 break
             if status in ("failed", "error"):
                 raise UploadError(
-                    "could not upload file from url: {0}".format(
-                        file_from_url.info
-                    )
+                    f"could not upload file from url: {file_from_url.info}"
                 )
             time.sleep(1)
         else:

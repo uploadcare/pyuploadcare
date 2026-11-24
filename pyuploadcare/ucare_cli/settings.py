@@ -1,7 +1,7 @@
 import argparse
 import configparser
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 str_settings = (
@@ -23,8 +23,8 @@ client_setting_mapping = {
 
 
 def load_config_from_file(  # noqa: C901
-    filename, conf: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+    filename, conf: dict[str, Any] | None = None
+) -> dict[str, Any]:
     if not conf:
         conf = {}
 
@@ -50,8 +50,8 @@ def load_config_from_file(  # noqa: C901
 
 
 def load_config_from_args(  # noqa: C901
-    arg_namespace, conf: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+    arg_namespace, conf: dict[str, Any] | None = None
+) -> dict[str, Any]:
     if not conf:
         conf = {}
 
@@ -72,10 +72,10 @@ def load_config_from_args(  # noqa: C901
 
 
 def load_config(  # noqa: C901
-    arg_namespace: Optional[argparse.Namespace] = None,
-    config_file_names: Optional[List[str]] = None,
-) -> Dict[str, Any]:
-    conf: Dict[str, Any] = {}
+    arg_namespace: argparse.Namespace | None = None,
+    config_file_names: list[str] | None = None,
+) -> dict[str, Any]:
+    conf: dict[str, Any] = {}
 
     if config_file_names:
         for file_name in config_file_names:

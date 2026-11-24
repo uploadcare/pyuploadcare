@@ -1,5 +1,5 @@
 import itertools
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from pyuploadcare.api.base import ListCountMixin
 from pyuploadcare.helpers import ensure_aware_datetime
@@ -28,8 +28,8 @@ class BaseApiList:
         self.starting_point = starting_point
         self.limit = limit
         self.request_limit = request_limit
-        self._count: Optional[int] = None
-        self._client: "Uploadcare" = client
+        self._count: int | None = None
+        self._client: Uploadcare = client
 
     @property
     def resource_api(self) -> ListCountMixin:
@@ -79,9 +79,7 @@ class BaseApiList:
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return list(
-                itertools.islice(self, item.start, item.stop, item.step)
-            )
+            return list(itertools.islice(self, item.start, item.stop, item.step))
         try:
             return next(itertools.islice(self, item, None))
         except StopIteration:
@@ -89,9 +87,7 @@ class BaseApiList:
 
     def count(self):
         if self.starting_point:
-            raise ValueError(
-                "Can't count objects if the `starting_point` present"
-            )
+            raise ValueError("Can't count objects if the `starting_point` present")
         if self._count is None:
             qs = self.query_parameters()
             qs.pop("limit", None)

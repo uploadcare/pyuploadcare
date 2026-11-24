@@ -3,9 +3,7 @@ from pyuploadcare.ucare_cli.commands.helpers import pprint
 
 
 def register_arguments(subparsers):
-    subparser = subparsers.add_parser(
-        "update_webhook", help="update a webhook"
-    )
+    subparser = subparsers.add_parser("update_webhook", help="update a webhook")
     subparser.set_defaults(func=update_webhook)
     subparser.add_argument("webhook_id", help="webhook id")
     subparser.add_argument("--target_url", help="webhook target URL")
@@ -39,7 +37,5 @@ def update_webhook(arg_namespace, client: Uploadcare):  # noqa: C901
     if arg_namespace.signing_secret is not None:
         kwargs["signing_secret"] = arg_namespace.signing_secret
 
-    webhook = client.update_webhook(
-        webhook_id=arg_namespace.webhook_id, **kwargs
-    )
+    webhook = client.update_webhook(webhook_id=arg_namespace.webhook_id, **kwargs)
     pprint(webhook.model_dump())

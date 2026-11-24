@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import unittest
 
 from django.core.exceptions import ValidationError
@@ -69,9 +67,7 @@ class FileFieldTest(unittest.TestCase):
         self.assertEqual(emp.cv, None)
 
     def test_validation_error_if_value_is_int(self):
-        Employee = self._construct_Employee_class_with_variations(
-            "int", FileField()
-        )
+        Employee = self._construct_Employee_class_with_variations("int", FileField())
 
         with self.assertRaises(ValidationError):
             Employee(cv=123)
@@ -123,9 +119,7 @@ class FileGroupFieldTest(unittest.TestCase):
         self.assertEqual(book.pages, None)
 
     def test_validation_error_if_value_is_int(self):
-        Book = self._construct_Book_class_with_variations(
-            "int", FileGroupField()
-        )
+        Book = self._construct_Book_class_with_variations("int", FileGroupField())
 
         with self.assertRaises(ValidationError):
             Book(pages=123)
@@ -139,9 +133,7 @@ class FileGroupFieldTest(unittest.TestCase):
             Book(pages="123")
 
     def test_file_group_instance_if_group_id_is_valid(self):
-        Book = self._construct_Book_class_with_variations(
-            "valid_str", FileGroupField()
-        )
+        Book = self._construct_Book_class_with_variations("valid_str", FileGroupField())
 
         book = Book(pages="0513dda0-582f-447d-846f-096e5df9e2bb~2")
         self.assertIsInstance(book.pages, FileGroup)
