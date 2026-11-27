@@ -1111,8 +1111,7 @@ class Uploadcare:
         """Delete the webhooks that send events to ``target_url``.
 
         Deletes the webhooks for all events that use the URL; to delete one
-        webhook, use ``delete_webhook()`` with its id. A URL with no
-        webhooks is not an error.
+        webhook, use ``delete_webhook()`` with its id.
 
         Usage example::
 

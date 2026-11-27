@@ -226,18 +226,15 @@ def _same_origin_url(
 ) -> str:
     """Resolve ``url`` against ``base`` and check it stays in ``origin``.
 
-    ``origin`` defaults to the origin of ``base``. Raises
-    ``InvalidRequestError`` otherwise: the HTTP client sends credentials
-    with every request.
+    ``origin`` defaults to the origin of ``base``. Raises ``ValueError``
+    otherwise: the HTTP client sends credentials with every request.
     """
     if origin is None:
         origin = _origin(base)
 
     resolved = urljoin(base, url)
     if _origin(resolved) != origin:
-        raise InvalidRequestError(
-            f"refusing to follow `next` outside {origin[1]}: {resolved}"
-        )
+        raise ValueError(f"refusing to follow `next` outside {origin[1]}: {resolved}")
     return resolved
 
 
@@ -288,7 +285,10 @@ def _iterate_pages(  # noqa: C901
         next_ = getattr(response, "next", None)
         if next_:
             # A relative `next` resolves against the page that supplied it.
-            next_ = _same_origin_url(next_, page_url, origin)
+            try:
+                next_ = _same_origin_url(next_, page_url, origin)
+            except ValueError as exc:
+                raise InvalidRequestError(str(exc)) from exc
 
 
 class PageMixin(APIProtocol):
@@ -343,7 +343,10 @@ class PageMixin(APIProtocol):
         if not isinstance(next_url, str) or not next_url:
             raise InvalidParamError("`next_url` must be a non-empty string")
 
-        url = _same_origin_url(next_url, str(self._client.base_url))
+        try:
+            url = _same_origin_url(next_url, str(self._client.base_url))
+        except ValueError as exc:
+            raise InvalidRequestError(str(exc)) from exc
         return self._parse_page(self._client.get(url).json())
 
 

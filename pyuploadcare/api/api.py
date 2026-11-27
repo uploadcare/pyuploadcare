@@ -325,8 +325,7 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
 
         https://uploadcare.com/docs/api/rest/webhook/unsubscribe/
 
-        Deletes the webhooks for all events that use the URL. A URL with no
-        webhooks is not an error.
+        Deletes the webhooks for all events that use the URL.
         """
         if not isinstance(target_url, str):
             raise InvalidParamError("`target_url` must be a string")
