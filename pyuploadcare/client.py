@@ -88,14 +88,15 @@ class Uploadcare:
           not signed, so ``secret_key`` is not needed. CDN requests never
           carry the token. It also authorizes ``account_project_api``.
         - account_project_api_base: Account-scoped Project API base url.
-        - transport: httpx2 transport for REST, Upload and CDN requests.
-          Pass one shared instance to make many short-lived clients (e.g.
-          one per caller token) reuse a single connection pool::
+        - transport: httpx2 transport for REST, Upload, CDN and
+          account-scoped Project API requests. Pass one shared instance to
+          make many short-lived clients (e.g. one per caller token) reuse a
+          single connection pool::
 
               >>> _TRANSPORT = httpx2.HTTPTransport(
               ...     limits=httpx2.Limits(max_connections=200),
               ... )
-              >>> Uploadcare(..., transport=_TRANSPORT)
+              >>> Uploadcare(..., oauth_token=token, transport=_TRANSPORT)
 
           TLS is configured on the transport, so ``verify_api_ssl`` and
           ``verify_upload_ssl`` are ignored when it is set. The client never
@@ -237,6 +238,7 @@ class Uploadcare:
                 retry_throttled=retry_throttled,
                 user_agent_extension=user_agent_extension,
                 timeout=timeout,
+                transport=transport,
             )
             if oauth_token
             else None
