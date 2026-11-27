@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [7.1.0](https://github.com/uploadcare/pyuploadcare/compare/v7.0.1...v7.1.0) - Unreleased
 
 ### Added
 
@@ -25,7 +25,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `list_files(stored=..., removed=...).count()` ignored the filters and
   returned the unfiltered total ([#355](https://github.com/uploadcare/pyuploadcare/issues/355)).
-
 
 ## [7.0.1](https://github.com/uploadcare/pyuploadcare/compare/v7.0.0...v7.0.1) - 2026-11-10
 
