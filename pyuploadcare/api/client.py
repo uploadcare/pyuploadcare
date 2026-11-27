@@ -243,7 +243,9 @@ class Client(HTTPXClient):
         extension_info = ""
         if self.user_agent_extension:
             extension_info = f"; {self.user_agent_extension}"
+
+        key_info = f"/{self.public_key}" if self.public_key else ""
         return (
-            f"PyUploadcare/{__version__}/{self.public_key} "
+            f"PyUploadcare/{__version__}{key_info} "
             f"({python_implementation()}/{python_version()}{extension_info})"
         )
