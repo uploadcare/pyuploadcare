@@ -14,7 +14,7 @@ from typing import Any, cast
 
 from pydantic import TypeAdapter, ValidationError
 
-from pyuploadcare.api.base import API, ResponseOrEntity, _iterate_pages
+from pyuploadcare.api.base import API, PageMixin, ResponseOrEntity, _iterate_pages
 from pyuploadcare.api.client import Client
 from pyuploadcare.api.project_entities import (
     API_UNITS,
@@ -158,7 +158,7 @@ class AccountProjectAPIBase(API):
         return {"limit": request_limit}
 
 
-class AccountProjectsAPI(AccountProjectAPIBase):
+class AccountProjectsAPI(AccountProjectAPIBase, PageMixin):
     """Projects and their settings."""
 
     response_classes = {
@@ -182,6 +182,23 @@ class AccountProjectsAPI(AccountProjectAPIBase):
         _check_page_limits(limit, request_limit)
         url = self._build_url(query_parameters=self._page_query(request_limit))
         return self._iterate(url, "list", limit=limit)
+
+    def list_page(  # type: ignore[override]
+        self,
+        request_limit: int | None = None,
+    ) -> ProjectListResponse:
+        """Return the first page of projects available to the token's user.
+
+        Args:
+            - request_limit: number of projects per page, 1 to 100.
+        """
+        _check_page_limits(None, request_limit)
+        page = super().list_page(request_limit=request_limit)
+        return cast(ProjectListResponse, page)
+
+    def fetch_page(self, next_url: str) -> ProjectListResponse:
+        """Return the page of projects that ``next_url`` points to."""
+        return cast(ProjectListResponse, super().fetch_page(next_url))
 
     def count(self) -> int:
         url = self._build_url(query_parameters={"limit": 1})
