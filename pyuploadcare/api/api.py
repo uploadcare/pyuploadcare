@@ -6,6 +6,7 @@ from collections.abc import Iterable, Iterator
 from json import JSONDecodeError
 from time import time
 from typing import Any, cast
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from httpx2._types import RequestFiles
@@ -319,6 +320,25 @@ class WebhooksAPI(API, CreateMixin, ListMixin, UpdateMixin, DeleteMixin):
         except InvalidRequestError as request_error:
             self._process_exceptions(request_error)
 
+    def unsubscribe(self, target_url: str) -> None:
+        """Delete every webhook of the project with this ``target_url``.
+
+        https://uploadcare.com/docs/api/rest/webhook/unsubscribe/
+
+        Deletes the webhooks for all events that use the URL.
+        """
+        if not isinstance(target_url, str):
+            raise InvalidParamError("`target_url` must be a string")
+
+        split = urlsplit(target_url)
+        if split.scheme not in ("http", "https") or not split.netloc:
+            raise InvalidParamError(
+                f"`target_url` must be an absolute http(s) URL: {target_url!r}"
+            )
+
+        url = self._build_url(suffix="unsubscribe")
+        self._client.delete_with_payload(url, json={"target_url": target_url})
+
 
 class DocumentConvertAPI(API, RetrieveMixin):
     resource_type = "convert/document"
@@ -597,6 +617,35 @@ class UploadAPI(API):
             raise APIError(f"could not find status in result: {response}")
         return response
 
+    def info(self, file_id: UUID | str) -> entities.UploadFileInfo:
+        """Get the info of an uploaded file.
+
+        Works right after the upload, before the file is available in the
+        REST API.
+
+        Usage example::
+
+            >>> info = uploadcare.upload_api.info(file_id)
+            >>> info.is_ready, info.size
+
+        """
+        if not self.public_key:
+            raise ValueError("public_key is required")
+
+        file_id = str(file_id)
+        if not RE_UUID_RESOURCE_ID.match(file_id):
+            raise InvalidParamError(f"Invalid file id: {file_id}")
+
+        url = self._build_url(
+            base="info",
+            query_parameters={
+                "pub_key": self.public_key,
+                "file_id": file_id.lower(),
+            },
+        )
+        document = self._client.get(url)
+        return self._parse_response(document.json(), entities.UploadFileInfo)
+
     def create_group(
         self,
         files: Iterable[str | UUID],
@@ -621,7 +670,7 @@ class UploadAPI(API):
                 expire,
             )
 
-        url = self._build_url(base="/group/")
+        url = self._build_url(base="/group")
         document = self._client.post(url, data=data)
         return document.json()
 

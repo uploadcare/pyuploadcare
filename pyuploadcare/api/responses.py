@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel, Field, RootModel
 
 from pyuploadcare.api.entities import (
     DocumentConvertInfo,
@@ -119,3 +119,7 @@ AddonResultType = TypeVar("AddonResultType", bound=AddonResponseResult)
 class AddonResponse(Response):
     status: AddonStatus
     result: dict[str, Any] | None = None
+    details: dict[str, Any] | None = Field(
+        None,
+        description='Present when status is "error", e.g. {"title": "...", "code": "..."}',
+    )

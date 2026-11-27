@@ -82,6 +82,17 @@ Example of using callback function for printing progress::
     56780/56780 B
 
 
+Get the info of an uploaded file from the Upload API. It is available right after the upload,
+before the file shows up in the REST API; ``is_ready`` stays ``False`` until the file is
+available on the CDN::
+
+    info: UploadFileInfo = uploadcare.get_upload_info(ucare_file)
+    if info.is_ready:
+        print(info.original_filename, info.size, info.is_stored)
+
+``get_upload_info`` accepts a ``File`` or a file UUID. A removed or unknown file raises
+``InvalidRequestError``.
+
 Manage files and file groups
 ----------------------------
 
@@ -573,9 +584,14 @@ Update a webhook's signing secret::
 
     webhook: Webhook = uploadcare.update_webhook(webhook_id, signing_secret="7kMVZivndx0ErgvhRKAr")
 
-Delete a webhook::
+Delete a webhook by its id::
 
     uploadcare.delete_webhook(webhook_id)
+
+Delete the webhooks that send events to a URL. Unlike ``delete_webhook``, it deletes the
+webhooks for all events with this URL; a URL with no webhooks is not an error::
+
+    uploadcare.unsubscribe_webhook("https://path/to/webhook")
 
 
 Secure delivery

@@ -8,6 +8,7 @@ from pyuploadcare.api.addon_entities import (
     AddonRemoveBGExecutionParams,
 )
 from pyuploadcare.api.api import AddonsAPI
+from pyuploadcare.api.responses import AddonResponse, AddonStatus
 
 
 @pytest.fixture()
@@ -109,3 +110,21 @@ def test_remove_bg_status(uploadcare):
         AddonLabels.REMOVE_BG,
     )
     assert result.status
+
+
+def test_status_response_error_details():
+    response = AddonResponse.model_validate(
+        {
+            "status": "error",
+            "details": {
+                "title": "Remove.bg is unavailable",
+                "code": "remove_bg_unavailable",
+            },
+        }
+    )
+    assert response.status == AddonStatus.ERROR
+    assert response.result is None
+    assert response.details == {
+        "title": "Remove.bg is unavailable",
+        "code": "remove_bg_unavailable",
+    }

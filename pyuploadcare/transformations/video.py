@@ -5,7 +5,6 @@ from pyuploadcare.transformations.base import BaseTransformation, StrEnum
 
 class VideoFormat(StrEnum):
     webm = "webm"
-    ogg = "ogg"
     mp4 = "mp4"
 
 

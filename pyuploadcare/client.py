@@ -4,8 +4,10 @@ import ssl
 import warnings
 from collections.abc import Callable, Iterable, Iterator
 from time import time
-from typing import IO, Any
+from typing import IO, Any, cast
 from uuid import UUID
+
+from httpx2 import BaseTransport
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
 from pyuploadcare.api import (
@@ -26,10 +28,15 @@ from pyuploadcare.api.client import Client
 from pyuploadcare.api.entities import (
     FileSearchInfo,
     ProjectInfo,
+    UploadFileInfo,
     Webhook,
     WebhookEvent,
 )
-from pyuploadcare.api.responses import FileSearchResponse
+from pyuploadcare.api.responses import (
+    FileListResponse,
+    FileSearchResponse,
+    GroupListResponse,
+)
 from pyuploadcare.api.search_entities import FileSearchRequest
 from pyuploadcare.exceptions import DuplicateFileError, InvalidParamError
 from pyuploadcare.helpers import (
@@ -71,6 +78,18 @@ class Uploadcare:
         - multipart_chunk_size: Chunk size in bytes for multipart uploading.
         - auth_class: Authentication class to use for API.
         - secure_url_builder: URL builder for secure delivery.
+        - transport: httpx2 transport for REST, Upload and CDN requests.
+          Pass one shared instance to make many short-lived clients (e.g.
+          one per caller token) reuse a single connection pool::
+
+              >>> _TRANSPORT = httpx2.HTTPTransport(
+              ...     limits=httpx2.Limits(max_connections=200),
+              ... )
+              >>> Uploadcare(..., transport=_TRANSPORT)
+
+          TLS is configured on the transport, so ``verify_api_ssl`` and
+          ``verify_upload_ssl`` are ignored when it is set. The client never
+          closes the transport: closing it is up to the caller.
 
     """
 
@@ -94,6 +113,7 @@ class Uploadcare:
         multipart_chunk_size=conf.multipart_chunk_size,
         auth_class: type[UploadcareAuth] = UploadcareAuth,
         secure_url_builder: BaseSecureUrlBuilder | None = None,
+        transport: BaseTransport | None = None,
     ):
         if not public_key:
             raise ValueError("public_key is required")
@@ -130,6 +150,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         self.upload_client = Client(
@@ -141,6 +162,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         self.cdn_client = Client(
@@ -152,6 +174,7 @@ class Uploadcare:
             user_agent_extension=user_agent_extension,
             retry_throttled=retry_throttled,
             public_key=public_key,
+            transport=transport,
         )
 
         api_config = {
@@ -772,6 +795,72 @@ class Uploadcare:
             removed=removed,
         )
 
+    def get_upload_info(self, file_id: UUID | str | File) -> UploadFileInfo:
+        """Get the info of an uploaded file from the Upload API.
+
+        Works right after the upload, before the file is available in the
+        REST API. ``is_ready`` is ``False`` until the file is available on
+        the CDN. A removed or unknown file raises ``InvalidRequestError``.
+
+        Usage example::
+
+            >>> info = uploadcare.get_upload_info(
+            ...     'a771f854-c2cb-408a-8c36-71af77811f3b'
+            ... )
+            >>> if info.is_ready:
+            ...     print(info.original_filename, info.size)
+
+        """
+        if isinstance(file_id, File):
+            return self.upload_api.info(file_id.uuid)
+        return self.upload_api.info(file_id)
+
+    def list_files_page(
+        self,
+        starting_point=None,
+        ordering=None,
+        request_limit: int | None = None,
+        stored: bool | None = None,
+        removed: bool | None = None,
+    ) -> FileListResponse:
+        """Get the first page of files.
+
+        Takes the filters of ``list_files()``. The page has ``results``
+        (``FileInfo``), ``total``, ``per_page``, ``next`` and ``previous``.
+        ``next`` is ``None`` on the last page.
+
+        Usage example::
+
+            >>> page = uploadcare.list_files_page(stored=True, request_limit=50)
+            >>> print(page.total)
+            >>> for file_info in page.results:
+            ...     print(file_info.uuid)
+
+        Get the next page later, e.g. in another request::
+
+            >>> cursor = page.next
+            >>> page = uploadcare.fetch_files_page(cursor)
+
+        """
+        query_parameters = FileList(
+            client=self,
+            starting_point=starting_point,
+            ordering=ordering,
+            stored=stored,
+            removed=removed,
+        ).query_parameters()
+        page = self.files_api.list_page(request_limit=request_limit, **query_parameters)
+        return cast(FileListResponse, page)
+
+    def fetch_files_page(self, next_url: str) -> FileListResponse:
+        """Get the page of files that ``next_url`` points to.
+
+        ``next_url`` is the ``next`` or ``previous`` of a page from
+        ``list_files_page()``. A URL outside the REST API origin raises
+        ``InvalidRequestError``.
+        """
+        return cast(FileListResponse, self.files_api.fetch_page(next_url))
+
     def search_files(
         self,
         request: FileSearchRequest | dict[str, Any],
@@ -921,6 +1010,45 @@ class Uploadcare:
             request_limit=request_limit,
         )
 
+    def list_file_groups_page(
+        self,
+        starting_point=None,
+        ordering=None,
+        request_limit: int | None = None,
+    ) -> GroupListResponse:
+        """Get the first page of file groups.
+
+        Takes the filters of ``list_file_groups()``. The page has ``results``
+        (``GroupInfo``), ``total``, ``per_page``, ``next`` and ``previous``.
+
+        Usage example::
+
+            >>> page = uploadcare.list_file_groups_page(request_limit=20)
+            >>> groups = list(page.results)
+            >>> while page.next:
+            ...     page = uploadcare.fetch_file_groups_page(page.next)
+            ...     groups.extend(page.results)
+
+        """
+        query_parameters = GroupList(
+            client=self,
+            starting_point=starting_point,
+            ordering=ordering,
+        ).query_parameters()
+        page = self.groups_api.list_page(
+            request_limit=request_limit, **query_parameters
+        )
+        return cast(GroupListResponse, page)
+
+    def fetch_file_groups_page(self, next_url: str) -> GroupListResponse:
+        """Get the page of file groups that ``next_url`` points to.
+
+        ``next_url`` is the ``next`` or ``previous`` of a page from
+        ``list_file_groups_page()``. A URL outside the REST API origin raises
+        ``InvalidRequestError``.
+        """
+        return cast(GroupListResponse, self.groups_api.fetch_page(next_url))
+
     def create_webhook(
         self,
         target_url: str,
@@ -978,6 +1106,19 @@ class Uploadcare:
             webhook_id = webhook_id.id
 
         return self.webhooks_api.delete(webhook_id)  # type: ignore
+
+    def unsubscribe_webhook(self, target_url: str) -> None:
+        """Delete the webhooks that send events to ``target_url``.
+
+        Deletes the webhooks for all events that use the URL; to delete one
+        webhook, use ``delete_webhook()`` with its id.
+
+        Usage example::
+
+            >>> uploadcare.unsubscribe_webhook('https://example.com/hooks/')
+
+        """
+        self.webhooks_api.unsubscribe(target_url)
 
     def get_project_info(self) -> ProjectInfo:
         """Get info about account project."""

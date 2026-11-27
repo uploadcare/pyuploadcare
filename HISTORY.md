@@ -6,6 +6,16 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Support for one-page listing with a `next` cursor.
+- Method to retrieve uploaded file info.
+- Method to unsubscribe webhooks by `target_url`.
+- `transport` argument of `Uploadcare` for a custom httpx2 transport.
+- `details` field of `AddonResponse` with error info of a failed addon execution.
+
 ## [7.0.2](https://github.com/uploadcare/pyuploadcare/compare/v7.0.1...v7.0.2) - 2026-11-20
 
 ### Fixed

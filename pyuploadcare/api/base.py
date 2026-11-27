@@ -219,6 +219,25 @@ def _origin(url: str) -> tuple[str, str, int | None]:
     return scheme, (split.hostname or "").lower(), port
 
 
+def _same_origin_url(
+    url: str,
+    base: str,
+    origin: tuple[str, str, int | None] | None = None,
+) -> str:
+    """Resolve ``url`` against ``base`` and check it stays in ``origin``.
+
+    ``origin`` defaults to the origin of ``base``. Raises ``ValueError``
+    otherwise: the HTTP client sends credentials with every request.
+    """
+    if origin is None:
+        origin = _origin(base)
+
+    resolved = urljoin(base, url)
+    if _origin(resolved) != origin:
+        raise ValueError(f"refusing to follow `next` outside {origin[1]}: {resolved}")
+    return resolved
+
+
 def _iterate_pages(  # noqa: C901
     first_url: str,
     fetch_page: Callable[[str], dict[str, Any]],
@@ -265,16 +284,73 @@ def _iterate_pages(  # noqa: C901
 
         next_ = getattr(response, "next", None)
         if next_:
-            # A relative `next` resolves against the page that supplied it,
-            # so it is same-origin by construction.
-            next_ = urljoin(page_url, next_)
-            if _origin(next_) != origin:
-                raise InvalidRequestError(
-                    f"refusing to follow `next` outside {origin[1]}: {next_}"
-                )
+            # A relative `next` resolves against the page that supplied it.
+            try:
+                next_ = _same_origin_url(next_, page_url, origin)
+            except ValueError as exc:
+                raise InvalidRequestError(str(exc)) from exc
 
 
-class ListMixin(APIProtocol):
+class PageMixin(APIProtocol):
+    """Read a list endpoint one page at a time."""
+
+    def _parse_page(self, raw: Any) -> PaginatedResponse:
+        response = self._parse_response(raw, self._get_response_class("list"))
+        if isinstance(response, PaginatedResponse):
+            return response
+
+        # Webhooks are not paginated: the whole list is one page.
+        results = list(cast(Any, response))
+        return PaginatedResponse(
+            results=results, total=len(results), per_page=len(results)
+        )
+
+    def list_page(
+        self,
+        request_limit: int | None = None,
+        **query_parameters,
+    ) -> PaginatedResponse:
+        """Return the first page of the list.
+
+        Pass the page's ``next`` to ``fetch_page()`` to get the next page.
+
+        Args:
+            - request_limit: results per page.
+            - query_parameters: endpoint filters, sent as the query string.
+
+        Usage example::
+
+            >>> page = uploadcare.files_api.list_page(
+            ...     request_limit=50, stored="true"
+            ... )
+            >>> if page.next:
+            ...     page = uploadcare.files_api.fetch_page(page.next)
+
+        """
+        if request_limit is not None:
+            query_parameters["limit"] = request_limit
+
+        url = self._build_url(query_parameters=query_parameters)
+        return self._parse_page(self._client.get(url).json())
+
+    def fetch_page(self, next_url: str) -> PaginatedResponse:
+        """Return the page that ``next_url`` points to.
+
+        ``next_url`` is the ``next`` or ``previous`` of an earlier page. A
+        relative URL resolves against the API base. A URL on another origin
+        raises ``InvalidRequestError``.
+        """
+        if not isinstance(next_url, str) or not next_url:
+            raise InvalidParamError("`next_url` must be a non-empty string")
+
+        try:
+            url = _same_origin_url(next_url, str(self._client.base_url))
+        except ValueError as exc:
+            raise InvalidRequestError(str(exc)) from exc
+        return self._parse_page(self._client.get(url).json())
+
+
+class ListMixin(PageMixin):
     def list(
         self,
         limit=None,
