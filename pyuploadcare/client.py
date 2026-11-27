@@ -10,6 +10,7 @@ from uuid import UUID
 from httpx2 import BaseTransport
 
 from pyuploadcare import File, FileGroup, FileList, GroupList, conf
+from pyuploadcare.account_project_client import AccountProjectAPIClient
 from pyuploadcare.api import (
     AddonsAPI,
     DocumentConvertAPI,
@@ -85,7 +86,8 @@ class Uploadcare:
           the public key in ``X-Uploadcare-Pub-Key``) instead of the project
           key pair; ``set_access_token()`` replaces it for both. Uploads are
           not signed, so ``secret_key`` is not needed. CDN requests never
-          carry the token.
+          carry the token. It also authorizes ``account_project_api``.
+        - account_project_api_base: Account-scoped Project API base url.
         - transport: httpx2 transport for REST, Upload and CDN requests.
           Pass one shared instance to make many short-lived clients (e.g.
           one per caller token) reuse a single connection pool::
@@ -122,6 +124,7 @@ class Uploadcare:
         auth_class: type[UploadcareAuth] = UploadcareAuth,
         secure_url_builder: BaseSecureUrlBuilder | None = None,
         oauth_token: str | None = conf.oauth_token,
+        account_project_api_base=conf.project_api_base,
         transport: BaseTransport | None = None,
     ):
         if not public_key:
@@ -222,6 +225,42 @@ class Uploadcare:
         self.tags_api = TagsAPI(client=self.rest_client, **api_config)  # type: ignore
         self.addons_api = AddonsAPI(client=self.rest_client, **api_config)  # type: ignore
         self.url_api = URLAPI(client=self.cdn_client, **api_config)
+
+        # Account-scoped: works with every project of the token's user, not
+        # only with `public_key`. Has its own auth: Project API requests must
+        # not carry `X-Uploadcare-Pub-Key`.
+        self._account_project_api: AccountProjectAPIClient | None = (
+            AccountProjectAPIClient(
+                token=oauth_token,
+                api_base=account_project_api_base,
+                verify_api_ssl=verify_api_ssl,
+                retry_throttled=retry_throttled,
+                user_agent_extension=user_agent_extension,
+                timeout=timeout,
+            )
+            if oauth_token
+            else None
+        )
+
+    @property
+    def account_project_api(self) -> AccountProjectAPIClient:
+        """Account-scoped Project API client.
+
+        Unlike ``project_api``, which is scoped to the client's project, it
+        manages every project the token's user owns or is a team member of::
+
+            >>> uploadcare = Uploadcare(public_key='<public-key>',
+            ...                         oauth_token='<access-token>')
+            >>> uploadcare.account_project_api.list_projects()
+
+        Only available when the client was created with ``oauth_token``.
+        """
+        if self._account_project_api is None:
+            raise ValueError(
+                "the account-scoped Project API needs an OAuth access token: "
+                "pass `oauth_token`"
+            )
+        return self._account_project_api
 
     def file(
         self,
@@ -1156,14 +1195,18 @@ class Uploadcare:
     def set_access_token(self, token: str) -> str:
         """Replace the OAuth access token used for the following requests.
 
-        Only available when the client was created with ``oauth_token``.
+        Applies to the REST, Upload and account-scoped Project APIs. Only
+        available when the client was created with ``oauth_token``.
         """
         if self.oauth is None:
             raise ValueError(
                 "the client is not authorized with OAuth: "
                 "pass `oauth_token` to use an access token"
             )
-        return self.oauth.set_access_token(token)
+        token = self.oauth.set_access_token(token)
+        if self._account_project_api is not None:
+            self._account_project_api.set_access_token(token)
+        return token
 
     def generate_upload_signature(self) -> tuple[int, str]:
         """Expiration and signature for signed uploads."""
