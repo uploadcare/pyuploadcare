@@ -116,3 +116,16 @@ def test_unsubscribe_signs_request_with_key_pair():
     assert headers["Authorization"].startswith("Uploadcare demopublickey:")
     assert headers["Accept"] == "application/vnd.uploadcare-v0.7+json"
     assert "Date" in headers
+
+
+def test_unsubscribe_with_oauth_sends_bearer():
+    server = FakeServer()
+    uploadcare = make_uploadcare(server, secret_key=None, oauth_token="token")
+
+    uploadcare.unsubscribe_webhook(TARGET_URL)
+
+    headers = server.requests[0].headers
+    assert headers["Authorization"] == "Bearer token"
+    assert headers["X-Uploadcare-Pub-Key"] == "demopublickey"
+    assert headers["Accept"] == "application/vnd.uploadcare-v0.7+json"
+    assert json.loads(server.requests[0].content) == {"target_url": TARGET_URL}
