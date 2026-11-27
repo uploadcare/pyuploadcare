@@ -227,6 +227,18 @@ def test_get_upload_info_errors(status, error):
         uploadcare.get_upload_info(FILE_UUID)
 
 
+def test_get_upload_info_with_oauth_sends_bearer():
+    server = FakeServer()
+    uploadcare = make_uploadcare(server, oauth_token="token")
+
+    uploadcare.get_upload_info(FILE_UUID)
+
+    headers = server.last.headers
+    assert headers["Authorization"] == "Bearer token"
+    assert headers["X-Uploadcare-Pub-Key"] == PUB_KEY
+    assert query(server.last)["pub_key"] == [PUB_KEY]
+
+
 @pytest.mark.parametrize(
     "file_id",
     [
