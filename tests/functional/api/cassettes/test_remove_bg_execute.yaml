@@ -1,7 +1,7 @@
 interactions:
 - request:
     body: '{"target": "485f5c0e-3567-46b1-a5c9-96a8ffc45713", "params": {"crop": true,
-      "add_shadow": true}}'
+      "bg_color": "81d4fa"}}'
     headers:
       accept:
       - '*/*'
@@ -10,7 +10,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '96'
+      - '98'
       content-type:
       - application/json
       host:

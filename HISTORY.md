@@ -6,6 +6,14 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/uploadcare/pyuploadcare/compare/v7.0.2...HEAD)
+
+### Changed
+
+- **Breaking**: `AddonRemoveBGExecutionParams` now accepts `crop`, `bg_color`,
+  and `channels`. (`crop_margin`, `scale`, `add_shadow`, `type_level`, `type`,
+  `semitransparency`, `roi`, `position`) are removed with no replacement.
+
 ## [7.0.2](https://github.com/uploadcare/pyuploadcare/compare/v7.0.1...v7.0.2) - 2026-11-20
 
 ### Fixed
