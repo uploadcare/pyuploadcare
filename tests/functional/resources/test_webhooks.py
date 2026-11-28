@@ -39,3 +39,13 @@ def test_create_webhook_signed_secret(uploadcare):
     )
     assert isinstance(webhook, Webhook)
     assert webhook.signing_secret
+
+
+@pytest.mark.vcr
+def test_create_webhook_moderation_event(uploadcare):
+    webhook = uploadcare.create_webhook(
+        target_url="https://webhook.site/699ba5a4-b178-41c7-b416-5d1b6739d052",
+        event="moderation.state_changed",
+    )
+    assert isinstance(webhook, Webhook)
+    assert webhook.event == "moderation.state_changed"
